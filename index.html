@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Royz Art</title>
+	<link rel="stylesheet" type="text/css" href="styles.css"><!link to csss file>
+	<!script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js">
+	<!/script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">
+	<script src="script.js" defer type="module"></script> <!link to external javascript file>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/web3@1.5.0/dist/web3.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.3/pako.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bignumber.js/bignumber.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<body class="body">
+
+		<! div container for header> 
+		<div class="Header">
+			<div class="buttonContainer"></div> <!-- Green light -->
+		</div>
+
+	<div class="Grid_container"> <! does not move and has background>
+
+		<div class="Navigation_section"> 
+			<! entire div shifts offscreeen when selected or becomes invisble (may need to shift because they are clickable)> 
+
+			<div class="Physical_art">
+				<! container for painting populate grid from database>
+			</div>
+
+			<div class="Digitial_art">
+				<! container for digital art. Navigate to new page and populate grid>
+			</div>
+
+			<div class="Math_research">
+				<! container for research articles>
+			</div>
+
+			<div class="Upcoming_events">
+				<! container for upcoming events>
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>

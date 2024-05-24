@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: lightgray;
+            overflow: hidden; /* Prevent scrolling when zoomed */
+        }
+
+        .privacy-policy-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            max-height: calc(100vh - 40px); /* Adjusted to ensure div stays within viewport */
+            overflow-y: auto; /* Enable vertical scrollbar if content exceeds max-height */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0.8px 5px rgba(0, 0, 0.5, 0.5); /* Adding shadow */
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        p {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="privacy-policy-container">
+        <h1>Privacy Policy</h1>
+        
+        <h2>Information Collection and Use</h2>
+        <p>We do not collect any personal information from visitors to this website. </p>
+        
+        <h2>Cookies</h2>
+        <p>This website does not use cookies.</p>
+        
+        <h2>Third Party Websites</h2>
+        <p>This website may contain links to third-party websites. We are not responsible for the privacy practices or the content of such websites.</p>
+        
+        <h2>Non-local versus Local Data</h2>
+        <p>This website may store any data a user inputs into fields such as (but not limited to) commissions forms, purchases, AI commands, and messages. Only the last 100 messages will be stored locally in an array on the server. Only purchases, commissions, and Roys artwork will be exposed to the mongoose DB. No other information is stored. In essence granting our visitors complete privacy unless they choose to purchase items in which information is neccassry to gather.</p>
+
+        <h2>Changes to This Privacy Policy</h2>
+        <p>We reserve the right to update or change our Privacy Policy at any time. Any changes will be posted on this page.</p>
+        
+        <h2>Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, please contact us.</p>
+    </div>
+</body>
+</html>

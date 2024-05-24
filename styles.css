@@ -1,0 +1,407 @@
+html, body {
+    height: 100vh;
+    /*flex-direction: column;*/
+    background-color: lightgray;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    touch-action: none; /* Prevents touch gestures, including pinch-to-zoom */
+}
+
+body{
+    width: 100%;
+    margin: 0px;
+    position: absolute;
+    display: fixed;
+}
+
+a {
+  text-decoration: none;
+  color: black; /* Set link color to black */
+}
+
+/* CSS for customizing scrollbar */
+::-webkit-scrollbar {
+    width: 10px; /* Width of the scrollbar */
+    border-radius: 2px;
+}
+
+.live-Messages::-webkit-scrollbar {
+    width: 3px; /* Width of the scrollbar */
+    border-radius: 1vh;
+}
+
+::-webkit-scrollbar-track {
+    background: none; /* Color of the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the thumb */
+    border-radius: 5px; /* Roundness of the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the thumb on hover */
+}
+
+.Header {
+    position: relative;
+    background-color: lightgray; /* Example background color for header */
+    text-align: center; /* Center align the text in header */
+    /*padding: 40px; */
+    width: 100%; /* Ensure header takes up the full width of body */
+    /*margin-top: 2%;*/
+    font-family: cursive;
+    height: 8%;
+}
+
+.search-input:hover,
+.search-input:focus {
+    background-color: whitesmoke;
+    outline: none; /* Remove the white border */
+}
+
+
+.buttonContainer{ 
+    position: relative;
+    color: #fff; 
+    height: 57%;  
+    width: 17%;
+    left: 86%;
+    top: 28%;
+}
+
+.connect-button, 
+.loggedIn-button {
+    display: inline-block;
+    position: absolute;
+    background-color: #0067b3; /* initial background color of connect button*/
+    align-items: center; /* Vertically center the content */ 
+    justify-content: center; /* Horizontally center the content */
+    color: #fff; 
+    border: none;
+    border-radius: 12%;  
+    padding: 0px;
+    cursor: pointer; 
+    height: 100%;  
+    /*width: 33%;*/
+    width: 11vh;
+    right: 30%;
+    font-size: 1px; /* Relative font size using viewport width */
+    overflow: hidden; /* Prevent content from overflowing */
+    transition: background-color 0.3s; /* Smooth transition for background color change */
+    margin: 0px;
+    text-align: center;
+}
+
+.back-button:hover,
+.commission-button:hover, 
+.AI-button:hover,
+.gridBack-button:hover, 
+.gridFoward-button:hover,
+.form-submit:hover{
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3); /* Slightly larger box shadow on hover */
+    background-color: #8b8989;
+}
+
+.connect-button:hover {
+    background-color: #005093; /* Darker background color on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Slightly larger box shadow on hover */
+}
+
+.loggedIn-button:hover {
+    /*background-color: #004c99; /* Darker shade of blue when hovered */
+    background-color: #005093; /* Darker background color on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Slightly larger box shadow on hover */
+    cursor: pointer; 
+}
+
+.green-light {
+    display: inline-block;
+    position: absolute;
+    width: 2vh;
+    right: 23vh;
+    height: 2vh;
+    top: 2vh;
+    border-radius: 50%; /* Circular shape */
+    background-color: transparent;
+    transform: translateY(-50%); /* Adjust vertical alignment */
+    margin-right: 5px;
+}
+
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: lightgray;
+    padding: 0px; 
+    border: 0.08vh solid #000000;
+    border-radius: 5px;
+    z-index: 99999;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    height: 400px;
+}
+
+
+
+@media screen and (max-width: 900px) {
+    .popup {
+        width: 300px;
+        /*transform: translate(-50%, -50%);*/
+    }
+}
+
+.dbPopup {
+    display: flex;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: dimgray; /* Light gray background */
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* Shadow under the border */
+    max-width: 400px;
+    width: 80%;
+    height: auto; /* Adjust height automatically based on content */
+    text-align: center;
+    overflow: hidden; /* Hide overflow content */
+    border: 1px solid #ccc; /* Add border */
+    justifyContent:  center;
+}
+
+/* Style for buttons inside the popup */
+.dbPopup button {
+    margin: 10px; /* Add space between buttons */
+    padding: 10px 20px; /* Padding for buttons */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Style for upload button */
+#uploadButton {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+}
+
+/* Style for cancel button */
+#cancelButton {
+    background-color: #f44336; /* Red background */
+    color: white; /* White text */
+}
+
+/* Style for exit button */
+#exitButton {
+    background-color: transparent; /* Transparent background */
+    color: #555; /* Dark gray text */
+    font-size: 18px; /* Larger font size */
+    position: absolute; /* Absolute positioning */
+    top: 10px; /* Adjust top position */
+    left: 10px; /* Adjust left position */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Remove borders from input tags */
+.dbPopup input {
+    border: none;
+    border-bottom: 1px solid #ccc; /* Add bottom border */
+    padding: 5px; /* Add padding */
+    margin: 5px; /* Add margin */
+}
+
+/* Remove border from image input */
+.dbPopup input[type="file"] {
+    border: none;
+}
+input, button {
+        margin: 10px;
+}
+
+.cancel-button {
+    background-color: #ff6347;
+    position: relative;
+    color: #ffffff;
+    border-radius: 5px;
+    /*padding: 10px;*/
+    font-size: 14px;
+    margin-top: 5%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 30%;
+    left: 35%;
+    height: 10%;
+}
+
+
+.cancel-button:hover {
+    background-color: #ff4136;
+}
+
+
+.Provider {
+    background-color: whitesmoke; 
+}
+
+
+.Grid_container {
+    background-color: lightgray; /* Background color for the grid container */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*height: calc(100vh - 100px); */
+    height: 83%;
+    width: 98%;
+    left: 1%;
+
+}
+
+
+.Navigation_section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 18px; /* Gap between grid items */
+    justify-content: center; /* Center the grid horizontally */
+    align-items: center; /* Center the grid vertically */
+    background-color: none;
+    position: relative;
+}
+
+
+.Physical_art,
+.Digitial_art,
+.Math_research,
+.Upcoming_events {
+    background-color: whitesmoke; /* Background color for each grid item */
+    padding: 20px;
+    text-align: center;
+    width: 22vw; /* 20% of the viewport width */
+    height: 22vh; /* 20% of the viewport height */
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.7); /* Adding shadow */
+    transition: transform 0.2s ease; /* Smooth transition for the transform property */
+    border-radius: 10px;
+}
+
+.Physical_art:hover,
+.Digitial_art:hover,
+.Math_research:hover,
+.Upcoming_events:hover {
+    transform: translateY(-5px); /* Move the item up by 5 pixels when hovered over */
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5); /* Adding shadow */
+}
+
+.Upcoming_events,
+.Math_research,
+.Digitial_art, 
+.Physical_art  {
+    position: relative;
+    background-image: linear-gradient(to bottom, #696969, #b7c9d3);
+    background-position: top;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.Upcoming_events::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/upcomingEvents4.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.Math_research::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/mathBackground4.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+
+.Physical_art::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/artbackground4.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+
+.Digitial_art::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/NFTbackground4.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+
+/* Styling for the columns */
+.column {
+    float: left;
+    width: 30.33%;
+    text-align: center; /* Align text in the center */
+}
+  
+  /* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.header-text{
+  font-family: "Bungee Spice", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+
+.recentSells {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    position: relative; /* Set the parent container to relative position */
+}
+
+.recentSells::-webkit-scrollbar {
+    width: 0px; /* Adjust scrollbar width as needed */
+    position: absolute; /* Position the scrollbar absolutely */
+    left: 0; /* Position it at the left */
+    top: 0; /* Align it to the top */
+    height: 100%; /* Set scrollbar height to fill the container */
+}
+
+.recentSells::-webkit-scrollbar-thumb {
+    background-color: 'dimgray;'; /* Adjust scrollbar thumb color */
+    border-radius: 5px; /* Adjust scrollbar thumb border-radius */
+}
+
+#horizontalContainer:hover {
+    background-color: #505050; /* Change background color on hover */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    transform: translateY(-1px); /* Move the item up by 5 pixels when hovered over */
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5); /* Adding shadow */
+}
