@@ -2,31 +2,8 @@
 // Date last modified: 05-11-24
 // purpose: Make web3 art website
 
-// to do list 
-
-/*
-1) find out how to upload code 
-2) respond for commission and maybe AI bot here 
-3) ai bot will be on the server because we dont want them having acess
-
-*/
-
-///links for help uploading to internet
-// change  filePath = './index.html'; // change to https://www.bursonskullz.com  line 1100 ish 
-
-// check transaction hash from DB at https://etherscan.io/tx/"hash_string_here"
-//https://www.youtube.com/watch?v=oykl1Ih9pMg
-
-//https://www.youtube.com/watch?v=yhiuV6cqkNs
-
-
-// nodemailer 
-// https://www.youtube.com/watch?v=cqdAS49RthQ
-
-/////////////////////////////////
 const maxNumberAIEvents = 10;
 var localAIUsers = [];
-// needs to be local to server
 let attemptedClients = [];
 let globalPurchaseTimerArray = [];
 var timerIsAlreadyCalled = false;
@@ -36,14 +13,11 @@ const path = require('path');
 const socketIo = require('socket.io');
 const cluster = require('cluster');
 const os = require('os');
-//const express = require('express');
-//const app = express();
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const puppeteer = require('puppeteer');
 const zlib = require('zlib');
 var inlineBase64 = require('nodemailer-plugin-inline-base64');
-//// variables 
 
 const paintCollectionString = 'Painting';
 const purchasesCollectionString = 'Purchase';
@@ -101,7 +75,6 @@ const commissionSchema = new mongoose.Schema({
     isActive: Boolean
 });
 
-// Create models 
 const paintingModel = mongoose.model(paintCollectionString, paintingSchema); 
 const purchaseModel = mongoose.model(purchasesCollectionString, purchaseSchema); 
 const commissionModel = mongoose.model(commissionCollectionString, commissionSchema); 
@@ -217,7 +190,7 @@ const randomNames = [
   'WhistlingWolf', 'MysticalMongoose', 'VelvetVole', 'FunkyFirefly', 'JungleJackal', 'AstralAxolotl', 'CosmicCamel', 'ShimmeringShark', 'ElectricEchidna', 'PsychedelicPhoenix',
   'StarryStingray', 'GlowingGuppy', 'SapphireSalamander', 'DreamyDingo', 'GalacticGorilla', 'TwinklingTurtle', 'FrostyFalcon', 'WhimsicalWeasel', 'FlamingFlamingo', 'CrimsonCheet'];
 
-
+// Roul will use these defintions may need (or should) extrac/ import from seperate file.
 const knownDefinitions = [
   {
     word: 'cat',
@@ -496,7 +469,6 @@ const knownDefinitions = [
     usage: ['Noun', 'Verb'],
     type: 'Non-living'
   }
-  // Additional entries would follow the same pattern
 ];
 const users = [];
 
@@ -536,7 +508,6 @@ try{
 
         cluster.on('exit', (worker, code, signal) => {
             console.log(`Worker ${worker.process.pid} died`);
-            // Optionally, you can fork a new worker when one dies
             cluster.fork();
         });
     } else {
@@ -551,8 +522,6 @@ try{
                 console.log(`Server running really good on port ${PORT}`);
             })).catch((error) => {
                 console.error('Error connecting to MongoDB:', error);
-
-                // if error is internet make prompt
                 process.exit(1);
             }); 
 
@@ -571,22 +540,15 @@ try{
             } else {
                 clientIP = ipAddress;
             }
-
-
-            //const randomIndex = Math.floor(Math.random() * randomNames.length);
-            //const username = randomNames[randomIndex];
-
             let username;
             let attempts = 0;
             const maxAttempts = 1000;
-            // Loop until a unique username is generated
+ 
             do {
                 const randomIndex = Math.floor(Math.random() * randomNames.length);
                 username = randomNames[randomIndex];
                 attempts++;
             } while (messageHistory.some(obj => obj.username === username && attempts < maxAttempts));
-
-                // If maxAttempts reached, assign the first name from randomNames
             if (attempts >= maxAttempts) {
                 username = randomNames[0];
             }
@@ -599,8 +561,6 @@ try{
             };
 
             users.push(currentUser);
-
-            // Handle incoming messages
             socket.on('message', (message) => {
                 const ipAddress = socket.handshake.address;
                 const timeSent = new Date().toISOString();
@@ -610,14 +570,11 @@ try{
                 } else {
                     clientIP = ipAddress;
                 }
-                // need to get ip again 
-
                 const sender = users.find(u => u.ip == clientIP);
 
                 let senderName;
 
                 if (sender) {
-                    // Retrieve the name of the sender
                     senderName = sender.user;
                 } else {
                     senderName = 'noName';
@@ -630,9 +587,6 @@ try{
                         coolDown: sender.coolDown,
                         nameChanges:0 
                     };
-
-                    // find username cooldown value and set into each obj to acces
-
                 if(!checkString(obj.msg)){
                     obj.msg = 'Your input contains inappropriate content. Please ensure your message is respectful!';
                 }
@@ -640,8 +594,6 @@ try{
                 if(canSendMessage(messageHistory, obj.username, timeSent)){
                     console.log('user can send message');
                     messageHistory.push(obj);
-                    //console.log(obj);
-                    // only want to emit object if user can send!! 
                     io.emit('message', obj);
                 }else{
                     console.log('Restricted user trying to send message', obj.username);
@@ -649,13 +601,8 @@ try{
 
                 if(messageHistory.length > 100){
                     messageHistory.pop();
-                    // when it gets to a 100 it will start poping 
-                }
-               
-                
+                }                
             });
-
-
         });
     }
     
@@ -665,7 +612,6 @@ try{
 
 
 function checkString(input) {
-    // Define patterns for threats, bad language, and sexually explicit language
     const badLanguagePatterns = ['niger','nigger', 'niggger', 'niggggger','niiiggeer', 'nigga', 'bitch', 'whore', 'cunt', 'fuck', 'fucckk','fucck', 'fucckkk', 'shit', 'motherfucker', 'ass', 'bastard', 'dick'];
     const threatPatterns = ['kill you', 'hurt you', 'endanger you', 'menace you', 'attack you', 'assault you', 'intimidate you', 'coerce you', 'terrorize you'];
     const sexuallyExplicitPatterns = ['pussy', 'dick', 'cock', 'vagina', 'asshole', 'boobs', 'tits', 'anal', 'cum', 'sex'];
@@ -690,7 +636,6 @@ function checkString(input) {
         }
     }
 
-    // Input does not contain any forbidden words or phrases
     return true;
 }
 
@@ -698,12 +643,9 @@ function checkString(input) {
 function canSendMessage(array, name, time) {
     var ability_to_send = true; 
     console.log(time);
-    
-    // Convert time parameter to Date object if it's not already
     const currentTime = time instanceof Date ? time : new Date(time);
 
     array.forEach((obj)=>{
-        // Convert obj.time to Date object if it's not already
         const msgTime = obj.time instanceof Date ? obj.time : new Date(obj.time);
         const timeDifference = (currentTime - msgTime) / 1000; // Time difference in seconds
         console.log(timeDifference);
@@ -715,17 +657,14 @@ function canSendMessage(array, name, time) {
                 if (thisSender.coolDown > 10) {
                     console.log('User has exceeded cooldown limit');
                     ability_to_send = false;
-                    // Start a timer to reset cooldown after 10 seconds
                     setTimeout(() => {
                         thisSender.coolDown = 0;
                         console.log('User has ability to send again');
-                    }, 24 * 60 * 60 * 1000); // 24 hours in seconds
+                    }, 24 * 60 * 60 * 1000); 
                 }
             }           
         } else {
-            console.log('Time difference is okay', timeDifference);
-            //const thisSender = users.find(u => u.user == obj.username);  
-            //thisSender.coolDown = 0;      
+            console.log('Time difference is okay', timeDifference);   
         }
     });
 
@@ -733,50 +672,36 @@ function canSendMessage(array, name, time) {
 }
 
 function checkEmailString(email) {
-    // Regular expression for email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    // Check if the email matches the regular expression
     const isValidEmail = emailRegex.test(email);
-
-    // Return true if the email is valid, false otherwise
     return isValidEmail;
 }
 async function checkAddressString(address) {
     try {
         const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=`+googleAPIKEY);
         const data = await response.json();
-        
-        // Check if the response contains any results
         if (data.results && data.results.length > 0) {
-            // Address is valid if at least one result is returned
             return true;
         } else {
-            // No results found, address is invalid
             return false;
         }
     } catch (error) {
         console.error('Error checking address:', error);
-        // Return false in case of any errors
         return false;
     }
 }
 
 
 async function checkIfName(string) {
-    // Check if the first name is non-empty
     if (!string.trim()) {
-        return false; // Empty string is not valid
+        return false; 
     }
 
-    
-    // Check for inappropriate characters
-    const inappropriateRegex = /[^\w\s'-]/; // Allowed characters: letters, digits, spaces, hyphens, and apostrophes
+    const inappropriateRegex = /[^\w\s'-]/; 
     if (inappropriateRegex.test(string)) {
-        return false; // Inappropriate characters found
+        return false; 
     }
 
-    // Check for common bad words (you can extend this list)
     const badWords = [
     'niger', 'nigga', 'bitch', 'whore', 'cunt', 'fuck', 'shit', 'motherfucker', 
     'ass', 'bastard', 'dick', 'kill you', 'hurt you', 'endanger you', 'menace you', 'attack you', 
@@ -786,25 +711,19 @@ async function checkIfName(string) {
 
     const lowerCaseFirstName = string.toLowerCase();
     if (badWords.some(word => lowerCaseFirstName.includes(word))) {
-        return false; // Bad word found
+        return false; 
     }
 
     const excessiveRepeatingRegex = /(.)\1{5,}/;
 
     if (excessiveRepeatingRegex.test(string)) {
-        return false; // Excessive repeating characters found
+        return false; 
     }
-    // If none of the above conditions are met, the first name is considered valid
     return true;
 
     
 }
-
-
-
-// Function to send email
 async function sendEmail(email, address, firstName, lastName, productID, price, productName, productIMG) {
-// HTML files to send
     let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
                     <div class="header" style="width: 100%; margin-bottom: 20px; text-align: center;">
                         <img src="https://i.ibb.co/kmVWh5p/Burson-SKull-Text.png" alt="Burson-SKull-Text" style="width: 100%; height: auto; max-height: 200px;">
@@ -825,9 +744,6 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
                     </div>
                 </div>`;
 
-
-    // defining host and authentification 
-
     let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465, 
@@ -840,16 +756,12 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
     });
 
     transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
-
-    // define mail options
      let mailOptions = {
             from: buisnessEmial, 
             to: email, 
             subject: 'Congrats on your new purchase!', 
             html: HTML
     };
-
-    // try sending email 
     try {
 
         let result = await transporter.sendMail(mailOptions);
@@ -870,7 +782,6 @@ function getMaxValueofPurchases(attemptedClientsArray) {
     }else{
         let lastelement = attemptedClientsArray[0];
         attemptedClientsArray.forEach(element => {
-            // if first index dont do anything bec
             if(lastelement.numberOfPurchaseAttempts<= element.numberOfPurchaseAttempts){
                 maxValue = element.numberOfPurchaseAttempts;
             }else{
@@ -884,10 +795,9 @@ function getMaxValueofPurchases(attemptedClientsArray) {
     return maxValue;
 }
 
-// Function to send email
 async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, image) {
-
-// HTML files to send
+    let mailTo = "mailto:" + buisnessEmial;
+    let yourName = 'Roy Burson';
     let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
                     <div class="header" style="width: 100%; margin-bottom: 20px; text-align: center;">
                         <img src="https://i.ibb.co/kmVWh5p/Burson-SKull-Text.png" alt="Burson-SKull-Text" style="width: 100%; height: auto; max-height: 200px;">
@@ -901,14 +811,10 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
                         <ul style="font-size: 16px; padding-left: 20px; margin: 0;">
                             <li style="margin-bottom: 5px;">Tracking Number: ${trackingNumber}</li>
                         </ul>
-                        <p style="font-size: 16px; margin: 10px 0;">If you have any questions or concerns, feel free to <a href="mailto:bursodevelopments@gmail.com" style="font-size: 16px;">contact us</a>.</p>
-                        <p style="font-size: 16px; margin: 0;">Best regards,<br><span class="signature" style="text-indent: 20px;"> &nbsp; &nbsp; Roy Burson</span></p>
+                        <p style="font-size: 16px; margin: 10px 0;">If you have any questions or concerns, feel free to <a href=`${mailTo}` style="font-size: 16px;">contact us</a>.</p>
+                        <p style="font-size: 16px; margin: 0;">Best regards,<br><span class="signature" style="text-indent: 20px;"> &nbsp; &nbsp; ${yourName}</span></p>
                     </div>
                 </div>`;
-
-
-    // defining host and authentification 
-
     let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465, 
@@ -921,16 +827,12 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
     });
 
     transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
-
-    // define mail options
      let mailOptions = {
             from: buisnessEmial, 
             to: email, 
             subject: 'Tracking Number', 
             html: HTML
     };
-
-    // try sending email 
     try {
 
         let result = await transporter.sendMail(mailOptions);
@@ -965,41 +867,29 @@ async function verifyUserinputData(email, address, firstName, lastName){
 
 
 async function roulsResponse(question) {
-    const lowercaseQuestion = question.toLowerCase(); // Convert question to lowercase
+    const lowercaseQuestion = question.toLowerCase();
 
     const artworkKeywords = ['painting', 'artwork', 'buy', 'purchase'];
     const metamaskKeywords = ['metamask', 'connect', 'wallet'];
     const chatKeywords = ['chat', 'communicate', 'others'];
 
     const keyWordsForQuestion = ['how', 'where', 'when', 'what', 'why', 'which', 'who', 'whom', 'whose'];
-
-    // Split the question into multiple questions or responses based on keywords
     const parts = [];
     let currentPart = '';
 
     for (let word of lowercaseQuestion.split(' ')) {
         if (keyWordsForQuestion.includes(word)) {
-            // Push the current part to the parts array
             if (currentPart.trim() !== '') {
-
-                // only trim if parts are not related to one another
-                // need to have data set of definitions that we can train with
-                // look for splitters
-                //  and, commmas, ! ... etc others. (indicators to split)
                 parts.push(currentPart.trim());
             }
-            currentPart = ''; // Reset current part
+            currentPart = ''; 
         }
-        // Append the word to the current part
         currentPart += word + ' ';
     }
-
-    // Push the last part to the parts array
     if (currentPart.trim() !== '') {
         parts.push(currentPart.trim());
     }
 
-    // Evaluate each part and build the response string
     let response = '';
     let responseArray = [];
 
@@ -1007,11 +897,9 @@ async function roulsResponse(question) {
         if (artworkKeywords.some(keyword => part.includes(keyword))) {
             response += "To buy a painting, you can visit our website's art gallery section and select the painting you like. Then, follow the instructions to make a purchase.";
         } 
-        // Check if the part is related to connecting Metamask
         else if (metamaskKeywords.some(keyword => part.includes(keyword))) {
             response += "To connect your Metamask wallet, please follow these steps: [insert steps here]<br>";
         } 
-        // Check if the part is related to chatting with others
         else if (chatKeywords.some(keyword => part.includes(keyword))) {
             response += "You can chat with others on our website by navigating to the chat section and joining a conversation or starting a new one.\n\n";
         }else if (helloPhrases.some(phrase => part.toLowerCase().includes(phrase))) {
@@ -1024,7 +912,6 @@ async function roulsResponse(question) {
         } else if (part.toLowerCase().includes("thanks") || part.toLowerCase().includes("Thankss")) {
             response = "Your welcome if there is anything else i can assist with let me know!.\n\n";
         } 
-        // If the part is not related to any known topic, add an error message
         else {
             response += "I'm sorry, I couldn't understand your question or it's not related to the topics I can assist with.\n\n";
         }
@@ -1032,44 +919,25 @@ async function roulsResponse(question) {
         responseArray.push([{rsp: response.trim()}]);
     }
     return responseArray
-    // save part to array and return array
-    // on client side add each one 
 }
 
 async function validateTransaction(transactionHash) {
-    // Construct the URL for fetching transaction details from Etherscan
     const apiUrl = `https://api.etherscan.io/api?module=proxy&action=eth_getTransactionByHash&txhash=${transactionHash}&apikey=YOUR_API_KEY`;
 
     try {
-        // Fetch transaction details from Etherscan API
         const response = await fetch(apiUrl);
         const data = await response.json();
-
-        // Check if the transaction exists
         if (data && data.result) {
-            // Access transaction details from the result
             const transaction = data.result;
-
-            // Extract recipient, sender, and value from transaction
             const { from, to, value } = transaction;
-
-            // Print recipient, sender, and value
-            //console.log('Recipient:', to);
-            //console.log('Sender:', from);
-            //console.log('Value:', value);
-
-            // Perform validation checks
             if (from && to && value) {
-                // Transaction is valid
                 console.log('Transaction is valid:', transaction);
                 return true;
             } else {
-                // Transaction is missing required properties
                 console.error('Transaction is missing required properties:', transaction);
                 return false;
             }
         } else {
-            // Transaction not found
             console.error('Transaction not found:', transactionHash);
             return false;
         }
@@ -1089,12 +957,10 @@ const handleHttpRequest = async (req, res, io) => {
             req.on('data', (chunk) => {
                 body += chunk.toString();
             });
-
-                // Process the completed request
             req.on('end', async () => {
                 try {
                     const thisObj = JSON.parse(body);
-                    if(thisObj.passcode == paintingUploadCode){// add attempts later and save IP to get em back
+                    if(thisObj.passcode == paintingUploadCode){
                             const newPainting = new paintingModel({
                                 image: thisObj.image,
                                 name: thisObj.name,
@@ -1178,8 +1044,6 @@ const handleHttpRequest = async (req, res, io) => {
                     if(commissionValidator.isActive){
                         res.end(JSON.stringify({ success: false, code: 230 })); 
                     }else{
-
-                        // users commission was a success and he wants more!
                         const newCommissionObject = {
                                 address: data.address,
                                 artworkMedium: data.artworkMedium,
@@ -1275,13 +1139,11 @@ const handleHttpRequest = async (req, res, io) => {
         }   
 
     }else if(req.method == 'POST' && req.url == '/AI-event'){
-        try{
+try{
             let body = '';
             req.on('data', chunk => {
                 body += chunk.toString();
             });
-
-
             // track number of responses and send back null objects if over say 10 and increase to 1000
             // set a date and then allow more and reset number of request if under maxamount (1000)
             // use local array 
@@ -1298,74 +1160,10 @@ const handleHttpRequest = async (req, res, io) => {
                 } catch (error) {
                         res.end(JSON.stringify({ ServerMessage: 'Try-catch fail', code: 2 })); 
                 }
-                // grab ip adress 
-                // check if user is in localAIUsers by IP attribute 
-
-                
-                /*
-                const aIUserIp = req.connection.remoteAddress;
-
-                const AiUSer = {
-                    ipAddress: aIUserIp ,
-                    lastEventdate: new Date(),
-                    numberOfEvents: 0
-                };
-
-                const userIndex = localAIUsers.findIndex(user => user.ipAddress === aIUserIp);
-
-                if (userIndex !== -1) {
-                    const user = localAIUsers[userIndex];
-
-                    // Update last event date
-                    user.lastEventDate = new Date();
-
-                    // Increment the number of events
-                    user.numberOfEvents += 1;
-
-                    // Check the number of events
-                    if (user.numberOfEvents <= maxNumberAIEvents) {
-                        console.log('User is all good, send back normal response');
-                        
-                        try {
-                            const serverAIResponse = await roulsResponse(data.question);
-                            if (serverAIResponse) {
-                                res.end(JSON.stringify({ serverAIResponse, code: 0 })); // Include serverAIResponse in the response object
-                            } else {
-                                res.end(JSON.stringify({ ServerMessage: 'Roul failed miserably', code: 1 })); 
-                            }
-                        } catch (error) {
-                            res.end(JSON.stringify({ ServerMessage: 'Try-catch fail', code: 2 })); 
-                            console.log(error);
-                        }
-                    } else {
-                        res.end(JSON.stringify({ ServerMessage: 'Too many attempts in a short period', code: 3 })); 
-                    }
-                }else{
-                    const newUser = {
-                        ipAddress: aIUserIp,
-                        lastEventDate: new Date(),
-                        numberOfEvents: 1
-                    };
-                    localAIUsers.push(newUser);
-
-                    try {
-                        const serverAIResponse = await roulsResponse(data.question);
-                        if (serverAIResponse) {
-                            res.end(JSON.stringify({ serverAIResponse, code: 0 })); // Include serverAIResponse in the response object
-                        } else {
-                            res.end(JSON.stringify({ ServerMessage: 'Roul failed miserably', code: 1 })); 
-                        }
-                    } catch (error) {
-                        res.end(JSON.stringify({ ServerMessage: 'Try-catch fail', code: 2 })); 
-                        console.log(error);
-                    }
-                }
-                */
             });
         }catch(error){
             console.log('Error with fetch request /AI-event ');
         }
-
     }else if(req.method == 'GET' && req.url == '/getALL-purchases'){
         try{
             const purchases = async () => {
@@ -1455,8 +1253,8 @@ const handleHttpRequest = async (req, res, io) => {
                     };
 
                 console.log('the user has send this many attempts',  attemptedPurchaseClient.numberOfPurchaseAttempts);
-                const maxResetValue = 60000; // Maximum reset value (60 seconds)
-                const minResetValue = 30000;  // Minimum reset value (30 seconds)
+                const maxResetValue = 60000; 
+                const minResetValue = 30000;  
                 let randomNumberreset = Math.floor(Math.random() * (maxResetValue - minResetValue + 1)) + minResetValue;
 
                 if (attemptedClients.length == 0) {
@@ -1464,9 +1262,7 @@ const handleHttpRequest = async (req, res, io) => {
                     res.setHeader('Content-Type', 'application/json');
                     res.end(JSON.stringify({ canUserAttemptPurchase: true }));
                     attemptedClients.push(attemptedPurchaseClient);
-                    // add 1 to each element with same ip
                     attemptedClients.forEach(client => {
-                        // need to checkIp t
                         if (client.paintingId === attemptedPurchaseClient.paintingId && client.ipAddress == clientIP) {
                             client.numberOfPurchaseAttempts +=1;
                         }
@@ -1482,18 +1278,12 @@ const handleHttpRequest = async (req, res, io) => {
                             res.setHeader('Content-Type', 'application/json');
                             attemptedClients.push(attemptedPurchaseClient);
                             res.end(JSON.stringify({ canUserAttemptPurchase: true, code: 232121311 }));
-
-                            // add 1 to each element with same ip
                             attemptedClients.forEach(client => {
                                 if (client.paintingId === attemptedPurchaseClient.paintingId) {
                                     client.numberOfPurchaseAttempts +=1;
                                 }
                             });
-
-                            // each time we send true we need to add 1 to every item in attemptedCLients that match the ip 
                          }else{
-                            //const getInstockValue = await paintingModel.find({});
-
                             const getInstockValue = await paintingModel.findOne(
                                 { _id: attemptedPurchaseClient.paintingId }
                             );
@@ -1502,16 +1292,10 @@ const handleHttpRequest = async (req, res, io) => {
                                 if (getInstockValue.inStock) {
                                     console.log('Item is still in stock!');
                                 let allInProgressFalse = attemptedClients.filter(client => client.inProgress == true && client.paintingId == attemptedPurchaseClient.paintingId);
-
-                                // every time resonse goes through add 1 to the attempts (only when server sends back true);
-
                                 if(allInProgressFalse.length != 0){
                                     console.log('Someone is already attempted to buy the same exact painting==>');
                                     res.setHeader('Content-Type', 'application/json');
                                     res.end(JSON.stringify({ canUserAttemptPurchase: false, code : 102111}));
-
-
-                                    // timer resets every object so we can keep local value 
                                     if(timerIsAlreadyCalled){
                                         console.log('no need to set timer because its active');
                                     }else{
@@ -1538,7 +1322,6 @@ const handleHttpRequest = async (req, res, io) => {
                                         if (client.paintingId === attemptedPurchaseClient.paintingId) {
                                             client.numberOfPurchaseAttempts +=1;
                                         }
-                                     //client.numberOfPurchaseAttempts += 1;
                                     });
                                     res.end(JSON.stringify({ canUserAttemptPurchase: true, code : 10213321}));
 
@@ -1554,10 +1337,6 @@ const handleHttpRequest = async (req, res, io) => {
                                 res.setHeader('Content-Type', 'application/json');
                                 res.end(JSON.stringify({ canUserAttemptPurchase: false, code :  6477665555}));
                             }
-
-
-
-
                         }
                     }else{
                         if(thisAttemptedClientArray.length == 0){
@@ -1565,32 +1344,22 @@ const handleHttpRequest = async (req, res, io) => {
                             attemptedClients.push(attemptedPurchaseClient);
                             res.setHeader('Content-Type', 'application/json');
                             res.end(JSON.stringify({ canUserAttemptPurchase: true, code: 2322225511 })); 
-
-                            //update each attempt
                         }else if(attemptedPurchaseClient.numberOfPurchaseAttempts > maxPurchaseAttempts){
                             console.log('User has exceeded maximum number of attempts');
                             res.setHeader('Content-Type', 'application/json');
                             res.end(JSON.stringify({ canUserAttemptPurchase: false, code: 232585511 }));   
-
                             let purchaseTimerIsOn = globalPurchaseTimerArray.filter(obj=> obj.ipAddress == attemptedPurchaseClient.ipAddress);
                             console.log('purchaseTimerIsOn', purchaseTimerIsOn);
                             if(purchaseTimerIsOn.length>0){
-                                //timer is already on
                                 console.log('item is already present no need to reset timer or push item in array');
                                 console.log('we found', purchaseTimerIsOn)
                             }else{
                                  console.log('item is not present but we are adding it and adding a timer');
-                                // array is not empty and we cannot find client timer 
                                 const timedOutClient ={
                                     ipAddress: attemptedPurchaseClient.ipAddress,
                                     timer: true
                                 };
                                 globalPurchaseTimerArray.push(timedOutClient);
-
-
-                                // Set timer wait 10 seconds before resetting cleint attributed in attemptedClientsarray 
-                                // we filter through the array named for ip address and objId 
-                                // then if we find them we remove them from the array attemptedClients
                                 let resetUserTimer = 36000000; // 10 hours in milliseconds
                                 console.log('trying to set timer');
                                 setTimeout(function () {
@@ -1609,18 +1378,8 @@ const handleHttpRequest = async (req, res, io) => {
                                             globalPurchaseTimerArray.splice(i, 1); // Remove 1 item at index i
                                         }
                                     }
-
-                                    // remove client from timedOutClients
-                                }, resetUserTimer); // 5-second delay
-                            }
-
-                            
-
-                            
-                            // filter through array called attemptedClients by attemptedPurchaseClient.ipAddress and attemptedPurchaseClient.paintingId
-                            // remove all of them from attemptedClients array 
-
-                            // if hanging metamask on client side over 2 minutes cancel it or make pop up                
+                                }, resetUserTimer); 
+                            }             
                         }else{
                             console.log('An unexexpted error occureed');
                             res.setHeader('Content-Type', 'application/json');
@@ -1628,15 +1387,6 @@ const handleHttpRequest = async (req, res, io) => {
                         }
 
                     }
-
-                   
-                    /*
-                    for(client of attemptedClients){
-                        if(client.paintingId == objectId){
-                            currenTransactionInProgress = true;
-                        }
-                    }*/
-
                 }
             });
         }catch(error){
@@ -1651,7 +1401,6 @@ const handleHttpRequest = async (req, res, io) => {
             });
 
             req.on('end', async ()=> {
-                // Parse the JSON data from the request body
                 const data = JSON.parse(body);
                  try{ 
 
@@ -1673,7 +1422,7 @@ const handleHttpRequest = async (req, res, io) => {
                         { _id: objectId }, 
                         { $set: {
                              inStock: false,
-                              dateSold: new Date() // Set dateSold to the current date/time
+                              dateSold: new Date() 
                             }
                         } 
                     );
@@ -1713,23 +1462,7 @@ const handleHttpRequest = async (req, res, io) => {
                             attemptedClients = [];
                             sendEmail(email, address, firstName, lastName, objectId, updatedPainting.price, updatedPainting.name, updatedPainting.image)
                                 .then(result => {
-                                    /*
-                                    let foundIndex = -1 ;
-                                    for (let thisIndex = 0; thisIndex < attemptedClients.length; thisIndex++) {
-                                        thisIndex +=1 ;
-                                        if(client.paintingId == attemptedPurchaseClient.paintingId){
-                                            foundIndex = thisIndex;                        
-                                            if (foundIndex !== -1) {
-                                                attemptedClients.splice(foundIndex, 1); // Remove the element at foundIndex
-                                                console.log('Client removed:');
-                                            } else {
-                                                console.log('Client not found:');
-                                            }
-                                        }else{
-                                            console.log('cannot find paiting ID');
-                                        }
-                                    }*/
-
+                                    console.log('Email sent successfully', result);
                                 })
                                 .catch(error => {
                                      attemptedClients = [];
@@ -1793,13 +1526,8 @@ const handleHttpRequest = async (req, res, io) => {
                         .catch((error) => {
                             console.log('there was an error sending the Newdata array to client or the return of verifyUserinputData() function');
                         });
-
-                    // Send the response with the result
-                    //res.setHeader('Content-Type', 'application/json');
                 } catch (error) {
                     console.error('Error processing request:', error);
-                    // If an error occurs, send an error response
-                    //res.setHeader('Content-Type', 'application/json');
                     res.statusCode = 500;
                     res.end(JSON.stringify({verified: false}));
                 }
@@ -1857,9 +1585,6 @@ const handleHttpRequest = async (req, res, io) => {
                         }
                     });
                     
-                    // reset the name in array
-                    // can set a timestamp of last set name
-                    // if number of changes >7 and difference between stamps is less then say 1 month 
                     users[userIndex].user = data.newUsername;
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({success: true, oldName: usersOldName, newName: users[userIndex].user})); 
@@ -1896,9 +1621,6 @@ const handleHttpRequest = async (req, res, io) => {
             });
 
             req.on('end', async () => {           
-
-                // might need to prevenet the same person from clicking multiple times 
-                // can be added later 
                 try {
                     const data = JSON.parse(body);
                     const updaterIPAddress = req.connection.remoteAddress;
@@ -1906,31 +1628,25 @@ const handleHttpRequest = async (req, res, io) => {
                     const isObjectInArray = updatedViewsHistory.some(obj => obj.ip === updator.ip && obj.data === updator.data);
 
                     if(isObjectInArray){
-                        //console.log('user already viewed the painting', updator.data)
                         res.setHeader('Content-Type', 'application/json');
                         res.end(JSON.stringify({ success: false, message: 'you already viewed this painting' }));
                     }else{
                         updatedViewsHistory.push(updator);
-                        const thispainting = await paintingModel.findOne({ _id: data });
-                        
+                        const thispainting = await paintingModel.findOne({ _id: data });                 
                         if (thispainting) {
-                            // Update the views count
                             const result = await paintingModel.updateOne(
                                 { _id: data },
                                 { $set: { views: thispainting.views + 1 } }
                             );
 
                             if (result.modifiedCount === 1) {
-                                // Send success response if update was successful
                                 res.writeHead(200, { 'Content-Type': 'application/json' });
                                 res.end(JSON.stringify({ success: true }));
                             } else {
-                                // Send failure response if update was not successful
                                 res.writeHead(200, { 'Content-Type': 'application/json' });
                                 res.end(JSON.stringify({ success: false }));
                             }
                         } else {
-                            // Send failure response if painting with given ID was not found
                             res.writeHead(404, { 'Content-Type': 'application/json' });
                             res.end(JSON.stringify({ success: false, message: 'Painting not found' }));
                         }
@@ -1938,7 +1654,6 @@ const handleHttpRequest = async (req, res, io) => {
 
                 } catch (error) {
                     console.log(error);
-                    // Send error response if there was an error
                     res.writeHead(500, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ success: false, message: 'Internal server error' }));
                 }
@@ -1958,9 +1673,7 @@ const handleHttpRequest = async (req, res, io) => {
             }
         
             const extname = path.extname(filePath);
-            let contentType = 'text/html'; // Default content type
-        
-            // Set content type based on file extension
+            let contentType = 'text/html'; 
             switch (extname) {
                 case '.js':
                     contentType = 'text/javascript';
@@ -1982,16 +1695,13 @@ const handleHttpRequest = async (req, res, io) => {
             fs.readFile(filePath, (err, content) => {
                 if (err) {
                     if (err.code === 'ENOENT') {
-                        // File not found
                         res.writeHead(404);
                         res.end('404 Not Found we got this back');
                     } else {
-                        // Server error
                         res.writeHead(500);
                         res.end('Internal Server Error: ' + err.code);
                     }
                 } else {
-                    // Serve the file with appropriate content type
                     res.writeHead(200, { 'Content-Type': contentType });
                     res.end(content, 'utf-8');
                 }
