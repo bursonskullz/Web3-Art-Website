@@ -16,7 +16,7 @@ var currentlyPrinted = false;
 var gridPageNumber = 1;
 var changeUserNamePopUpExist = false;
 var currentlyTryingToBuy = false;
-
+var isSocketPresent = false;
 //const sideElementsWidth = '15%';
 
 let EmailformData  = {
@@ -2083,57 +2083,54 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
     unknownDiv.appendChild(messageInput);
 
-    socket.on('updateCurrentPaintings', data => {
-            // Access the data sent from the server
-        console.log('Received data from server:', data);
 
-        for(const myObj of currentPaintingArray){
-            if(myObj._id == data.Id && myObj.inStock == true){
-                myObj.inStock = false;
-                console.log('we updated the array item', myObj);
+    if(isSocketPresent){
+        console.log('socket is already present no need to add again');
+    }else{
+        isSocketPresent = true;
+        socket.on('updateCurrentPaintings', data => {
+                // Access the data sent from the server
+            console.log('Received data from server:', data);
 
-                setTimeout( ()=> {
-                    try{
-                        const purchaseForm = document.querySelector('.purchase-form-container');
+            for(const myObj of currentPaintingArray){
+                if(myObj._id == data.Id && myObj.inStock == true){
+                    myObj.inStock = false;
+                    console.log('we updated the array item', myObj);
 
-                        // maybe wait a few seconds before removing
-                        if(purchaseForm && purchaseForm.id == myObj._id){
-                            purchaseForm.remove();
-                            console.log('we removed the form');
-                        }else{
-                            console.log('we did not find the form to remove after 1 Millisecond');
+                    setTimeout( ()=> {
+                        try{
+                            const purchaseForm = document.querySelector('.purchase-form-container');
+
+                            // maybe wait a few seconds before removing
+                            if(purchaseForm && purchaseForm.id == myObj._id){
+                                purchaseForm.remove();
+                                console.log('we removed the form');
+                            }else{
+                                console.log('we did not find the form to remove after 1 Millisecond');
+                            }
+
+                        }catch(error){
+                            console.log(error);
                         }
-
-                    }catch(error){
-                        console.log(error);
-                    }
-                }, 15000); // 15 seconds then remove form if active
+                    }, 15000); // 15 seconds then remove form if active
 
 
+                }else{
+                    console.log('cannot find painting to update');
+                }
+        }
+
+        });
+        socket.on('message', (myobject) => {        
+            if(myobject.coolDown <= 10){
+                addMessage(myobject.msg, myobject.username, myobject.time); 
             }else{
-                console.log('cannot find painting to update');
+                alert('you cannot send anymore messages for 24 hours');
             }
+            
+        });
     }
 
-    // You can perform any necessary actions with the data here
-    });
-
-
-    // Event listener for receiving messages from server
-    socket.on('message', (myobject) => {        
-        if(myobject.coolDown <= 10){
-
-            // pass in boolean operator that is true if current user is this user 
-            // if boolean opertor is true then add event listener to do fetch request and update db
-            // first it needs to pop up small list underneath the name like a square 
-
-            addMessage(myobject.msg, myobject.username, myobject.time);
-            // maybe need to add to the message history 
-        }else{
-            alert('you cannot send anymore messages for 24 hours');
-        }
-        
-    });
 
 
     // Event listener for send button
