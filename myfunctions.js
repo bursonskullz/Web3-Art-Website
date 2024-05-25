@@ -1,4 +1,3 @@
-
 import {gridNavigator} from './script.js';
 //import { ethers } from './ethers';
  import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.0.8/dist/ethers.esm.min.js'; 
@@ -30,77 +29,610 @@ let EmailformData  = {
 const contractAddress = "0x123abc...";
 
 
+
 export async function painting_section_click(parentElement) {
-    console.log("Painting section clicked!"); // Log a message to the console
+    console.log("Painting section clicked!"); 
 
-    // Display the loading animation
-    const loadingAnimation = document.createElement('div');
-    loadingAnimation.textContent = 'Loading...'; // You can customize the loading animation here
-    loadingAnimation.style.position = 'absolute';
-    loadingAnimation.style.top = '0';
-    loadingAnimation.style.left = '0';
-    loadingAnimation.className = "loadingPopUp";
-    document.body.appendChild(loadingAnimation);
+    if(currentPaintingArray.length != 0){
+        console.log('already did fetch request should have access to data no need to push again');
+        // need to add listeners again
+    }else {
+        console.log('First time calling fecth');
+        const loadingAnimation = document.createElement('div');
+        loadingAnimation.textContent = 'Loading...'; 
+        loadingAnimation.style.position = 'absolute';
+        loadingAnimation.style.top = '0';
+        loadingAnimation.style.left = '0';
+        loadingAnimation.className = "loadingPopUp";
+        document.body.appendChild(loadingAnimation);
 
-    try {
-        const response = await fetch('/getALL-paintings', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        if (response.ok) {
-            const compressedPaintingArray = await response.json();            
-            if (compressedPaintingArray.success == false) {
-                console.log('did not get back array maybe it had hard time sending');
-                // need to warn user to try again!
-            }else{
-                for (let i = 0; i < compressedPaintingArray.length; i++) {
-                    currentPaintingArray.push(compressedPaintingArray[i]);
+        try {
+            const response = await fetch('/getALL-paintings', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-                    try {
-                        const purchaseResponse = await fetch('/getALL-purchases', {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        });
-                        if (purchaseResponse.ok) {
-                            const compressedPurchaseArray = await purchaseResponse.json();            
-                            if (compressedPaintingArray.success == false) {
-                                console.log('server sent back an error');
-                                alert('There was an unexpected error please refresh and check your internet connection');
-                            }else{
-                                for (let i = 0; i < compressedPurchaseArray.length; i++) {
-                                    currentPurchaseArray.push(compressedPurchaseArray[i]);
+            });
+            if (response.ok) {
+                const compressedPaintingArray = await response.json();            
+                if (compressedPaintingArray.success == false) {
+                    console.log('did not get back array maybe it had hard time sending');
+                    // need to warn user to try again!
+                }else{
+                    for (let i = 0; i < compressedPaintingArray.length; i++) {
+                        currentPaintingArray.push(compressedPaintingArray[i]);
+                    }
+                        try {
+                            const purchaseResponse = await fetch('/getALL-purchases', {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json'
                                 }
+                            });
+                            if (purchaseResponse.ok) {
+                                const compressedPurchaseArray = await purchaseResponse.json();            
+                                if (compressedPaintingArray.success == false) {
+                                    console.log('server sent back an error');
+                                    alert('There was an unexpected error please refresh and check your internet connection');
+                                }else{
+                                    for (let i = 0; i < compressedPurchaseArray.length; i++) {
+                                        currentPurchaseArray.push(compressedPurchaseArray[i]);
+                                    }
 
+                                    document.body.removeChild(loadingAnimation);
+                                    shiftOffScreen(gridNavigator);
+                                    
+                                }
+                            } else {
+                                console.error('Failed to fetch purhcases:', response.statusText);
                                 document.body.removeChild(loadingAnimation);
-                                shiftOffScreen(gridNavigator);
-                                
                             }
-                        } else {
-                            console.error('Failed to fetch purhcases:', response.statusText);
+                        } catch (error) {
+                            console.error('Error fetching paintings:', error);
                             document.body.removeChild(loadingAnimation);
                         }
-                    } catch (error) {
-                        console.error('Error fetching paintings:', error);
-                        document.body.removeChild(loadingAnimation);
                     }
-                }
 
-                
-        } else {
-            console.error('Failed to fetch paintings the response we not okay', response.statusText);
-            // Hide the loading animation if there's an error
+                    
+            } else {
+                console.error('Failed to fetch paintings the response we not okay', response.statusText);
+                // Hide the loading animation if there's an error
+                document.body.removeChild(loadingAnimation);
+            }
+        } catch (error) {
+            console.error('Error fetching paintings:', error);
             document.body.removeChild(loadingAnimation);
         }
-    } catch (error) {
-        console.error('Error fetching paintings:', error);
-        document.body.removeChild(loadingAnimation);
-        // Hide the loading animation if there's an error
-        //document.body.removeChild(loadingAnimation);
     }
+    
+}
+
+export async function addPaintingElementListener(paintingElement) {
+    paintingElement.addEventListener('click',  function() { 
+            if(!paintingClicked){
+                paintingClicked = true;
+                ////////////////////////////////////DO NOT REMOVE FOR DEV/////////////////////////////////////////////////
+                // add loading animation to the left side of screen
+                // send request to server to get paintings and save as mypaintingsArray
+                // may need to send 1 at  time to ensure the user doesnt get overloaded once it reaches say 10,000 items 
+                // when user recieved all paintings remove animation and call lines 67-79
+                ////////////////////////////////////DO NOT REMOVE FOR DEV/////////////////////////////////////////////////
+
+                painting_section_click(paintingElement)
+                  .then(() => {
+                    setTimeout(async () => { 
+                        if(window.innerWidth >= 1301 ){
+                            sideElementsWidthPercent = '15%'; 
+                            GridWidth = '65%';
+                            gridItemWidth = '100%';
+                            rowWidth = '10%';
+
+                            if(currentPaintingArray.length >= 24){
+                                makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }else{
+                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }
+                          
+                            var paintingGrid = document.querySelector('.NewGrid');
+                            paintingGrid.style.left = '18%';
+
+                            /*
+                            const searchBar = document.querySelector('.search-container');
+                            if(searchBar){
+                               searchBar.remove(); // comment if statement when function searchBar is properly setup
+                            }*/
+                            
+                        }else if(window.innerWidth <= 1300 && window.innerWidth >= 998 ){
+                            sideElementsWidthPercent = '15%'; 
+                            GridWidth = '65%';
+                            gridItemWidth = '100%';
+                            rowWidth = '10%';
+
+                            if(currentPaintingArray.length >= 24){
+                                makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }else{
+                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }
+
+                            
+                            var paintingGrid = document.querySelector('.NewGrid');
+                            const addToDBButton = document.querySelector('.add-to-DB');
+                            const deleteToDBButton = document.querySelector('.minus-to-DB');
+                            const backButtonContainer = document.querySelector('.backButtonContainer');
+                            const commissionContainer = document.querySelector('.commissionContainer');
+                            const AIbuttonContainer = document.querySelector('.AIbuttonContainer');
+                            const gridFowardContainer = document.querySelector('.gridFowardContainer');
+                            const gridBackContainer = document.querySelector('.gridBackContainer');
+                            const headerTextContainer = document.querySelector('.headerTextContainer');
+
+                            
+
+                            const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
+
+                            ptagDescriptions.forEach(itemDescription => {
+                                itemDescription.style.fontSize = '1.6vh';
+                            });
+
+                            
+                            const purchasesInfoContainer = document.querySelector('.infoContainer');
+
+                            if(purchasesInfoContainer){
+                                purchasesInfoContainer.style.fontSize = '1.5vh';
+                                purchasesInfoContainer.style.marginTop = '0vh';   
+                            }
+
+
+                            const dateNodes = document.querySelectorAll('.dateNode');
+
+                            // Loop through each dateNode element
+                            dateNodes.forEach(dateNode => {
+                                dateNode.style.fontSize = '1.3vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+
+                            const dpurchasesfirstNameDivs = document.querySelectorAll('.purchasesfirstNameDiv');
+
+                            // Loop through each dateNode element
+                            dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
+                                dpurchasesfirstNameDiv.style.fontSize = '1.3vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+
+
+                            const dppurchasesPriceDivs = document.querySelectorAll('.purchasesPriceDiv');
+
+                            // Loop through each dateNode element
+                            dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
+                                dppurchasesPriceDiv.style.fontSize = '1.3vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+                            
+
+                            if(addToDBButton && deleteToDBButton){
+                                addToDBButton.remove();
+                                deleteToDBButton.remove();  
+                            }else{
+                                // dont do anything
+                            }
+
+
+                            paintingGrid.style.left = '18%';
+
+                            backButtonContainer.style.left = '47.5%';
+                            backButtonContainer.style.width = '6vh';
+
+                            commissionContainer.style.left = '54.8%';
+                            commissionContainer.style.width = '6vh';
+
+                            AIbuttonContainer.style.left = '60.8%';
+                            AIbuttonContainer.style.width = '6vh';
+
+                            gridFowardContainer.style.left = '40%';
+                            gridFowardContainer.style.width = '6vh';
+
+                            gridBackContainer.style.left = '32.5%';
+                            gridBackContainer.style.width = '6vh';
+
+                            if(addToDBButton && deleteToDBButton){
+                               addToDBButton.remove();
+                                deleteToDBButton.remove(); 
+                            }else{
+
+                            }
+                            
+                            const searchBar = document.querySelector('.search-container');
+                            
+                            if(searchBar){
+                              searchBar.remove();  
+                            }
+                            
+
+                        }else if(window.innerWidth <= 998 && window.innerWidth >= 610 ){
+
+                            // need to decrease the width of the image not the height
+                            GridWidth = '52%';
+                            gridItemWidth = '95%';
+                            // change width to each grid time
+                            sideElementsWidthPercent = '20%'; 
+                            rowWidth = '33%';
+
+                            if(currentPaintingArray.length >= 24){
+                                makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 3, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }else{
+                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 3, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }
+
+                            var paintingGrid = document.querySelector('.NewGrid');
+                            paintingGrid.style.left = '24.2%';
+                            // grab the gid make it sat 10% smaller and make side elements larger
+
+                            const searchBar = document.querySelector('.search-container');
+                            const addToDBButton = document.querySelector('.add-to-DB');
+                            const deleteToDBButton = document.querySelector('.minus-to-DB');
+                            const headerTextContainer = document.querySelector('.headerTextContainer');
+                            const backButtonContainer = document.querySelector('.backButtonContainer');
+                            const commissionContainer = document.querySelector('.commissionContainer');
+                            const AIbuttonContainer = document.querySelector('.AIbuttonContainer');
+                            const gridFowardContainer = document.querySelector('.gridFowardContainer');
+                            const gridBackContainer = document.querySelector('.gridBackContainer');
+
+
+
+
+
+                            const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
+
+                            ptagDescriptions.forEach(itemDescription => {
+                                itemDescription.style.fontSize = '1.5vh';
+                            });
+
+
+
+                            const purchasesInfoContainer = document.querySelector('.infoContainer');
+                            //purchasesInfoContainer.style.fontSize = '1.5vh';
+                            if(purchasesInfoContainer){
+                                purchasesInfoContainer.style.marginTop = '0vh';
+                            }
+                            
+
+                            const dateNodes = document.querySelectorAll('.dateNode');
+
+                            // Loop through each dateNode element
+                            dateNodes.forEach(dateNode => {
+                                dateNode.style.fontSize = '1.1vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+
+                            const dpurchasesfirstNameDivs = document.querySelectorAll('.purchasesfirstNameDiv');
+
+                            // Loop through each dateNode element
+                            dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
+                                dpurchasesfirstNameDiv.style.fontSize = '1.1vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+
+
+                            const dppurchasesPriceDivs = document.querySelectorAll('.purchasesPriceDiv');
+
+                            // Loop through each dateNode element
+                            dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
+                                dppurchasesPriceDiv.style.fontSize = '1.1vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+                            if(purchasesInfoContainer){
+                                //purchasesInfoContainer.style.fontSize = '1.2vh';
+                                purchasesInfoContainer.style.marginTop = '1.1vh';
+                            }
+
+
+                            headerTextContainer.style.width = '38%';
+
+                            backButtonContainer.style.left = '44.5%';
+                            backButtonContainer.style.width = '6vh';
+
+                            commissionContainer.style.left = '52.8%';
+                            commissionContainer.style.width = '6vh';
+
+                            AIbuttonContainer.style.left = '60.8%';
+                            AIbuttonContainer.style.width = '6vh';
+
+                            gridFowardContainer.style.left = '36%';
+                            gridFowardContainer.style.width = '6vh';
+
+                            gridBackContainer.style.left = '27%';
+                            gridBackContainer.style.width = '6vh';
+
+                            if(addToDBButton && deleteToDBButton){
+                                addToDBButton.remove();
+                                deleteToDBButton.remove();  
+                            }
+                            searchBar.remove();
+
+                            // reset font size of footer 
+                            var listItems = document.getElementsByTagName('li');
+                            var listH3Items = document.getElementsByTagName('li');
+                            //var descriptionTags = document.getElementsByClassName('descriptionPaintingPTAG');
+
+                            for (var i = 0; i < listItems.length; i++) {
+                               listItems[i].style.fontSize = '2.2vh'; // Change '16px' to your desired font size
+                            }
+
+                            for (var i = 0; i < listH3Items.length; i++) {
+                                listItems[i].style.fontSize = '2.2vh'; // Change '16px' to your desired font size
+                            }
+                            /*
+                            for (var i = 0; i < descriptionTags.length; i++) {
+                                descriptionTags[i].style.fontSize = '1.2vh';
+                            }*/
+
+                        }else if(window.innerWidth <= 609 && window.innerWidth >= 500){
+
+                            // need to fix this to be better other ones are good. Maybe make additional if with one element high. 
+                            sideElementsWidthPercent = '24%'; 
+                            GridWidth = '45%';
+                            gridItemWidth = '100%';
+                            rowWidth = '50%';
+
+                            if(currentPaintingArray.length >= 24){
+                                makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }else{
+                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }
+
+                            var paintingGrid = document.querySelector('.NewGrid');
+                            const searchBar = document.querySelector('.search-container');
+                            const addToDBButton = document.querySelector('.add-to-DB');
+                            const deleteToDBButton = document.querySelector('.minus-to-DB');
+
+                            const backButtonContainer = document.querySelector('.backButtonContainer');
+                            const commissionContainer = document.querySelector('.commissionContainer');
+                            const AIbuttonContainer = document.querySelector('.AIbuttonContainer');
+                            const gridFowardContainer = document.querySelector('.gridFowardContainer');
+                            const gridBackContainer = document.querySelector('.gridBackContainer');
+                            const headerTextContainer = document.querySelector('.headerTextContainer');
+                            const purchasesInfoContainer = document.querySelector('.infoContainer');
+
+
+
+                            const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
+
+                            ptagDescriptions.forEach(itemDescription => {
+                                itemDescription.style.fontSize = '1.4vh';
+                            });
+
+                            const dateNodes = document.querySelectorAll('.dateNode');
+
+                            // Loop through each dateNode element
+                            dateNodes.forEach(dateNode => {
+                                dateNode.style.fontSize = '1vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+
+                            const dpurchasesfirstNameDivs = document.querySelectorAll('.purchasesfirstNameDiv');
+
+                            // Loop through each dateNode element
+                            dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
+                                dpurchasesfirstNameDiv.style.fontSize = '1vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+
+
+                            const dppurchasesPriceDivs = document.querySelectorAll('.purchasesPriceDiv');
+
+                            // Loop through each dateNode element
+                            dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
+                                dppurchasesPriceDiv.style.fontSize = '1vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+                            if(purchasesInfoContainer){
+                                purchasesInfoContainer.style.marginTop = '1vh';
+                            }
+                            
+                            headerTextContainer.style.width = '38%';
+
+                            backButtonContainer.style.left = '40.5%';
+                            backButtonContainer.style.width  = '5.5vh';
+
+                            commissionContainer.style.left = '46.8%';
+                            commissionContainer.style.width  = '5.5vh';
+
+                            AIbuttonContainer.style.left = '52.8%';
+                            AIbuttonContainer.style.width  = '5.5vh';
+
+                            gridFowardContainer.style.left = '33%';
+                            gridFowardContainer.style.width  = '5.5vh';
+
+                            gridBackContainer.style.left = '26%';
+                            gridBackContainer.style.width  = '5.5vh';
+
+                            
+                            searchBar.remove(); 
+                            
+
+                            if(addToDBButton && deleteToDBButton){
+                                addToDBButton.remove();
+                                deleteToDBButton.remove();  
+                            }
+
+                            var listItems = document.getElementsByTagName('li');
+                            var listH3Items = document.getElementsByTagName('li');
+                            //var descriptionTags = document.getElementsByClassName('descriptionPaintingPTAG');
+
+                            for (var i = 0; i < listItems.length; i++) {
+                               listItems[i].style.fontSize = '2.2vh'; // Change '16px' to your desired font size
+                            }
+
+                            for (var i = 0; i < listH3Items.length; i++) {
+                                listItems[i].style.fontSize = '2.2vh'; // Change '16px' to your desired font size
+                            }
+
+                            //need to reset icons size in header and move left a little
+                            // make additional if size is less than 400 for example galazy Z fold 5
+                            // should not be less then 200 maybe ever
+
+                            paintingGrid.style.left = '27.5%';
+
+                        }else if(window.innerWidth <= 499 && window.innerWidth >= 350 ){
+                            sideElementsWidthPercent = '27%'; 
+                            GridWidth = '80%';
+                            gridItemWidth = '100%';
+                            rowWidth = '50%';
+
+
+                            if(currentPaintingArray.length >= 24){
+                                makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }else{
+                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                            }
+
+                            var paintingGrid = document.querySelector('.NewGrid');
+                            paintingGrid.style.left = '10%';
+                            paintingGrid.style.height = '60%';
+                            paintingGrid.style.top = '2%';
+                            paintingGrid.style.marginBottom = '2%';
+                            // need to change font size inside grid elements overlay to half 
+                            // increase the width of .connect-button, and .loggedIn-button
+                            // sit closer to the right 
+                            // decrease the font size 
+                            const tree = document.querySelector('.tree');
+                            const recentSells = document.querySelector('.recentSells');
+                            const acceptibleCoins = document.querySelector('.acceptibleCoins');
+                            const chatRoom = document.querySelector('.crypto-chat-room');
+                            const searchBar = document.querySelector('.search-container');
+                            const addToDBButton = document.querySelector('.add-to-DB');
+                            const deleteToDBButton = document.querySelector('.minus-to-DB');
+
+                            const backButtonContainer = document.querySelector('.backButtonContainer');
+                            const commissionContainer = document.querySelector('.commissionContainer');
+                            const AIbuttonContainer = document.querySelector('.AIbuttonContainer');
+                            const gridFowardContainer = document.querySelector('.gridFowardContainer');
+                            const gridBackContainer = document.querySelector('.gridBackContainer');
+
+
+
+                            const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
+
+                            ptagDescriptions.forEach(itemDescription => {
+                                itemDescription.style.fontSize = '1.3vh';
+                            });
+
+
+                            const dateNodes = document.querySelectorAll('.dateNode');
+
+                            // Loop through each dateNode element
+                            dateNodes.forEach(dateNode => {
+                                dateNode.style.fontSize = '.9vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+
+                            const dpurchasesfirstNameDivs = document.querySelectorAll('.purchasesfirstNameDiv');
+
+                            // Loop through each dateNode element
+                            dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
+                                dpurchasesfirstNameDiv.style.fontSize = '.9vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+
+
+                            const dppurchasesPriceDivs = document.querySelectorAll('.purchasesPriceDiv');
+
+                            // Loop through each dateNode element
+                            dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
+                                dppurchasesPriceDiv.style.fontSize = '.9vh'; // Reset the font size
+                                // Add more style resets as needed
+                            });
+
+                            tree.remove();
+                            recentSells.remove();
+                            acceptibleCoins.remove();
+                            searchBar.remove();
+
+                            if(addToDBButton && deleteToDBButton){
+                                addToDBButton.remove();
+                                deleteToDBButton.remove();  
+                            }
+
+                            if(greenLight){
+                                greenLight.remove();
+                            }
+                            
+                            // reset home back size and alignment
+                            backButtonContainer.style.width = '4.2vh';
+                            backButtonContainer.style.left = '46.5%';
+
+
+                            commissionContainer.style.width = '4.2vh';
+                            commissionContainer.style.left = '55%';
+
+                            AIbuttonContainer.style.width = '4.2vh';
+                            AIbuttonContainer.style.left = '63%';
+
+                            gridFowardContainer.style.width  = '4.2vh';
+
+
+                            gridBackContainer.style.width  = '4.2vh';
+                            gridBackContainer.style.left = '32%';
+
+                            chatRoom.style.height = '14%';
+                            chatRoom.style.width =  '78%';
+                            chatRoom.style.height = '30%';
+                            chatRoom.style.position = 'relative';
+                            chatRoom.style.left = '11.5%';
+                            chatRoom.style.top = '0%';
+                            chatRoom.style.zIndex = '99999';
+
+
+                            var listItems = document.getElementsByTagName('li');
+                            var listH3Items = document.getElementsByTagName('h3');
+                            //var descriptionTags = document.getElementsByClassName('descriptionPaintingPTAG');
+
+                            for (var i = 0; i < listItems.length; i++) {
+                               listItems[i].style.fontSize = '1.5vh'; // Change '16px' to your desired font size
+                            }
+
+                            for (var i = 0; i < listH3Items.length; i++) {
+                                listH3Items[i].style.fontSize = '1.5vh'; // Change '16px' to your desired font size
+                            }
+
+                            // edit the input tag to fit parent element or adjust here
+                        }else if(window.innerWidth <= 350) {
+                            window.location.href = 'unsupported.html'; // Replace 'another_page.html' with the URL of the page you want to redirect to
+                        }
+
+                        //handleResize(); // get working before uplading code 
+                        gridNavigator.style.display = 'none';
+
+                        let msgHisotry = await getMessageHistory();
+
+                        for(const element of msgHisotry){
+                            addMessage(element.msg, element.username, element.time);
+                        }
+
+                    }, 101); 
+                  })
+                  .catch((error) => {
+                    // Handle any errors that occurred during the asynchronous operation
+                    console.error('Error:', error);
+                  });
+                //painting_section_click(paintingElement); // have this function return all the paintings in
+
+                // const mypaintingsArray  = painting_section_click(paintingElement);
+                paintingClicked = false;
+            }else{
+                console.log('we already clicked the painting section');
+            }
+        }); 
 }
 
 export function math_section_click(parentElement){
@@ -1865,7 +2397,74 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     backButton.style.backgroundPosition = 'center'; 
 
     backButton.addEventListener('click', function() {
-        window.location.href = myWebDomain;
+        paintingClicked = false;
+        const body = document.body;
+
+        // Clear all existing content from the body
+        while (body.firstChild) {
+            body.removeChild(body.firstChild);
+        }
+
+        // Define the new HTML content for the body
+        const newBodyContent = `
+            <div class="Header">
+                <div class="buttonContainer"></div>
+            </div>
+            <div class="Grid_container">
+                <div class="Navigation_section">
+                    <div class="Physical_art"></div>
+                    <div class="Digitial_art"></div>
+                    <div class="Math_research"></div>
+                    <div class="Upcoming_events"></div>
+                </div>
+            </div>
+        `;
+
+        // Insert the new HTML content into the body
+        body.innerHTML = newBodyContent;
+
+        // need to check if connected again 
+
+
+        checkifConnected().then(() => {
+            if(!isConnected){ 
+                const thisConnectBUtton =  document.querySelector(".connect-button");
+
+                if(thisConnectBUtton){
+                    thisConnectBUtton.addEventListener("click", async function() {
+                        makeConnection(); 
+                        addMetaMaskListener();
+                        //addCoinbaseListener();
+                    });
+                }else{
+                    console.log('User is loggedin or metamask not found');
+                }
+            }else{
+                const thisLoggedInBUtton = document.querySelector('.loggedIn-button');
+
+                if(thisLoggedInBUtton){
+                    thisLoggedInBUtton.addEventListener("click", async function(){
+                        console.log('clicking current connect button');
+                        // makeLog(user);
+                    });
+                }else{
+                    console.log('cannot find the loggedIn-button');
+                }
+
+            }
+        }).catch(error =>{
+            console.log('cannot call the checkifConnected() function properly');
+            console.log(error);
+        });  
+
+        const paintingElement = document.querySelector('.Physical_art');
+            if(paintingElement){
+                addPaintingElementListener(paintingElement).then(()=>{
+                    console.log('we added the listener to the paintingElement element');
+                });   
+            }else{
+                console.log('cannot find new painting array');
+            }
     });
 
     commissionContainer.style.height = '90%';
