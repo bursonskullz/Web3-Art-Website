@@ -2458,13 +2458,58 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         });  
 
         const paintingElement = document.querySelector('.Physical_art');
-            if(paintingElement){
-                addPaintingElementListener(paintingElement).then(()=>{
-                    console.log('we added the listener to the paintingElement element');
-                });   
-            }else{
-                console.log('cannot find new painting array');
-            }
+        const updatesElements = document.querySelector('.Upcoming_events'); 
+        const digitalElement = document.querySelector('.Digitial_art'); 
+        const mathElement = document.querySelector('.Math_research'); 
+
+        if(paintingElement){
+            addPaintingElementListener(paintingElement).then(()=>{
+                console.log('we added the listener to the paintingElement element');
+            });   
+        }else{
+            console.log('cannot find new painting array');
+        }
+
+
+        if(digitalElement){
+            digitalElement.addEventListener('click', function() {
+                if(!NFTDivOverlay){
+                    NFTDivOverlay = true;
+                    nft_section_click(digitalElement);
+                    // no need to reset boolean operators as function already does
+                    
+                }
+            }); 
+        }else{
+            console.log('cannot find digitalElement div');
+        }
+
+
+
+        if(mathElement){
+            mathElement.addEventListener('click', function() {
+                if(!mathOverlay){
+                    mathOverlay = true;
+                    math_section_click(mathElement);
+                    
+                }
+            }); 
+        }else{
+            console.log('cannot find math element div');
+        }
+
+
+
+        if(updatesElements){
+            updatesElements.addEventListener('click', function() {
+                if(!updatesOverlay){
+                    mathOverlay = true;
+                    upcoming_section_click(updatesElements);
+                }
+            }); 
+        }else{
+            console.log('cannot find events div');
+        }
     });
 
     commissionContainer.style.height = '90%';
