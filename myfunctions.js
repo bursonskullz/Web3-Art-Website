@@ -11,6 +11,9 @@ const abi = [/* Your contract ABI here */];
 const socket = io();
 const iconHeaderWidth = '11.4vh';
 
+let paintingChunks = [];
+let totalChunks = 0;
+
 var submitButtonIsClicked = false;
 var currentlyPrinted = false;
 var gridPageNumber = 1;
@@ -2126,8 +2129,24 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 addMessage(myobject.msg, myobject.username, myobject.time); 
             }else{
                 alert('you cannot send anymore messages for 24 hours');
+            }   
+        });
+        socket.on('updatePaintingChunk', (data) => {
+           paintingChunks[data.index] = data.chunk;
+           totalChunks = data.total;
+
+            if (paintingChunks.length === totalChunks && paintingChunks.every(chunk => chunk !== undefined)) {
+                const paintingString = paintingChunks.join('');
+                const newPainting = JSON.parse(paintingString);
+                currentPaintingArray.push(newPainting);
             }
-            
+        });
+
+        socket.on('updatePaintingComplete', () => {
+            console.log('All chunks have been received.');
+            alert('A new painting has been added.');
+            paintingChunks = [];
+            totalChunks = 0;
         });
     }
 
