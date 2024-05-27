@@ -1089,10 +1089,22 @@ const handleHttpRequest = async (req, res, io) => {
 
                             });  
 
-                            //console.log(newPainting);
                             newPainting.save().then((result)=>{
-                                //console.log(result);
-                                res.end(JSON.stringify({success: true})); 
+                                const paintingString = JSON.stringify(newPainting);
+                                const chunkSize = 500;
+                                let chunks = [];
+
+                                for (let i = 0; i < paintingString.length; i += chunkSize) {
+                                    chunks.push(paintingString.substring(i, i + chunkSize));
+                                }
+                                chunks.forEach((chunk, index) => {
+                                    io.emit('updatePaintingChunk', { chunk, index, total: chunks.length });
+                                });
+
+                                io.emit('updatePaintingComplete');
+
+                                console.log('console went through check on client side');
+                                res.end(JSON.stringify({ success: true }));
                             }).catch((error) =>{
                                 console.log(error);
                                 res.end(JSON.stringify({success: false})); 
