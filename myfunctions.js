@@ -20,6 +20,7 @@ var gridPageNumber = 1;
 var changeUserNamePopUpExist = false;
 var currentlyTryingToBuy = false;
 var isSocketPresent = false;
+var clientCanSendAIfetchRequest = true;
 //const sideElementsWidth = '15%';
 
 let EmailformData  = {
@@ -3104,69 +3105,74 @@ function isValidPhoneNumber(phoneNumber) {
         //inputContainer.style.padding = '10px'; // Adding padding for better appearance
         inputParent.appendChild(inputContainer);
 
-        inputContainer.addEventListener('keydown', async function(event) {
-            if (event.key === 'Enter') {
-                const userInput = inputContainer.value;
-                if(userInput == ''){
-                    // dont evaluate empty string
-                }else{
-                    try{
-                        overlayMain.innerHTML = '';
-                        let response = await getResponse(userInput);
-                        inputContainer.value = '';
-
-                        // response is array of server messages that need to be appended in a ptag to parent ptag
-
-
-                        if(response != null){
-                            console.log(' we should get an array', response);
-
-                            for(const serverRSPDS of response.serverAIResponse){
-                                console.log(serverRSPDS);
-                                writeToParentDivWithDelay(serverRSPDS[0].rsp, overlayMain, 10);
+            inputContainer.addEventListener('keydown', async function(event) {
+                if (event.key === 'Enter') {
+                    const userInput = inputContainer.value;
+                    if(userInput == ''){
+                        // dont evaluate empty string
+                    }else{
+                        try{
+                            if(clientCanSendAIfetchRequest){
+                                overlayMain.innerHTML = '';
+                                let thisIndex = -1;
+                                let response = await getResponse(userInput);
+                                inputContainer.value = '';
+                                if(response != null){
+                                    if(response.code == 4){
+                                        overlayMain.innerHTML = '';
+                                        clientCanSendAIfetchRequest = false;
+                                        writeToParentDivWithDelay(response.serverMessage, overlayMain, 10,thisIndex);
+                                        setTimeout(() => {
+                                            clientCanSendAIfetchRequest = true;
+                                        }, 48 * 60 * 60 * 1000);
+                                    }else{
+                                        for(const serverRSPDS of response.serverAIResponse){
+                                            thisIndex +=1;
+                                            console.log(serverRSPDS);
+                                            writeToParentDivWithDelay(serverRSPDS[0].rsp, overlayMain, 10,thisIndex);
+                                        }
+                                    }
+                                }else{
+                                    writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10, 1);
+                                }
+                            }else{
+                                overlayMain.innerHTML = '';
+                                const restrictedString = "We're sorry, but you've exceeded the maximum number of AI requests allowed within a 48-hour period. For security and system stability reasons, we kindly ask you to wait for 48 hours before making additional requests. Thank you for your understanding and cooperation.";
+                                writeToParentDivWithDelay(restrictedString, overlayMain, 10,1);
                             }
-                        }else{
-                            writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10);
-                        }
+                            overlayMain.style.marginTop = '20px';
+                            overlayMain.style.height = `calc(100% - 20px)`; 
+                        }catch(error){
+                            console.log(error);
+                            writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10,1);
+                        }  
+                    }
 
-                        overlayMain.style.marginTop = '20px';
-                        overlayMain.style.height = `calc(100% - 20px)`; 
-
-                        
-                    }catch(error){
-                        console.log(error);
-                        // type error in main div
-                        writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10);
-                    }  
+                    
                 }
-
-                
-            }
-        });
-        // Create exitButton
+            });
         const exitButton = document.createElement('div');
         exitButton.id = 'exitButton';
-        exitButton.textContent = '❌'; // X emoji
+        exitButton.textContent = '❌'; 
         exitButton.style.position = 'absolute';
         exitButton.style.top = '1%';
         exitButton.style.right = '95%';
-        exitButton.style.width = '5%'; // Fixed width
-        exitButton.style.height = '5%'; // Fixed height
-        exitButton.style.fontSize = '2vh'; // Adjust font size
-        exitButton.style.border = 'none'; // Remove border for a cleaner look
-        exitButton.style.background = 'none'; // Remove background color
-        exitButton.style.cursor = 'pointer'; // Change cursor to pointer on hover
+        exitButton.style.width = '5%'; 
+        exitButton.style.height = '5%'; 
+        exitButton.style.fontSize = '2vh'; 
+        exitButton.style.border = 'none'; 
+        exitButton.style.background = 'none'; 
+        exitButton.style.cursor = 'pointer'; 
         exitButton.addEventListener('click', function() {
             botContainer.remove();
         });
         botContainer.appendChild(exitButton);
 
-        // Add event listener to inputContainer
         inputContainer.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 console.log('User typed:', inputContainer.value);
                 // You can add more logic here to handle the user's input
-                inputContainer.value = ''; // Clear input after submission
+                inputContainer.value = ''; 
             }
         }); 
     });
@@ -3274,10 +3280,7 @@ function isValidPhoneNumber(phoneNumber) {
 
 
     makePaintGrid(array, parentElement, numColumns, gridWidthPercent);
-    // call this function with elements only change array!!!
-
-
-    // footer attributes
+ 
     footer.style.position = 'relative';
     footer.style.height = '65vh';
     footer.style.width = '100%';
@@ -3289,7 +3292,6 @@ function isValidPhoneNumber(phoneNumber) {
     footer.style.boxShadow = '0px -2px 4px rgba(0, 0, 0, 0.7)';
     footer.className = 'footer';
 
-    // footer attributes
     footerLEGAL.style.position = 'relative';
     footerLEGAL.style.height = '10vh';
     footerLEGAL.style.width = '100%';
@@ -3393,31 +3395,7 @@ function isValidPhoneNumber(phoneNumber) {
     // Append row to footer
     footContainer.appendChild(row);
 
-    // Append footer to the body
-    //document.body.appendChild(footer);
 
-
-    /*gridContainer.addEventListener('scroll', function() {
-        // Check if scroll position is at the top
-        if (gridContainer.scrollTop > 0) {
-          showScrollUpArrow();// fires during scroll maybe make arrow visible
-          //console.log('we are at the top');
-
-        }else if(gridContainer.scrollTop == 0){
-            console.log('ScrollTop = 0');
-        }else if(gridContainer.scrollTop > 500){
-             console.log('ScrollTop > 50s%');
-        }else {
-        // Scroll position is at the top, hide arrow
-            console.log('Fires when we hit the top');
-            //hideScrollUpArrow();
-        }
-
-    });*/
-
-
-
-    // Search bar neeeds fixed
     createSearchBar(header);
     // use instead  accounts = await window.ethereum.request(); 
     if(isConnected == true && window.ethereum.selectedAddress == RoysWallet){
@@ -3431,7 +3409,7 @@ function isValidPhoneNumber(phoneNumber) {
 
     parentElement.appendChild(acceptableCoins);
     parentElement.appendChild(recentSells);
-    parentElement.appendChild(unknownDiv);// edit to div you find of interest
+    parentElement.appendChild(unknownDiv);
 
 
     backButtonContainer.appendChild(backButton);
@@ -3457,23 +3435,13 @@ function isValidPhoneNumber(phoneNumber) {
 
 
 export async function getNFTs(contractAddress, providerUrl) {
-    // Initialize the provider
     const provider = new ethers.providers.JsonRpcProvider(providerUrl);
-
-    // Load the contract ABI
     let abi = await getContractABI(contractAddress); 
-
-    // Create an instance of the contract
     const contract = new ethers.Contract(contractAddress, abi, provider);
 
     try {
-        // Call the contract's function to get the total number of Bored Apes
         const totalNFTs = await contract.totalSupply();
-
-        // Create an array to store the Bored Apes
         const NFTs = [];
-
-        // Loop through each token ID and retrieve the owner's address
         for (let i = 1; i <= totalNFTs; i++) {
             const owner = await contract.ownerOf(i);
             NFTs.push({ tokenId: i, owner: owner });
@@ -3481,103 +3449,75 @@ export async function getNFTs(contractAddress, providerUrl) {
 
         return NFTs;
     } catch (error) {
-        //console.error('Error fetching tokens:', error);
         return [];
     }
 }
 
-
-    // Function to add message to chat box
 export function addMessage(message, username, timestamp) {
-    // Create p tag for the message
-
-    //need to get the username of the client and compare to the username being called as a paramater
-
-    msgCount +=1 ; // add 1 to msgCount
+    msgCount +=1 ;
     const p = document.createElement('p');
     p.textContent = message;
-
-    // Style the p tag (rest of your styling goes here)
-    p.style.height = 'auto'; // Set height to auto
-    p.style.position = 'relative'; // Make position relative
+    p.style.height = 'auto'; 
+    p.style.position = 'relative';
 
                 // Create username div
     const usernameDiv = document.createElement('div');
     usernameDiv.textContent = username;
-    usernameDiv.style.position = 'absolute'; // Set position to absolute
-    usernameDiv.style.top = '0%'; // Align to the top of the message
-    usernameDiv.style.left = '0%'; // Align to the left of the message
-    usernameDiv.style.padding = '4px'; // Add padding
-    usernameDiv.style.backgroundColor = 'transparent'; // Set background color
-    usernameDiv.style.color = 'black'; // Set text color
-    usernameDiv.style.fontSize = '1.5vh'; // Set font size
-    usernameDiv.style.borderTopLeftRadius = '5px'; // Add border radius to top left corner
-    usernameDiv.style.borderBottomRightRadius = '5px'; // Add border radius to bottom right corner
+    usernameDiv.style.position = 'absolute'; 
+    usernameDiv.style.top = '0%'; 
+    usernameDiv.style.left = '0%';
+    usernameDiv.style.padding = '4px'; 
+    usernameDiv.style.backgroundColor = 'transparent'; 
+    usernameDiv.style.color = 'black'; 
+    usernameDiv.style.fontSize = '1.5vh'; 
+    usernameDiv.style.borderTopLeftRadius = '5px'; 
+    usernameDiv.style.borderBottomRightRadius = '5px'; 
     usernameDiv.style.marginBottom = '2vh';
     usernameDiv.classList.add('message-username');
 
-    // Create timestamp div
     const timestampDiv = document.createElement('div');
     timestampDiv.textContent = timestamp;
-    timestampDiv.style.position = 'absolute'; // Set position to absolute
-    timestampDiv.style.bottom = '0%'; // Align to the bottom of the message
-    timestampDiv.style.right = '0%'; // Align to the right of the message
-    timestampDiv.style.padding = '0 5px'; // Add padding
-    timestampDiv.style.backgroundColor = 'transparent'; // Set background color
-    timestampDiv.style.color = 'white'; // Set text color
-    timestampDiv.style.fontSize = '1.2vh'; // Set font size
+    timestampDiv.style.position = 'absolute';
+    timestampDiv.style.bottom = '0%'; 
+    timestampDiv.style.right = '0%'; 
+    timestampDiv.style.padding = '0 5px'; 
+    timestampDiv.style.backgroundColor = 'transparent';
+    timestampDiv.style.color = 'white'; 
+    timestampDiv.style.fontSize = '1.2vh'; 
     timestampDiv.style.marginTop = '2vh';
 
     const localChatBox = document.querySelector('.chatBox');
     localChatBox.appendChild(p);
-
-    p.style.maxWidth = '80%'; // Limit width to 90% of parent
-    p.style.wordWrap = 'break-word'; // Wrap text when it reaches parent's width
+    p.style.maxWidth = '80%';
+    p.style.wordWrap = 'break-word'; 
     p.style.backgroundColor = 'dimgray';
-    //p.style.borderRadius = '1vh';
     p.style.fontSize = '1.5vh';
-    p.style.marginBottom = '10px'; // Add some space between messages
+    p.style.marginBottom = '10px'; 
     p.style.marginTop = '0px';
     p.style.overflowY = 'auto';
 
-    // Set border style for the bottom side only
     p.style.borderBottomStyle = 'solid';
-    p.style.borderBottomWidth = '0.2vh'; // Set border width
-    p.style.borderBottomColor = 'lightgray'; // Set border color
+    p.style.borderBottomWidth = '0.2vh';
+    p.style.borderBottomColor = 'lightgray'; 
 
-    p.style.padding = '4vh'; // Adjust the value as needed
+    p.style.padding = '4vh'; 
     p.style.color = 'white';
-
-    // CSS for customizing scrollbar
-    p.style.scrollbarWidth = 'thin'; // Set the width of the scrollbar
-    p.style.scrollbarColor = 'transparent dimgray'; // Set the color 
+    p.style.scrollbarWidth = 'thin'; 
+    p.style.scrollbarColor = 'transparent dimgray'; 
     localChatBox.scrollTop = localChatBox.scrollHeight;
-
-    //p.style.margin = '3px';
     p.classList.add('live-Messages');
-    p.setAttribute('id', username + "Message" + msgCount.toString()); // Replace 'uniqueId' with the desired ID value
-    // Scroll to bottom of chat box
-        
-
-     // Append delete button, username div, and timestamp div to the message p tag
-    //p.appendChild(deleteButton);
+    p.setAttribute('id', username + "Message" + msgCount.toString()); 
     p.appendChild(usernameDiv);
     p.appendChild(timestampDiv);
         
 }
 
 async function getContractABI(contractAddress) {
-    // Etherscan API endpoint for fetching contract ABI
     const apiUrl = `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=YourApiKeyToken`;
-
     try {
-        // Fetch contract ABI from Etherscan API
         const response = await fetch(apiUrl);
         const data = await response.json();
-
-        // Check if the response is successful and ABI is available
         if (data.status == "1" && data.result != "") {
-            // Parse and return the ABI
             return JSON.parse(data.result);
         } else {
             console.error("Error fetching ABI:", data.message);
@@ -3592,10 +3532,6 @@ async function getContractABI(contractAddress) {
 
 
 export async function checkifConnected(){
-    // if both are available just log into metmask 
-    // add ability to change to coinbase
-    // coinbase does not seem safe it wants writeable acess must review
-
     let connectButtton = document.createElement("div"); 
     let loggedInButton = document.createElement("div"); 
     let buttonContainer = document.querySelector('.buttonContainer');
@@ -3630,8 +3566,6 @@ export async function checkifConnected(){
         connectButtton.appendChild(buttonPTAG);
     }else{
         if(window.ethereum.selectedAddress != null && window.ethereum.isMetaMask){ 
-            //ethereum.selectedAddress' is deprecated and may be removed in the future. Please use the 'eth_accounts' RPC method instead.
-            // checks if wallet has no adress and returns null from extension
             isConnected = true; 
             buttonContainer.appendChild(greenLight);
             buttonContainer.appendChild(loggedInButton);
@@ -3639,8 +3573,8 @@ export async function checkifConnected(){
 
             const connectButtonPTAG = document.createElement('p');
 
-            connectButtonPTAG.innerHTML = window.ethereum.selectedAddress.substring(0, 8) + '~~~'; // change to current adress
-            connectButtonPTAG.classList.add('centered-text'); // Add a class for centering text
+            connectButtonPTAG.innerHTML = window.ethereum.selectedAddress.substring(0, 8) + '~~~';
+            connectButtonPTAG.classList.add('centered-text'); 
 
             connectButtonPTAG.style.position = 'relative';
             connectButtonPTAG.style.width = '70%';
@@ -3652,11 +3586,7 @@ export async function checkifConnected(){
             loggedInButton.appendChild(connectButtonPTAG);
             toggleGreenLight(); 
         }else{
-            // check coinbase is installed before proceeding (is not considered safe yet)!
-            // only for firefox (if others fail);
-
                 try {
-                    // Request accounts and handle the response asynchronously
                     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                     
                     if (accounts.length > 0 && window.ethereum.isMetaMask) {
@@ -3692,10 +3622,8 @@ export async function checkifConnected(){
                         buttonPTAG.style.width = '100%';
                         buttonPTAG.style.height = '100%';
                         buttonPTAG.style.top = '0%';
-                        //buttonPTAG.style.left = '0%';
                         buttonPTAG.style.margin = '0%';
                         buttonPTAG.style.fontSize = '1.5vh';
-
                         buttonPTAG.style.display = 'flex';
                         buttonPTAG.style.justifyContent = 'center';
                         buttonPTAG.style.alignItems = 'center';
@@ -3711,17 +3639,11 @@ export async function checkifConnected(){
     
 }
 
-// Function to create the popup for changing the username
 async function createChangeUsernamePopup() {
-
-    // check if popup already exist 
     if(changeUserNamePopUpExist){
         console.log('popup already exist');
     }else{
-        // Create the popup container
         changeUserNamePopUpExist = true;
-
-
         const popupContainer = document.createElement('div');
         popupContainer.classList.add('popup-container');
         popupContainer.style.position = 'absolute';
@@ -3801,8 +3723,6 @@ async function createChangeUsernamePopup() {
                             }else{
                                 console.log('cannot find any messages might be empty');
                             }
-
-                            // Close the popup
                             document.body.removeChild(popupContainer);
                             changeUserNamePopUpExist = false;
                         }else{
