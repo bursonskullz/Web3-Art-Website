@@ -12,7 +12,7 @@
 
 
 // local variables to server
-const maxNumberAIEvents = 10;
+const maxNumberOfAIEventsPerClient = 150;
 var localAIUsers = [];
 let attemptedClients = [];
 let globalPurchaseTimerArray = [];
