@@ -16,6 +16,7 @@ const maxNumberAIEvents = 10;
 var localAIUsers = [];
 let attemptedClients = [];
 let globalPurchaseTimerArray = [];
+var userAIQuestions = [];
 var timerIsAlreadyCalled = false;
 
 // packages
@@ -2619,87 +2620,70 @@ const handleHttpRequest = async (req, res, io) => {
             req.on('data', chunk => {
                 body += chunk.toString();
             });
-
-
-            // track number of responses and send back null objects if over say 10 and increase to 1000
-            // set a date and then allow more and reset number of request if under maxamount (1000)
-            // use local array 
             req.on('end', async ()=> {
                 const data = JSON.parse(body);
                 res.setHeader('Content-Type', 'application/json');
                 try {
-                    const serverAIResponse = await roulsResponse(data.question);
-                    if (serverAIResponse) {
-                        res.end(JSON.stringify({ serverAIResponse, code: 0 })); // Include serverAIResponse in the response object
-                    } else {
-                            res.end(JSON.stringify({ ServerMessage: 'Roul failed miserably', code: 1 })); 
-                        }
-                } catch (error) {
-                        res.end(JSON.stringify({ ServerMessage: 'Try-catch fail', code: 2 })); 
-                }
-                // grab ip adress 
-                // check if user is in localAIUsers by IP attribute 
+                  const clientIP = req.connection.remoteAddress;
+                  const existingItems = userAIQuestions.filter(item => item.ipAddress === clientIP);
+                  if (existingItems.length > 0) {
+                      const maxEventsItem = existingItems.reduce((maxItem, currentItem) => {
+                          return maxItem.numberOfEvents > currentItem.numberOfEvents ? maxItem : currentItem;
+                      });
+                      const timeDifference = Math.abs(new Date() - new Date(maxEventsItem.lastEventDate));
+                      const hoursDifference = Math.ceil(timeDifference / (1000 * 60 * 60));
+                      if (hoursDifference <= 48 && maxEventsItem.numberOfEvents > maxNumberOfAIEventsPerClient) {
+                        console.log('user exeeded max number of events within 48 hours');
+                        setTimeout(() => {
+                            const indicesToRemove = [];
+                            userAIQuestions.forEach((item, index) => {
+                                if (item.ipAddress === clientIp) {
+                                    indicesToRemove.push(index);
+                                }
+                            });
+                            indicesToRemove.forEach(index => {
+                                userAIQuestions.splice(index, 1);
+                            });
+                            console.log('we removed items in array user should be able to send again');
+                        }, 48 * 60 * 60 * 1000); 
+                        res.end(JSON.stringify({ serverMessage: 'User exceeds number of alotted responses', code: 4 })); 
 
-                
-                /*
-                const aIUserIp = req.connection.remoteAddress;
+                      } else {
+                        console.log('users has sent multiple req to the AI-event fetch');
+                        const Aievent = {
+                            ipAddress: clientIP,
+                            lastEventDate: new Date(),
+                            numberOfEvents: maxEventsItem.numberOfEvents+1 
+                        };
+                        userAIQuestions.push(Aievent);
 
-                const AiUSer = {
-                    ipAddress: aIUserIp ,
-                    lastEventdate: new Date(),
-                    numberOfEvents: 0
-                };
-
-                const userIndex = localAIUsers.findIndex(user => user.ipAddress === aIUserIp);
-
-                if (userIndex !== -1) {
-                    const user = localAIUsers[userIndex];
-
-                    // Update last event date
-                    user.lastEventDate = new Date();
-
-                    // Increment the number of events
-                    user.numberOfEvents += 1;
-
-                    // Check the number of events
-                    if (user.numberOfEvents <= maxNumberAIEvents) {
-                        console.log('User is all good, send back normal response');
-                        
-                        try {
-                            const serverAIResponse = await roulsResponse(data.question);
-                            if (serverAIResponse) {
-                                res.end(JSON.stringify({ serverAIResponse, code: 0 })); // Include serverAIResponse in the response object
-                            } else {
-                                res.end(JSON.stringify({ ServerMessage: 'Roul failed miserably', code: 1 })); 
-                            }
-                        } catch (error) {
-                            res.end(JSON.stringify({ ServerMessage: 'Try-catch fail', code: 2 })); 
-                            console.log(error);
-                        }
-                    } else {
-                        res.end(JSON.stringify({ ServerMessage: 'Too many attempts in a short period', code: 3 })); 
-                    }
-                }else{
-                    const newUser = {
-                        ipAddress: aIUserIp,
-                        lastEventDate: new Date(),
-                        numberOfEvents: 1
-                    };
-                    localAIUsers.push(newUser);
-
-                    try {
                         const serverAIResponse = await roulsResponse(data.question);
+
                         if (serverAIResponse) {
-                            res.end(JSON.stringify({ serverAIResponse, code: 0 })); // Include serverAIResponse in the response object
+                            res.end(JSON.stringify({ serverAIResponse, code: 0 })); 
                         } else {
-                            res.end(JSON.stringify({ ServerMessage: 'Roul failed miserably', code: 1 })); 
+                            res.end(JSON.stringify({ serverMessage: 'Roul failed miserably', code: 1 })); 
                         }
-                    } catch (error) {
-                        res.end(JSON.stringify({ ServerMessage: 'Try-catch fail', code: 2 })); 
-                        console.log(error);
-                    }
+
+                      }
+                  } else {
+                      console.log('users first time sending AI-fetch');
+                      const Aievent = {
+                          ipAddress: clientIP,
+                          lastEventDate: new Date(),
+                          numberOfEvents: 1 
+                      };
+                      userAIQuestions.push(Aievent);
+                      const serverAIResponse = await roulsResponse(data.question);
+                      if (serverAIResponse) {
+                          res.end(JSON.stringify({ serverAIResponse, code: 0 })); 
+                      } else {
+                          res.end(JSON.stringify({serverMessage: 'Roul failed miserably', code: 1 })); 
+                      }
+                  }
+                } catch (error) {
+                    res.end(JSON.stringify({serverMessage: 'Try-catch fail', code: 2 })); 
                 }
-                */
             });
         }catch(error){
             console.log('Error with fetch request /AI-event ');
