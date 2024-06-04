@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 05-25-24
+// Date last modified: 06-04-24
 // purpose: Make web3 art website
 
 // to do list 
@@ -485,8 +485,1334 @@ const knownDefinitions = [
     definition8: null,
     usage: ['Noun', 'Verb'],
     type: 'Non-living'
+  },{
+    word: 'abate',
+    definition1: 'to become less intense or widespread.',
+    definition2: 'to reduce in amount, degree, or severity.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Verb',
+    type: null
+  },
+  {
+    word: 'acumen',
+    definition1: 'the ability to make good judgments and quick decisions, typically in a particular domain.',
+    definition2: 'keen insight; shrewdness.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: null
+  },
+  {
+    word: 'altruistic',
+    definition1: 'showing a disinterested and selfless concern for the well-being of others; unselfish.',
+    definition2: 'motive or behavior characterized by selflessness.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },
+  {
+    word: 'boisterous',
+    definition1: 'noisy, energetic, and cheerful; rowdy.',
+    definition2: 'loud, clamorous, or unrestrained.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },
+  {
+    word: 'catalyst',
+    definition1: 'a substance that increases the rate of a chemical reaction without itself undergoing any permanent chemical change.',
+    definition2: 'a person or thing that precipitates an event.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: null
+  },
+  {
+    word: 'debilitate',
+    definition1: 'to make (someone) weak and infirm.',
+    definition2: 'to impair the strength of.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Verb',
+    type: null
+  },
+  {
+    word: 'ebullient',
+    definition1: 'cheerful and full of energy.',
+    definition2: 'boiling or agitated as if boiling.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },
+  {
+    word: 'facilitate',
+    definition1: 'to make (an action or process) easy or easier.',
+    definition2: 'to help (something) run more smoothly and effectively.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Verb',
+    type: null
+  },
+  {
+    word: 'gregarious',
+    definition1: 'fond of company; sociable.',
+    definition2: 'living in flocks or loosely organized communities.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },
+  {
+    word: 'hackneyed',
+    definition1: 'lacking significance through having been overused; unoriginal and trite.',
+    definition2: 'made commonplace or trite; stale.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },{
+    word: 'abate',
+    definition1: 'to become less intense or widespread.',
+    definition2: 'to reduce in amount, degree, or severity.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Verb',
+    type: null
+  },
+  {
+    word: 'acumen',
+    definition1: 'the ability to make good judgments and quick decisions, typically in a particular domain.',
+    definition2: 'keen insight; shrewdness.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: null
+  },
+  {
+    word: 'altruistic',
+    definition1: 'showing a disinterested and selfless concern for the well-being of others; unselfish.',
+    definition2: 'motive or behavior characterized by selflessness.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },
+  {
+    word: 'boisterous',
+    definition1: 'noisy, energetic, and cheerful; rowdy.',
+    definition2: 'loud, clamorous, or unrestrained.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },
+  {
+    word: 'catalyst',
+    definition1: 'a substance that increases the rate of a chemical reaction without itself undergoing any permanent chemical change.',
+    definition2: 'a person or thing that precipitates an event.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: null
+  },
+  {
+    word: 'debilitate',
+    definition1: 'to make (someone) weak and infirm.',
+    definition2: 'to impair the strength of.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Verb',
+    type: null
+  },
+  {
+    word: 'ebullient',
+    definition1: 'cheerful and full of energy.',
+    definition2: 'boiling or agitated as if boiling.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },
+  {
+    word: 'facilitate',
+    definition1: 'to make (an action or process) easy or easier.',
+    definition2: 'to help (something) run more smoothly and effectively.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Verb',
+    type: null
+  },
+  {
+    word: 'gregarious',
+    definition1: 'fond of company; sociable.',
+    definition2: 'living in flocks or loosely organized communities.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },
+  {
+    word: 'hackneyed',
+    definition1: 'lacking significance through having been overused; unoriginal and trite.',
+    definition2: 'made commonplace or trite; stale.',
+    definition3: null,
+    definition4: null,
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: null
+  },{
+    word: 'love',
+    definition1: 'an intense feeling of deep affection.',
+    definition2: 'a person or thing that one loves.',
+    definition3: 'a great interest and pleasure in something.',
+    definition4: 'a deep romantic or sexual attachment to someone.',
+    definition5: 'a feeling of strong or constant affection for a person.',
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: ['Noun', 'Verb'],
+    type: 'Emotion'
+  },
+  {
+    word: 'friend',
+    definition1: 'a person with whom one has a bond of mutual affection, typically one exclusive of sexual or family relations.',
+    definition2: 'a person whom one knows and with whom one has a bond of mutual affection, typically exclusive of sexual or family relations.',
+    definition3: 'a person attached to another by feelings of affection or personal regard.',
+    definition4: 'a person who gives assistance; patron; supporter.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Relationship'
+  },
+  {
+    word: 'happy',
+    definition1: 'feeling or showing pleasure or contentment.',
+    definition2: 'fortunate and convenient.',
+    definition3: 'characterized by or indicative of pleasure, contentment, or joy.',
+    definition4: 'delighted, pleased, or glad, as over a particular thing.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Emotion'
+  },
+  {
+    word: 'sad',
+    definition1: 'affected by unhappiness or grief; sorrowful or mournful.',
+    definition2: 'expressive of or characterized by sorrow.',
+    definition3: 'causing sorrow; sorrowful; distressing.',
+    definition4: 'deplorably bad, sorry, or pitiful.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Emotion'
+  },
+  {
+    word: 'friendship',
+    definition1: 'the emotions or conduct of friends; the state of being friends.',
+    definition2: 'a relationship between friends.',
+    definition3: 'the state of being a friend; association as friends.',
+    definition4: 'a friendly relation or intimacy.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Relationship'
+  },
+  {
+    word: 'family',
+    definition1: 'a group consisting of parents and children living together in a household.',
+    definition2: 'all the descendants of a common ancestor.',
+    definition3: 'a group of people united by certain convictions or a common affiliation.',
+    definition4: 'a group of people related to one another by blood or marriage.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Relationship'
+  },
+  {
+    word: 'health',
+    definition1: 'the state of being free from illness or injury.',
+    definition2: 'a person\'s mental or physical condition.',
+    definition3: 'a person\'s mental or physical condition as monitored by medical professionals.',
+    definition4: 'the condition of being sound in body, mind, or spirit; especially : freedom from physical disease or pain.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'State'
+  },
+  {
+    word: 'money',
+    definition1: 'a current medium of exchange in the form of coins and banknotes; coins and banknotes collectively.',
+    definition2: 'the assets, property, and resources owned by someone or something; wealth.',
+    definition3: 'financial gain; the profit earned from an investment or business venture.',
+    definition4: 'capital; property or assets with a monetary value.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Resource'
+  },
+  {
+    word: 'work',
+    definition1: 'activity involving mental or physical effort done in order to achieve a purpose or result.',
+    definition2: 'a task or tasks to be undertaken; something a person or thing has to do.',
+    definition3: 'the place where one is employed.',
+    definition4: 'a job or occupation, especially one requiring effort and skill.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: ['Noun', 'Verb'],
+    type: null
+  },
+  {
+    word: 'home',
+    definition1: 'the place where one lives permanently, especially as a member of a family or household.',
+    definition2: 'an institution for people needing professional care or supervision.',
+    definition3: 'a place where something flourishes, is most typically found, or from which it originates.',
+    definition4: 'a person\'s place of origin, habitat, or base of operations.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Location'
+  },{
+    word: 'atom',
+    definition1: 'the basic unit of a chemical element, consisting of a nucleus containing protons and neutrons, surrounded by electrons.',
+    definition2: 'the basic unit of a chemical element, a particle composed of a nucleus of neutrons and protons and orbiting electrons.',
+    definition3: 'a particle of matter indivisible by chemical means, consisting of a nucleus surrounded by electrons.',
+    definition4: 'the smallest particle of a chemical element that can exist.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Particle'
+  },
+  {
+    word: 'molecule',
+    definition1: 'a group of atoms bonded together, representing the smallest fundamental unit of a chemical compound that can take part in a chemical reaction.',
+    definition2: 'the smallest physical unit of a substance that can exist independently, consisting of one or more atoms held together by chemical forces.',
+    definition3: 'the smallest particle of a substance that retains all the properties of the substance and is composed of one or more atoms.',
+    definition4: 'a group of two or more atoms held together by chemical bonds.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Particle'
+  },
+  {
+    word: 'gene',
+    definition1: 'a unit of heredity that is transferred from a parent to offspring and is held to determine some characteristic of the offspring.',
+    definition2: 'a segment of DNA that contains the instructions for building a particular protein or performing a specific function.',
+    definition3: 'the basic physical and functional unit of heredity, made up of DNA and located on a chromosome.',
+    definition4: 'a molecular unit of heredity of a living organism.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Genetics'
+  },
+  {
+    word: 'DNA',
+    definition1: 'deoxyribonucleic acid, a self-replicating material present in nearly all living organisms as the main constituent of chromosomes.',
+    definition2: 'the molecule that carries the genetic instructions for growth, development, functioning, and reproduction in all known living organisms and many viruses.',
+    definition3: 'the chemical that contains information that determines an organism\'s traits.',
+    definition4: 'a molecule that carries most of the genetic instructions used in the growth, development, functioning, and reproduction of all known living organisms and many viruses.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Molecule'
+  },
+  {
+    word: 'electron',
+    definition1: 'a stable subatomic particle with a negative electric charge, found in all atoms and acting as the primary carrier of electricity in solids.',
+    definition2: 'a subatomic particle with a negative electric charge, typically found orbiting the nucleus of an atom.',
+    definition3: 'a subatomic particle that orbits the nucleus of an atom and carries a negative electric charge.',
+    definition4: 'a negatively charged subatomic particle that orbits the nucleus of an atom.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Particle'
+  },
+  {
+    word: 'neutron',
+    definition1: 'a subatomic particle of about the same mass as a proton but without an electric charge, present in all atomic nuclei except those of ordinary hydrogen.',
+    definition2: 'a subatomic particle found in the nucleus of an atom, having a mass close to that of the proton but with no electrical charge.',
+    definition3: 'an elementary particle found in atomic nuclei with a mass close to that of the proton but lacking an electric charge.',
+    definition4: 'a subatomic particle found in the nucleus of an atom that has a mass nearly equal to that of the proton but lacks an electric charge.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Particle'
+  },
+  {
+    word: 'proton',
+    definition1: 'a stable subatomic particle occurring in all atomic nuclei, with a positive electric charge equal in magnitude to that of an electron, but of opposite sign.',
+    definition2: 'a subatomic particle found in the nucleus of an atom, with a positive electric charge equal in magnitude to that of an electron.',
+    definition3: 'a positively charged subatomic particle found in the nucleus of an atom.',
+    definition4: 'a stable subatomic particle occurring in all atomic nuclei, with a positive electric charge equal in magnitude to that of an electron, but of opposite sign.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Particle'
+  },
+  {
+    word: 'chemical',
+    definition1: 'a substance produced by or used in a chemical process.',
+    definition2: 'a substance with a distinct molecular composition that is produced by or used in a chemical process.',
+    definition3: 'a substance produced by a chemical reaction.',
+    definition4: 'a substance made by or used in a chemical process.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Substance'
+  },{
+    word: 'quantum',
+    definition1: 'the smallest quantity of radiant energy, representing the energy of an electromagnetic wave proportional to its frequency.',
+    definition2: 'a discrete quantity of energy proportional in magnitude to the frequency of the radiation it represents.',
+    definition3: 'the basic unit of electromagnetic energy.',
+    definition4: 'a discrete packet or unit of energy associated with electromagnetic radiation.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Physics'
+  },
+  {
+    word: 'fusion',
+    definition1: 'the process or result of joining two or more things together to form a single entity.',
+    definition2: 'the process of combining atoms under extremely high temperatures and pressures to produce nuclear energy.',
+    definition3: 'the process or result of joining two or more things together to form a single entity, especially the nuclei of atoms.',
+    definition4: 'the combining of atoms to produce nuclear energy.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Physics'
+  },
+  {
+    word: 'relativity',
+    definition1: 'the dependence of various physical phenomena on relative motion of the observer and the observed objects, especially regarding the nature and behavior of space, time, and gravity.',
+    definition2: 'the principle that all laws of physics are the same in all inertial frames and that the speed of light is always constant.',
+    definition3: 'the state or quality of being relative.',
+    definition4: 'the theory developed by Albert Einstein to explain the effects of motion on the perception of time and space.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Physics'
+  },
+  {
+    word: 'gene',
+    definition1: 'a unit of heredity that is transferred from a parent to offspring and is held to determine some characteristic of the offspring.',
+    definition2: 'a segment of DNA that contains the instructions for building a particular protein or performing a specific function.',
+    definition3: 'the basic physical and functional unit of heredity, made up of DNA and located on a chromosome.',
+    definition4: 'a molecular unit of heredity of a living organism.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Biology'
+  },
+  {
+    word: 'neuron',
+    definition1: 'a specialized cell transmitting nerve impulses; a nerve cell.',
+    definition2: 'a nerve cell; the basic building block of the nervous system.',
+    definition3: 'a specialized cell that transmits nerve impulses.',
+    definition4: 'a nerve cell that transmits electrical impulses throughout the body.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Biology'
+  },
+  {
+    word: 'enzymes',
+    definition1: 'a substance produced by a living organism that acts as a catalyst to bring about a specific biochemical reaction.',
+    definition2: 'a substance produced by a living organism that acts as a catalyst to bring about a specific biochemical reaction, especially in the breakdown of food into simpler substances.',
+    definition3: 'biological molecules that act as catalysts and help complex reactions occur everywhere in life.',
+    definition4: 'biological catalysts that speed up the rate of chemical reactions in living organisms.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Biology'
+  },
+  {
+    word: 'bacteria',
+    definition1: 'single-celled microorganisms that lack a nucleus and are capable of causing disease.',
+    definition2: 'microscopic living organisms, usually one-celled, that can be found everywhere.',
+    definition3: 'microscopic organisms that can be found virtually everywhere on Earth, including in extreme environments.',
+    definition4: 'microorganisms that are typically single-celled and can be found in various habitats.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Microbiology'
+  },
+  {
+    word: 'cell',
+    definition1: 'the smallest structural and functional unit of an organism, typically microscopic and consisting of cytoplasm and a nucleus enclosed in a membrane.',
+    definition2: 'the basic structural, functional, and biological unit of all known living organisms.',
+    definition3: 'the smallest unit of life that can replicate independently.',
+    definition4: 'the fundamental structural and functional unit of all living organisms.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Biology'
+  },
+  {
+    word: 'evolution',
+    definition1: 'the process by which different kinds of living organisms are thought to have developed and diversified from earlier forms during the history of the Earth.',
+    definition2: 'the change in the heritable characteristics of biological populations over successive generations.',
+    definition3: 'the gradual development of something, especially from a simple to a more complex form.',
+    definition4: 'the process of change in all forms of life over generations.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Biology'
+  },{
+    word: 'lit',
+    definition1: 'excellent, amazing, or exciting.',
+    definition2: 'impressive or exciting.',
+    definition3: 'outstanding or excellent.',
+    definition4: 'something that is amazing or exciting.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'woke',
+    definition1: 'aware of and actively attentive to important facts and issues (especially issues of racial and social justice).',
+    definition2: 'alert to injustice in society, especially racism.',
+    definition3: 'socially and politically conscious.',
+    definition4: 'aware of and engaged in social and political issues.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'bae',
+    definition1: 'a term of endearment for one\'s romantic partner.',
+    definition2: 'a significant other or romantic partner.',
+    definition3: 'an affectionate term for one\'s boyfriend or girlfriend.',
+    definition4: 'an acronym for "before anyone else," used to refer to one\'s romantic partner.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Informal'
+  },
+  {
+    word: 'savage',
+    definition1: 'fierce, violent, and uncontrolled.',
+    definition2: 'brutal, fierce, and unrelenting.',
+    definition3: 'fearless and unstoppable.',
+    definition4: 'aggressive and uncompromising.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'chill',
+    definition1: 'relaxed and easygoing.',
+    definition2: 'calm and composed.',
+    definition3: 'relaxed or easygoing in manner or style.',
+    definition4: 'unexcited or unimpressed.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'lit',
+    definition1: 'drunk or intoxicated.',
+    definition2: 'under the influence of alcohol or drugs.',
+    definition3: 'intoxicated, especially with alcohol.',
+    definition4: 'inebriated or intoxicated, especially from alcohol.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'fam',
+    definition1: 'one\'s close friends or family.',
+    definition2: 'one\'s inner circle of close friends or relatives.',
+    definition3: 'a term used to refer to one\'s close friends or family.',
+    definition4: 'one\'s immediate family or closest friends.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Informal'
+  },
+  {
+    word: 'lit',
+    definition1: 'excited or enthusiastic.',
+    definition2: 'full of energy and enthusiasm.',
+    definition3: 'very exciting or thrilling.',
+    definition4: 'enthusiastic or exhilarated.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'salty',
+    definition1: 'angry, irritated, or bitter, especially as a result of losing or being slighted.',
+    definition2: 'upset or annoyed, especially when something doesn\'t go as planned.',
+    definition3: 'resentful or bitter, especially when someone feels slighted or cheated.',
+    definition4: 'feeling bitter or resentful about something.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'lit',
+    definition1: 'excellent or impressive.',
+    definition2: 'exciting or fun.',
+    definition3: 'very enjoyable or entertaining.',
+    definition4: 'awesome or amazing.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'thirsty',
+    definition1: 'eager or desperate for attention, validation, or approval.',
+    definition2: 'craving attention or validation from others.',
+    definition3: 'desperate for attention or approval.',
+    definition4: 'seeking attention or validation, especially on social media.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'savage',
+    definition1: 'a person who is fierce, violent, and uncontrolled.',
+    definition2: 'someone who is brutally honest or blunt in their words and actions.',
+    definition3: 'a person who is aggressive and unrelenting in their behavior.',
+    definition4: 'someone who is fearless and unstoppable.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Informal'
+  },
+  {
+    word: 'squad',
+    definition1: 'a close-knit group of friends who are always together.',
+    definition2: 'a tight-knit group of people who hang out together regularly.',
+    definition3: 'a group of friends who are always there for each other.',
+    definition4: 'a group of people who share a strong bond and spend a lot of time together.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Informal'
+  },
+  {
+    word: 'fire',
+    definition1: 'excellent, outstanding, or amazing.',
+    definition2: 'exciting, intense, or thrilling.',
+    definition3: 'impressive or remarkable.',
+    definition4: 'outstandingly good or exciting.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },{
+    word: 'yeet',
+    definition1: 'an exclamation of excitement, approval, surprise, or all-around energy, often as issued when doing a dance move or throwing something.',
+    definition2: 'a versatile word that can be used to convey excitement, enthusiasm, or approval.',
+    definition3: 'an exclamation used to express excitement, approval, or joy.',
+    definition4: 'a word used to express excitement, triumph, or joy, especially when dancing or throwing something.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Interjection',
+    type: 'Informal'
+  },
+  {
+    word: 'flex',
+    definition1: 'to show off one\'s accomplishments, skills, or possessions, often in a boastful or exaggerated manner.',
+    definition2: 'to display one\'s superiority or success in a way that is intended to impress others.',
+    definition3: 'to show off or boast about one\'s abilities, achievements, or possessions.',
+    definition4: 'to demonstrate one\'s strength, skill, or prowess, often in a showy or boastful manner.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Verb',
+    type: 'Informal'
+  },
+  {
+    word: 'fomo',
+    definition1: 'the fear of missing out, characterized by anxiety or unease about not being included in something enjoyable or interesting.',
+    definition2: 'a feeling of anxiety or insecurity caused by the belief that one is missing out on something exciting or interesting happening elsewhere.',
+    definition3: 'anxiety or apprehension that others might be having rewarding experiences from which one is absent.',
+    definition4: 'anxiety or apprehension caused by the belief that others are having fun or experiencing exciting things without you.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Informal'
+  },
+  {
+    word: 'chillax',
+    definition1: 'to relax or calm down, often used as a command or suggestion to someone who is stressed or agitated.',
+    definition2: 'to chill out and relax, especially when feeling stressed or tense.',
+    definition3: 'to take it easy or unwind, especially when feeling tense or anxious.',
+    definition4: 'to calm down or take a break from stress, especially by relaxing and unwinding.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Verb',
+    type: 'Informal'
+  },
+  {
+    word: 'lit',
+    definition1: 'turned up or excited, often as a result of alcohol or drugs.',
+    definition2: 'intoxicated or under the influence of alcohol or drugs.',
+    definition3: 'excited or enthusiastic, especially after consuming alcohol or drugs.',
+    definition4: 'highly energetic or enthusiastic, often due to the consumption of alcohol or drugs.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'thicc',
+    definition1: 'used to describe a person (usually a woman) with a curvaceous and voluptuous figure, especially one with a large buttocks and thighs.',
+    definition2: 'describing a person, usually a woman, who has a voluptuous and curvy figure, especially with thick thighs and buttocks.',
+    definition3: 'having a curvaceous and attractive figure, especially with full hips and thighs.',
+    definition4: 'having a shapely and curvaceous body, especially with a full and rounded buttocks and thighs.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },
+  {
+    word: 'lit',
+    definition1: 'something that is exciting, impressive, or outstanding.',
+    definition2: 'an event or experience that is fun, exciting, or highly enjoyable.',
+    definition3: 'a situation or event that is highly enjoyable or entertaining.',
+    definition4: 'a party, gathering, or event that is highly enjoyable and exciting.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Informal'
+  },
+  {
+    word: 'woke',
+    definition1: 'informed and aware of social and political issues, especially regarding racism and social justice.',
+    definition2: 'conscious and aware of social and political issues, especially those related to race and inequality.',
+    definition3: 'alert to injustices and inequalities in society, especially those related to race, gender, and class.',
+    definition4: 'aware and informed about social and political issues, particularly those related to racism and inequality.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Informal'
+  },{
+    word: 'strategic',
+    definition1: 'relating to the identification of long-term goals and the means of achieving them.',
+    definition2: 'concerned with the formulation and implementation of plans or strategies.',
+    definition3: 'pertaining to the planning and execution of long-term objectives.',
+    definition4: 'related to the development and implementation of strategies for achieving long-term goals.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Business'
+  },
+  {
+    word: 'innovative',
+    definition1: 'introducing or using new ideas, methods, or technologies.',
+    definition2: 'characterized by the creation or introduction of new ideas, methods, or products.',
+    definition3: 'marked by the adoption or implementation of new methods or ideas.',
+    definition4: 'associated with the introduction of new ideas, methods, or technologies.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Business'
+  },
+  {
+    word: 'efficiency',
+    definition1: 'the ability to accomplish a task with minimal waste of time, effort, or resources.',
+    definition2: 'the quality or degree of being efficient in the use of resources, time, or effort.',
+    definition3: 'the effectiveness and productivity of a process or system in using resources.',
+    definition4: 'the ratio of output to input in a process, system, or organization.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Business'
+  },
+  {
+    word: 'leadership',
+    definition1: 'the action of leading a group of people or an organization.',
+    definition2: 'the ability to guide, direct, or influence people to achieve a common goal.',
+    definition3: 'the act of providing direction, guidance, and motivation to a group of individuals.',
+    definition4: 'the capacity to inspire and influence others towards the achievement of a common objective.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Business'
+  },
+  {
+    word: 'synergy',
+    definition1: 'the interaction or cooperation of two or more organizations, substances, or other agents to produce a combined effect greater than the sum of their separate effects.',
+    definition2: 'the combined power of a group of people or things that is greater than the sum of their individual powers.',
+    definition3: 'the interaction or cooperation of two or more elements to produce a combined effect that is greater than the sum of their separate effects.',
+    definition4: 'the combined effort or cooperation of multiple elements to achieve a greater result than individual efforts could produce.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Business'
+  },
+  {
+    word: 'proactive',
+    definition1: 'creating or controlling a situation by causing something to happen rather than responding to it after it has happened.',
+    definition2: 'taking action in advance to prevent a problem from occurring or to create a favorable outcome.',
+    definition3: 'anticipating and taking steps to influence or control future events or situations.',
+    definition4: 'acting in anticipation of future problems or opportunities rather than reacting to them after they occur.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Adjective',
+    type: 'Business'
+  },
+  {
+    word: 'productivity',
+    definition1: 'the measure of efficiency in completing a task, typically expressed as the ratio of output to input.',
+    definition2: 'the rate at which goods or services are produced per unit of input.',
+    definition3: 'the effectiveness of effort, especially in industry, as measured in terms of the rate of output per unit of input.',
+    definition4: 'the efficiency with which resources are used in producing goods or services.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Business'
+  },
+  {
+    word: 'collaboration',
+    definition1: 'the action of working with someone to produce or create something.',
+    definition2: 'the process of two or more people or organizations working together to achieve a common goal.',
+    definition3: 'the act of cooperating or working together with others to achieve a common objective.',
+    definition4: 'the joint effort of multiple individuals or groups to accomplish a shared goal.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Business'
+  },
+  {
+    word: 'analytics',
+    definition1: 'the systematic computational analysis of data or statistics.',
+    definition2: 'the process of analyzing data to uncover meaningful patterns, trends, and insights.',
+    definition3: 'the use of data analysis techniques to extract useful information and insights from large datasets.',
+    definition4: 'the examination and interpretation of data to understand patterns and trends.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Business'
+  },
+  {
+    word: 'efficacy',
+    definition1: 'the ability to produce a desired or intended result.',
+    definition2: 'the degree to which something is effective in achieving its intended purpose.',
+    definition3: 'the effectiveness or success of something in producing a desired or intended result.',
+    definition4: 'the capability of producing a desired or intended effect or result.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Business'
+  },
+  {
+    word: 'resilience',
+    definition1: 'the capacity to recover quickly from difficulties; toughness.',
+    definition2: 'the ability to bounce back from adversity, hardship, or setbacks.',
+    definition3: 'the ability to withstand and adapt to challenges, stressors, or changes.',
+    definition4: 'the psychological strength to cope with stress and adversity.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Business'
+  },{
+    word: 'chair',
+    definition1: 'a separate seat for one person, typically with a back and four legs.',
+    definition2: 'a piece of furniture for one person to sit on, with a back, a seat, and four legs.',
+    definition3: 'a piece of furniture consisting of a seat, legs, back, and often arms, designed to accommodate one person.',
+    definition4: 'a movable seat with a back, for a single person.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Furniture'
+  },
+  {
+    word: 'table',
+    definition1: 'a piece of furniture with a flat top and one or more legs, providing a level surface on which objects may be placed, and that can be used for such purposes as eating, writing, working, or playing games.',
+    definition2: 'a piece of furniture with a flat top and one or more legs, providing a level surface on which objects may be placed, and that can be used for such purposes as eating, writing, working, or playing games.',
+    definition3: 'a piece of furniture with a flat top and one or more legs, providing a level surface on which objects may be placed, and that can be used for such purposes as eating, writing, working, or playing games.',
+    definition4: 'a piece of furniture with a flat top and one or more legs, providing a level surface on which objects may be placed, and that can be used for such purposes as eating, writing, working, or playing games.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Furniture'
+  },{
+    word: 'door',
+    definition1: 'a hinged, sliding, or revolving barrier at the entrance to a building, room, or vehicle, or in the framework of a cupboard.',
+    definition2: 'a hinged, sliding, or revolving barrier at the entrance to a building, room, or vehicle, or in the framework of a cupboard.',
+    definition3: 'a hinged, sliding, or revolving barrier at the entrance to a building, room, or vehicle, or in the framework of a cupboard.',
+    definition4: 'a hinged, sliding, or revolving barrier at the entrance to a building, room, or vehicle, or in the framework of a cupboard.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Construction'
+  },
+  {
+    word: 'window',
+    definition1: 'an opening in the wall or roof of a building or vehicle that is fitted with glass or other transparent material in a frame to admit light or air and allow people to see out.',
+    definition2: 'an opening in the wall or roof of a building or vehicle that is fitted with glass or other transparent material in a frame to admit light or air and allow people to see out.',
+    definition3: 'an opening in the wall or roof of a building or vehicle that is fitted with glass or other transparent material in a frame to admit light or air and allow people to see out.',
+    definition4: 'an opening in the wall or roof of a building or vehicle that is fitted with glass or other transparent material in a frame to admit light or air and allow people to see out.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Construction'
+  },
+  {
+    word: 'computer',
+    definition1: 'an electronic device for storing and processing data, typically in binary form, according to instructions given to it in a variable program.',
+    definition2: 'an electronic device that accepts data, processes it, stores it, and produces an output (results).',
+    definition3: 'a programmable electronic device designed to accept data, perform prescribed mathematical and logical operations at high speed, and display the results of these operations.',
+    definition4: 'an electronic device that manipulates information or data.',
+    definition5: 'a device that can be instructed to carry out sequences of arithmetic or logical operations automatically via computer programming.',
+    definition6: 'a device capable of performing a variety of operations automatically.',
+    definition7: 'an electronic machine that can store and process large amounts of data and perform complex calculations.',
+    definition8: null,
+    usage: 'Noun',
+    type: 'Technology'
+  },
+  {
+    word: 'phone',
+    definition1: 'a telephone.',
+    definition2: 'a system that converts acoustic vibrations to electrical signals in order to transmit sound, typically voices, over a distance using wire or radio.',
+    definition3: 'a device used for transmitting sound or speech to a distant point, especially by telephone, radio, or television.',
+    definition4: 'a system for transmitting voices over a distance using wire or radio, by converting acoustic vibrations to electrical signals.',
+    definition5: 'a device for transmitting sound over long distances, especially one that converts sound into electrical signals and transmits them to a distant point.',
+    definition6: 'a system for transmitting voices over long distances, especially one that converts sound into electrical signals and transmits them to a distant point.',
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Technology'
+  },
+  {
+    word: 'clock',
+    definition1: 'an instrument for measuring and indicating time, typically by hands moving over a dial or series of marks.',
+    definition2: 'a mechanical or electrical device for measuring time, indicating hours, minutes, and sometimes seconds, typically by hands on a round dial or by displayed figures.',
+    definition3: 'a timepiece that shows the time of day.',
+    definition4: 'a device for measuring time, typically with hands or numbers to indicate the hour and minute.',
+    definition5: 'a device that measures and displays the time.',
+    definition6: 'a device used for measuring and indicating time, typically by hands on a dial or by numbers.',
+    definition7: 'an instrument for measuring time, typically with hands or digital representation of numbers.',
+    definition8: null,
+    usage: 'Noun',
+    type: 'Technology'
+  },{
+    word: 'time',
+    definition1: 'the indefinite continued progress of existence and events in the past, present, and future, regarded as a whole.',
+    definition2: 'the continued progress of existence and events in the past, present, and future.',
+    definition3: 'the measurement of the indefinite and continuous progress of existence and events in the past, present, and future.',
+    definition4: 'a system of measuring and organizing existence and events in the past, present, and future.',
+    definition5: 'a dimension in which events can be ordered from the past through the present into the future.',
+    definition6: 'the duration of an event, action, or process.',
+    definition7: 'a point at which a specified period begins or ends; the moment something occurs.',
+    definition8: 'an instance or occasion when something occurs.',
+    usage: 'Noun',
+    type: 'General'
+  },
+  {
+    word: 'work',
+    definition1: 'activity involving mental or physical effort done in order to achieve a purpose or result.',
+    definition2: 'a task or tasks to be undertaken; something a person or machine has to do.',
+    definition3: 'a job or profession.',
+    definition4: 'a place or premises for industrial activity, typically manufacturing.',
+    definition5: 'a place or premises for carrying out a particular activity or function.',
+    definition6: 'effort expended on a particular task or goal.',
+    definition7: 'a product or result of action, effort, or activity.',
+    definition8: null,
+    usage: 'Noun',
+    type: 'General'
+  },
+  {
+    word: 'home',
+    definition1: 'the place where one lives permanently, especially as a member of a family or household.',
+    definition2: 'a house, apartment, or other shelter that is the usual residence of a person, family, or household.',
+    definition3: 'a place where something flourishes, is most typically found, or from which it originates.',
+    definition4: 'the social unit formed by a family living together.',
+    definition5: 'a dwelling place; a house or place of residence.',
+    definition6: 'a place where something is discovered, founded, developed, or promoted; a headquarters.',
+    definition7: 'the place where something is invented, founded, or developed.',
+    definition8: null,
+    usage: 'Noun',
+    type: 'General'
+  },
+  {
+    word: 'money',
+    definition1: 'a current medium of exchange in the form of coins and banknotes; coins and banknotes collectively.',
+    definition2: 'a means of payment, especially coins or banknotes.',
+    definition3: 'the assets, property, and resources owned by someone or something; wealth.',
+    definition4: 'a medium of exchange; something generally accepted as a medium of exchange, a measure of value, or a means of payment.',
+    definition5: 'assets, property, and resources that are owned by a person or organization.',
+    definition6: 'currency and other financial assets collectively.',
+    definition7: 'something that is generally accepted as a medium of exchange, a measure of value, or a means of payment.',
+    definition8: null,
+    usage: 'Noun',
+    type: 'General'
+  },
+  {
+    word: 'family',
+    definition1: 'a group of one or more parents and their children living together as a unit.',
+    definition2: 'a group consisting of parents and children living together in a household.',
+    definition3: 'a group of people related by blood or marriage.',
+    definition4: 'a group consisting of one or two parents and their children living together in a household.',
+    definition5: 'a social unit consisting of parents and their children, considered as a group, whether dwelling together or not.',
+    definition6: 'a group of people united by certain convictions or a common affiliation.',
+    definition7: 'a group of individuals living under one roof and usually under one head; household.',
+    definition8: null,
+    usage: 'Noun',
+    type: 'General'
+  },
+  {
+    word: 'school',
+    definition1: 'an institution for educating children.',
+    definition2: 'a place where children go to learn.',
+    definition3: 'an institution for instruction in a particular skill or field.',
+    definition4: 'an educational institution designed to provide learning spaces and learning environments for teaching students under the direction of teachers.',
+    definition5: 'a place where young people receive education, especially secondary education.',
+    definition6: 'a place where children receive education; an institution for teaching children.',
+    definition7: 'an establishment for teaching and learning; a place where instruction is given in a particular discipline.',
+    definition8: null,
+    usage: 'Noun',
+    type: 'General'
+  },
+  {
+    word: 'friend',
+    definition1: 'a person with whom one has a bond of mutual affection, typically one exclusive of sexual or family relations.',
+    definition2: 'a person whom one knows and with whom one has a bond of mutual affection, typically exclusive of sexual or family relations.',
+    definition3: 'a person with whom one has a mutual bond of affection, typically one not related to family or romantic relationships.',
+    definition4: 'a person whom one knows and trusts; a person with whom one has a mutual bond of affection and trust.',
+    definition5: 'a person who is a trusted companion or with whom one shares a bond of mutual affection.',
+    definition6: 'a person with whom one has a bond of friendship; a person whom one knows well and is fond of.',
+    definition7: 'a person who is not related by blood or marriage but is considered to be close to oneself.',
+    definition8: null,
+    usage: 'Noun',
+    type: 'General'
+  },
+  {
+    word: 'love',
+    definition1: 'an intense feeling of deep affection.',
+    definition2: 'a deep and tender feeling of affection for or attachment to someone.',
+    definition3: 'a profoundly tender, passionate affection for another person.',
+    definition4: 'a feeling of warm personal attachment or deep affection, as for a friend, a parent, or a child.',
+    definition5: 'a strong feeling of affection, warmth, fondness, and regard toward someone or something.',
+    definition6: 'a strong positive emotion of regard and affection; an intense feeling of deep affection or fondness.',
+    definition7: 'a deep, tender, ineffable feeling of affection and solicitude toward a person, such as that arising from kinship, recognition of attractive qualities, or a sense of underlying oneness.',
+    definition8: null,
+    usage: 'Noun',
+    type: 'General'
+  }, {
+    word: 'Bitcoin',
+    definition1: 'the first decentralized digital currency, created in 2009 by an unknown person or group using the name Satoshi Nakamoto.',
+    definition2: 'a digital currency that operates on a decentralized network of computers.',
+    definition3: 'a type of digital currency in which a record of transactions is maintained and new units of currency are generated by the computational solution of mathematical problems, and which operates independently of a central bank.',
+    definition4: 'a decentralized digital currency without a central bank or single administrator, that can be sent from user to user on the peer-to-peer bitcoin network without the need for intermediaries.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Cryptocurrency'
+  },
+  {
+    word: 'Ethereum',
+    definition1: 'a decentralized, open-source blockchain system that features smart contract functionality.',
+    definition2: 'a decentralized platform that enables smart contracts and decentralized applications (DApps) to be built and operated without any downtime, fraud, control, or interference from a third party.',
+    definition3: 'a decentralized, open-source blockchain featuring smart contract functionality.',
+    definition4: 'an open-source, blockchain-based platform that enables the creation of smart contracts and decentralized applications (DApps).',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Cryptocurrency'
+  },
+  {
+    word: 'Blockchain',
+    definition1: 'a decentralized, distributed ledger technology that records all transactions across multiple computers in a way that prevents them from being tampered with or deleted.',
+    definition2: 'a digital ledger in which transactions made in bitcoin or another cryptocurrency are recorded chronologically and publicly.',
+    definition3: 'a digital database containing information (such as records of financial transactions) that can be simultaneously used and shared within a large decentralized, publicly accessible network.',
+    definition4: 'a distributed, decentralized, public ledger that records transactions across a network of computers.',
+    definition5: 'a system in which a record of transactions made in bitcoin or another cryptocurrency is maintained across several computers that are linked in a peer-to-peer network.',
+    definition6: 'a system of recording information in a way that makes it difficult or impossible to change, hack, or cheat the system.',
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Technology'
+  },
+  {
+    word: 'Cryptocurrency',
+    definition1: 'a digital or virtual currency that uses cryptography for security and operates independently of a central bank.',
+    definition2: 'a digital or virtual form of currency that uses cryptography for security and operates independently of a central authority or government.',
+    definition3: 'a digital or virtual currency that uses cryptography for security and operates on a decentralized network of computers.',
+    definition4: 'a type of digital or virtual currency that uses cryptography for security and operates on a decentralized network of computers.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Finance'
+  },
+  {
+    word: 'Wallet',
+    definition1: 'a digital or physical device used to store, send, and receive cryptocurrencies like Bitcoin.',
+    definition2: 'a software program or hardware device that allows users to store, send, and receive digital currencies like Bitcoin.',
+    definition3: 'a digital or physical container used to store, send, and receive cryptocurrencies such as Bitcoin.',
+    definition4: 'a digital or physical tool that allows users to manage their cryptocurrencies like Bitcoin by storing private keys and facilitating transactions.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Technology'
+  },
+  {
+    word: 'Mining',
+    definition1: 'the process of validating transactions and adding them to a blockchain ledger by solving complex mathematical problems.',
+    definition2: 'the process of adding transaction records to a blockchain ledger by solving complex mathematical problems.',
+    definition3: 'the process of creating new units of a cryptocurrency, such as Bitcoin, by solving complex mathematical problems.',
+    definition4: 'the process of verifying and recording transactions on a blockchain ledger by solving complex mathematical problems.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Technology'
+  },
+  {
+    word: 'Altcoin',
+    definition1: 'any cryptocurrency other than Bitcoin.',
+    definition2: 'any digital currency other than Bitcoin.',
+    definition3: 'any cryptocurrency that is not Bitcoin.',
+    definition4: 'any digital or virtual currency that is not Bitcoin.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Cryptocurrency'
+  },
+  {
+    word: 'Smart Contract',
+    definition1: 'self-executing contracts with the terms of the agreement between buyer and seller written directly into code.',
+    definition2: 'a computer protocol intended to digitally facilitate, verify, or enforce the negotiation or performance of a contract.',
+    definition3: 'self-executing contracts with the terms of the agreement between buyer and seller written directly into code.',
+    definition4: 'a digital contract that automatically executes, enforces, or verifies the terms of an agreement using computer code.',
+    definition5: null,
+    definition6: null,
+    definition7: null,
+    definition8: null,
+    usage: 'Noun',
+    type: 'Technology'
   }
-  // Additional entries would follow the same pattern
 ];
 const users = [];
 
@@ -964,46 +2290,50 @@ async function roulsResponse(question) {
     const chatKeywords = ['chat', 'communicate', 'others'];
 
     const keyWordsForQuestion = ['how', 'where', 'when', 'what', 'why', 'which', 'who', 'whom', 'whose'];
-
-    // Split the question into multiple questions or responses based on keywords
+    const askingDefinition = ['definition of', 'meaning of', 'defintion of', 'defnition of', 'defition of'];
     const parts = [];
     let currentPart = '';
 
+
     for (let word of lowercaseQuestion.split(' ')) {
         if (keyWordsForQuestion.includes(word)) {
-            // Push the current part to the parts array
             if (currentPart.trim() !== '') {
-
-                // only trim if parts are not related to one another
-                // need to have data set of definitions that we can train with
-                // look for splitters
-                //  and, commmas, ! ... etc others. (indicators to split)
                 parts.push(currentPart.trim());
             }
-            currentPart = ''; // Reset current part
+            currentPart = ''; 
         }
-        // Append the word to the current part
         currentPart += word + ' ';
     }
 
-    // Push the last part to the parts array
     if (currentPart.trim() !== '') {
         parts.push(currentPart.trim());
     }
 
-    // Evaluate each part and build the response string
+    // Extract the word from the parts
+    let targetWord = '';
+    for (let part of parts) {
+        const match = part.match(/(?:of|mean\s*)\s+["']?(.*?)[?"']?$/);
+        if (match && match[1]) {
+            targetWord = match[1];
+            break; // Stop searching once the word is found
+        }
+    }
     let response = '';
     let responseArray = [];
-
+    let partIndex = -1;
     for (let part of parts) {
+      partIndex +=1;
+      /*
+      if(checkString(part)){
+
+      }*/
+        console.log('checking current part', part);
         if (artworkKeywords.some(keyword => part.includes(keyword))) {
-            response += "To buy a painting, you can visit our website's art gallery section and select the painting you like. Then, follow the instructions to make a purchase.";
+            response += "To buy a painting, you can visit our website's art gallery section and select the painting you like. Then, follow the instructions to make a purchase. Make sure metamask is installed and the extension is available.";
         } 
-        // Check if the part is related to connecting Metamask
         else if (metamaskKeywords.some(keyword => part.includes(keyword))) {
             response += "To connect your Metamask wallet, please follow these steps: [insert steps here]<br>";
         } 
-        // Check if the part is related to chatting with others
         else if (chatKeywords.some(keyword => part.includes(keyword))) {
             response += "You can chat with others on our website by navigating to the chat section and joining a conversation or starting a new one.\n\n";
         }else if (helloPhrases.some(phrase => part.toLowerCase().includes(phrase))) {
@@ -1012,12 +2342,30 @@ async function roulsResponse(question) {
             const currentTime = new Date().toLocaleTimeString();
             response = `The current time is ${currentTime}.\n\n`;
         } else if (part.toLowerCase().includes("who built this website")) {
-            response = "This website was built by [insert name/company].\n\n";
-        } else if (part.toLowerCase().includes("thanks") || part.toLowerCase().includes("Thankss")) {
+            response = "This website was built by [Roy Burson].\n\n";
+        } else if (part.toLowerCase().includes("thanks") || part.toLowerCase().includes("Thankss")|| part.toLowerCase().includes("thank you")) {
             response = "Your welcome if there is anything else i can assist with let me know!.\n\n";
-        } 
-        // If the part is not related to any known topic, add an error message
-        else {
+        }else if(askingDefinition.some(phrase => part.toLowerCase().includes(phrase))){
+          const thisWord = targetWord;
+          //const thisWord = part.substring(part.lastIndexOf(" ")+1);
+          const stripedWord = thisWord.replace(/\s/g, "");
+          console.log(' seems like the user is asking for a definition of:', stripedWord);
+          
+          let matchingObj = knownDefinitions.find(obj => obj.word === stripedWord);
+
+          if (matchingObj) {
+              console.log('We found a matching word:', matchingObj);
+              let formattedString = Object.entries(matchingObj)
+                  .filter(([key, value]) => value !== null) 
+                  .map(([key, value]) => `${key}: ${value}`)
+                  .join('\n\n'); 
+
+              response += formattedString + '\n\n';
+          } else {
+              response += 'We could not find the word you are looking for.\n\n';
+          }
+          
+        } else {
             response += "I'm sorry, I couldn't understand your question or it's not related to the topics I can assist with.\n\n";
         }
 
