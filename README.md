@@ -11,10 +11,11 @@
     const dbURL = 'your-mongoose-db-string';
     const googleAPIKEY = 'your-google-api-maps-key';
     const myDomain = 'localhost';
-    const PORT = process.env.PORT || 27015; // Edit port if needed
+    const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
+    const PORT = process.env.PORT || 27015; 
     ```
 
-3. Change Roy's wallet address to your wallet address in the `myfunction.js` file (it must be a MetaMask wallet):
+3. Change Roy's wallet address to your wallet address in the `myfunction.js` file (it must be a MetaMask wallet for time being):
 
     ```javascript
     const RoysWallet = '0x5cdad7876270364242ade65e8e84655b53398b76';
