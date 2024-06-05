@@ -1,12 +1,12 @@
 // Name: Roy Burson 
-// Date last modified: 06-04-24
+// Date last modified: 06-05-24
 // purpose: Make web3 art website
 
 // to do list 
 
 /*
 1) find out how to upload code to digital ocean and cost 
-2) fix AI bot response
+2) fix AI bot response (add words and attempt to get smarter the more you use it)
 3) limit fetch request to DB (need to keep track of them per IP) for certain time period (like 48 hours) this prevents clog up or build up in mongo
 */
 
@@ -32,7 +32,6 @@ const puppeteer = require('puppeteer');
 const zlib = require('zlib');
 var inlineBase64 = require('nodemailer-plugin-inline-base64');
 
-
 // collections db strings 
 const paintCollectionString = 'Painting';
 const purchasesCollectionString = 'Purchase';
@@ -44,9 +43,8 @@ const appPasscode = 'google-app-passcode-here';
 const buisnessEmial = 'your-buisiness-email@gmail.com';
 const dbURL = 'your-mongoose-db-string';
 const googleAPIKEY = 'your-google-api-maps-key';
+const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
 const myDomain = 'localhost';
-
-
 
 const paintingSchema = new mongoose.Schema({
     image: String,
@@ -2202,7 +2200,46 @@ function getMaxValueofPurchases(attemptedClientsArray) {
     return maxValue;
 }
 
-// Function to send email
+
+async function getNewDefinition(word) {
+  const apiUrl =`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${MERRIAM_WEBSTER_API_KEY}`;
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    const data = await response.json();
+
+    //console.log(`we recieved data for the word ${word}:`, data);
+
+    if (data.length === 0) {
+      console.log('No definition found.');
+      return nulls;
+    }
+
+    // Assume the first entry contains the relevant information
+    const entry = data[0];
+
+    const wordInfo = {
+      word: word,
+      definition1: entry.shortdef[0] ? entry.shortdef[0] : null,
+      definition2: entry.shortdef[1] ? entry.shortdef[1] : null,
+      definition3: entry.shortdef[2] ? entry.shortdef[2] : null,
+      definition4: entry.shortdef[3] ? entry.shortdef[3] : null,
+      definition5: entry.shortdef[4] ? entry.shortdef[4] : null,
+      definition6: entry.shortdef[5] ? entry.shortdef[5] : null,
+      definition7: entry.shortdef[6] ? entry.shortdef[6] : null,
+      definition8: entry.shortdef[7] ? entry.shortdef[7] : null,
+      usage: entry.fl || 'Unknown',
+      type: 'Unknown' // You might need additional logic to determine the type
+    };
+
+    return wordInfo;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return null;
+  }
+}
 async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, image) {
 
 // HTML files to send
@@ -2286,12 +2323,131 @@ async function verifyUserinputData(email, address, firstName, lastName){
 async function roulsResponse(question) {
     const lowercaseQuestion = question.toLowerCase(); // Convert question to lowercase
 
-    const artworkKeywords = ['painting', 'artwork', 'buy', 'purchase'];
+    const artworkPurchaseKeywords = [
+      'buy a painting',
+      'buy art',
+      'purchase a painting',
+      'buy a painting',
+      'purchase artwork',
+      'buy art',
+      'purchase art',
+      'acquire a painting',
+      'acquire artwork',
+      'acquire art',
+      'get a painting',
+      'get artwork',
+      'get art',
+      'obtain a painting',
+      'obtain artwork',
+      'obtain art',
+      'invest in a painting',
+      'invest in artwork',
+      'invest in art',
+      'procure a painting',
+      'procure artwork',
+      'procure art',
+      'secure a painting',
+      'secure artwork',
+      'secure art',
+      'own a painting',
+      'own artwork',
+      'own art',
+      'purchase a masterpiece',
+      'buy a masterpiece',
+      'acquire a masterpiece',
+      'get a masterpiece',
+      'obtain a masterpiece',
+      'invest in a masterpiece',
+      'procure a masterpiece',
+      'secure a masterpiece',
+      'own a masterpiece',
+      'how can i buy art',
+      'how can i purchase art',
+      'how can i get art',
+      'how can i buy artwtwork',
+      'How do I go about buying art?',
+      'What is the process for purchasing art?',
+      'How can I acquire artwork?',
+      'What steps should I take to buy art?',
+      'How do I purchase artwork?',
+      'How can I get my hands on some art?',
+      'How do I buy artwork?',
+      'How can I get some artwork?',
+      'Where do I start if I want to buy art?',
+      'How do I begin the process of buying art?',
+      'Where can I buy art?',
+      'How can I start collecting art?',
+      'What are the steps to buying art?',
+      'How can I invest in art?',
+      'How can I buy art as an investment without breaking the bank?',
+      'What are the risks involved in buying art?',
+      'How can I buy art that will appreciate in value?',
+      'What are the advantages of buying art from galleries versus online?',
+      'How can I find reputable art dealers?',
+      'What should I know about buying art from private sellers?',
+      'How can I buy art on a payment plan?',
+      'What are the tax implications of buying art?',
+      'How can I insure the art I buy?',
+      'What are the legal considerations when buying art?',
+      'How can I transport the art I buy safely?',
+      'What are the costs associated with buying art?',
+      'How can I store the art I buy properly?',
+      'What are the best practices for maintaining the art I buy?',
+      'How can I display the art I buy effectively?',
+      'What are the trends in buying art currently?',
+      'How can I find out about upcoming art events where I can buy art?',
+      'What are the pitfalls to avoid when buying art?',
+      'How can I educate myself about buying art?',
+      'What are the common mistakes people make when buying art?',
+      'How can I buy art with a social or environmental conscience?',
+      'What are the benefits of buying art directly from artists versus through galleries?',
+      'How can I buy art as a form of cultural investment?',
+      'What role does technology play in buying art?',
+      'How can I navigate the art market when buying art?',
+      'What are the different approaches to buying art as an investment?',
+      'How can I buy art that reflects my personal values?',
+      'What are the advantages of buying art from emerging artists?',
+      'How can I assess the quality of art before buying it?',
+      'What are the best ways to discover new artists when buying art?',
+      'How can I support diversity and inclusion when buying art?',
+      'What are the implications of buying art on the secondary market?',
+      'How can I buy art that aligns with my cultural heritage?',
+      'What are the long-term considerations when buying art?',
+      'How can I buy art that sparks conversation and dialogue?',
+      'What are the ethical considerations when buying art from indigenous artists?',
+      'How can I buy art that contributes to social change?',
+      'What are the best strategies for building a diverse art collection?',
+      'How can I incorporate digital art into my collection?',
+      'What role does provenance play when buying art?',
+      'How can I buy art in a way that supports sustainable practices?',
+      'What are the benefits of buying art from local artists?',
+      'How can I buy art that tells a story?',
+      'What are the implications of buying art from non-traditional sources?',
+      'How can I buy art as a means of preserving cultural heritage?',
+      'What are the considerations when buying art for public spaces?',
+      'How can I buy art that challenges conventional notions?',
+      'What are the potential risks and rewards of buying art online versus in person?',
+      'How can I buy art that captures the spirit of a specific time or place?',
+      'What are the advantages of buying art from diverse perspectives?',
+      'How can I buy art that fosters inclusivity and representation?',
+      'What are the considerations when buying art for investment versus personal enjoyment?',
+      'How can I buy art that resonates with contemporary issues?',
+      'What are the implications of buying art from international artists?',
+      'How can I buy art that promotes cultural exchange and understanding?',
+      'What are the best ways to support emerging artists when buying art?',
+      'How can I buy art that challenges stereotypes and biases?',
+      'What are the considerations when buying art as a form of political expression?',
+      'How can I buy art that contributes to community development?',
+      'How do I go about buying art?',
+      'What is the process for purchasing art?',
+      'How can I acquire artwork?',
+      'What steps should I take to buy art?'
+];
     const metamaskKeywords = ['metamask', 'connect', 'wallet'];
     const chatKeywords = ['chat', 'communicate', 'others'];
 
     const keyWordsForQuestion = ['how', 'where', 'when', 'what', 'why', 'which', 'who', 'whom', 'whose'];
-    const askingDefinition = ['definition of', 'meaning of', 'defintion of', 'defnition of', 'defition of'];
+    const askingDefinition = ['definition of', 'meaning of', 'defintion of', 'defnition of', 'defition of', 'what is a', 'what is the meaning of', 'what is the definition of', 'what is the meaning of the word'];
     const parts = [];
     let currentPart = '';
 
@@ -2322,24 +2478,116 @@ async function roulsResponse(question) {
     let response = '';
     let responseArray = [];
     let partIndex = -1;
+
+    // Array of similar time phrases
+    const similarTimePhrases = [
+        "what time is it",
+        "current time",
+        "time right now",
+        "time is it",
+        "what's the time",
+        "what hour is it",
+        "what's the current time",
+        "time now",
+        "tell me the time",
+        "what is the time",
+        "what's the current time",
+        "what is the current hour",
+        "tell me what time it is",
+        "can you tell me the time",
+        "what is the hour",
+        "do you know what time it is",
+        "time at the moment",
+        "please tell me the time",
+        "what time is it now",
+        "current hour",
+        "could you tell me the time",
+        "what is the present time",
+        "time currently",
+        "time it is",
+        "tell me the current time",
+        "time now please",
+        "what time it is right now",
+        "current time please",
+        "what's the time now",
+        "can you tell me what time it is",
+        "time right now please",
+        "could you tell me what time it is now",
+        "please tell me what time it is",
+        "what time is it at the moment",
+        "could you please tell me the time",
+        "what is the time now",
+        "can you tell me the current time",
+        "what hour is it now",
+        "what's the hour",
+        "do you know the time",
+        "what's the current time please",
+        "tell me what time it is now",
+        "what is the time at present",
+        "what is the time currently",
+        "what is the current time now",
+        "tell me the time right now"
+    ];
+
     for (let part of parts) {
       partIndex +=1;
-      /*
       if(checkString(part)){
+        let currentWords = part.split(" ");
+        for(const word of currentWords){
+          let matchingObj = knownDefinitions.find(obj => obj.word === word);
+          if(matchingObj){
+            // we found it no need to add the same definition again
+          }else{
+              getNewDefinition(word).then((result)=>{
+                if(result !== null){
+                    console.log('trying to save new definition into local array on server', result);
+                    knownDefinitions.push(result);
+                }else{
+                  console.log('getNewDefinition() function returned null instead of object to push to array');
+                }
+              }).catch(error=>{
+                  console.log('Error calling  getNewDefinition() function near line 2485', error);
+              });
+          }
+        }
 
-      }*/
-        console.log('checking current part', part);
-        if (artworkKeywords.some(keyword => part.includes(keyword))) {
-            response += "To buy a painting, you can visit our website's art gallery section and select the painting you like. Then, follow the instructions to make a purchase. Make sure metamask is installed and the extension is available.";
+      //2) determine if basic question and use easy statement returns 
+
+      //3) else 
+        // determine if question, command, or statement before executing commands from memory. 
+
+
+        if (artworkPurchaseKeywords.some(keyword => part.includes(keyword))) {
+            response = "To buy a painting, you can visit our website's art gallery section and select the painting you like. Then, follow the instructions to make a purchase. Make sure metamask is installed and the extension is available.";
         } 
         else if (metamaskKeywords.some(keyword => part.includes(keyword))) {
-            response += "To connect your Metamask wallet, please follow these steps: [insert steps here]<br>";
+            response = "To connect your Metamask wallet, please click the connect button on the top right corner of the webpage.";
         } 
         else if (chatKeywords.some(keyword => part.includes(keyword))) {
-            response += "You can chat with others on our website by navigating to the chat section and joining a conversation or starting a new one.\n\n";
+            response = "You can chat with others on our website by navigating to the chat section and joining a conversation or starting a new one.\n\n";
         }else if (helloPhrases.some(phrase => part.toLowerCase().includes(phrase))) {
-            response = "Hello! How can I assist you today?\n\n";
-        } else if (part.toLowerCase().includes("what time is it")) {
+
+            var professionalGreetings = [
+                "Hello, how may I assist you?",
+                "Welcome, how may I be of service?",
+                "Greetings, how can I assist you today?",
+                "Hello there, what can I help you with?",
+                "Hi, how may I assist you today?",
+                "Hello, what can I do for you today?",
+                "Hi there, how can I help you?",
+                "Hello, how can I be of assistance?",
+                "Welcome, how may I assist you?",
+                "Hello, what brings you here today?",
+                "Hi, how may I help you?",
+                "Hello there, how can I be of assistance?",
+                "Hi, how can I assist you?",
+                "Hello, how may I assist you right now?",
+                "Greetings, how can I assist you right away?"
+            ];
+            var randomIndex = Math.floor(Math.random() * professionalGreetings.length);
+            response = professionalGreetings[randomIndex];
+
+        } else if (similarTimePhrases.some(phrase => part.toLowerCase().includes(phrase))) {
             const currentTime = new Date().toLocaleTimeString();
             response = `The current time is ${currentTime}.\n\n`;
         } else if (part.toLowerCase().includes("who built this website")) {
@@ -2356,19 +2604,24 @@ async function roulsResponse(question) {
 
           if (matchingObj) {
               console.log('We found a matching word:', matchingObj);
+
               let formattedString = Object.entries(matchingObj)
                   .filter(([key, value]) => value !== null) 
                   .map(([key, value]) => `${key}: ${value}`)
                   .join('\n\n'); 
 
-              response += formattedString + '\n\n';
+              response = formattedString + '\n';
+              console.log('we formatted the json object to string:', response);
           } else {
-              response += 'We could not find the word you are looking for.\n\n';
+              response = 'We could not find the word you are looking for.\n\n';
           }
           
         } else {
-            response += "I'm sorry, I couldn't understand your question or it's not related to the topics I can assist with.\n\n";
+            response = "I'm sorry, I couldn't understand your question or it's not related to the topics I can assist with.\n\n";
         }
+      }else{
+        response += 'Sorry I do not accept inappropriate input and bad words!';
+      }
 
         responseArray.push([{rsp: response.trim()}]);
     }
