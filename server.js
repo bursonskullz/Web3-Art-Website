@@ -1876,151 +1876,127 @@ const updatedViewsHistory = [];
 
 const PORT = process.env.PORT || 27015; 
 const PORT2 = process.env.PORT || 4040; 
-try{
 
+try{
     if (cluster.isMaster) {
         const numCPUs = os.cpus().length;
-
         console.log(`Master ${process.pid} is running`);
-
-        // Fork workers.
-        for (let i = 0; i < numCPUs; i++) {
-            cluster.fork();
-        }
-
-        cluster.on('exit', (worker, code, signal) => {
-            console.log(`Worker ${worker.process.pid} died`);
-            // Optionally, you can fork a new worker when one dies
-            cluster.fork();
-        });
-    } else {
-        const server = http.createServer((req, res) => {
-            handleHttpRequest(req, res, io);
-        });
-
-
         mongoose.set('debug', true);
         mongoose.connect(dbURL)
         .then(async (result) => {
-            await addBasicDefinitions(basicDefinitions);  
-
-            server.listen(PORT, myDomain, async () => {
-                console.log(`Server running really good on port ${PORT}`);
+            const server = http.createServer((req, res) => {
+                handleHttpRequest(req, res, io);
             });
-        })
-        .catch((error) => {
-            console.error('Error connecting to MongoDB:', error);
-            process.exit(1);
-        });
 
+            server.listen(PORT, myDomain, () => {
+                console.log(`Server running on port ${PORT}`);
+            });
+            const io = socketIo(server);
 
-        const io = socketIo(server);
+            io.on('connection', (socket) => {
 
-        io.on('connection', (socket) => {
-
-            console.log('A user connected');
-            
-            const ipAddress = socket.handshake.address;
-
-            let clientIP;
-            if (ipAddress.includes('::ffff:')) {
-                clientIP = ipAddress.split(':').pop();
-            } else {
-                clientIP = ipAddress;
-            }
-
-
-            //const randomIndex = Math.floor(Math.random() * randomNames.length);
-            //const username = randomNames[randomIndex];
-
-            let username;
-            let attempts = 0;
-            const maxAttempts = 1000;
-            // Loop until a unique username is generated
-            do {
-                const randomIndex = Math.floor(Math.random() * randomNames.length);
-                username = randomNames[randomIndex];
-                attempts++;
-            } while (messageHistory.some(obj => obj.username === username && attempts < maxAttempts));
-
-                // If maxAttempts reached, assign the first name from randomNames
-            if (attempts >= maxAttempts) {
-                username = randomNames[0];
-            }
-
-            const currentUser = { 
-                ip: clientIP, 
-                user: username, 
-                coolDown: 0,
-                nameChanges: 0
-            };
-
-            users.push(currentUser);
-
-            // Handle incoming messages
-            socket.on('message', (message) => {
+                console.log('A user connected');
+                
                 const ipAddress = socket.handshake.address;
-                const timeSent = new Date().toISOString();
+
                 let clientIP;
                 if (ipAddress.includes('::ffff:')) {
                     clientIP = ipAddress.split(':').pop();
                 } else {
                     clientIP = ipAddress;
                 }
-                // need to get ip again 
 
-                const sender = users.find(u => u.ip == clientIP);
+                let username;
+                let attempts = 0;
+                const maxAttempts = 1000;
+                do {
+                    const randomIndex = Math.floor(Math.random() * randomNames.length);
+                    username = randomNames[randomIndex];
+                    attempts++;
+                } while (messageHistory.some(obj => obj.username === username && attempts < maxAttempts));
 
-                let senderName;
-
-                if (sender) {
-                    // Retrieve the name of the sender
-                    senderName = sender.user;
-                } else {
-                    senderName = 'noName';
+                if (attempts >= maxAttempts) {
+                    username = randomNames[0];
                 }
 
-                const obj = {
-                        msg: message,
-                        username: senderName,
-                        time: timeSent, 
-                        coolDown: sender.coolDown,
-                        nameChanges:0 
-                    };
+                const currentUser = { 
+                    ip: clientIP, 
+                    user: username, 
+                    coolDown: 0,
+                    nameChanges: 0
+                };
 
-                    // find username cooldown value and set into each obj to acces
+                users.push(currentUser);
+                socket.on('message', (message) => {
+                    const ipAddress = socket.handshake.address;
+                    const timeSent = new Date().toISOString();
+                    let clientIP;
+                    if (ipAddress.includes('::ffff:')) {
+                        clientIP = ipAddress.split(':').pop();
+                    } else {
+                        clientIP = ipAddress;
+                    }
+                    const sender = users.find(u => u.ip == clientIP);
 
-                if(!checkString(obj.msg)){
-                    obj.msg = 'Your input contains inappropriate content. Please ensure your message is respectful!';
-                }
+                    let senderName;
 
-                if(canSendMessage(messageHistory, obj.username, timeSent)){
-                    console.log('user can send message');
-                    messageHistory.push(obj);
-                    //console.log(obj);
-                    // only want to emit object if user can send!! 
-                    io.emit('message', obj);
-                }else{
-                    console.log('Restricted user trying to send message', obj.username);
-                }
+                    if (sender) {
+                        senderName = sender.user;
+                    } else {
+                        senderName = 'noName';
+                    }
 
-                if(messageHistory.length > 100){
-                    messageHistory.pop();
-                    // when it gets to a 100 it will start poping 
-                }
-               
-                
+                    const obj = {
+                            msg: message,
+                            username: senderName,
+                            time: timeSent, 
+                            coolDown: sender.coolDown,
+                            nameChanges:0 
+                        };
+                    if(!checkString(obj.msg)){
+                        obj.msg = 'Your input contains inappropriate content. Please ensure your message is respectful!';
+                    }
+
+                    if(canSendMessage(messageHistory, obj.username, timeSent)){
+                        console.log('user can send message');
+                        messageHistory.push(obj);
+                        io.emit('message', obj);
+                    }else{
+                        console.log('Restricted user trying to send message', obj.username);
+                    }
+
+                    if(messageHistory.length > 100){
+                        messageHistory.pop();
+                    }
+                               
+                });   
             });
+            console.log('Socket Created');
+            console.log('Connected to MongoDB, calling addBasicDefinitions() function');
+            await addBasicDefinitions(basicDefinitions);
+            console.log('Done adding definitions, launching workers');
 
-
+            for (let i = 0; i < numCPUs; i++) {
+                cluster.fork();
+            }
+        })
+        .catch((error) => {
+            console.error('Error connecting to MongoDB:', error);
+            process.exit(1);
         });
+
+        cluster.on('exit', (worker, code, signal) => {
+          console.log(`Worker ${worker.process.pid} died, forking a new one`);
+          cluster.fork();
+        });
+    } else {
+      // Worker processes can handle other tasks if needed
+      console.log(`Worker ${process.pid} started`);
     }
     
 }catch(error){
-    console.log('Error createServer', error);
+    console.log('Error creating the Server', error);
 }
-
-
 function checkString(input) {
     // Define patterns for threats, bad language, and sexually explicit language
     const badLanguagePatterns = ['niger','nigger', 'niggger', 'niggggger','niiiggeer', 'nigga', 'bitch', 'whore', 'cunt', 'fuck', 'fucckk','fucck', 'fucckkk', 'shit', 'motherfucker', 'ass', 'bastard', 'dick'];
