@@ -1,12 +1,9 @@
 import {gridNavigator} from './script.js';
-//import { ethers } from './ethers';
- import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.0.8/dist/ethers.esm.min.js'; 
+import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.0.8/dist/ethers.esm.min.js'; 
 const myWebDomain = 'http://localhost:27015/'; 
 var msgCount = 0; 
-//const WEIFACTOR = 0.001;
 const WEIFACTOR = 0.001;
 const RoysWallet = '0x5cdad7876270364242ade65e8e84655b53398b76';
-// ABI (Application Binary Interface) of your contract
 const abi = [/* Your contract ABI here */];
 const socket = io();
 const iconHeaderWidth = '11.4vh';
@@ -2436,13 +2433,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 </div>
             </div>
         `;
-
-        // Insert the new HTML content into the body
         body.innerHTML = newBodyContent;
-
-        // need to check if connected again 
-
-
         checkifConnected().then(() => {
             if(!isConnected){ 
                 const thisConnectBUtton =  document.querySelector(".connect-button");
@@ -2550,418 +2541,365 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     commission.style.backgroundPosition = 'center'; 
 
 
-    commission.addEventListener('click', async function() {
+ commission.addEventListener('click', async function() {
+        const containerChecker = document.querySelector('.commissionUserInputForm');
+        if(containerChecker == null){
+            let containerInput = document.createElement('div');
+            containerInput.classList.add('container-input');
+            containerInput.style.position = 'absolute';
+            containerInput.style.top = '10%';
+            containerInput.style.width = '450px';
+            containerInput.style.height = '600px';
+            containerInput.style.overflow = 'auto'; 
+            containerInput.style.border = '1px solid #ccc';
+            containerInput.style.borderRadius = '10px';
+            containerInput.style.boxSizing = 'border-box';
+            containerInput.style.background = '#9b9999';
+            containerInput.style.fontFamily = 'Arial, sans-serif';
+            containerInput.style.border = '1px solid black';
+            containerInput.className = 'commissionUserInputForm';
 
-        // Add containerInput element
-        let containerInput = document.createElement('div');
-        containerInput.classList.add('container-input');
-        containerInput.style.position = 'absolute';
-        containerInput.style.top = '10%';
-        containerInput.style.width = '450px';
-        containerInput.style.height = '600px';
-        containerInput.style.overflow = 'auto'; // Use auto to show scrollbars if content exceeds height
-        containerInput.style.border = '1px solid #ccc';
-        containerInput.style.borderRadius = '10px';
-        containerInput.style.boxSizing = 'border-box';
-        containerInput.style.background = '#9b9999';
-        containerInput.style.fontFamily = 'Arial, sans-serif';
-        containerInput.style.border = '1px solid black';
+            let isDragging = false;
+            let offsetX = 0;
+            let offsetY = 0;
 
-        // Variables to track dragging state and offsets
-        let isDragging = false;
-        let offsetX = 0;
-        let offsetY = 0;
+            containerInput.addEventListener("mousedown", function (event) {
+                offsetX = event.clientX - containerInput.getBoundingClientRect().left;
+                offsetY = event.clientY - containerInput.getBoundingClientRect().top;
 
-        // Add mousedown event listener to start dragging
-        containerInput.addEventListener("mousedown", function (event) {
-            // Calculate the offset of the mouse click relative to the container's position
-            offsetX = event.clientX - containerInput.getBoundingClientRect().left;
-            offsetY = event.clientY - containerInput.getBoundingClientRect().top;
-
-            // Set dragging state to true
-            isDragging = true;
-
-            // Change cursor style to indicate dragging
-            containerInput.style.cursor = "grabbing";
-        });
-
-        // Add mousemove event listener to handle dragging movement
-        document.addEventListener("mousemove", function (event) {
-            if (isDragging) {
-                // Update container position based on mouse movement
-                containerInput.style.left = (event.clientX - offsetX) + "px";
-                containerInput.style.top = (event.clientY - offsetY) + "px";
-            }
-        });
-
-        // Add mouseup event listener to stop dragging
-        document.addEventListener("mouseup", function () {
-            // Set dragging state to false
-            isDragging = false;
-
-            // Reset cursor style
-            containerInput.style.cursor = "grab";
-        });
-        // Append containerInput to the body or another container element
-        document.body.appendChild(containerInput);
-
-        // Media query for smaller screens
-        const mediaQuery = window.matchMedia('(max-width: 768px)');
-
-        const handleMediaQuery = (mq) => {
-            if (mq.matches) {
-                const screenWidth = window.innerWidth;
-                if (screenWidth <= 360) {
-                    // If screen width is 400 or less, adjust the left position to 5%
-                    containerInput.style.left = '0%';
-                    containerInput.style.width = '330px';
-                    containerInput.style.zIndex = '100000000';
-                }else if (screenWidth <= 400) {
-                    // If screen width is 400 or less, adjust the left position to 5%
-                    containerInput.style.left = '5%';
-                    containerInput.style.width = '330px';
-                    containerInput.style.zIndex = '100000000';
-                }else if (screenWidth <= 450) {
-                    // If screen width is 400 or less, adjust the left position to 5%
-                    containerInput.style.left = '11%';
-                    containerInput.style.width = '330px';
-                    containerInput.style.zIndex = '100000000';
-                } else if (screenWidth <= 540) {
-                    // If screen width is 500 or less, adjust the left position to 7%
-                    containerInput.style.left = '16%';
-                    containerInput.style.width = '350px';
-                    containerInput.style.zIndex = '100000000';
-                } else if (screenWidth <= 770) {
-                    // If screen width is 770 or less, adjust the left position to 8%
-                    containerInput.style.left = '20%';
-                    containerInput.style.width = '400px';
-                    containerInput.style.zIndex = '100000000';
-                }
-            }else{
-                // Set the left position to center it inside its parent
-                const parentWidth = containerInput.parentElement.clientWidth;
-                const containerWidth = containerInput.offsetWidth;
-                const leftPosition = (parentWidth - containerWidth) / 2;
-                containerInput.style.left = leftPosition + 'px';
-            }
-        };
-
-        // Initial call to handle media query
-        handleMediaQuery(mediaQuery);
-
-        // Add event listener for changes to the media query
-        mediaQuery.addEventListener('change', (event) => {
-            handleMediaQuery(event.target);
-        });
-
-        let container = document.createElement('div');
-        container.classList.add('container');
-        container.style.width = '85%';
-        container.style.height = '80%';
-        container.style.left = '7.5%';
-        container.style.top = '10%';
-        container.style.position = 'absolute';
-        //container.style.padding = '20px';
-        container.style.backgroundColor = 'none';
-        container.style.overflowY = 'scroll';
-        container.style.justifyContent = 'center'; 
-        container.style.textAlign = 'center';
-
-        container.style.flexDirection = 'column';
-        container.style.alignItems = 'center'; // Center its children horizontally
-
-        let exitDiv = document.createElement('div');
-        exitDiv.classList.add('exit-div');
-        exitDiv.textContent = '✖'; 
-        exitDiv.style.position = 'absolute';
-        exitDiv.style.top = '0%';
-        exitDiv.style.right = '5%';
-        exitDiv.style.height = '25px';
-        exitDiv.style.width = '25px';
-        exitDiv.style.cursor = 'pointer';
-        exitDiv.style.fontSize = '20px'; 
-        exitDiv.style.color = 'black'; 
-        container.appendChild(exitDiv);
-            
-        exitDiv.addEventListener('click', function() {
-            document.body.removeChild(containerInput);
-        });
-
-        
-
-
-       // Create form title
-        let title = document.createElement('h2');
-        title.textContent = 'Commission Form';
-        title.style.textAlign = 'center';
-        title.style.marginBottom = '20px';
-
-
-        const formDescription = `
-        Hello,
-
-        Thank you for considering me for your commission. To get started, I'll need some information from you. Please provide your name and contact details below. Additionally, kindly include a description of the painting you have in mind, along with any specific details or preferences.
-
-        Once you've filled out the form, I'll review your request and get back to you as soon as possible. Your input is valuable, and I'm excited to bring your vision to life!
-        `;
-        
-        let para = document.createElement('p');
-        para.textContent = formDescription;
-        para.style.marginBottom = '10px';
-
-        container.appendChild(title);
-
-        // Create parent element for the image and center it
-        let imageContainer = document.createElement('div');
-        imageContainer.style.display = 'flex'; // Use flexbox
-        imageContainer.style.justifyContent = 'center'; // Center its children horizontally
-
-        // Create image element
-        let image = document.createElement('img');
-        image.setAttribute('src', '/images/BursonSkull.png'); 
-        image.setAttribute('alt', 'BursonSkullCommissionTemp'); 
-        image.style.width = '100px'; // Adjust width as needed
-        image.style.height = '100px'; // Adjust height as needed
-        image.style.marginBottom = '20px'; // Add space between image and form
-
-        // Append image to its parent container
-        imageContainer.appendChild(image);
-
-        // Append imageContainer to the main container
-        container.appendChild(imageContainer);
-
-
-        container.appendChild(para);
-
-
-        // Create form elements
-        let formElements = [
-            { label: 'First Name', type: 'text', id: 'firstName' },
-            { label: 'Last Name', type: 'text', id: 'lastName' },
-            { label: 'Email', type: 'email', id: 'email' },
-            { label: 'Phone', type: 'tel', id: 'phone' },
-            { label: 'Address', type: 'text', id: 'address' },
-            { label: 'details', type: 'textarea', id: 'details' },
-            { label: 'Artwork Title', type: 'text', id: 'artworkTitle' },
-            { label: 'Artwork Medium', type: 'text', id: 'artworkMedium' },
-            { label: 'Artwork Size', type: 'text', id: 'artworkSize' },
-            { label: 'Comments', type: 'textarea', id: 'comments' }
-        ];
-
-        let maxLabelWidth = 0;
-        formElements.forEach(element => {
-            maxLabelWidth = Math.max(maxLabelWidth, element.label.length);
-        });
-
-        formElements.forEach(element => {
-            let formGroup = document.createElement('div');
-            formGroup.classList.add('form-group');
-            formGroup.style.display = 'flex';
-            formGroup.style.flexDirection = 'column'; // Set the direction to column
-            formGroup.style.marginBottom = '20px';
-
-            let label = document.createElement('label');
-            label.textContent = element.label;
-            label.setAttribute('for', element.id);
-            label.style.fontWeight = 'bold';
-            label.style.marginBottom = '5px'; // Adjust as needed
-
-            let input;
-            if (element.type === 'textarea') {
-                input = document.createElement('textarea');
-                input.classList.add('form-input');
-                input.style.width = '87%';
-                input.style.height = '80px'; // Adjust height for textarea
-                input.style.padding = '10px';
-                input.style.marginBottom = '10px';
-            } else {
-                input = document.createElement('input');
-                input.setAttribute('type', element.type);
-                input.classList.add('form-input');
-                input.style.width = '87%';
-                input.style.padding = '10px';
-                input.style.marginBottom = '10px';
-            }
-            input.setAttribute('id', element.id);
-
-            formGroup.appendChild(label);
-            formGroup.appendChild(input);
-            container.appendChild(formGroup);
-        });
-
-            // Create submit button
-            let submitButton = document.createElement('button');
-            submitButton.textContent = 'Submit';
-            submitButton.classList.add('form-submit');
-            submitButton.style.backgroundColor = '#0067b3';
-            submitButton.style.color = 'white';
-            submitButton.style.border = 'none';
-            submitButton.style.borderRadius = '5px';
-            submitButton.style.padding = '10px 20px';
-            submitButton.style.cursor = 'pointer';
-            submitButton.style.marginTop = '20px'; // Add margin to separate from other elements
-
-            // Add event listener for form submission
-            submitButton.addEventListener('click', async function() {
-                // Get form values
-                let formData = {};
-                formElements.forEach(element => {
-                    formData[element.id] = document.getElementById(element.id).value;
-                });
-                // to to make loading icon inside and remove if successful or bad input 
-                // can make after validateUserInfo
-                // need to restrict fecthes on server side 
-
-                if(formData.phone == ''){
-                   alert('Please enter a phone number before proceeding');
-                }else{
-                    const ValidNumber = isValidPhoneNumber(formData.phone);
-                    if(ValidNumber){
-                        if(formData.artWorkSize == ''){
-                            alert('Please enter the dimensions length and width of the painting your requesting!');
-                        }else{
-                            if(formData.details == ''){
-                                alert('Please enter a few details of your painting you request!');
-                            }else{
-                                if(formData.artworkTitle == ''){
-                                    alert('Please enter title for your commission!');
-                                }else{
-                                    const checkMyInfo = await validateUserInfo(formData.email, formData.address, formData.firstName, formData.lastName);
-
-                                     if(checkMyInfo.verified){
-                                        console.log('trying to send commission to Db!', formData);
-                                        try {
-                                            const response = await fetch('/add-commission', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                },
-                                                body: JSON.stringify(formData) 
-                                            });
-
-                                            if (response.ok) {
-                                                const serverMessage = await response.json();
-                                                if(serverMessage.success == true){
-                                                     // delete content and create sucess and thank you div! 
-                                                     console.log('message came back true',serverMessage);
-
-                                                     console.log('need to make a success div');
-                                                    formElements.forEach(element => {
-                                                        document.getElementById(element.id).value = '';
-                                                    });
-                                                    containerInput.remove();
-
-                                                    // create success div
-                                                    // Create success div
-                                                    let successDiv = document.createElement('div');
-                                                    successDiv.classList.add('success-message');
-                                                    successDiv.style.position = 'fixed';
-                                                    successDiv.style.top = '50%';
-                                                    successDiv.style.left = '50%';
-                                                    successDiv.style.transform = 'translate(-50%, -50%)';
-                                                    successDiv.style.width = '80%'; // Set width to 80% of the viewport
-                                                    successDiv.style.maxWidth = '400px'; // Set maximum width for larger screens
-                                                    successDiv.style.background = '#ffffff';
-                                                    successDiv.style.border = '1px solid #ccc';
-                                                    successDiv.style.padding = '20px';
-                                                    successDiv.style.textAlign = 'center';
-                                                    successDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
-                                                    successDiv.style.zIndex = '9999'; // Ensure it appears above other elements
-                                                    successDiv.style.backgroundColor = 'lightgray';
-                                                    successDiv.style.border = '1px solid black';
-                                                    successDiv.style.borderRadius = '1vh';
-
-                                                    // Add thank you message
-                                                    let thankYouMessage = document.createElement('p');
-                                                    thankYouMessage.textContent = 'Thank you for your commission! We have received your request and will get back to you soon.';
-                                                    successDiv.appendChild(thankYouMessage);
-                                                    // Add exit button
-                                                    let exitButton = document.createElement('button');
-                                                    exitButton.textContent = 'Close';
-                                                    exitButton.style.marginTop = '20px'; // Add some space between message and button
-                                                    exitButton.style.cursor = 'pointer';
-                                                    exitButton.style.backgroundColor = '#ff3333'; // Set background color to red
-                                                    exitButton.style.color = '#ffffff'; // Set text color to white
-                                                    exitButton.style.border = 'none'; // Remove border
-                                                    exitButton.style.padding = '10px 20px'; // Add padding for better appearance
-                                                    exitButton.style.borderRadius = '5px'; // Add border radius for rounded corners
-                                                    exitButton.addEventListener('click', function() {
-                                                        document.body.removeChild(successDiv); // Remove the success div when the button is clicked
-                                                    });
-                                                    successDiv.appendChild(exitButton);
-
-                                                    // Append success div to the body
-                                                    document.body.appendChild(successDiv);
-
-                                                }else{
-                                                    console.log('message came back false', serverMessage)
-
-                                                                                                        // Clear form inputs
-                                                    formElements.forEach(element => {
-                                                        document.getElementById(element.id).value = '';
-                                                    });
-
-                                                   if(serverMessage.code == 230){
-                                                        alert(' You already have a commission active bro!!');
-                                                        containerInput.remove();
-                                                   }else if(serverMessage.code == -2){  
-                                                        alert(' The result from .save() came back false');
-                                                   }else if(serverMessage.code == -3){
-                                                        alert(' There was an unexpected issue we could not accept your information please try again.');
-                                                   }
-                                                }
-                                                console.log('Received paintings:', serverMessage);
-                                            } else {
-                                                console.error('Failed to add commission alert user');
-                                            }
-                                        } catch (error) {
-                                            console.error('Error adding painting:', error);
-                                        }
-                                     }else if (!checkMyInfo.verified){
-                                        if(checkMyInfo.email){
-                                            if(checkMyInfo.address){
-                                                if(checkMyInfo.firstName){
-                                                    if(checkMyInfo.lastName){
-                                                        console.log('this should never call because one of them will be false as !checkMyInfo.verified = false');
-                                                    }else{
-                                                         alert('Please enter a valid last Name');
-                                                    }
-                                                }else{
-                                                      alert('Please enter a valid First Name');
-                                                }
-                                            }else{
-                                                alert('Please enter a valid address to ship package');
-                                            }
-                                        }else{
-                                                alert('Please enter a valid email');
-                                        }
-                                    }
-
-                                }
-                            }
-                        }
-                    }else{
-                        alert('Please enter a valid phone number');
-                    }
-                }
-
+                isDragging = true;
+                containerInput.style.cursor = "grabbing";
             });
 
-            container.appendChild(submitButton);
+            document.addEventListener("mousemove", function (event) {
+                if (isDragging) {
+                    containerInput.style.left = (event.clientX - offsetX) + "px";
+                    containerInput.style.top = (event.clientY - offsetY) + "px";
+                }
+            });
+
+            document.addEventListener("mouseup", function () {
+                isDragging = false;
+                containerInput.style.cursor = "grab";
+            });
+            document.body.appendChild(containerInput);
+
+            const mediaQuery = window.matchMedia('(max-width: 768px)');
+
+            const handleMediaQuery = (mq) => {
+                if (mq.matches) {
+                    const screenWidth = window.innerWidth;
+                    if (screenWidth <= 360) {
+                        containerInput.style.left = '0%';
+                        containerInput.style.width = '330px';
+                        containerInput.style.zIndex = '100000000';
+                    }else if (screenWidth <= 400) {
+                        containerInput.style.left = '5%';
+                        containerInput.style.width = '330px';
+                        containerInput.style.zIndex = '100000000';
+                    }else if (screenWidth <= 450) {
+                        containerInput.style.left = '11%';
+                        containerInput.style.width = '330px';
+                        containerInput.style.zIndex = '100000000';
+                    } else if (screenWidth <= 540) {
+                        containerInput.style.left = '16%';
+                        containerInput.style.width = '350px';
+                        containerInput.style.zIndex = '100000000';
+                    } else if (screenWidth <= 770) {
+                        containerInput.style.left = '20%';
+                        containerInput.style.width = '400px';
+                        containerInput.style.zIndex = '100000000';
+                    }
+                }else{
+                    const parentWidth = containerInput.parentElement.clientWidth;
+                    const containerWidth = containerInput.offsetWidth;
+                    const leftPosition = (parentWidth - containerWidth) / 2;
+                    containerInput.style.left = leftPosition + 'px';
+                }
+            };
+
+            handleMediaQuery(mediaQuery);
+
+            mediaQuery.addEventListener('change', (event) => {
+                handleMediaQuery(event.target);
+            });
+
+            let container = document.createElement('div');
+            container.classList.add('container');
+            container.style.width = '85%';
+            container.style.height = '80%';
+            container.style.left = '7.5%';
+            container.style.top = '10%';
+            container.style.position = 'absolute';
+            container.style.backgroundColor = 'none';
+            container.style.overflowY = 'scroll';
+            container.style.justifyContent = 'center'; 
+            container.style.textAlign = 'center';
+
+            container.style.flexDirection = 'column';
+            container.style.alignItems = 'center'; 
+
+            let exitDiv = document.createElement('div');
+            exitDiv.classList.add('exit-div');
+            exitDiv.textContent = '✖'; 
+            exitDiv.style.position = 'absolute';
+            exitDiv.style.top = '0%';
+            exitDiv.style.right = '5%';
+            exitDiv.style.height = '25px';
+            exitDiv.style.width = '25px';
+            exitDiv.style.cursor = 'pointer';
+            exitDiv.style.fontSize = '20px'; 
+            exitDiv.style.color = 'black'; 
+            container.appendChild(exitDiv);
+                
+            exitDiv.addEventListener('click', function() {
+                document.body.removeChild(containerInput);
+            });
 
 
-        containerInput.appendChild(container);
-        document.body.appendChild(containerInput);
+            let title = document.createElement('h2');
+            title.textContent = 'Commission Form';
+            title.style.textAlign = 'center';
+            title.style.marginBottom = '20px';
 
+
+            const formDescription = `
+            Hello,
+
+            Thank you for considering me for your commission. To get started, I'll need some information from you. Please provide your name and contact details below. Additionally, kindly include a description of the painting you have in mind, along with any specific details or preferences.
+
+            Once you've filled out the form, I'll review your request and get back to you as soon as possible. Your input is valuable, and I'm excited to bring your vision to life!
+            `;
+            
+            let para = document.createElement('p');
+            para.textContent = formDescription;
+            para.style.marginBottom = '10px';
+
+            container.appendChild(title);
+
+            let imageContainer = document.createElement('div');
+            imageContainer.style.display = 'flex';
+            imageContainer.style.justifyContent = 'center'; 
+
+            let image = document.createElement('img');
+            image.setAttribute('src', '/images/BursonSkull.png'); 
+            image.setAttribute('alt', 'BursonSkullCommissionTemp'); 
+            image.style.width = '100px'; 
+            image.style.height = '100px'; 
+            image.style.marginBottom = '20px'; 
+
+            imageContainer.appendChild(image);
+            container.appendChild(imageContainer);
+            container.appendChild(para);
+
+            let formElements = [
+                { label: 'First Name', type: 'text', id: 'firstName' },
+                { label: 'Last Name', type: 'text', id: 'lastName' },
+                { label: 'Email', type: 'email', id: 'email' },
+                { label: 'Phone', type: 'tel', id: 'phone' },
+                { label: 'Address', type: 'text', id: 'address' },
+                { label: 'details', type: 'textarea', id: 'details' },
+                { label: 'Artwork Title', type: 'text', id: 'artworkTitle' },
+                { label: 'Artwork Medium', type: 'text', id: 'artworkMedium' },
+                { label: 'Artwork Size', type: 'text', id: 'artworkSize' },
+                { label: 'Comments', type: 'textarea', id: 'comments' }
+            ];
+
+            let maxLabelWidth = 0;
+            formElements.forEach(element => {
+                maxLabelWidth = Math.max(maxLabelWidth, element.label.length);
+            });
+
+            formElements.forEach(element => {
+                let formGroup = document.createElement('div');
+                formGroup.classList.add('form-group');
+                formGroup.style.display = 'flex';
+                formGroup.style.flexDirection = 'column'; 
+                formGroup.style.marginBottom = '20px';
+
+                let label = document.createElement('label');
+                label.textContent = element.label;
+                label.setAttribute('for', element.id);
+                label.style.fontWeight = 'bold';
+                label.style.marginBottom = '5px'; 
+
+                let input;
+                if (element.type === 'textarea') {
+                    input = document.createElement('textarea');
+                    input.classList.add('form-input');
+                    input.style.width = '87%';
+                    input.style.height = '80px'; 
+                    input.style.padding = '10px';
+                    input.style.marginBottom = '10px';
+                } else {
+                    input = document.createElement('input');
+                    input.setAttribute('type', element.type);
+                    input.classList.add('form-input');
+                    input.style.width = '87%';
+                    input.style.padding = '10px';
+                    input.style.marginBottom = '10px';
+                }
+                input.setAttribute('id', element.id);
+
+                formGroup.appendChild(label);
+                formGroup.appendChild(input);
+                container.appendChild(formGroup);
+            });
+                let submitButton = document.createElement('button');
+                submitButton.textContent = 'Submit';
+                submitButton.classList.add('form-submit');
+                submitButton.style.backgroundColor = '#0067b3';
+                submitButton.style.color = 'white';
+                submitButton.style.border = 'none';
+                submitButton.style.borderRadius = '5px';
+                submitButton.style.padding = '10px 20px';
+                submitButton.style.cursor = 'pointer';
+                submitButton.style.marginTop = '20px'; 
+
+                submitButton.addEventListener('click', async function() {
+
+                    let formData = {};
+                    formElements.forEach(element => {
+                        formData[element.id] = document.getElementById(element.id).value;
+                    });
+
+                    if(formData.phone == ''){
+                       alert('Please enter a phone number before proceeding');
+                    }else{
+                        const ValidNumber = isValidPhoneNumber(formData.phone);
+                        if(ValidNumber){
+                            if(formData.artWorkSize == ''){
+                                alert('Please enter the dimensions length and width of the painting your requesting!');
+                            }else{
+                                if(formData.details == ''){
+                                    alert('Please enter a few details of your painting you request!');
+                                }else{
+                                    if(formData.artworkTitle == ''){
+                                        alert('Please enter title for your commission!');
+                                    }else{
+                                        const checkMyInfo = await validateUserInfo(formData.email, formData.address, formData.firstName, formData.lastName);
+
+                                         if(checkMyInfo.verified){
+                                            console.log('trying to send commission to Db!', formData);
+                                            try {
+                                                const response = await fetch('/add-commission', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    },
+                                                    body: JSON.stringify(formData) 
+                                                });
+
+                                                if (response.ok) {
+                                                    const serverMessage = await response.json();
+                                                    if(serverMessage.success == true){
+                                                         console.log('message came back true',serverMessage);
+                                                         console.log('need to make a success div');
+                                                        formElements.forEach(element => {
+                                                            document.getElementById(element.id).value = '';
+                                                        });
+                                                        containerInput.remove();
+
+                                                        let successDiv = document.createElement('div');
+                                                        successDiv.classList.add('success-message');
+                                                        successDiv.style.position = 'fixed';
+                                                        successDiv.style.top = '50%';
+                                                        successDiv.style.left = '50%';
+                                                        successDiv.style.transform = 'translate(-50%, -50%)';
+                                                        successDiv.style.width = '80%'; 
+                                                        successDiv.style.maxWidth = '400px'; 
+                                                        successDiv.style.background = '#ffffff';
+                                                        successDiv.style.border = '1px solid #ccc';
+                                                        successDiv.style.padding = '20px';
+                                                        successDiv.style.textAlign = 'center';
+                                                        successDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+                                                        successDiv.style.zIndex = '9999'; 
+                                                        successDiv.style.backgroundColor = 'lightgray';
+                                                        successDiv.style.border = '1px solid black';
+                                                        successDiv.style.borderRadius = '1vh';
+
+                                                        let thankYouMessage = document.createElement('p');
+                                                        thankYouMessage.textContent = 'Thank you for your commission! We have received your request and will get back to you soon.';
+                                                        successDiv.appendChild(thankYouMessage);
+
+                                                        let exitButton = document.createElement('button');
+                                                        exitButton.textContent = 'Close';
+                                                        exitButton.style.marginTop = '20px'; 
+                                                        exitButton.style.cursor = 'pointer';
+                                                        exitButton.style.backgroundColor = '#ff3333'; 
+                                                        exitButton.style.color = '#ffffff';
+                                                        exitButton.style.border = 'none'; 
+                                                        exitButton.style.padding = '10px 20px'; 
+                                                        exitButton.style.borderRadius = '5px'; 
+                                                        exitButton.addEventListener('click', function() {
+                                                            document.body.removeChild(successDiv); 
+                                                        });
+                                                        successDiv.appendChild(exitButton);
+
+                                                        document.body.appendChild(successDiv);
+
+                                                    }else{
+                                                        console.log('message came back false', serverMessage);
+                                                        formElements.forEach(element => {
+                                                            document.getElementById(element.id).value = '';
+                                                        });
+
+                                                       if(serverMessage.code == 230){
+                                                            alert(' You already have a commission active bro!!');
+                                                            containerInput.remove();
+                                                       }else if(serverMessage.code == -2){  
+                                                            alert(' The result from .save() came back false');
+                                                       }else if(serverMessage.code == -3){
+                                                            alert(' There was an unexpected issue we could not accept your information please try again.');
+                                                       }
+                                                    }
+                                                    console.log('Received paintings:', serverMessage);
+                                                } else {
+                                                    console.error('Failed to add commission alert user');
+                                                }
+                                            } catch (error) {
+                                                console.error('Error adding painting:', error);
+                                            }
+                                         }else if (!checkMyInfo.verified){
+                                            if(checkMyInfo.email){
+                                                if(checkMyInfo.address){
+                                                    if(checkMyInfo.firstName){
+                                                        if(checkMyInfo.lastName){
+                                                            console.log('this should never call because one of them will be false as !checkMyInfo.verified = false');
+                                                        }else{
+                                                             alert('Please enter a valid last Name');
+                                                        }
+                                                    }else{
+                                                          alert('Please enter a valid First Name');
+                                                    }
+                                                }else{
+                                                    alert('Please enter a valid address to ship package');
+                                                }
+                                            }else{
+                                                    alert('Please enter a valid email');
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                        }else{
+                            alert('Please enter a valid phone number');
+                        }
+                    }
+
+                });
+
+                container.appendChild(submitButton);
+            containerInput.appendChild(container);
+            document.body.appendChild(containerInput);
+        }else{
+            console.log('commission form is already active');
+        }
     });
 
 function isValidPhoneNumber(phoneNumber) {
-    // Regular expression to match a valid phone number format
-    // This example matches North American phone numbers
-    // Adjust the regex pattern as needed for different phone number formats
     let phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
-
-    // Test the phone number against the regex pattern
     return phoneRegex.test(phoneNumber);
 }
 
@@ -2988,195 +2926,7 @@ function isValidPhoneNumber(phoneNumber) {
 
     
 
-    AIbutton.addEventListener('click', function(){
-        
-        // Create botContainer
-        const botContainer = document.createElement('div');
-        botContainer.id = 'botContainer';
-        botContainer.style.width = '350px';
-        botContainer.style.height = '70%';
-        botContainer.style.position = 'fixed';
-        botContainer.style.top = '50%';
-        botContainer.style.left = '50%';
-        botContainer.style.transform = 'translate(-50%, -50%)';
-        botContainer.style.backgroundColor = '#9b9999';
-        botContainer.style.zIndex = '9999999';
-        botContainer.style.borderRadius = '2vh';
-        botContainer.style.border = '1px solid black';
-
-        // Check if the width should be adjusted
-        if (window.innerWidth > 700) {
-            botContainer.style.width = '500px';
-        }
-        document.body.appendChild(botContainer);
-
-
-        let offsetX, offsetY;
-        let isDragging = false;
-
-        botContainer.addEventListener("mousedown", function (event) {
-            isDragging = true;
-            offsetX = event.clientX - parseFloat(window.getComputedStyle(botContainer).left);
-            offsetY = event.clientY - parseFloat(window.getComputedStyle(botContainer).top);
-            //popupForm.style.cursor = "grabbing";
-        });
-
-        document.addEventListener("mousemove", function (event) {
-            if (isDragging) {
-                botContainer.style.left = (event.clientX - offsetX) + "px";
-                botContainer.style.top = (event.clientY - offsetY) + "px";
-            }
-        });
-
-        document.addEventListener("mouseup", function () {
-            isDragging = false;
-            botContainer.style.cursor = "grab";
-        });
-
-        const responseDiv = document.createElement('div');
-        responseDiv.id = 'responseDiv';
-        responseDiv.style.width = '90%';
-        responseDiv.style.height = '68%'; // Adjusted height
-        responseDiv.style.top = '5%';
-        responseDiv.style.margin = '2% auto'; // Adjusted margin-top to 10% and centered horizontally
-        responseDiv.style.backgroundColor = 'none';
-        responseDiv.style.border = '1px solid black';
-        responseDiv.style.overflowY = 'auto';
-        responseDiv.style.position = 'relative';
-        responseDiv.style.backgroundImage = 'url("/images/BursonSkull.png")';
-        responseDiv.style.backgroundSize = 'contain';
-        responseDiv.style.backgroundRepeat = 'no-repeat';
-        responseDiv.style.backgroundPosition = 'center'; 
-        responseDiv.style.borderRadius = '1vh';
-        responseDiv.style.overflowY = 'hidden';
-        botContainer.appendChild(responseDiv);
-
-        // Create overlay
-        const overlay = document.createElement('div');
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.position = 'absolute';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.backgroundColor = 'black';
-        overlay.style.opacity = '0.73';
-        responseDiv.appendChild(overlay);
-        // Create overlay on top of overlay
-        const overlayMain = document.createElement('div');
-        overlayMain.style.width = '100%';
-        overlayMain.style.height = '100%';
-        //overlayMain.style.position = 'absolute';
-        overlayMain.style.top = '0';
-        overlayMain.style.left = '0';
-        overlayMain.style.backgroundColor = 'black';
-        overlayMain.style.opacity = '0.70';
-        overlayMain.style.color = 'white';
-        overlayMain.style.overflowY = 'scroll';
-        overlayMain.style.display = 'flex';
-        overlayMain.style.flexDirection = 'column';
-        overlayMain.style.justifyContent = 'flex-start'; // optional, to center vertically
-        overlayMain.style.alignItems = 'center'; // optional, to center horizontally
-
-        overlay.appendChild(overlayMain);
-
-        overlayMain.style.fontSize = '2vh';
-       
-
-        // Create parent div for inputContainer
-        const inputParent = document.createElement('div');
-        inputParent.style.position = 'absolute';
-        inputParent.style.bottom = '7.2%'; // Positioned at the bottom with 10px margin
-        inputParent.style.width = '90%'; // Set to same width as responseDiv
-        inputParent.style.height = '8.5%'; // Set to same width as responseDiv
-        inputParent.style.left = '3.2%'; // Center input horizontally
-        //inputContainer.style.display = 'block';
-        botContainer.appendChild(inputParent);
-
-        // Create inputContainer
-        const inputContainer = document.createElement('input');
-        inputContainer.id = 'inputContainer';
-        inputContainer.type = 'text';
-        inputContainer.style.border = 'none';
-        inputContainer.style.position = 'relative';
-        inputContainer.placeholder = 'Type here...';
-        inputContainer.style.width = '100%'; // Set to full width of parent div
-        inputContainer.style.height = '100%'; // Set to full width of parent div
-        inputContainer.style.left = '0%'; // Set to full width of parent div
-        //inputContainer.style.padding = '10px'; // Adding padding for better appearance
-        inputParent.appendChild(inputContainer);
-
-            inputContainer.addEventListener('keydown', async function(event) {
-                if (event.key === 'Enter') {
-                    const userInput = inputContainer.value;
-                    if(userInput == ''){
-                        // dont evaluate empty string
-                    }else{
-                        try{
-                            if(clientCanSendAIfetchRequest){
-                                overlayMain.innerHTML = '';
-                                let thisIndex = -1;
-                                let response = await getResponse(userInput);
-                                inputContainer.value = '';
-                                if(response != null){
-                                    if(response.code == 4){
-                                        overlayMain.innerHTML = '';
-                                        clientCanSendAIfetchRequest = false;
-                                        writeToParentDivWithDelay(response.serverMessage, overlayMain, 10,thisIndex);
-                                        setTimeout(() => {
-                                            clientCanSendAIfetchRequest = true;
-                                        }, 48 * 60 * 60 * 1000);
-                                    }else{
-                                        for(const serverRSPDS of response.serverAIResponse){
-                                            thisIndex +=1;
-                                            console.log(serverRSPDS);
-                                            writeToParentDivWithDelay(serverRSPDS[0].rsp, overlayMain, 10,thisIndex);
-                                        }
-                                    }
-                                }else{
-                                    writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10, 1);
-                                }
-                            }else{
-                                overlayMain.innerHTML = '';
-                                const restrictedString = "We're sorry, but you've exceeded the maximum number of AI requests allowed within a 48-hour period. For security and system stability reasons, we kindly ask you to wait for 48 hours before making additional requests. Thank you for your understanding and cooperation.";
-                                writeToParentDivWithDelay(restrictedString, overlayMain, 10,1);
-                            }
-                            overlayMain.style.marginTop = '20px';
-                            overlayMain.style.height = `calc(100% - 20px)`; 
-                        }catch(error){
-                            console.log(error);
-                            writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10,1);
-                        }  
-                    }
-
-                    
-                }
-            });
-        const exitButton = document.createElement('div');
-        exitButton.id = 'exitButton';
-        exitButton.textContent = '❌'; 
-        exitButton.style.position = 'absolute';
-        exitButton.style.top = '1%';
-        exitButton.style.right = '95%';
-        exitButton.style.width = '5%'; 
-        exitButton.style.height = '5%'; 
-        exitButton.style.fontSize = '2vh'; 
-        exitButton.style.border = 'none'; 
-        exitButton.style.background = 'none'; 
-        exitButton.style.cursor = 'pointer'; 
-        exitButton.addEventListener('click', function() {
-            botContainer.remove();
-        });
-        botContainer.appendChild(exitButton);
-
-        inputContainer.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                console.log('User typed:', inputContainer.value);
-                // You can add more logic here to handle the user's input
-                inputContainer.value = ''; 
-            }
-        }); 
-    });
-
+AIbutton.addEventListener('click', function(){
     gridFowardContainer.style.height = '90%';
     gridFowardContainer.style.width = iconHeaderWidth;
     gridFowardContainer.style.top = '7%'; 
@@ -3188,7 +2938,6 @@ function isValidPhoneNumber(phoneNumber) {
     gridFowardContainer.addEventListener('click', function() {
         let totalPageNumbers = Math.ceil(currentPaintingArray.length / 24);
         console.log('total pages = ', totalPageNumbers);
-
         if(gridPageNumber < totalPageNumbers){
             gridPageNumber += 1;
             let startIndex = (gridPageNumber - 1) * 24;
@@ -3238,8 +2987,6 @@ function isValidPhoneNumber(phoneNumber) {
         }
 
     });
-
-
     gridBack.style.position = 'absolute'; 
     gridBack.style.width = '70%';
     gridBack.style.height = '70%';
@@ -3253,16 +3000,12 @@ function isValidPhoneNumber(phoneNumber) {
     gridBack.style.backgroundPosition = 'center'; 
 
     header.style.backgroundColor = '#9b9999';
-    header.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; /* Adjust values for your shadow */
-
-    //header.style.opacity = '.6'; 
-
+    header.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; 
     headerLogo.style.position = 'absolute'; 
     headerLogo.style.height = '8.5vh'
     headerLogo.style.width = '10%'; 
     headerLogo.style.left = '0%'; 
     headerLogo.style.top = '0%';
-    //logoContainer.style.borderTop = "0.4vh solid dimgray"; 
     headerLogo.style.backgroundColor = 'none'; 
     headerLogo.style.backgroundImage = 'url(/images/bursonskull.png)';
     headerLogo.style.backgroundSize = 'contain';
@@ -3321,43 +3064,32 @@ function isValidPhoneNumber(phoneNumber) {
     logoContainer.style.width = '70%'; 
     logoContainer.style.left = '15%'; 
     logoContainer.style.top = '10%';
-    //logoContainer.style.borderTop = "0.4vh solid dimgray"; 
-    //logoContainer.style.backgroundColor = 'none'; 
 
     footerLargeTextContainer.style.position = 'absolute'; 
     footerLargeTextContainer.style.height = '100%'
     footerLargeTextContainer.style.width = '75%'; 
     footerLargeTextContainer.style.right = '5%'; 
     footerLargeTextContainer.style.top = '0%';
-    //footerLargeTextContainer.style.backgroundColor = 'white';
-    footerLargeTextContainer.style.backgroundImage = 'url("/images/bursonSKullText.png")'; // images created via Gimp
+    footerLargeTextContainer.style.backgroundImage = 'url("/images/bursonSKullText.png")'; 
     footerLargeTextContainer.style.backgroundSize = 'cover';
     footerLargeTextContainer.style.backgroundRepeat = 'no-repeat';
     footerLargeTextContainer.style.backgroundPosition = 'center';
-
 
     logo.style.position = 'relative'; 
     logo.style.height = '100%'
     logo.style.width = '15%'; 
     logo.style.left = '10%'; 
-    //logo.style.top = '0%';
-    //logoContainer.style.borderTop = "0.4vh solid dimgray"; 
-    //logo.style.backgroundColor = 'white'; 
     logo.style.backgroundImage = 'url(/images/bursonskull.png)';
     logo.style.backgroundSize = 'contain';
     logo.style.backgroundRepeat = 'no-repeat';
     logo.style.backgroundPosition = 'center';
 
-    // Create row div
     var row = document.createElement("div");
     row.classList.add("row");
 
-    // Create columns
     for (var i = 1; i <= 3; i++) {
         var column = document.createElement("div");
         column.classList.add("column");
-
-      // Add content to each column
         var heading = document.createElement("h3");
         heading.style.fontSize = '3vh';
 
@@ -3389,13 +3121,7 @@ function isValidPhoneNumber(phoneNumber) {
         row.appendChild(column);
     }
 
-        // Loop through each list item
-    
-
-    // Append row to footer
     footContainer.appendChild(row);
-
-
     createSearchBar(header);
     // use instead  accounts = await window.ethereum.request(); 
     if(isConnected == true && window.ethereum.selectedAddress == RoysWallet){
@@ -3410,8 +3136,7 @@ function isValidPhoneNumber(phoneNumber) {
     parentElement.appendChild(acceptableCoins);
     parentElement.appendChild(recentSells);
     parentElement.appendChild(unknownDiv);
-
-
+ 
     backButtonContainer.appendChild(backButton);
     header.appendChild(backButtonContainer);
 
@@ -3528,9 +3253,7 @@ async function getContractABI(contractAddress) {
         return null;
     }
 }
-
-
-
+ 
 export async function checkifConnected(){
     let connectButtton = document.createElement("div"); 
     let loggedInButton = document.createElement("div"); 
@@ -3631,9 +3354,7 @@ export async function checkifConnected(){
                     }
                 } catch (error) {
                     console.error('Error requesting accounts from MetaMask:', error);
-                }
-
-            
+                }     
         }
     }
     
@@ -3704,7 +3425,6 @@ async function createChangeUsernamePopup() {
                     if (!response.ok) {
                         console.log('response is not okay');
                     }else{
-                        // Parse the JSON response
                         console.log('trying to return data we got from server');
                         const data = await response.json();
 
@@ -3741,8 +3461,6 @@ async function createChangeUsernamePopup() {
             }catch(error){
                 console.log('error with response from server try and catch failed', error);
             }
-
-            
         });
 
         const attemptsMessage = document.createElement('p');
@@ -3843,9 +3561,6 @@ function ScrollDownArrow() {
    console.log('make Down arrow');
 }
 
-
-
-
 function createDatabaseUtility(parentElement){
     var dbIconContainer = document.createElement("div");
 
@@ -3901,10 +3616,7 @@ function createDatabaseUtility(parentElement){
     parentElement.appendChild(dbIconContainer);
 }
 
-
-
 function createSearchBar(parentElement) {
-    // Create search container
     var searchContainer = document.createElement("div");
     searchContainer.classList.add("search-container");
 
@@ -4121,40 +3833,10 @@ const calculateConversionFactor = (amount) => {
         return 0.0016805; 
     }else{
         return 1;
-    } // must be a integer
+    } 
 }; 
 
-
-
-/*
-const calculateConversionFactor = (amount) => {
-    // Check if the amount is a whole number
-    if (Number.isInteger(amount)) {
-        return 0.001;
-    }else{
-
-        // Get the fractional part by subtracting the integer part from the amount
-        const fractionalPart = amount - Math.floor(amount);
-        
-        console.log('the fractional part is', fractionalPart);
-        // Check if the fractional part matches any of the specified values
-        if (fractionalPart <= 0.2){
-            return 0.001 + 0.000100; // 20% the value of 0.001 because we split 5 times 
-        }else if( fractionalPart <= 0.4){
-           return 0.001 +  0.000200;
-        }else if( fractionalPart <= 0.6){
-           return 0.001 +  0.000400;
-        }else if( fractionalPart <= 0.8){
-           return 0.001 +  0.000600;
-        }
-    }
-};
-
-*/
-
 function printInfo(div) {
-    // Define an array of strings
-
     var strings = [
         'Welcome to',
         'BursonSkullz.com',
@@ -4172,27 +3854,20 @@ function printInfo(div) {
     div.style.fontSize = '2.1vh';
     div.style.width = '100%';
     div.style.left = '0%';
-    div.style.textAlign = 'center'; // Horizontally center the content
+    div.style.textAlign = 'center'; 
     div.style.fontSize = '2.2vh';
     div.style.color = 'white';
 
-    // Function to print each string with a delay
     function printString(index) {
-
-        // only call if finishedPrinting is true
         var stringToPrint = strings[index];
-        if (!stringToPrint) return; // Exit if no more strings to print
-        // Loop through each character in the string
+        if (!stringToPrint) return; 
         for (var i = 0; i < stringToPrint.length; i++) {
-            // Use setTimeout to delay printing each character
             setTimeout(function(char) {
                 return function() {
-                    div.textContent += char; // Append character to the output div
+                    div.textContent += char; 
                 };
-            }(stringToPrint[i]), i * 200); // Delay each character by 100 milliseconds
-        }
-        // Schedule the next string to print after the current one
-         
+            }(stringToPrint[i]), i * 200); 
+        }         
         setTimeout(function() {
             div.textContent = '';
             printString(index + 1);
@@ -4201,21 +3876,18 @@ function printInfo(div) {
             }else{
 
             }
-        }, stringToPrint.length * 250); // Delay before printing the next string
+        }, stringToPrint.length * 250); 
     }
-
-    // Start printing the first string
     printString(0);
     currentlyPrinted = true;
 }
 
 export async function getVeChainPrice(element) {
-    let retryCount = 0; // Track the number of retries
-    const maxRetries = 2; // Maximum number of retries
-    const retryInterval = 180000; // Interval between retries in milliseconds (3 minutes)
+    let retryCount = 0; 
+    const maxRetries = 2; 
+    const retryInterval = 180000; 
 
     function fetchVETPrice() {
-        // Make an API request to fetch VeChain price from CoinGecko
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=vechain&vs_currencies=usd')
             .then(response => {
                 if (!response.ok) {
