@@ -206,6 +206,61 @@ const randomNames = [
   'WhistlingWolf', 'MysticalMongoose', 'VelvetVole', 'FunkyFirefly', 'JungleJackal', 'AstralAxolotl', 'CosmicCamel', 'ShimmeringShark', 'ElectricEchidna', 'PsychedelicPhoenix',
   'StarryStingray', 'GlowingGuppy', 'SapphireSalamander', 'DreamyDingo', 'GalacticGorilla', 'TwinklingTurtle', 'FrostyFalcon', 'WhimsicalWeasel', 'FlamingFlamingo', 'CrimsonCheet'];
 
+const basicDefinitions = [
+  'to', 'from', 'why', 'his', 'her', 'this', 'dad', 'mom',
+  'and', 'the', 'a', 'an', 'in', 'on', 'at', 'with', 'he', 'she',
+  'it', 'we', 'they', 'you', 'I', 'me', 'us', 'them', 'my', 'your',
+  'our', 'their', 'who', 'what', 'when', 'where', 'how', 'can', 'will',
+  'would', 'could', 'should', 'do', 'did', 'does', 'is', 'are', 'was',
+  'were', 'be', 'being', 'been', 'have', 'has', 'had', 'not', 'no',
+  'yes', 'please', 'thank', 'good', 'bad', 'up', 'down', 'left', 'right',
+  'day', 'night', 'now', 'then', 'soon', 'later', 'before', 'after',
+  'come', 'go', 'see', 'look', 'watch', 'listen', 'hear', 'speak',
+  'say', 'tell', 'ask', 'answer', 'think', 'know', 'understand',
+  'want', 'need', 'like', 'love', 'hate', 'find', 'get', 'give', 'make',
+  'take', 'use', 'work', 'play', 'run', 'walk', 'eat', 'drink', 'sleep',
+  'read', 'write', 'open', 'close', 'start', 'stop', 'begin', 'end',
+  'big', 'small', 'large', 'tiny', 'huge', 'fast', 'slow', 'quick', 'easy',
+  'hard', 'difficult', 'simple', 'complicated', 'good', 'bad', 'beautiful',
+  'ugly', 'pretty', 'handsome', 'ugly', 'nice', 'mean', 'kind', 'friendly',
+  'happy', 'sad', 'angry', 'excited', 'bored', 'tired', 'hungry', 'thirsty',
+  'hot', 'cold', 'warm', 'cool', 'bright', 'dark', 'light', 'heavy', 'strong',
+  'weak', 'healthy', 'sick', 'safe', 'dangerous', 'clean', 'dirty', 'fresh',
+  'stale', 'loud', 'quiet', 'silent', 'noisy', 'rich', 'poor', 'expensive',
+  'cheap', 'free', 'busy', 'calm', 'peaceful', 'violent', 'dangerous', 'safe',
+  'open', 'closed', 'empty', 'full', 'sharp', 'dull', 'straight', 'curved',
+  'round', 'square', 'triangular', 'circular', 'oval', 'regular', 'irregular',
+  'smooth', 'rough', 'soft', 'hard', 'wet', 'dry', 'liquid', 'solid', 'gas',
+  'visible', 'invisible', 'clear', 'cloudy', 'foggy', 'sunny', 'rainy', 'windy',
+  'stormy', 'thunderous', 'bright', 'dark', 'day', 'night', 'morning', 'afternoon',
+  'evening', 'night', 'yesterday', 'today', 'tomorrow', 'next', 'last', 'first',
+  'second', 'third', 'final', 'early', 'late', 'soon', 'now', 'immediately', 'suddenly',
+  'gradually', 'quickly', 'slowly', 'carefully', 'recklessly', 'happily', 'sadly',
+  'angrily', 'patiently', 'impatiently', 'politely', 'rudely', 'kindly', 'cruelly',
+  'freely', 'easily', 'difficultly', 'hardly', 'mostly', 'partly', 'completely',
+  'exactly', 'approximately', 'precisely', 'perfectly', 'properly', 'wrongly', 'rightly',
+  'fairly', 'unfairly', 'justly', 'unjustly', 'clearly', 'vaguely', 'directly',
+  'indirectly', 'locally', 'globally', 'nationally', 'internationally', 'publicly',
+  'privately', 'officially', 'unofficially', 'formally', 'informally', 'technically',
+  'casually', 'seriously', 'sincerely', 'formally', 'politically', 'religiously',
+  'spiritually', 'scientifically', 'philosophically', 'historically', 'culturally',
+  'socially', 'economically', 'emotionally', 'mentally', 'physically', 'personally',
+  'professionally', 'financially', 'legally', 'illegally', 'morally', 'immorally',
+  'ethically', 'unethically', 'safely', 'unsafely', 'effectively', 'ineffectively',
+  'efficiently', 'inefficiently', 'successfully', 'unsuccessfully', 'randomly',
+  'regularly', 'frequently', 'rarely', 'occasionally', 'periodically', 'continuously',
+  'constantly', 'consistently', 'often', 'seldom', 'hardly', 'scarcely', 'barely',
+  'virtually', 'literally', 'figuratively', 'truly', 'really', 'apparently', 'seemingly',
+  'obviously', 'clearly', 'apparently', 'reportedly', 'allegedly', 'presumably', 'supposedly',
+  'hopefully', 'thankfully', 'fortunately', 'unfortunately', 'sadly', 'luckily', 'coincidentally',
+  'strangely', 'oddly', 'weirdly', 'curiously', 'interestingly', 'amazingly', 'astonishingly',
+  'incredibly', 'surprisingly', 'shockingly', 'unbelievably', 'honestly', 'frankly', 'truly',
+  'sincerely', 'genuinely', 'earnestly', 'faithfully', 'trustworthily', 'loyally', 'disloyally',
+  'faithlessly', 'honorably', 'dishonorably', 'disgracefully', 'shamefully', 'blatantly',
+  'brazenly', 'openly', 'publicly', 'privately', 'secretly', 'covertly', 'stealthily',
+  'furtively', 'sneakily', 'slyly', 'craftily', 'deviously', 'diplomatically', 'tactfully',
+  'delicately', 'sensitively', 'respectfully', 'disrespectfully', 'casually', 'informally',
+  'easily', 'quickly'];
 
 const knownDefinitions = [
   {
@@ -1819,24 +1874,8 @@ const messageHistory = [];
 
 const updatedViewsHistory = [];
 
-const PORT = process.env.PORT || 27015; // Define the port for the server
-const PORT2 = process.env.PORT || 4040; // Define the port for the server
-
-/*
-// Load the SSL certificate files
-const options = {
-    key: fs.readFileSync('path/to/private.key'),
-    cert: fs.readFileSync('path/to/certificate.crt')
-};
-
-
-const server = http.createServer(options, (req, res) => {
-
-    handleHttpRequest(req, res, io);
-});
-
-*/
-
+const PORT = process.env.PORT || 27015; 
+const PORT2 = process.env.PORT || 4040; 
 try{
 
     if (cluster.isMaster) {
@@ -1862,14 +1901,17 @@ try{
 
         mongoose.set('debug', true);
         mongoose.connect(dbURL)
-            .then((result) => server.listen(PORT, myDomain , () => {
-                console.log(`Server running really good on port ${PORT}`);
-            })).catch((error) => {
-                console.error('Error connecting to MongoDB:', error);
+        .then(async (result) => {
+            await addBasicDefinitions(basicDefinitions);  
 
-                // if error is internet make prompt
-                process.exit(1);
-            }); 
+            server.listen(PORT, myDomain, async () => {
+                console.log(`Server running really good on port ${PORT}`);
+            });
+        })
+        .catch((error) => {
+            console.error('Error connecting to MongoDB:', error);
+            process.exit(1);
+        });
 
 
         const io = socketIo(server);
@@ -2009,7 +2051,17 @@ function checkString(input) {
     return true;
 }
 
-
+async function addBasicDefinitions(array) {
+  for (const word of array) {
+    const checkIfWordExist = knownDefinitions.find(item => item.word === word);
+    if (checkIfWordExist === undefined) {
+      const addThisWord = await getNewDefinition(word);
+      if (addThisWord !== null) {
+        knownDefinitions.push(addThisWord);
+      }
+    }
+  }
+}
 function canSendMessage(array, name, time) {
     var ability_to_send = true; 
     console.log(time);
