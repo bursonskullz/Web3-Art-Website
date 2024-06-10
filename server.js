@@ -1,23 +1,26 @@
 // Name: Roy Burson 
-// Date last modified: 06-05-24
+// Date last modified: 06-10-24
 // purpose: Make web3 art website
 
 // to do list 
 
 /*
 1) find out how to upload code to digital ocean and cost 
-2) fix AI bot response (add words and attempt to get smarter the more you use it)
+2) fix AI bot (roul) by training him from dataset. He needs to be able to write code and do math and perform logic
 3) limit fetch request to DB (need to keep track of them per IP) for certain time period (like 48 hours) this prevents clog up or build up in mongo
+4) need to set fetches to bursonskullz.com/(your-fetches maybe)
 */
 
-
 // local variables to server
-const maxNumberOfAIEventsPerClient = 150;
+const maxNumberOfAIEventsPerClient = 100;
 var localAIUsers = [];
 let attemptedClients = [];
 let globalPurchaseTimerArray = [];
-var userAIQuestions = [];
+let AIEventTimers = [];
 var timerIsAlreadyCalled = false;
+var userAIQuestions = [];
+var previousQuestion0 = [];
+var previousQuestion1 = [];
 
 // packages
 const http = require('http');
@@ -31,6 +34,12 @@ const nodemailer = require('nodemailer');
 const puppeteer = require('puppeteer');
 const zlib = require('zlib');
 var inlineBase64 = require('nodemailer-plugin-inline-base64');
+const Web3 = require('web3');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+const OpenAI = require('openai');
+require('dotenv').config();
+
 
 // collections db strings 
 const paintCollectionString = 'Painting';
@@ -44,7 +53,13 @@ const buisnessEmial = 'your-buisiness-email@gmail.com';
 const dbURL = 'your-mongoose-db-string';
 const googleAPIKEY = 'your-google-api-maps-key';
 const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
+const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
 const myDomain = 'localhost';
+const openai = new OpenAI({
+    apiKey: OPENAI_API_KEY,
+});
+
+
 
 const paintingSchema = new mongoose.Schema({
     image: String,
@@ -94,6 +109,61 @@ const commissionSchema = new mongoose.Schema({
 const paintingModel = mongoose.model(paintCollectionString, paintingSchema); 
 const purchaseModel = mongoose.model(purchasesCollectionString, purchaseSchema); 
 const commissionModel = mongoose.model(commissionCollectionString, commissionSchema); 
+
+const basicDefinitions = ['to', 'from', 'why', 'his', 'her', 'this','dad', 'mom',
+  'and', 'the', 'a', 'an', 'in', 'on', 'at', 'with', 'he', 'she',
+  'it', 'we', 'they', 'you', 'I', 'me', 'us', 'them', 'my', 'your',
+  'our', 'their', 'who', 'what', 'when', 'where', 'how', 'can', 'will',
+  'would', 'could', 'should', 'do', 'did', 'does', 'is', 'are', 'was',
+  'were', 'be', 'being', 'been', 'have', 'has', 'had', 'not', 'no',
+  'yes', 'please', 'thank', 'good', 'bad', 'up', 'down', 'left', 'right',
+  'day', 'night', 'now', 'then', 'soon', 'later', 'before', 'after',
+  'come', 'go', 'see', 'look', 'watch', 'listen', 'hear', 'speak',
+  'say', 'tell', 'ask', 'answer', 'think', 'know', 'understand',
+  'want', 'need', 'like', 'love', 'hate', 'find', 'get', 'give', 'make',
+  'take', 'use', 'work', 'play', 'run', 'walk', 'eat', 'drink', 'sleep',
+  'read', 'write', 'open', 'close', 'start', 'stop', 'begin', 'end',
+  'big', 'small', 'large', 'tiny', 'huge', 'fast', 'slow', 'quick', 'easy',
+  'hard', 'difficult', 'simple', 'complicated', 'good', 'bad', 'beautiful',
+  'ugly', 'pretty', 'handsome', 'ugly', 'nice', 'mean', 'kind', 'friendly',
+  'happy', 'sad', 'angry', 'excited', 'bored', 'tired', 'hungry', 'thirsty',
+  'hot', 'cold', 'warm', 'cool', 'bright', 'dark', 'light', 'heavy', 'strong',
+  'weak', 'healthy', 'sick', 'safe', 'dangerous', 'clean', 'dirty', 'fresh',
+  'stale', 'loud', 'quiet', 'silent', 'noisy', 'rich', 'poor', 'expensive',
+  'cheap', 'free', 'busy', 'calm', 'peaceful', 'violent', 'dangerous', 'safe',
+  'open', 'closed', 'empty', 'full', 'sharp', 'dull', 'straight', 'curved',
+  'round', 'square', 'triangular', 'circular', 'oval', 'regular', 'irregular',
+  'smooth', 'rough', 'soft', 'hard', 'wet', 'dry', 'liquid', 'solid', 'gas',
+  'visible', 'invisible', 'clear', 'cloudy', 'foggy', 'sunny', 'rainy', 'windy',
+  'stormy', 'thunderous', 'bright', 'dark', 'day', 'night', 'morning', 'afternoon',
+  'evening', 'night', 'yesterday', 'today', 'tomorrow', 'next', 'last', 'first',
+  'second', 'third', 'final', 'early', 'late', 'soon', 'now', 'immediately', 'suddenly',
+  'gradually', 'quickly', 'slowly', 'carefully', 'recklessly', 'happily', 'sadly',
+  'angrily', 'patiently', 'impatiently', 'politely', 'rudely', 'kindly', 'cruelly',
+  'freely', 'easily', 'difficultly', 'hardly', 'mostly', 'partly', 'completely',
+  'exactly', 'approximately', 'precisely', 'perfectly', 'properly', 'wrongly', 'rightly',
+  'fairly', 'unfairly', 'justly', 'unjustly', 'clearly', 'vaguely', 'directly',
+  'indirectly', 'locally', 'globally', 'nationally', 'internationally', 'publicly',
+  'privately', 'officially', 'unofficially', 'formally', 'informally', 'technically',
+  'casually', 'seriously', 'sincerely', 'formally', 'politically', 'religiously',
+  'spiritually', 'scientifically', 'philosophically', 'historically', 'culturally',
+  'socially', 'economically', 'emotionally', 'mentally', 'physically', 'personally',
+  'professionally', 'financially', 'legally', 'illegally', 'morally', 'immorally',
+  'ethically', 'unethically', 'safely', 'unsafely', 'effectively', 'ineffectively',
+  'efficiently', 'inefficiently', 'successfully', 'unsuccessfully', 'randomly',
+  'regularly', 'frequently', 'rarely', 'occasionally', 'periodically', 'continuously',
+  'constantly', 'consistently', 'often', 'seldom', 'hardly', 'scarcely', 'barely',
+  'virtually', 'literally', 'figuratively', 'truly', 'really', 'apparently', 'seemingly',
+  'obviously', 'clearly', 'apparently', 'reportedly', 'allegedly', 'presumably', 'supposedly',
+  'hopefully', 'thankfully', 'fortunately', 'unfortunately', 'sadly', 'luckily', 'coincidentally',
+  'strangely', 'oddly', 'weirdly', 'curiously', 'interestingly', 'amazingly', 'astonishingly',
+  'incredibly', 'surprisingly', 'shockingly', 'unbelievably', 'honestly', 'frankly', 'truly',
+  'sincerely', 'genuinely', 'earnestly', 'faithfully', 'trustworthily', 'loyally', 'disloyally',
+  'faithlessly', 'honorably', 'dishonorably', 'disgracefully', 'shamefully', 'blatantly',
+  'brazenly', 'openly', 'publicly', 'privately', 'secretly', 'covertly', 'stealthily',
+  'furtively', 'sneakily', 'slyly', 'craftily', 'deviously', 'diplomatically', 'tactfully',
+  'delicately', 'sensitively', 'respectfully', 'disrespectfully', 'casually', 'informally',
+  'easily', 'quickly'];
 
 const helloPhrases = [
     "hello", 
@@ -206,63 +276,8 @@ const randomNames = [
   'WhistlingWolf', 'MysticalMongoose', 'VelvetVole', 'FunkyFirefly', 'JungleJackal', 'AstralAxolotl', 'CosmicCamel', 'ShimmeringShark', 'ElectricEchidna', 'PsychedelicPhoenix',
   'StarryStingray', 'GlowingGuppy', 'SapphireSalamander', 'DreamyDingo', 'GalacticGorilla', 'TwinklingTurtle', 'FrostyFalcon', 'WhimsicalWeasel', 'FlamingFlamingo', 'CrimsonCheet'];
 
-const basicDefinitions = [
-  'to', 'from', 'why', 'his', 'her', 'this', 'dad', 'mom',
-  'and', 'the', 'a', 'an', 'in', 'on', 'at', 'with', 'he', 'she',
-  'it', 'we', 'they', 'you', 'I', 'me', 'us', 'them', 'my', 'your',
-  'our', 'their', 'who', 'what', 'when', 'where', 'how', 'can', 'will',
-  'would', 'could', 'should', 'do', 'did', 'does', 'is', 'are', 'was',
-  'were', 'be', 'being', 'been', 'have', 'has', 'had', 'not', 'no',
-  'yes', 'please', 'thank', 'good', 'bad', 'up', 'down', 'left', 'right',
-  'day', 'night', 'now', 'then', 'soon', 'later', 'before', 'after',
-  'come', 'go', 'see', 'look', 'watch', 'listen', 'hear', 'speak',
-  'say', 'tell', 'ask', 'answer', 'think', 'know', 'understand',
-  'want', 'need', 'like', 'love', 'hate', 'find', 'get', 'give', 'make',
-  'take', 'use', 'work', 'play', 'run', 'walk', 'eat', 'drink', 'sleep',
-  'read', 'write', 'open', 'close', 'start', 'stop', 'begin', 'end',
-  'big', 'small', 'large', 'tiny', 'huge', 'fast', 'slow', 'quick', 'easy',
-  'hard', 'difficult', 'simple', 'complicated', 'good', 'bad', 'beautiful',
-  'ugly', 'pretty', 'handsome', 'ugly', 'nice', 'mean', 'kind', 'friendly',
-  'happy', 'sad', 'angry', 'excited', 'bored', 'tired', 'hungry', 'thirsty',
-  'hot', 'cold', 'warm', 'cool', 'bright', 'dark', 'light', 'heavy', 'strong',
-  'weak', 'healthy', 'sick', 'safe', 'dangerous', 'clean', 'dirty', 'fresh',
-  'stale', 'loud', 'quiet', 'silent', 'noisy', 'rich', 'poor', 'expensive',
-  'cheap', 'free', 'busy', 'calm', 'peaceful', 'violent', 'dangerous', 'safe',
-  'open', 'closed', 'empty', 'full', 'sharp', 'dull', 'straight', 'curved',
-  'round', 'square', 'triangular', 'circular', 'oval', 'regular', 'irregular',
-  'smooth', 'rough', 'soft', 'hard', 'wet', 'dry', 'liquid', 'solid', 'gas',
-  'visible', 'invisible', 'clear', 'cloudy', 'foggy', 'sunny', 'rainy', 'windy',
-  'stormy', 'thunderous', 'bright', 'dark', 'day', 'night', 'morning', 'afternoon',
-  'evening', 'night', 'yesterday', 'today', 'tomorrow', 'next', 'last', 'first',
-  'second', 'third', 'final', 'early', 'late', 'soon', 'now', 'immediately', 'suddenly',
-  'gradually', 'quickly', 'slowly', 'carefully', 'recklessly', 'happily', 'sadly',
-  'angrily', 'patiently', 'impatiently', 'politely', 'rudely', 'kindly', 'cruelly',
-  'freely', 'easily', 'difficultly', 'hardly', 'mostly', 'partly', 'completely',
-  'exactly', 'approximately', 'precisely', 'perfectly', 'properly', 'wrongly', 'rightly',
-  'fairly', 'unfairly', 'justly', 'unjustly', 'clearly', 'vaguely', 'directly',
-  'indirectly', 'locally', 'globally', 'nationally', 'internationally', 'publicly',
-  'privately', 'officially', 'unofficially', 'formally', 'informally', 'technically',
-  'casually', 'seriously', 'sincerely', 'formally', 'politically', 'religiously',
-  'spiritually', 'scientifically', 'philosophically', 'historically', 'culturally',
-  'socially', 'economically', 'emotionally', 'mentally', 'physically', 'personally',
-  'professionally', 'financially', 'legally', 'illegally', 'morally', 'immorally',
-  'ethically', 'unethically', 'safely', 'unsafely', 'effectively', 'ineffectively',
-  'efficiently', 'inefficiently', 'successfully', 'unsuccessfully', 'randomly',
-  'regularly', 'frequently', 'rarely', 'occasionally', 'periodically', 'continuously',
-  'constantly', 'consistently', 'often', 'seldom', 'hardly', 'scarcely', 'barely',
-  'virtually', 'literally', 'figuratively', 'truly', 'really', 'apparently', 'seemingly',
-  'obviously', 'clearly', 'apparently', 'reportedly', 'allegedly', 'presumably', 'supposedly',
-  'hopefully', 'thankfully', 'fortunately', 'unfortunately', 'sadly', 'luckily', 'coincidentally',
-  'strangely', 'oddly', 'weirdly', 'curiously', 'interestingly', 'amazingly', 'astonishingly',
-  'incredibly', 'surprisingly', 'shockingly', 'unbelievably', 'honestly', 'frankly', 'truly',
-  'sincerely', 'genuinely', 'earnestly', 'faithfully', 'trustworthily', 'loyally', 'disloyally',
-  'faithlessly', 'honorably', 'dishonorably', 'disgracefully', 'shamefully', 'blatantly',
-  'brazenly', 'openly', 'publicly', 'privately', 'secretly', 'covertly', 'stealthily',
-  'furtively', 'sneakily', 'slyly', 'craftily', 'deviously', 'diplomatically', 'tactfully',
-  'delicately', 'sensitively', 'respectfully', 'disrespectfully', 'casually', 'informally',
-  'easily', 'quickly'];
 
-const knownDefinitions = [
+var knownDefinitions = [
   {
     word: 'cat',
     definition1: `a small domesticated carnivorous mammal with soft fur, a short snout, and retractable claws. 
@@ -1875,7 +1890,7 @@ const messageHistory = [];
 const updatedViewsHistory = [];
 
 const PORT = process.env.PORT || 27015; 
-const PORT2 = process.env.PORT || 4040; 
+
 
 try{
     if (cluster.isMaster) {
@@ -1891,6 +1906,7 @@ try{
             server.listen(PORT, myDomain, () => {
                 console.log(`Server running on port ${PORT}`);
             });
+
             const io = socketIo(server);
 
             io.on('connection', (socket) => {
@@ -1992,13 +2008,34 @@ try{
     } else {
       // Worker processes can handle other tasks if needed
       console.log(`Worker ${process.pid} started`);
+      // Perform other tasks here if needed
     }
     
 }catch(error){
     console.log('Error creating the Server', error);
 }
+
+const getPrice = async (chainlinkAbi, address) => {
+  try {
+    return price = '100'; // price in USD
+  } catch (error) {
+    console.error(`Error fetching price for address ${address}:`, error);
+    return 'Failed'; 
+  }
+};
+
+async function addBasicDefinitions(array) {
+  for (const word of array) {
+    const checkIfWordExist = knownDefinitions.find(item => item.word === word);
+    if (checkIfWordExist === undefined) {
+      const addThisWord = await getNewDefinition(word);
+      if (addThisWord !== null) {
+        knownDefinitions.push(addThisWord);
+      }
+    }
+  }
+}
 function checkString(input) {
-    // Define patterns for threats, bad language, and sexually explicit language
     const badLanguagePatterns = ['niger','nigger', 'niggger', 'niggggger','niiiggeer', 'nigga', 'bitch', 'whore', 'cunt', 'fuck', 'fucckk','fucck', 'fucckkk', 'shit', 'motherfucker', 'ass', 'bastard', 'dick'];
     const threatPatterns = ['kill you', 'hurt you', 'endanger you', 'menace you', 'attack you', 'assault you', 'intimidate you', 'coerce you', 'terrorize you'];
     const sexuallyExplicitPatterns = ['pussy', 'dick', 'cock', 'vagina', 'asshole', 'boobs', 'tits', 'anal', 'cum', 'sex'];
@@ -2022,35 +2059,15 @@ function checkString(input) {
             return false;
         }
     }
-
-    // Input does not contain any forbidden words or phrases
     return true;
 }
 
-async function addBasicDefinitions(array) {
-  for (const word of array) {
-    const checkIfWordExist = knownDefinitions.find(item => item.word === word);
-    if (checkIfWordExist === undefined) {
-      const addThisWord = await getNewDefinition(word);
-      if (addThisWord !== null) {
-        knownDefinitions.push(addThisWord);
-      }
-    }
-  }
-}
 function canSendMessage(array, name, time) {
     var ability_to_send = true; 
-    console.log(time);
-    
-    // Convert time parameter to Date object if it's not already
     const currentTime = time instanceof Date ? time : new Date(time);
-
     array.forEach((obj)=>{
-        // Convert obj.time to Date object if it's not already
         const msgTime = obj.time instanceof Date ? obj.time : new Date(obj.time);
-        const timeDifference = (currentTime - msgTime) / 1000; // Time difference in seconds
-        console.log(timeDifference);
-
+        const timeDifference = (currentTime - msgTime) / 1000; 
         if (timeDifference < 0.5) {
             const thisSender = users.find(u => u.user == obj.username);
             if (thisSender) {
@@ -2058,17 +2075,13 @@ function canSendMessage(array, name, time) {
                 if (thisSender.coolDown > 10) {
                     console.log('User has exceeded cooldown limit');
                     ability_to_send = false;
-                    // Start a timer to reset cooldown after 10 seconds
                     setTimeout(() => {
                         thisSender.coolDown = 0;
                         console.log('User has ability to send again');
                     }, 24 * 60 * 60 * 1000); // 24 hours in seconds
                 }
             }           
-        } else {
-            console.log('Time difference is okay', timeDifference);
-            //const thisSender = users.find(u => u.user == obj.username);  
-            //thisSender.coolDown = 0;      
+        } else { 
         }
     });
 
@@ -2076,50 +2089,34 @@ function canSendMessage(array, name, time) {
 }
 
 function checkEmailString(email) {
-    // Regular expression for email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    // Check if the email matches the regular expression
     const isValidEmail = emailRegex.test(email);
-
-    // Return true if the email is valid, false otherwise
     return isValidEmail;
 }
 async function checkAddressString(address) {
     try {
         const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=`+googleAPIKEY);
         const data = await response.json();
-        
-        // Check if the response contains any results
         if (data.results && data.results.length > 0) {
-            // Address is valid if at least one result is returned
             return true;
         } else {
-            // No results found, address is invalid
             return false;
         }
     } catch (error) {
         console.error('Error checking address:', error);
-        // Return false in case of any errors
         return false;
     }
 }
 
 
 async function checkIfName(string) {
-    // Check if the first name is non-empty
     if (!string.trim()) {
-        return false; // Empty string is not valid
+        return false; 
     }
-
-    
-    // Check for inappropriate characters
     const inappropriateRegex = /[^\w\s'-]/; // Allowed characters: letters, digits, spaces, hyphens, and apostrophes
     if (inappropriateRegex.test(string)) {
-        return false; // Inappropriate characters found
+        return false; 
     }
-
-    // Check for common bad words (you can extend this list)
     const badWords = [
     'niger', 'nigga', 'bitch', 'whore', 'cunt', 'fuck', 'shit', 'motherfucker', 
     'ass', 'bastard', 'dick', 'kill you', 'hurt you', 'endanger you', 'menace you', 'attack you', 
@@ -2129,25 +2126,18 @@ async function checkIfName(string) {
 
     const lowerCaseFirstName = string.toLowerCase();
     if (badWords.some(word => lowerCaseFirstName.includes(word))) {
-        return false; // Bad word found
+        return false; 
     }
-
     const excessiveRepeatingRegex = /(.)\1{5,}/;
-
     if (excessiveRepeatingRegex.test(string)) {
-        return false; // Excessive repeating characters found
+        return false; 
     }
-    // If none of the above conditions are met, the first name is considered valid
     return true;
 
     
 }
 
-
-
-// Function to send email
 async function sendEmail(email, address, firstName, lastName, productID, price, productName, productIMG) {
-// HTML files to send
     let atagRef = 'mailto:' + buisnessEmial;
     let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
                     <div class="header" style="width: 100%; margin-bottom: 20px; text-align: center;">
@@ -2169,9 +2159,6 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
                     </div>
                 </div>`;
 
-
-    // defining host and authentification 
-
     let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465, 
@@ -2185,7 +2172,6 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
 
     transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
 
-    // define mail options
      let mailOptions = {
             from: buisnessEmial, 
             to: email, 
@@ -2193,11 +2179,9 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
             html: HTML
     };
 
-    // try sending email 
     try {
 
         let result = await transporter.sendMail(mailOptions);
-        //console.log('Email sent:', result);
         return result;
     } catch (error) {
         console.error('Error sending email', error);
@@ -2228,6 +2212,56 @@ function getMaxValueofPurchases(attemptedClientsArray) {
     return maxValue;
 }
 
+async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, image) {
+
+// HTML files to send
+    let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
+                    <div class="header" style="width: 100%; margin-bottom: 20px; text-align: center;">
+                        <img src="https://i.ibb.co/kmVWh5p/Burson-SKull-Text.png" alt="Burson-SKull-Text" style="width: 100%; height: auto; max-height: 200px;">
+                    </div>
+                    <div class="product-image" style="width: 100%; margin-bottom: 20px; text-align: center;">
+                        <img src="${image}" alt="Product Image" style="width: 80%; height: auto; max-height: 300px;">
+                    </div>
+                    <div class="message" style="font-size: 16px; width: 100%; text-align: left;">
+                        <p style="font-size: 16px; margin: 0;">Thank you ${name} for your purchase! </p>
+                        <p style="font-size: 16px; margin: 10px 0;">Here is your tracking number:</p>
+                        <ul style="font-size: 16px; padding-left: 20px; margin: 0;">
+                            <li style="margin-bottom: 5px;">Tracking Number: ${trackingNumber}</li>
+                        </ul>
+                        <p style="font-size: 16px; margin: 10px 0;">If you have any questions or concerns, feel free to <a href="mailto:bursodevelopments@gmail.com" style="font-size: 16px;">contact us</a>.</p>
+                        <p style="font-size: 16px; margin: 0;">Best regards,<br><span class="signature" style="text-indent: 20px;"> &nbsp; &nbsp; Roy Burson</span></p>
+                    </div>
+                </div>`;
+
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465, 
+        secure: true,
+        auth: {
+            user: buisnessEmial, 
+            pass: appPasscode
+        }
+
+    });
+
+    transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
+     let mailOptions = {
+            from: buisnessEmial, 
+            to: email, 
+            subject: 'Tracking Number', 
+            html: HTML
+    };
+
+    try {
+
+        let result = await transporter.sendMail(mailOptions);
+        console.log('Email sent');
+        return result;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        throw error; 
+    }
+}
 
 async function getNewDefinition(word) {
   const apiUrl =`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${MERRIAM_WEBSTER_API_KEY}`;
@@ -2242,10 +2276,9 @@ async function getNewDefinition(word) {
 
     if (data.length === 0) {
       console.log('No definition found.');
-      return nulls;
+      return null;
     }
 
-    // Assume the first entry contains the relevant information
     const entry = data[0];
 
     const wordInfo = {
@@ -2268,70 +2301,10 @@ async function getNewDefinition(word) {
     return null;
   }
 }
-async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, image) {
-
-// HTML files to send
-    let atagRef = 'mailto:' + buisnessEmial;
-    let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
-                    <div class="header" style="width: 100%; margin-bottom: 20px; text-align: center;">
-                        <img src="https://i.ibb.co/kmVWh5p/Burson-SKull-Text.png" alt="Burson-SKull-Text" style="width: 100%; height: auto; max-height: 200px;">
-                    </div>
-                    <div class="product-image" style="width: 100%; margin-bottom: 20px; text-align: center;">
-                        <img src="${image}" alt="Product Image" style="width: 80%; height: auto; max-height: 300px;">
-                    </div>
-                    <div class="message" style="font-size: 16px; width: 100%; text-align: left;">
-                        <p style="font-size: 16px; margin: 0;">Thank you ${name} for your purchase! </p>
-                        <p style="font-size: 16px; margin: 10px 0;">Here is your tracking number:</p>
-                        <ul style="font-size: 16px; padding-left: 20px; margin: 0;">
-                            <li style="margin-bottom: 5px;">Tracking Number: ${trackingNumber}</li>
-                        </ul>
-                        <p style="font-size: 16px; margin: 10px 0;">If you have any questions or concerns, feel free to <a href="${atagRef}" style="font-size: 16px;">contact us</a>.</p>
-                        <p style="font-size: 16px; margin: 0;">Best regards,<br><span class="signature" style="text-indent: 20px;"> &nbsp; &nbsp; Roy Burson</span></p>
-                    </div>
-                </div>`;
-
-
-    // defining host and authentification 
-
-    let transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465, 
-        secure: true,
-        auth: {
-            user: buisnessEmial, 
-            pass: appPasscode
-        }
-
-    });
-
-    transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
-
-    // define mail options
-     let mailOptions = {
-            from: buisnessEmial, 
-            to: email, 
-            subject: 'Tracking Number', 
-            html: HTML
-    };
-
-    // try sending email 
-    try {
-
-        let result = await transporter.sendMail(mailOptions);
-        console.log('Email sent');
-        return result;
-    } catch (error) {
-        console.error('Error sending email:', error);
-        throw error; 
-    }
-}
-
 
 
 
 async function verifyUserinputData(email, address, firstName, lastName){
-
-
     const isEmail = checkEmailString(email);
     const isAddress = await checkAddressString(address);
     const isFirstName = await checkIfName(firstName);
@@ -2349,8 +2322,7 @@ async function verifyUserinputData(email, address, firstName, lastName){
 
 
 async function roulsResponse(question) {
-    const lowercaseQuestion = question.toLowerCase(); // Convert question to lowercase
-
+    const lowercaseQuestion = question.toLowerCase();
     const artworkPurchaseKeywords = [
       'buy a painting',
       'buy art',
@@ -2475,7 +2447,10 @@ async function roulsResponse(question) {
     const chatKeywords = ['chat', 'communicate', 'others'];
 
     const keyWordsForQuestion = ['how', 'where', 'when', 'what', 'why', 'which', 'who', 'whom', 'whose'];
-    const askingDefinition = ['definition of', 'meaning of', 'defintion of', 'defnition of', 'defition of', 'what is a', 'what is the meaning of', 'what is the definition of', 'what is the meaning of the word'];
+
+    const askingDefinition = ['definition of', 'meaning of', 'defintion of', 'defnition of', 'defition of', 
+                              'what is a', 'what is the meaning of', 'what is the definition of', 
+                              'what is the meaning of the word', 'what is a', 'definition of a', 'what does the word'];
     const parts = [];
     let currentPart = '';
 
@@ -2564,14 +2539,13 @@ async function roulsResponse(question) {
         for(const word of currentWords){
           let matchingObj = knownDefinitions.find(obj => obj.word === word);
           if(matchingObj){
-            // we found it no need to add the same definition again
           }else{
               getNewDefinition(word).then((result)=>{
                 if(result !== null){
-                    console.log('trying to save new definition into local array on server', result);
+                    //console.log('trying to save new definition into local array on server', result);
                     knownDefinitions.push(result);
                 }else{
-                  console.log('getNewDefinition() function returned null instead of object to push to array');
+                  //console.log('getNewDefinition() function returned null instead of object to push to array');
                 }
               }).catch(error=>{
                   console.log('Error calling  getNewDefinition() function near line 2485', error);
@@ -2579,11 +2553,10 @@ async function roulsResponse(question) {
           }
         }
 
-      //2) determine if basic question and use easy statement returns 
+        //2) determine if basic question and use easy statement returns below
 
-      //3) else 
+        //3) else 
         // determine if question, command, or statement before executing commands from memory. 
-
 
         if (artworkPurchaseKeywords.some(keyword => part.includes(keyword))) {
             response = "To buy a painting, you can visit our website's art gallery section and select the painting you like. Then, follow the instructions to make a purchase. Make sure metamask is installed and the extension is available.";
@@ -2626,29 +2599,46 @@ async function roulsResponse(question) {
           const thisWord = targetWord;
           //const thisWord = part.substring(part.lastIndexOf(" ")+1);
           const stripedWord = thisWord.replace(/\s/g, "");
-          console.log(' seems like the user is asking for a definition of:', stripedWord);
-          
+          //console.log(' seems like the user is asking for a definition of:', stripedWord);
           let matchingObj = knownDefinitions.find(obj => obj.word === stripedWord);
 
           if (matchingObj) {
-              console.log('We found a matching word:', matchingObj);
-
               let formattedString = Object.entries(matchingObj)
                   .filter(([key, value]) => value !== null) 
                   .map(([key, value]) => `${key}: ${value}`)
                   .join('\n\n'); 
 
               response = formattedString + '\n';
-              console.log('we formatted the json object to string:', response);
           } else {
               response = 'We could not find the word you are looking for.\n\n';
           }
           
         } else {
-            response = "I'm sorry, I couldn't understand your question or it's not related to the topics I can assist with.\n\n";
+            const questionHasAlreadyBeenAsked0 = previousQuestion0.findIndex(obj=> obj.question== part);
+            const questionHasAlreadyBeenAsked1 = previousQuestion1.findIndex(obj=> obj.question== part);
+
+            if(questionHasAlreadyBeenAsked0 !== -1){
+                response = previousQuestion0[questionHasAlreadyBeenAsked0];
+            }else if (questionHasAlreadyBeenAsked1 !== -1){
+                response = previousQuestion1[questionHasAlreadyBeenAsked1];
+            }else{
+                response = await fetchOpenAIResponse(part);
+                // push to array
+                const AIeventObject = {
+                    question: part,
+                    response: response
+                };
+
+                if(questionHasAlreadyBeenAsked0.length <= 1000000000000){
+                    previousQuestion0.push(AIeventObject);     
+                }else{
+                    previousQuestion1.push(AIeventObject);
+                }
+            }
+            
         }
       }else{
-        response += 'Sorry I do not accept inappropriate input and bad words!';
+        response = 'Sorry I do not accept inappropriate input and bad words!';
       }
 
         responseArray.push([{rsp: response.trim()}]);
@@ -2656,17 +2646,33 @@ async function roulsResponse(question) {
     return responseArray
 }
 
+async function fetchOpenAIResponse(question) {
+    try {
+        const stream = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: question }],
+            stream: true,
+        });
+
+        let aiResponse = '';
+        for await (const chunk of stream) {
+            aiResponse += chunk.choices[0]?.delta?.content || "";
+        }
+        return aiResponse.trim();
+    } catch (error) {
+        console.error('Error fetching AI response:', error.response ? error.response.data : error.message);
+        return "I'm sorry, I couldn't understand your question or it's not related to the topics I can assist with.\n\n";
+        console.log('openAI failed', error);
+    }
+}
+
 async function validateTransaction(transactionHash) {
     const apiUrl = `https://api.etherscan.io/api?module=proxy&action=eth_getTransactionByHash&txhash=${transactionHash}&apikey=YOUR_API_KEY`;
 
     try {
-        // Fetch transaction details from Etherscan API
         const response = await fetch(apiUrl);
         const data = await response.json();
-
-        // Check if the transaction exists
         if (data && data.result) {
-            // Access transaction details from the result
             const transaction = data.result;
             const { from, to, value } = transaction;
             if (from && to && value) {
@@ -2674,6 +2680,7 @@ async function validateTransaction(transactionHash) {
                 console.log('Transaction is valid:', transaction);
                 return true;
             } else {
+                // Transaction is missing required properties
                 console.error('Transaction is missing required properties:', transaction);
                 return false;
             }
@@ -2699,11 +2706,10 @@ const handleHttpRequest = async (req, res, io) => {
                 body += chunk.toString();
             });
 
-                // Process the completed request
             req.on('end', async () => {
                 try {
                     const thisObj = JSON.parse(body);
-                    if(thisObj.passcode == paintingUploadCode){// add attempts later and save IP to get em back
+                    if(thisObj.passcode == paintingUploadCode){
                             const newPainting = new paintingModel({
                                 image: thisObj.image,
                                 name: thisObj.name,
@@ -2720,13 +2726,15 @@ const handleHttpRequest = async (req, res, io) => {
                             });  
 
                             newPainting.save().then((result)=>{
+                                console.log('trying to call large emit to all clients');
                                 const paintingString = JSON.stringify(newPainting);
-                                const chunkSize = 500;
+                                const chunkSize = 1024;
                                 let chunks = [];
 
                                 for (let i = 0; i < paintingString.length; i += chunkSize) {
                                     chunks.push(paintingString.substring(i, i + chunkSize));
                                 }
+
                                 chunks.forEach((chunk, index) => {
                                     io.emit('updatePaintingChunk', { chunk, index, total: chunks.length });
                                 });
@@ -2741,7 +2749,7 @@ const handleHttpRequest = async (req, res, io) => {
                             });
 
                     }else{
-                        console.log('could not uplaod for unknown reason');
+                        console.log('could not uplaod because passcode was not correct ');
                         res.end(JSON.stringify({success: false})); 
                     }
 
@@ -2751,10 +2759,9 @@ const handleHttpRequest = async (req, res, io) => {
                     res.end(JSON.stringify({ error: 'Bad Request' }));
                 }
             });
-    }catch(error){
+        }catch(error){
         console.log('Error with fetch request /add-painting request');
-    }
-
+        }
     }else if(req.method == 'GET' && req.url == '/getALL-paintings'){
         try{
             const paintings = async () => {
@@ -2904,67 +2911,96 @@ const handleHttpRequest = async (req, res, io) => {
             req.on('end', async ()=> {
                 const data = JSON.parse(body);
                 res.setHeader('Content-Type', 'application/json');
-                try {
-                  const clientIP = req.connection.remoteAddress;
-                  const existingItems = userAIQuestions.filter(item => item.ipAddress === clientIP);
-                  if (existingItems.length > 0) {
-                      const maxEventsItem = existingItems.reduce((maxItem, currentItem) => {
-                          return maxItem.numberOfEvents > currentItem.numberOfEvents ? maxItem : currentItem;
-                      });
-                      const timeDifference = Math.abs(new Date() - new Date(maxEventsItem.lastEventDate));
-                      const hoursDifference = Math.ceil(timeDifference / (1000 * 60 * 60));
-                      if (hoursDifference <= 48 && maxEventsItem.numberOfEvents > maxNumberOfAIEventsPerClient) {
-                        console.log('user exeeded max number of events within 48 hours');
-                        setTimeout(() => {
-                            const indicesToRemove = [];
-                            userAIQuestions.forEach((item, index) => {
-                                if (item.ipAddress === clientIp) {
-                                    indicesToRemove.push(index);
-                                }
-                            });
-                            indicesToRemove.forEach(index => {
-                                userAIQuestions.splice(index, 1);
-                            });
-                            console.log('we removed items in array user should be able to send again');
-                        }, 48 * 60 * 60 * 1000); 
-                        res.end(JSON.stringify({ serverMessage: 'User exceeds number of alotted responses', code: 4 })); 
+            try {
+              const clientIP = req.connection.remoteAddress;
+              const existingItems = userAIQuestions.filter(item => item.ipAddress === clientIP);
+              
+              if (existingItems.length > 0) {
+                const maxEventsItem = existingItems.reduce((maxItem, currentItem) => {
+                  return maxItem.numberOfEvents > currentItem.numberOfEvents ? maxItem : currentItem;
+                });
 
-                      } else {
-                        console.log('users has sent multiple req to the AI-event fetch');
-                        const Aievent = {
-                            ipAddress: clientIP,
-                            lastEventDate: new Date(),
-                            numberOfEvents: maxEventsItem.numberOfEvents+1 
-                        };
-                        userAIQuestions.push(Aievent);
+                const timeDifference = Math.abs(new Date() - new Date(maxEventsItem.lastEventDate));
+                const hoursDifference = Math.ceil(timeDifference / (1000 * 60 * 60));
 
-                        const serverAIResponse = await roulsResponse(data.question);
+                // For testing, set the timeout duration to 1 minute (60000 ms)
+                const testTimeoutDuration = 48 * 60 * 60 * 1000;
 
-                        if (serverAIResponse) {
-                            res.end(JSON.stringify({ serverAIResponse, code: 0 })); 
-                        } else {
-                            res.end(JSON.stringify({ serverMessage: 'Roul failed miserably', code: 1 })); 
-                        }
+                if (hoursDifference <= 48 && maxEventsItem.numberOfEvents > maxNumberOfAIEventsPerClient) {
+                  console.log('User exceeded max number of events within 48 hours. Check if timer is on. If not, set timer.');
+                  const checkAITimerIndex = AIEventTimers.findIndex(person => person.ipAddress === clientIP);
 
-                      }
+                  if (checkAITimerIndex !== -1) {
+                    if (!AIEventTimers[checkAITimerIndex].value) {
+                      AIEventTimers[checkAITimerIndex].value = true; 
+                      setTimeout(() => {
+                        userAIQuestions = userAIQuestions.filter(item => item.ipAddress !== clientIP);
+                        AIEventTimers.splice(checkAITimerIndex, 1);
+                        console.log(`Timer expired for IP ${clientIP}. Resetting user events and removing timer.`);
+                      }, testTimeoutDuration); // Test timeout duration
+
+                      res.end(JSON.stringify({ serverMessage: 'User exceeds number of allotted responses', code: 4 }));
+                    } else {
+                      console.log('Person is already in array and timer is already on, need to wait for reset.');
+                      res.end(JSON.stringify({ serverMessage: 'User exceeds number of allotted responses', code: 4 }));
+                    }
                   } else {
-                      console.log('users first time sending AI-fetch');
-                      const Aievent = {
-                          ipAddress: clientIP,
-                          lastEventDate: new Date(),
-                          numberOfEvents: 1 
-                      };
-                      userAIQuestions.push(Aievent);
-                      const serverAIResponse = await roulsResponse(data.question);
-                      if (serverAIResponse) {
-                          res.end(JSON.stringify({ serverAIResponse, code: 0 })); 
-                      } else {
-                          res.end(JSON.stringify({serverMessage: 'Roul failed miserably', code: 1 })); 
+                    const timedOutAIUser = {
+                      ipAddress: clientIP,
+                      value: true
+                    };
+                    AIEventTimers.push(timedOutAIUser);
+
+                    setTimeout(() => {
+                      userAIQuestions = userAIQuestions.filter(item => item.ipAddress !== clientIP);
+                      const timerIndex = AIEventTimers.findIndex(person => person.ipAddress === clientIP);
+                      if (timerIndex !== -1) {
+                        AIEventTimers.splice(timerIndex, 1);
                       }
+                      console.log(`Timer expired for IP ${clientIP}. Resetting user events and removing timer.`);
+                    }, testTimeoutDuration); // Test timeout duration
+
+                    res.end(JSON.stringify({ serverMessage: 'User exceeds number of allotted responses', code: 4 }));
                   }
-                } catch (error) {
-                    res.end(JSON.stringify({serverMessage: 'Try-catch fail', code: 2 })); 
+                } else {
+                  const Aievent = {
+                    ipAddress: clientIP,
+                    lastEventDate: new Date(),
+                    numberOfEvents: maxEventsItem.numberOfEvents + 1
+                  };
+                  userAIQuestions.push(Aievent);
+
+                  // dont call roul if same question is in the previous question array
+                  // fix roul to send less calls to openAI as last result 
+                  // make your own model and train 
+                  // use OPENAI as last resort
+                  const serverAIResponse = await roulsResponse(data.question);
+
+                  if (serverAIResponse) {
+                    res.end(JSON.stringify({ serverAIResponse, code: 0 }));
+                  } else {
+                    res.end(JSON.stringify({ serverMessage: 'Roul failed miserably', code: 1 }));
+                  }
                 }
+              } else {
+                console.log('User\'s first time sending AI fetch.');
+                const Aievent = {
+                  ipAddress: clientIP,
+                  lastEventDate: new Date(),
+                  numberOfEvents: 1
+                };
+                userAIQuestions.push(Aievent);
+                const serverAIResponse = await roulsResponse(data.question);
+                if (serverAIResponse) {
+                  res.end(JSON.stringify({ serverAIResponse, code: 0 }));
+                } else {
+                  res.end(JSON.stringify({ serverMessage: 'Roul failed miserably', code: 1 }));
+                }
+              }
+            } catch (error) {
+              console.log('Error on server AI-event', error);
+              res.end(JSON.stringify({ serverMessage: 'Try-catch fail', code: 2 }));
+            }
             });
         }catch(error){
             console.log('Error with fetch request /AI-event ');
