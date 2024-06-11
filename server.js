@@ -1,18 +1,20 @@
 // Name: Roy Burson 
-// Date last modified: 06-10-24
+// Date last modified: 06-11-24
 // purpose: Make web3 art website
 
 // to do list 
 
 /*
 1) find out how to upload code to digital ocean and cost 
-2) fix AI bot (roul) by training him from dataset. He needs to be able to write code and do math and perform logic
+2) fix AI bot (roul) by training him from dataset. He needs to be able to write code and do math and perform logic (we can use openAI as temp solution).
 3) limit fetch request to DB (need to keep track of them per IP) for certain time period (like 48 hours) this prevents clog up or build up in mongo
 4) need to set fetches to bursonskullz.com/(your-fetches maybe)
+5) start solidity contract and mint new series and extract data to interact with sol contract
 */
 
 // local variables to server
 const maxNumberOfAIEventsPerClient = 100;
+const max_array_length = 3294967295;
 var localAIUsers = [];
 let attemptedClients = [];
 let globalPurchaseTimerArray = [];
@@ -54,12 +56,10 @@ const dbURL = 'your-mongoose-db-string';
 const googleAPIKEY = 'your-google-api-maps-key';
 const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
 const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
-const myDomain = 'localhost';
+const myDomain = undefined; // swap to <yourdomain.com> after ip from digital ocean is setup only allow calls from htts://bursonskullz.com. Undefined allows any domain to call the server
 const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
 });
-
-
 
 const paintingSchema = new mongoose.Schema({
     image: String,
@@ -2626,17 +2626,19 @@ async function roulsResponse(question) {
                 console.log('we found previous question in array2 no need to fetching OPENAI event');
                 response = previousQuestion1[questionHasAlreadyBeenAsked1].response;
             }else{
+                // calling openAI response temporaily until bursonAI is setup properly and trained
                 response = await fetchOpenAIResponse(part);
-                // push to array
                 const AIeventObject = {
                     question: part,
                     response: response
                 };
 
-                if(questionHasAlreadyBeenAsked0.length <= 1000000000000){
+                if(questionHasAlreadyBeenAsked0.length <= max_array_length){
                     previousQuestion0.push(AIeventObject);     
-                }else{
+                }else if(questionHasAlreadyBeenAsked1.length <= max_array_length){
                     previousQuestion1.push(AIeventObject);
+                }else{
+                    console.log("System memory is full do not save");
                 }
             }
             
