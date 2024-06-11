@@ -4,6 +4,8 @@ html, body {
     background-color: lightgray;
     overflow-x: hidden; /* Prevent horizontal scrolling */
     touch-action: none; /* Prevents touch gestures, including pinch-to-zoom */
+    scrollbar-width: thin; /* Scrollbar width: auto, thin, or none */
+    scrollbar-color: #888 transparent; /* Thumb color and track color */
 }
 
 body{
@@ -20,13 +22,21 @@ a {
 
 /* CSS for customizing scrollbar */
 ::-webkit-scrollbar {
-    width: 10px; /* Width of the scrollbar */
+    width: 10px; /* Width of all scrollbars for edge/chrome */
     border-radius: 2px;
 }
 
 .live-Messages::-webkit-scrollbar {
     width: 3px; /* Width of the scrollbar */
     border-radius: 1vh;
+}
+.live-Messages {
+    scrollbar-width: thin; /* Scrollbar width for .live-Messages */
+    scrollbar-color: #888 transparent; /* Thumb color and track color */
+}
+
+.live-Messages:hover {
+    scrollbar-color: #555 transparent; /* Thumb color on hover and track color */
 }
 
 ::-webkit-scrollbar-track {
@@ -73,21 +83,20 @@ a {
 .loggedIn-button {
     display: inline-block;
     position: absolute;
-    background-color: #0067b3; /* initial background color of connect button*/
-    align-items: center; /* Vertically center the content */ 
-    justify-content: center; /* Horizontally center the content */
+    background-color: #0067b3; 
+    align-items: center;
+    justify-content: center; 
     color: #fff; 
     border: none;
     border-radius: 12%;  
     padding: 0px;
     cursor: pointer; 
     height: 100%;  
-    /*width: 33%;*/
     width: 11vh;
     right: 30%;
-    font-size: 1px; /* Relative font size using viewport width */
-    overflow: hidden; /* Prevent content from overflowing */
-    transition: background-color 0.3s; /* Smooth transition for background color change */
+    font-size: 1px;
+    overflow: hidden; 
+    transition: background-color 0.3s;
     margin: 0px;
     text-align: center;
 }
@@ -98,19 +107,18 @@ a {
 .gridBack-button:hover, 
 .gridFoward-button:hover,
 .form-submit:hover{
-    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3); /* Slightly larger box shadow on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3); 
     background-color: #8b8989;
 }
 
 .connect-button:hover {
-    background-color: #005093; /* Darker background color on hover */
-    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Slightly larger box shadow on hover */
+    background-color: #005093; 
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); 
 }
 
 .loggedIn-button:hover {
-    /*background-color: #004c99; /* Darker shade of blue when hovered */
-    background-color: #005093; /* Darker background color on hover */
-    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Slightly larger box shadow on hover */
+    background-color: #005093; 
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); 
     cursor: pointer; 
 }
 
@@ -121,9 +129,9 @@ a {
     right: 23vh;
     height: 2vh;
     top: 2vh;
-    border-radius: 50%; /* Circular shape */
+    border-radius: 50%; 
     background-color: transparent;
-    transform: translateY(-50%); /* Adjust vertical alignment */
+    transform: translateY(-50%); 
     margin-right: 5px;
 }
 
@@ -148,7 +156,6 @@ a {
 @media screen and (max-width: 900px) {
     .popup {
         width: 300px;
-        /*transform: translate(-50%, -50%);*/
     }
 }
 
@@ -158,41 +165,38 @@ a {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: dimgray; /* Light gray background */
+    background-color: dimgray; 
     padding: 20px;
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* Shadow under the border */
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); 
     max-width: 400px;
     width: 80%;
-    height: auto; /* Adjust height automatically based on content */
+    height: auto; 
     text-align: center;
-    overflow: hidden; /* Hide overflow content */
-    border: 1px solid #ccc; /* Add border */
+    overflow: hidden; 
+    border: 1px solid #ccc;
     justifyContent:  center;
+    z-index: 1000000000;
 }
 
-/* Style for buttons inside the popup */
 .dbPopup button {
-    margin: 10px; /* Add space between buttons */
-    padding: 10px 20px; /* Padding for buttons */
+    margin: 10px;
+    padding: 10px 20px; 
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
-/* Style for upload button */
 #uploadButton {
-    background-color: #4CAF50; /* Green background */
-    color: white; /* White text */
+    background-color: #4CAF50; 
+    color: white; 
 }
 
-/* Style for cancel button */
 #cancelButton {
-    background-color: #f44336; /* Red background */
-    color: white; /* White text */
+    background-color: #f44336;
+    color: white; 
 }
 
-/* Style for exit button */
 #exitButton {
     background-color: transparent; /* Transparent background */
     color: #555; /* Dark gray text */
@@ -404,4 +408,27 @@ input, button {
     cursor: pointer; /* Change cursor to pointer on hover */
     transform: translateY(-1px); /* Move the item up by 5 pixels when hovered over */
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5); /* Adding shadow */
+}
+.selection-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.coin-option {
+  cursor: pointer;
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.circle-icon {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #000;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.selected .circle-icon {
+  background-color: #000;
 }
