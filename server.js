@@ -2613,14 +2613,18 @@ async function roulsResponse(question) {
               response = 'We could not find the word you are looking for.\n\n';
           }
           
-        } else {
-            const questionHasAlreadyBeenAsked0 = previousQuestion0.findIndex(obj=> obj.question== part);
-            const questionHasAlreadyBeenAsked1 = previousQuestion1.findIndex(obj=> obj.question== part);
+        }  else {
+            const questionHasAlreadyBeenAsked0 = previousQuestion0.findIndex(obj=> obj.question == part);
+            const questionHasAlreadyBeenAsked1 = previousQuestion1.findIndex(obj=> obj.question == part);
+
+            console.log('searching to see if question is already asked');
 
             if(questionHasAlreadyBeenAsked0 !== -1){
-                response = previousQuestion0[questionHasAlreadyBeenAsked0];
-            }else if (questionHasAlreadyBeenAsked1 !== -1){
-                response = previousQuestion1[questionHasAlreadyBeenAsked1];
+                console.log('we found previous question in array1 no need to fetching OPENAI event');
+                response = previousQuestion0[questionHasAlreadyBeenAsked0].response;
+            }else if(questionHasAlreadyBeenAsked1 !== -1){
+                console.log('we found previous question in array2 no need to fetching OPENAI event');
+                response = previousQuestion1[questionHasAlreadyBeenAsked1].response;
             }else{
                 response = await fetchOpenAIResponse(part);
                 // push to array
