@@ -56,7 +56,7 @@ const dbURL = 'your-mongoose-db-string';
 const googleAPIKEY = 'your-google-api-maps-key';
 const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
 const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
-const myDomain = undefined; // swap to <yourdomain.com> after ip from digital ocean is setup only allow calls from htts://bursonskullz.com. Undefined allows any domain to call the server
+const myDomain = ''; // change to undefined or yourdomain.com to prevent multiple servers calling 
 const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
 });
