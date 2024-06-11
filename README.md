@@ -1,6 +1,6 @@
 # Web3-Art-Website
 
-1. First, create a free mongoose Database, gather a Google Maps API key, an app passcode, a business email, and a private code only you have access to, as well as an Merriam webstter dictionary APi key and a OPENAI API key. 
+1. First, create a free mongoose Database, gather a Google Maps API key, a google app passcode under the google apps section (you may need to enable two factor authentication), a business email, and a private code only you have access to, as well as an Merriam webstter dictionary APi key and a OPENAI API key. 
 
 2. Change the constants in the `server.js` file:
 
