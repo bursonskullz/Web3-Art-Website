@@ -1,6 +1,6 @@
 # Web3-Art-Website
 
-1. First, create a free mongoose Database, gather a Google Maps API key, an app passcode, a business email, and a private code only you have access to. 
+1. First, create a free mongoose Database, gather a Google Maps API key, an app passcode, a business email, and a private code only you have access to, as well as an Merriam webstter dictionary APi key and a OPENAI API key. 
 
 2. Change the constants in the `server.js` file:
 
@@ -12,6 +12,7 @@
     const googleAPIKEY = 'your-google-api-maps-key';
     const myDomain = 'localhost';
     const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
+    const OPENAI_API_KEY = 'YOUR-OPENAI-KEY';
     const PORT = process.env.PORT || 27015; 
     ```
 
