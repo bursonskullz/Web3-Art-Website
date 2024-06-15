@@ -7,7 +7,7 @@ const RoysWallet = '0x5cdad7876270364242ade65e8e84655b53398b76';
 const abi = [/* Your contract ABI here */];
 const socket = io();
 const iconHeaderWidth = '11.4vh';
-
+const acceptableCoinsSelection = ['ether'];
 let paintingChunks = [];
 let totalChunks = 0;
 
@@ -18,7 +18,6 @@ var changeUserNamePopUpExist = false;
 var currentlyTryingToBuy = false;
 var isSocketPresent = false;
 var clientCanSendAIfetchRequest = true;
-//const sideElementsWidth = '15%';
 
 let EmailformData  = {
     email: "",
@@ -27,16 +26,15 @@ let EmailformData  = {
     lastName: ""
 };
 
+var etcPriceInUSD = '333.50';
+var shibaInuPriceInUSD = '333.50';
+var polygonPriceInUSD = '333.50';
 const contractAddress = "0x123abc...";
-
-
 
 export async function painting_section_click(parentElement) {
     console.log("Painting section clicked!"); 
-
     if(currentPaintingArray.length != 0){
         console.log('already did fetch request should have access to data no need to push again');
-        // need to add listeners again
     }else {
         console.log('First time calling fecth');
         const loadingAnimation = document.createElement('div');
@@ -58,7 +56,6 @@ export async function painting_section_click(parentElement) {
                 const compressedPaintingArray = await response.json();            
                 if (compressedPaintingArray.success == false) {
                     console.log('did not get back array maybe it had hard time sending');
-                    // need to warn user to try again!
                 }else{
                     for (let i = 0; i < compressedPaintingArray.length; i++) {
                         currentPaintingArray.push(compressedPaintingArray[i]);
@@ -112,13 +109,6 @@ export async function addPaintingElementListener(paintingElement) {
     paintingElement.addEventListener('click',  function() { 
             if(!paintingClicked){
                 paintingClicked = true;
-                ////////////////////////////////////DO NOT REMOVE FOR DEV/////////////////////////////////////////////////
-                // add loading animation to the left side of screen
-                // send request to server to get paintings and save as mypaintingsArray
-                // may need to send 1 at  time to ensure the user doesnt get overloaded once it reaches say 10,000 items 
-                // when user recieved all paintings remove animation and call lines 67-79
-                ////////////////////////////////////DO NOT REMOVE FOR DEV/////////////////////////////////////////////////
-
                 painting_section_click(paintingElement)
                   .then(() => {
                     setTimeout(async () => { 
@@ -136,12 +126,6 @@ export async function addPaintingElementListener(paintingElement) {
                           
                             var paintingGrid = document.querySelector('.NewGrid');
                             paintingGrid.style.left = '18%';
-
-                            /*
-                            const searchBar = document.querySelector('.search-container');
-                            if(searchBar){
-                               searchBar.remove(); // comment if statement when function searchBar is properly setup
-                            }*/
                             
                         }else if(window.innerWidth <= 1300 && window.innerWidth >= 998 ){
                             sideElementsWidthPercent = '15%'; 
@@ -166,7 +150,6 @@ export async function addPaintingElementListener(paintingElement) {
                             const gridBackContainer = document.querySelector('.gridBackContainer');
                             const headerTextContainer = document.querySelector('.headerTextContainer');
 
-                            
 
                             const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
 
@@ -184,30 +167,19 @@ export async function addPaintingElementListener(paintingElement) {
 
 
                             const dateNodes = document.querySelectorAll('.dateNode');
-
-                            // Loop through each dateNode element
                             dateNodes.forEach(dateNode => {
-                                dateNode.style.fontSize = '1.3vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dateNode.style.fontSize = '1.3vh'; 
                             });
 
 
                             const dpurchasesfirstNameDivs = document.querySelectorAll('.purchasesfirstNameDiv');
-
-                            // Loop through each dateNode element
                             dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
-                                dpurchasesfirstNameDiv.style.fontSize = '1.3vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dpurchasesfirstNameDiv.style.fontSize = '1.3vh'; 
                             });
 
-
-
                             const dppurchasesPriceDivs = document.querySelectorAll('.purchasesPriceDiv');
-
-                            // Loop through each dateNode element
                             dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
-                                dppurchasesPriceDiv.style.fontSize = '1.3vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dppurchasesPriceDiv.style.fontSize = '1.3vh'; 
                             });
 
                             
@@ -218,22 +190,15 @@ export async function addPaintingElementListener(paintingElement) {
                             }else{
                                 // dont do anything
                             }
-
-
                             paintingGrid.style.left = '18%';
-
                             backButtonContainer.style.left = '47.5%';
                             backButtonContainer.style.width = '6vh';
-
                             commissionContainer.style.left = '54.8%';
                             commissionContainer.style.width = '6vh';
-
                             AIbuttonContainer.style.left = '60.8%';
                             AIbuttonContainer.style.width = '6vh';
-
                             gridFowardContainer.style.left = '40%';
                             gridFowardContainer.style.width = '6vh';
-
                             gridBackContainer.style.left = '32.5%';
                             gridBackContainer.style.width = '6vh';
 
@@ -252,11 +217,8 @@ export async function addPaintingElementListener(paintingElement) {
                             
 
                         }else if(window.innerWidth <= 998 && window.innerWidth >= 610 ){
-
-                            // need to decrease the width of the image not the height
                             GridWidth = '52%';
                             gridItemWidth = '95%';
-                            // change width to each grid time
                             sideElementsWidthPercent = '20%'; 
                             rowWidth = '33%';
 
@@ -268,7 +230,6 @@ export async function addPaintingElementListener(paintingElement) {
 
                             var paintingGrid = document.querySelector('.NewGrid');
                             paintingGrid.style.left = '24.2%';
-                            // grab the gid make it sat 10% smaller and make side elements larger
 
                             const searchBar = document.querySelector('.search-container');
                             const addToDBButton = document.querySelector('.add-to-DB');
@@ -280,17 +241,11 @@ export async function addPaintingElementListener(paintingElement) {
                             const gridFowardContainer = document.querySelector('.gridFowardContainer');
                             const gridBackContainer = document.querySelector('.gridBackContainer');
 
-
-
-
-
                             const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
 
                             ptagDescriptions.forEach(itemDescription => {
                                 itemDescription.style.fontSize = '1.5vh';
                             });
-
-
 
                             const purchasesInfoContainer = document.querySelector('.infoContainer');
                             //purchasesInfoContainer.style.fontSize = '1.5vh';
@@ -298,54 +253,39 @@ export async function addPaintingElementListener(paintingElement) {
                                 purchasesInfoContainer.style.marginTop = '0vh';
                             }
                             
-
                             const dateNodes = document.querySelectorAll('.dateNode');
 
-                            // Loop through each dateNode element
                             dateNodes.forEach(dateNode => {
-                                dateNode.style.fontSize = '1.1vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dateNode.style.fontSize = '1.1vh'; 
                             });
 
 
                             const dpurchasesfirstNameDivs = document.querySelectorAll('.purchasesfirstNameDiv');
 
-                            // Loop through each dateNode element
                             dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
-                                dpurchasesfirstNameDiv.style.fontSize = '1.1vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dpurchasesfirstNameDiv.style.fontSize = '1.1vh'; 
                             });
-
-
 
                             const dppurchasesPriceDivs = document.querySelectorAll('.purchasesPriceDiv');
 
-                            // Loop through each dateNode element
                             dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
-                                dppurchasesPriceDiv.style.fontSize = '1.1vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dppurchasesPriceDiv.style.fontSize = '1.1vh'; 
                             });
 
                             if(purchasesInfoContainer){
-                                //purchasesInfoContainer.style.fontSize = '1.2vh';
                                 purchasesInfoContainer.style.marginTop = '1.1vh';
                             }
 
 
                             headerTextContainer.style.width = '38%';
-
                             backButtonContainer.style.left = '44.5%';
                             backButtonContainer.style.width = '6vh';
-
                             commissionContainer.style.left = '52.8%';
                             commissionContainer.style.width = '6vh';
-
                             AIbuttonContainer.style.left = '60.8%';
                             AIbuttonContainer.style.width = '6vh';
-
                             gridFowardContainer.style.left = '36%';
                             gridFowardContainer.style.width = '6vh';
-
                             gridBackContainer.style.left = '27%';
                             gridBackContainer.style.width = '6vh';
 
@@ -355,26 +295,18 @@ export async function addPaintingElementListener(paintingElement) {
                             }
                             searchBar.remove();
 
-                            // reset font size of footer 
                             var listItems = document.getElementsByTagName('li');
                             var listH3Items = document.getElementsByTagName('li');
-                            //var descriptionTags = document.getElementsByClassName('descriptionPaintingPTAG');
 
                             for (var i = 0; i < listItems.length; i++) {
-                               listItems[i].style.fontSize = '2.2vh'; // Change '16px' to your desired font size
+                               listItems[i].style.fontSize = '2.2vh'; 
                             }
 
                             for (var i = 0; i < listH3Items.length; i++) {
-                                listItems[i].style.fontSize = '2.2vh'; // Change '16px' to your desired font size
+                                listItems[i].style.fontSize = '2.2vh'; 
                             }
-                            /*
-                            for (var i = 0; i < descriptionTags.length; i++) {
-                                descriptionTags[i].style.fontSize = '1.2vh';
-                            }*/
 
                         }else if(window.innerWidth <= 609 && window.innerWidth >= 500){
-
-                            // need to fix this to be better other ones are good. Maybe make additional if with one element high. 
                             sideElementsWidthPercent = '24%'; 
                             GridWidth = '45%';
                             gridItemWidth = '100%';
@@ -399,8 +331,6 @@ export async function addPaintingElementListener(paintingElement) {
                             const headerTextContainer = document.querySelector('.headerTextContainer');
                             const purchasesInfoContainer = document.querySelector('.infoContainer');
 
-
-
                             const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
 
                             ptagDescriptions.forEach(itemDescription => {
@@ -408,30 +338,19 @@ export async function addPaintingElementListener(paintingElement) {
                             });
 
                             const dateNodes = document.querySelectorAll('.dateNode');
-
-                            // Loop through each dateNode element
                             dateNodes.forEach(dateNode => {
-                                dateNode.style.fontSize = '1vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dateNode.style.fontSize = '1vh'; 
                             });
-
 
                             const dpurchasesfirstNameDivs = document.querySelectorAll('.purchasesfirstNameDiv');
 
-                            // Loop through each dateNode element
                             dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
-                                dpurchasesfirstNameDiv.style.fontSize = '1vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dpurchasesfirstNameDiv.style.fontSize = '1vh'; 
                             });
 
-
-
                             const dppurchasesPriceDivs = document.querySelectorAll('.purchasesPriceDiv');
-
-                            // Loop through each dateNode element
                             dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
-                                dppurchasesPriceDiv.style.fontSize = '1vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dppurchasesPriceDiv.style.fontSize = '1vh'; 
                             });
 
                             if(purchasesInfoContainer){
@@ -466,19 +385,14 @@ export async function addPaintingElementListener(paintingElement) {
 
                             var listItems = document.getElementsByTagName('li');
                             var listH3Items = document.getElementsByTagName('li');
-                            //var descriptionTags = document.getElementsByClassName('descriptionPaintingPTAG');
 
                             for (var i = 0; i < listItems.length; i++) {
-                               listItems[i].style.fontSize = '2.2vh'; // Change '16px' to your desired font size
+                               listItems[i].style.fontSize = '2.2vh'; 
                             }
 
                             for (var i = 0; i < listH3Items.length; i++) {
-                                listItems[i].style.fontSize = '2.2vh'; // Change '16px' to your desired font size
+                                listItems[i].style.fontSize = '2.2vh'; 
                             }
-
-                            //need to reset icons size in header and move left a little
-                            // make additional if size is less than 400 for example galazy Z fold 5
-                            // should not be less then 200 maybe ever
 
                             paintingGrid.style.left = '27.5%';
 
@@ -492,7 +406,7 @@ export async function addPaintingElementListener(paintingElement) {
                             if(currentPaintingArray.length >= 24){
                                 makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }else{
-                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                                makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }
 
                             var paintingGrid = document.querySelector('.NewGrid');
@@ -500,10 +414,7 @@ export async function addPaintingElementListener(paintingElement) {
                             paintingGrid.style.height = '60%';
                             paintingGrid.style.top = '2%';
                             paintingGrid.style.marginBottom = '2%';
-                            // need to change font size inside grid elements overlay to half 
-                            // increase the width of .connect-button, and .loggedIn-button
-                            // sit closer to the right 
-                            // decrease the font size 
+
                             const tree = document.querySelector('.tree');
                             const recentSells = document.querySelector('.recentSells');
                             const acceptibleCoins = document.querySelector('.acceptibleCoins');
@@ -528,30 +439,21 @@ export async function addPaintingElementListener(paintingElement) {
 
 
                             const dateNodes = document.querySelectorAll('.dateNode');
-
-                            // Loop through each dateNode element
                             dateNodes.forEach(dateNode => {
-                                dateNode.style.fontSize = '.9vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dateNode.style.fontSize = '.9vh'; 
                             });
 
 
                             const dpurchasesfirstNameDivs = document.querySelectorAll('.purchasesfirstNameDiv');
-
-                            // Loop through each dateNode element
                             dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
-                                dpurchasesfirstNameDiv.style.fontSize = '.9vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dpurchasesfirstNameDiv.style.fontSize = '.9vh'; 
                             });
 
 
 
                             const dppurchasesPriceDivs = document.querySelectorAll('.purchasesPriceDiv');
-
-                            // Loop through each dateNode element
                             dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
-                                dppurchasesPriceDiv.style.fontSize = '.9vh'; // Reset the font size
-                                // Add more style resets as needed
+                                dppurchasesPriceDiv.style.fontSize = '.9vh'; 
                             });
 
                             tree.remove();
@@ -564,27 +466,21 @@ export async function addPaintingElementListener(paintingElement) {
                                 deleteToDBButton.remove();  
                             }
 
-                            if(greenLight){
+                            if (typeof greenLight !== 'undefined' && greenLight) {
                                 greenLight.remove();
                             }
+
+                            //greenLight?.remove();
                             
-                            // reset home back size and alignment
                             backButtonContainer.style.width = '4.2vh';
                             backButtonContainer.style.left = '46.5%';
-
-
                             commissionContainer.style.width = '4.2vh';
                             commissionContainer.style.left = '55%';
-
                             AIbuttonContainer.style.width = '4.2vh';
                             AIbuttonContainer.style.left = '63%';
-
                             gridFowardContainer.style.width  = '4.2vh';
-
-
                             gridBackContainer.style.width  = '4.2vh';
                             gridBackContainer.style.left = '32%';
-
                             chatRoom.style.height = '14%';
                             chatRoom.style.width =  '78%';
                             chatRoom.style.height = '30%';
@@ -596,22 +492,17 @@ export async function addPaintingElementListener(paintingElement) {
 
                             var listItems = document.getElementsByTagName('li');
                             var listH3Items = document.getElementsByTagName('h3');
-                            //var descriptionTags = document.getElementsByClassName('descriptionPaintingPTAG');
-
                             for (var i = 0; i < listItems.length; i++) {
-                               listItems[i].style.fontSize = '1.5vh'; // Change '16px' to your desired font size
+                               listItems[i].style.fontSize = '1.5vh'; 
                             }
 
                             for (var i = 0; i < listH3Items.length; i++) {
-                                listH3Items[i].style.fontSize = '1.5vh'; // Change '16px' to your desired font size
+                                listH3Items[i].style.fontSize = '1.5vh'; 
                             }
-
-                            // edit the input tag to fit parent element or adjust here
                         }else if(window.innerWidth <= 350) {
-                            window.location.href = 'unsupported.html'; // Replace 'another_page.html' with the URL of the page you want to redirect to
+                            window.location.href = 'unsupported.html'; 
                         }
 
-                        //handleResize(); // get working before uplading code 
                         gridNavigator.style.display = 'none';
 
                         let msgHisotry = await getMessageHistory();
@@ -623,12 +514,8 @@ export async function addPaintingElementListener(paintingElement) {
                     }, 101); 
                   })
                   .catch((error) => {
-                    // Handle any errors that occurred during the asynchronous operation
                     console.error('Error:', error);
                   });
-                //painting_section_click(paintingElement); // have this function return all the paintings in
-
-                // const mypaintingsArray  = painting_section_click(paintingElement);
                 paintingClicked = false;
             }else{
                 console.log('we already clicked the painting section');
@@ -637,28 +524,17 @@ export async function addPaintingElementListener(paintingElement) {
 }
 
 export function math_section_click(parentElement){
-    /*
-    if(!mathOverlay){
-
-    }else{
-        comingSoonScreen(parentElement);
-    }
-    */
     comingSoonScreen(parentElement);
 }
 
 export function nft_section_click(parentElement){
-     // need access to function coming soon so we if we want in myfunction we need to pass in the function (parentElement, myfunctin)
-     console.log("NFT section clicked!"); // Log a message to the console
+     console.log("NFT section clicked!"); 
      comingSoonScreen(parentElement);
-     //shiftOffScreen(gridNavigator);
 }
 
 export function upcoming_section_click(parentElement){
-     // need access to function coming soon so we if we want in myfunction we need to pass in the function (parentElement, myfunctin)
-     console.log("NFT section clicked!"); // Log a message to the console
+     console.log("NFT section clicked!"); 
      comingSoonScreen(parentElement);
-     //shiftOffScreen(gridNavigator);
 }
 
 
@@ -666,10 +542,6 @@ export function upcoming_section_click(parentElement){
 
 
 export function makeConnection() {
-    // Check if already connected
-    // If connected, return or do whatever is needed
-
-    // Check if popup already exists
     let popup = document.querySelector('.popup');
     if (!popup) {
         popup = document.createElement("div");
@@ -691,54 +563,48 @@ export function makeConnection() {
         imageContainer.style.position = 'relative';
         imageContainer.style.width = '80%';
         imageContainer.style.height = '50%';
-        imageContainer.style.marginTop = '1%'; // adjust margin only on bottom
-        imageContainer.style.marginBottom = '7%'; // adjust margin only on bottom
+        imageContainer.style.marginTop = '1%'; 
+        imageContainer.style.marginBottom = '7%'; 
         imageContainer.style.borderRadius = '5px';
         //imageContainer.style.backgroundColor = 'blue';
-        imageContainer.style.backgroundImage = 'url("images/bursonskull2.png")';
+        imageContainer.style.backgroundImage = 'url("images/BursonSkull2.png")';
         //imageContainer.style.backgroundSize = 'cover'; 
         imageContainer.style.backgroundSize = 'contain'; 
         imageContainer.style.backgroundRepeat = 'no-repeat';
         imageContainer.style.backgroundPosition = 'center'; 
-        //imageContainer.style.textAlign = 'center'; // Horizontally center the content
         imageContainer.style.left = '10%';
         popup.appendChild(imageContainer);
 
         const Logocontainer1 = document.createElement('div');
         const Logocontainer2 = document.createElement('div');
 
-        // Create Provider divs
-        const providers = ["Metamask", "Coinbase"]; // Example providers remove coinbase until we are ready
+        const providers = ["Metamask", "Coinbase"]; 
         providers.forEach(providerName => {
             const providerDiv = document.createElement("div");
             //providerDiv.textContent = providerName;
             providerDiv.style.position = 'relative';
             providerDiv.classList.add("provider");
             providerDiv.className = providerName;
-            //providerDiv.style.border = "1px solid #ccc"; // Adding border
             providerDiv.style.width = '80%';
             providerDiv.style.height = '8%';
             providerDiv.style.marginTop = '2%';
             providerDiv.style.left = '10%';
-            providerDiv.style.alignItems = "center"; // Center vertically
-            providerDiv.style.justifyContent = "center"; // Center horizontally
+            providerDiv.style.alignItems = "center"; 
+            providerDiv.style.justifyContent = "center"; 
             providerDiv.style.borderRadius = '.5vh';
             providerDiv.style.backgroundColor = 'white';
             providerDiv.style.overflow = 'hidden';
-            providerDiv.style.boxShadow = '0px 0px 15px rgba(0, 0, 0, 0.5)'; /* Adding shadow */
-            
+            providerDiv.style.boxShadow = '0px 0px 15px rgba(0, 0, 0, 0.5)'; 
 
-            //providerDiv.style.margin = '2px'; only add
             if(providerName == "Coinbase"){
-                //providerDiv.style.textDecoration = 'line-through';
-                providerDiv.style.backgroundImage = 'url("/images/coinbase.png")';
-                providerDiv.style.backgroundSize = 'contain'; // Optional: Adjust the size of the background image
+                providerDiv.style.backgroundImage = 'url("/images/coinbase.PNG")';
+                providerDiv.style.backgroundSize = 'contain'; 
                 providerDiv.style.backgroundRepeat = 'no-repeat';
                 providerDiv.style.backgroundPosition = 'center'; 
             }else{
                 providerDiv.style.backgroundImage = 'url("/images/metamask.png")';
-                providerDiv.style.cursor = 'pointer'; // Cursor style
-                providerDiv.style.backgroundSize = 'contain'; // Optional: Adjust the size of the background image
+                providerDiv.style.cursor = 'pointer'; 
+                providerDiv.style.backgroundSize = 'contain';
                 providerDiv.style.backgroundRepeat = 'no-repeat';
                 providerDiv.style.backgroundPosition = 'center'; 
             }
@@ -746,7 +612,6 @@ export function makeConnection() {
             popup.appendChild(providerDiv);
         });
 
-        // Create cancel button
         const cancelButton = document.createElement("div");
         const ptag = document.createElement('p');
 
@@ -772,10 +637,8 @@ export function makeConnection() {
         cancelButton.appendChild(ptag);
         popup.appendChild(cancelButton);
 
-        // Append popup to body
         document.body.appendChild(popup);
 
-        // Add event listeners for dragging behavior
         let offsetX, offsetY;
         let isDragging = false;
 
@@ -802,98 +665,74 @@ export function makeConnection() {
 
 
 export function comingSoonScreen(divElement) {
-    // Set the position of the parent div to relative
     divElement.style.position = 'relative';
 
-    // Create a new div element for the overlay
     const overlay = document.createElement('div');
     const overlayText = document.createElement('p');
 
     overlay.classList.add('coming-soon-overlay');
     overlayText.classList.add('coming-soon-text');
 
-    // Set the background color of the overlay to black with 50% opacity
     overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
     overlay.style.borderRadius = '10px';
 
-    // Set overlay position to absolute
     overlay.style.position = 'absolute';
     overlay.style.width = '100%';
-    overlay.style.height = '0'; // Initially set height to 0
+    overlay.style.height = '0'; 
     overlay.style.left = '0';
-    overlay.style.bottom = '0'; // Start from the bottom of the parent div
+    overlay.style.bottom = '0';
 
-    // Create and style the text element
-    overlayText.style.color = 'white'; // Set text color to white
-    overlayText.style.position = 'absolute'; // Set position to absolute
-    overlayText.style.textAlign = 'center'; // Center align text
-    overlayText.style.width = '100%'; // Ensure text takes full width of parent
-    overlayText.style.margin = '0'; // Remove default margin
-    overlayText.style.top = '50%'; // Center vertically
-    overlayText.style.transform = 'translateY(-50%)'; // Adjust for vertical centering
 
-    // Set text content
+    overlayText.style.color = 'white';
+    overlayText.style.position = 'absolute'; 
+    overlayText.style.textAlign = 'center'; 
+    overlayText.style.width = '100%'; 
+    overlayText.style.margin = '0'; 
+    overlayText.style.top = '50%'; 
+    overlayText.style.transform = 'translateY(-50%)'; 
+
     overlayText.textContent = 'Coming Soon';
     overlayText.style.zIndex = 1000000;
-    // Append elements
     overlay.appendChild(overlayText);
     divElement.appendChild(overlay);
 
-    // Function to update the overlay height
     function updateOverlayHeight() {
-        const elapsedTime = performance.now() - startTime; // Calculate elapsed time
-        const percentageComplete = elapsedTime / animationDuration; // Calculate percentage complete
-        const newHeight = Math.min(percentageComplete * 100, 100); // Ensure height doesn't exceed 100%
-        overlay.style.height = newHeight + '%'; // Update overlay height
+        const elapsedTime = performance.now() - startTime; 
+        const percentageComplete = elapsedTime / animationDuration; 
+        const newHeight = Math.min(percentageComplete * 100, 100); 
+        overlay.style.height = newHeight + '%';
 
         if (percentageComplete < 1 && newHeight < 100) {
-            requestAnimationFrame(updateOverlayHeight); // Continue animation until 100% completion or height reaches 100%
+            requestAnimationFrame(updateOverlayHeight);
         }
     }
 
-    // Calculate the total duration of the animation in milliseconds
-    const animationDuration = 1000; // 1000 milliseconds (1 second)
-    const startTime = performance.now(); // Get the current time in milliseconds
+    const animationDuration = 1000; 
+    const startTime = performance.now(); 
 
-    // Start the animation
     requestAnimationFrame(updateOverlayHeight);
-
-    // Schedule the removal of the overlay after 3 seconds
     setTimeout(function () {
-        // Remove overlay
         divElement.removeChild(overlay);
-
-        // Reset global variables
         NFTDivOverlay = false;
         mathOverlay = false;
         updatesOverlay = false;
-    }, 3000); // 3000 milliseconds (3 seconds)
+    }, 3000); 
 }
 
 
 export function shiftOffScreen(element) {
-    // Define the shift amount
-    var shiftAmount = 2; // Move the element to the left by 2 pixels
-
-    // Define a function to shift the element
+    var shiftAmount = 2; 
     function shift() {
-        // Get the current left position or default to 0
         var currentPosition = parseFloat(element.style.left) || 0; 
-        // Move the element to the left by shiftAmount pixels
         element.style.left = (currentPosition - shiftAmount) + '1px';
-
-        // Check if the element is off-screen
         if (element.getBoundingClientRect().right <= 0) {
-            clearInterval(interval); // Stop shifting when the element is off-screen
+            clearInterval(interval);
         }
     }
-
-    // Start shifting the element every 1 millisecond
-    var interval = setInterval(shift, 38); // Adjust interval time as needed
+    var interval = setInterval(shift, 38); 
 }
 
 export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
-    //  variables declaration
     var numRows = Math.ceil(array.length / columns);
     var oldGrid = document.querySelector('.Grid_container');
     var gridContainer = document.createElement('div');
@@ -902,103 +741,64 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
         oldGrid.parentNode.removeChild(oldGrid); 
     }
     
-    // container attributes
     gridContainer.style.position = 'relative';
     gridContainer.style.height = '100%'; 
     gridContainer.className = 'NewGrid';
     gridContainer.style.width = gridWidthPercent;
-    //gridContainer.style.margin = '0 auto'; // Center horizontally
-    //gridContainer.style.left = '18%'; // Center horizontally
     gridContainer.style.top = '2%'; 
     gridContainer.style.padding = '4px';
-    gridContainer.style.zIndex = '10'; // Higher z-index to make it appear on top
-    gridContainer.style.backgroundColor = 'none'; // Set background color for grid container
-    gridContainer.style.overflow = 'auto'; // Make the container scrollable
+    gridContainer.style.zIndex = '10'; 
+    gridContainer.style.backgroundColor = 'none';
+    gridContainer.style.overflow = 'auto'; 
     gridContainer.style.display = 'grid';
     gridContainer.style.zIndex = '0';
 
-
-    // four side elements should depend on grid size (doc.width- gridWidth -2% or something )
-    // all four need to be the save width
-    // change the grid with smaller when users 
-
-    gridContainer.style.scrollbarWidth = 'none'; // Hide scrollbar for Firefox and edge
-    //gridContainer.style.msOverflowStyle = 'none'; // Hide scrollbar for Internet Explorer 
-    //gridContainer.style.overflow = '-moz-scrollbars-none'; // Hide scrollbar for Firefox (alternative)
-
-    const rowHeight = '33%'; // Example height for each row
-    // Set grid layout properties (number of columns and rows)
-    gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`; // Each column occupies equal space
-    gridContainer.style.gridTemplateRows = `repeat(${numRows},  ${rowHeight})`; // Each row occupies equal space
-    gridContainer.style.gap = '0px'; // vertical Gap between grid items
-        // Loop through the array to populate the grid
+    gridContainer.style.scrollbarWidth = 'none'; 
+    const rowHeight = '33%'; 
+    gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`; 
+    gridContainer.style.gridTemplateRows = `repeat(${numRows},  ${rowHeight})`; 
+    gridContainer.style.gap = '0px'; 
     array.forEach(item => {
-        // if viewport is computer fix heigh 
-        // otherwise set to relative
         var gridItem = document.createElement('div');
-
-        // if converting price to a decimal we need to fi 
         console.log(item.price.$numberDecimal);
-        gridItem.classList.add('grid-item'+ item.price.$numberDecimal.toString());// set class 
-        gridItem.setAttribute('id', item._id);// set ID
-        gridItem.textContent = item; // Set the content of the grid item
-        gridItem.style.position = 'relative'; // Position relative for absolute positioning of overlay
-
-        // Apply styles for grid item
-        gridItem.style.backgroundColor = '#aaaaaa'; // Set background color for grid item
+        gridItem.classList.add('grid-item'+ item.price.$numberDecimal.toString());
+        gridItem.setAttribute('id', item._id);
+        gridItem.textContent = item; 
+        gridItem.style.position = 'relative';
+        gridItem.style.backgroundColor = '#aaaaaa'; 
         gridItem.style.width = '95%'; 
         gridItem.style.left = '2.5%'; 
-        gridItem.style.height = '94%'; // Set height of grid item to fill the container
+        gridItem.style.height = '94%'; 
         gridItem.style.top = '3%';
         gridItem.style.display = 'flex';
         gridItem.style.justifyContent = 'center';
         gridItem.style.alignItems = 'center';
-        gridItem.style.setProperty('border-radius', '10px', 'important'); // Round corners
-        //gridItem.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)'; /* Adding shadow */
-        gridItem.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; /* Adjust values for your shadow */
+        gridItem.style.setProperty('border-radius', '10px', 'important'); 
+        gridItem.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; 
         removeString(gridItem, "[object Object]");
-        //removeString(gridItem, " ");
-        // need to resize image before uplaoding
-        //gridItem.style.backgroundImage = 'url("/images/napolean.jpg")';// convert to 600x500 pixels
-        gridItem.style.backgroundImage = `url("${item.image}")`;// convert to 600x500 pixels
-        gridItem.style.backgroundSize = 'cover'; // Optional: Adjust the size of the background image
+        gridItem.style.backgroundImage = `url("${item.image}")`;
+        gridItem.style.backgroundSize = 'cover'; 
         gridItem.style.backgroundRepeat = 'no-repeat';
         gridItem.style.backgroundPosition = 'center'; 
-        gridItem.style.backgroundSize = '90% 100%'; // Decreases the width of the background image to 80% of its original size
-        // Set height of the grid item
-        //gridItem.style.height = '25vh';
+        gridItem.style.backgroundSize = '90% 100%'; 
 
-        //parentElement.style.backgroundColor = 'dimgray';
-        //parentElement.style.backgroundImage = 'url(/images/metalback2.png)';
-        //parentElement.style.backgroundSize = 'cover'; 
-
-        // Create a transparent overlay 
         var overlay = document.createElement('div');
         overlay.classList.add('overlay');
-        // Style the overlay
         overlay.style.position = 'absolute';
         overlay.style.width = '100%';
         overlay.style.height = '100%';
         overlay.style.top = 0;
         overlay.style.left = 0;
-        overlay.style.setProperty('border-radius', '10px', 'important'); // Round corners
-        overlay.style.backgroundColor = 'dimgray'; // Semi-transparent blue background
-        overlay.style.display = 'none'; // Initially hide the overlay
-        overlay.style.flexDirection = 'column'; // Stack buttons vertically
-        overlay.style.justifyContent = 'flex-end'; // Align buttons to the bottom
+        overlay.style.setProperty('border-radius', '10px', 'important'); 
+        overlay.style.backgroundColor = 'dimgray'; 
+        overlay.style.display = 'none'; 
+        overlay.style.flexDirection = 'column'; 
+        overlay.style.justifyContent = 'flex-end'; 
         overlay.style.opacity = '.6';
 
-        // add back button to header and reload main website url when clicked
-
         gridItem.addEventListener('mouseenter', async function() {
-
-            // send request to server to add 1 do views and send back success or failure in jason 
-
             gridItem.style.transform = 'translateY(-5px)';
-            // Show the overlay on hover
             overlay.style.display = 'flex';
-
-            // get inStock from currentPaintingArray
             var checkIfInStock = null;
             for(const myObj of currentPaintingArray){
                 if(myObj._id == gridItem.id){
@@ -1009,7 +809,6 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
             }
 
             addBuyButton(gridItem, checkIfInStock, gridItem.id);
-            // Create a p element for description
 
             var descriptionP = document.createElement('p');
             descriptionP.className = 'descriptionPaintingPTAG';
@@ -1024,7 +823,7 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
             for(const painting of currentPaintingArray){
                 //console.log(painting);
                 if(painting._id == gridItem.id){
-                    descriptionP.innerHTML =  'Name:' + "    " + painting.name + '<br>'  + 'Approximate Price:' + "    " + painting.price.$numberDecimal + " ETH " +   '<br> <br>' +  painting.description;
+                    descriptionP.innerHTML =  'Name:' + "    " + painting.name + '<br>'  + 'Approximate Price:' + "    " + painting.price.$numberDecimal + " ETH " + '<br>'+ " Number of Views: "+  painting.views +  '<br> <br>' +  painting.description;
                 }
             }
             overlay.appendChild(descriptionP);
@@ -1032,7 +831,6 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
 
             const containsPaintingId = currentViewedPaintings.some(item => item.paintingId === gridItem.id);
 
-            // If the paintingId is not already in the array, push it
             if (!containsPaintingId) {
               currentViewedPaintings.push({paintingId: gridItem.id});
                 try {
@@ -1049,7 +847,6 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
                         console.log(serverMessage);
                         
                         if(serverMessage.success == true){
-                           // added a value but dont warn the user
                         }else{
                             console.log('we could not update the db object came back as', serverMessage);
                         }
@@ -1060,15 +857,12 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
                     console.error('Error adding painting:', error);
                 }
             }else{
-                // user has already clicked it while on the website
             }
 
 
         });
         gridItem.addEventListener('mouseleave', function() {
-            // Restore the original position on mouse leave
             gridItem.style.transform = 'translateY(0)';
-            // Hide the overlay on mouse leave
             overlay.style.display = 'none'; 
             const buyButton = document.querySelector('.buy-button' + gridItem.id.toString());
             const descriptionP = document.querySelector('.descriptionPaintingPTAG');
@@ -1078,15 +872,9 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
             } else {
                 console.error('Buy button not found');
             }
-            //buyButton.style.display = 'hidden';
-            //document.remove(buyButton);
-            //gridItem.removeChild(buyButton);
         });
 
-        // Append the overlay to the grid item
         gridItem.appendChild(overlay);
-
-        // Append the grid item to the grid container
         gridContainer.appendChild(gridItem);
     });
     
@@ -1094,97 +882,113 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
 
 }
 
-function addCryptoTokens(div){
+
+async function getAccetableCoinPrices(coins) {
+    try {
+        const response = await fetch('/get-prices', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(coins)
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const prices = await response.json();
+        return prices;
+    } catch (error) {
+        console.error('Error fetching prices:', error);
+        return [];
+    }
+}
+
+
+async function addCryptoTokens(div){
 
     const ethpopup = document.createElement('div');
     const ethlogo = document.createElement('div');
-    const ethptagContainer = document.createElement('div'); // Rename ethptag to ethptagContainer
+    const ethptagContainer = document.createElement('div'); 
     const ptag = document.createElement('p');
 
     ptag.textContent = 'Loading...'; 
     ptag.style.margin = '0'; 
-    ptag.style.top = '25%'; // Align content to the top
+    ptag.style.top = '25%'; 
     ptag.style.position = 'relative';
     ptag.style.height = '50%';
     ptag.style.width = '70%';
     ptag.style.left = '2.5%';
-    ptag.style.fontFamily = 'Roboto, sans-serif'; // Change 'Roboto' to the desired font name
-    // Set styles for the parent container (ethpopup)
+    ptag.style.fontFamily = 'Roboto, sans-serif'; 
     ethpopup.style.position = 'relative';
     ethpopup.style.width = '100%';
     ethpopup.style.height = '15%';
     ethpopup.style.backgroundColor = 'dimgray';
     ethpopup.style.borderBottom = '0.4vh solid lightgray'; 
-    ethpopup.style.borderTopLeftRadius = '2vh'; // Adjust border radius at the top left corner
-    ethpopup.style.borderTopRightRadius = '2vh'; // Adjust border radius at the top right corner
+    ethpopup.style.borderTopLeftRadius = '2vh'; 
+    ethpopup.style.borderTopRightRadius = '2vh';
 
-    // Set styles for the Ethereum logo container (ethlogo)
     ethlogo.style.display = 'inline-block';
     ethlogo.style.height = '100%'; 
     ethlogo.style.width = '20%';
-    ethlogo.style.backgroundImage = 'url("/images/EthLogo.png")';
+    ethlogo.style.backgroundImage = 'url("/images/EthLogo.PNG")';
     ethlogo.style.backgroundSize = 'contain';
     ethlogo.style.backgroundRepeat = 'no-repeat';
     ethlogo.style.backgroundPosition = 'center'; 
 
-    // Set styles for the Ethereum price container (ethptagContainer)
     ethptagContainer.style.display = 'inline-block';
     ethptagContainer.style.height = '100%'; 
     ethptagContainer.style.width = '80%';
     ethptagContainer.style.backgroundColor = 'none';
     ethptagContainer.style.fontSize = '2.4vh';
-    ethptagContainer.style.textAlign = 'center'; // Center the content horizontally
-    ethptagContainer.style.verticalAlign = 'top'; // Align content to the top
+    ethptagContainer.style.textAlign = 'center'; 
+    ethptagContainer.style.verticalAlign = 'top';
     ethptagContainer.classList.add('ethereumPriceContainer');
 
-    // Append the ptag element to the ethptagContainer
     ethptagContainer.appendChild(ptag);
     ethpopup.appendChild(ethlogo);
     ethpopup.appendChild(ethptagContainer);
     div.appendChild(ethpopup);
 
+    // use this functions to reset global prices values
     getEthereumPrice(ptag); 
 
     const polygonPopUp = document.createElement('div');
     const polygonLogo = document.createElement('div');
-    const polygonptagContainer = document.createElement('div'); // Rename ethptag to polygonptagContainer
+    const polygonptagContainer = document.createElement('div'); 
     const polyptag = document.createElement('p');
 
     polyptag.textContent = 'Loading...'; 
     polyptag.style.margin = '0'; 
-    polyptag.style.top = '25%'; // Align content to the top
+    polyptag.style.top = '25%'; 
     polyptag.style.position = 'relative';
     polyptag.style.height = '50%';
     polyptag.style.width = '70%';
     polyptag.style.left = '2.5%';
-    polyptag.style.fontFamily = 'Roboto, sans-serif'; // Change 'Roboto' to the desired font name
+    polyptag.style.fontFamily = 'Roboto, sans-serif';
 
-    // Set styles for the parent container (polygonPopUp)
     polygonPopUp.style.position = 'relative';
     polygonPopUp.style.width = '100%';
     polygonPopUp.style.height = '15%';
     polygonPopUp.style.backgroundColor = 'dimgray';
     polygonPopUp.style.borderBottom = '0.4vh solid lightgray'; 
-    // Set styles for the Polygon logo container (polygonLogo)
+
     polygonLogo.style.display = 'inline-block';
     polygonLogo.style.height = '100%'; 
     polygonLogo.style.width = '20%';
-    polygonLogo.style.backgroundImage = 'url("/images/PolyLogo.png")';
+    polygonLogo.style.backgroundImage = 'url("/images/PolyLogo.PNG")';
     polygonLogo.style.backgroundSize = 'contain';
     polygonLogo.style.backgroundRepeat = 'no-repeat';
     polygonLogo.style.backgroundPosition = 'center'; 
 
-    // Set styles for the Polygon price container (polygonptagContainer)
     polygonptagContainer.style.display = 'inline-block';
     polygonptagContainer.style.height = '100%'; 
     polygonptagContainer.style.width = '80%';
     polygonptagContainer.style.backgroundColor = 'none';
     polygonptagContainer.style.fontSize = '2.4vh';
-    polygonptagContainer.style.textAlign = 'center'; // Center the content horizontally
-    polygonptagContainer.style.verticalAlign = 'top'; // Align content to the top
+    polygonptagContainer.style.textAlign = 'center'; 
+    polygonptagContainer.style.verticalAlign = 'top';
     polygonptagContainer.classList.add('polygonPriceContainer');
 
-    // Append the ptag element to the polygonptagContainer
     polygonptagContainer.appendChild(polyptag);
     polygonPopUp.appendChild(polygonLogo);
     polygonPopUp.appendChild(polygonptagContainer);
@@ -1195,44 +999,43 @@ function addCryptoTokens(div){
     
     const bitCoinpopup = document.createElement('div');
     const bitCoinlogo = document.createElement('div');
-    const bitCoinptagContainer = document.createElement('div'); // Rename ethptag to ethptagContainer
+    const bitCoinptagContainer = document.createElement('div'); 
     const bitCoinptag = document.createElement('p');
 
     bitCoinptag.textContent = 'Loading...'; 
     bitCoinptag.style.margin = '0'; 
-    bitCoinptag.style.top = '25%'; // Align content to the top
+    bitCoinptag.style.top = '25%'; 
     bitCoinptag.style.position = 'relative';
     bitCoinptag.style.height = '50%';
     bitCoinptag.style.width = '70%';
     bitCoinptag.style.left = '2.5%';
-    bitCoinptag.style.fontFamily = 'Roboto, sans-serif'; // Change 'Roboto' to the desired font name
-    // Set styles for the parent container (ethpopup)
+    bitCoinptag.style.fontFamily = 'Roboto, sans-serif'; 
+
     bitCoinpopup.style.position = 'relative';
     bitCoinpopup.style.width = '100%';
     bitCoinpopup.style.height = '15%';
     bitCoinpopup.style.backgroundColor = 'dimgray';
     bitCoinpopup.style.borderBottom = '0.4vh solid lightgray'; 
 
-    // Set styles for the Ethereum logo container (ethlogo)
+
     bitCoinlogo.style.display = 'inline-block';
     bitCoinlogo.style.height = '100%'; 
     bitCoinlogo.style.width = '20%';
-    bitCoinlogo.style.backgroundImage = 'url("/images/bitcoinLogo.png")';
+    bitCoinlogo.style.backgroundImage = 'url("/images/bitcoinLogo.PNG")';
     bitCoinlogo.style.backgroundSize = 'contain';
     bitCoinlogo.style.backgroundRepeat = 'no-repeat';
     bitCoinlogo.style.backgroundPosition = 'center'; 
 
-    // Set styles for the Ethereum price container (ethptagContainer)
+
     bitCoinptagContainer.style.display = 'inline-block';
     bitCoinptagContainer.style.height = '100%'; 
     bitCoinptagContainer.style.width = '80%';
     bitCoinptagContainer.style.backgroundColor = 'none';
     bitCoinptagContainer.style.fontSize = '2.4vh';
-    bitCoinptagContainer.style.textAlign = 'center'; // Center the content horizontally
-    bitCoinptagContainer.style.verticalAlign = 'top'; // Align content to the top
+    bitCoinptagContainer.style.textAlign = 'center'; 
+    bitCoinptagContainer.style.verticalAlign = 'top'; 
     bitCoinptagContainer.classList.add('BitCoinPriceContainer');
 
-    // Append the ptag element to the ethptagContainer
     bitCoinptagContainer.appendChild(bitCoinptag);
     bitCoinpopup.appendChild(bitCoinlogo);
     bitCoinpopup.appendChild(bitCoinptagContainer);
@@ -1243,44 +1046,39 @@ function addCryptoTokens(div){
 
     const shibaInuCoinpopup = document.createElement('div');
     const shibaInuCoinlogo = document.createElement('div');
-    const shibaInuCoinptagContainer = document.createElement('div'); // Rename ethptag to ethptagContainer
+    const shibaInuCoinptagContainer = document.createElement('div'); 
     const shibaInuCoinptag = document.createElement('p');
 
     shibaInuCoinptag.textContent = 'Loading...'; 
     shibaInuCoinptag.style.margin = '0'; 
-    shibaInuCoinptag.style.top = '25%'; // Align content to the top
+    shibaInuCoinptag.style.top = '25%';
     shibaInuCoinptag.style.position = 'relative';
     shibaInuCoinptag.style.height = '50%';
     shibaInuCoinptag.style.width = '70%';
     shibaInuCoinptag.style.left = '2.5%';
-    shibaInuCoinptag.style.fontFamily = 'Roboto, sans-serif'; // Change 'Roboto' to the desired font name
-    // Set styles for the parent container (ethpopup)
+    shibaInuCoinptag.style.fontFamily = 'Roboto, sans-serif';
     shibaInuCoinpopup.style.position = 'relative';
     shibaInuCoinpopup.style.width = '100%';
     shibaInuCoinpopup.style.height = '15%';
     shibaInuCoinpopup.style.backgroundColor = 'dimgray';
     shibaInuCoinpopup.style.borderBottom = '0.4vh solid lightgray'; 
-
-    // Set styles for the Ethereum logo container (ethlogo)
     shibaInuCoinlogo.style.display = 'inline-block';
     shibaInuCoinlogo.style.height = '100%'; 
     shibaInuCoinlogo.style.width = '20%';
-    shibaInuCoinlogo.style.backgroundImage = 'url("/images/ShibLogo.png")';
+    shibaInuCoinlogo.style.backgroundImage = 'url("/images/ShibLogo.PNG")';
     shibaInuCoinlogo.style.backgroundSize = 'contain';
     shibaInuCoinlogo.style.backgroundRepeat = 'no-repeat';
     shibaInuCoinlogo.style.backgroundPosition = 'center'; 
 
-    // Set styles for the Ethereum price container (ethptagContainer)
     shibaInuCoinptagContainer.style.display = 'inline-block';
     shibaInuCoinptagContainer.style.height = '100%'; 
     shibaInuCoinptagContainer.style.width = '80%';
     shibaInuCoinptagContainer.style.backgroundColor = 'none';
     shibaInuCoinptagContainer.style.fontSize = '2.4vh';
-    shibaInuCoinptagContainer.style.textAlign = 'center'; // Center the content horizontally
-    shibaInuCoinptagContainer.style.verticalAlign = 'top'; // Align content to the top
+    shibaInuCoinptagContainer.style.textAlign = 'center'; 
+    shibaInuCoinptagContainer.style.verticalAlign = 'top'; 
     shibaInuCoinptagContainer.classList.add('ShibaInuPriceContainer');
 
-    // Append the ptag element to the ethptagContainer
     shibaInuCoinptagContainer.appendChild(shibaInuCoinptag);
     shibaInuCoinpopup.appendChild(shibaInuCoinlogo);
     shibaInuCoinpopup.appendChild(shibaInuCoinptagContainer);
@@ -1290,44 +1088,42 @@ function addCryptoTokens(div){
 
     const vechainCoinpopup = document.createElement('div');
     const vechainCoinlogo = document.createElement('div');
-    const vechainCoinptagContainer = document.createElement('div'); // Rename ethptag to ethptagContainer
+    const vechainCoinptagContainer = document.createElement('div');
     const vechainCoinptag = document.createElement('p');
 
     vechainCoinptag.textContent = 'Loading...'; 
     vechainCoinptag.style.margin = '0'; 
-    vechainCoinptag.style.top = '25%'; // Align content to the top
+    vechainCoinptag.style.top = '25%'; 
     vechainCoinptag.style.position = 'relative';
     vechainCoinptag.style.height = '50%';
     vechainCoinptag.style.width = '70%';
     vechainCoinptag.style.left = '2.5%';
-    vechainCoinptag.style.fontFamily = 'Roboto, sans-serif'; // Change 'Roboto' to the desired font name
-    // Set styles for the parent container (ethpopup)
+    vechainCoinptag.style.fontFamily = 'Roboto, sans-serif'; 
+
     vechainCoinpopup.style.position = 'relative';
     vechainCoinpopup.style.width = '100%';
     vechainCoinpopup.style.height = '15%';
     vechainCoinpopup.style.backgroundColor = 'dimgray';
     vechainCoinpopup.style.borderBottom = '0.4vh solid lightgray'; 
 
-    // Set styles for the Ethereum logo container (ethlogo)
+
     vechainCoinlogo.style.display = 'inline-block';
     vechainCoinlogo.style.height = '100%'; 
     vechainCoinlogo.style.width = '20%';
-    vechainCoinlogo.style.backgroundImage = 'url("/images/vechainLogo.png")';
+    vechainCoinlogo.style.backgroundImage = 'url("/images/vechainLogo.PNG")';
     vechainCoinlogo.style.backgroundSize = 'contain';
     vechainCoinlogo.style.backgroundRepeat = 'no-repeat';
     vechainCoinlogo.style.backgroundPosition = 'center'; 
 
-    // Set styles for the Ethereum price container (ethptagContainer)
     vechainCoinptagContainer.style.display = 'inline-block';
     vechainCoinptagContainer.style.height = '100%'; 
     vechainCoinptagContainer.style.width = '80%';
     vechainCoinptagContainer.style.backgroundColor = 'none';
     vechainCoinptagContainer.style.fontSize = '2.4vh';
-    vechainCoinptagContainer.style.textAlign = 'center'; // Center the content horizontally
-    vechainCoinptagContainer.style.verticalAlign = 'top'; // Align content to the top
+    vechainCoinptagContainer.style.textAlign = 'center'; 
+    vechainCoinptagContainer.style.verticalAlign = 'top'; 
     vechainCoinptagContainer.classList.add('veChainPriceContainer');
 
-    // Append the ptag element to the ethptagContainer
     vechainCoinptagContainer.appendChild(vechainCoinptag);
     vechainCoinpopup.appendChild(vechainCoinlogo);
     vechainCoinpopup.appendChild(vechainCoinptagContainer);
@@ -1337,25 +1133,24 @@ function addCryptoTokens(div){
 
     const etcClassicCoinpopup = document.createElement('div');
     const etcClassicCoinlogo = document.createElement('div');
-    const etcClassicCoinptagContainer = document.createElement('div'); // Rename ethptag to ethptagContainer
+    const etcClassicCoinptagContainer = document.createElement('div'); 
     const etcClassicCoinptag = document.createElement('p');
 
     etcClassicCoinptag.textContent = 'Loading...'; 
     etcClassicCoinptag.style.margin = '0'; 
-    etcClassicCoinptag.style.top = '25%'; // Align content to the top
+    etcClassicCoinptag.style.top = '25%'; 
     etcClassicCoinptag.style.position = 'relative';
     etcClassicCoinptag.style.height = '50%';
     etcClassicCoinptag.style.width = '70%';
     etcClassicCoinptag.style.left = '2.5%';
-    etcClassicCoinptag.style.fontFamily = 'Roboto, sans-serif'; // Change 'Roboto' to the desired font name
-    // Set styles for the parent container (ethpopup)
+    etcClassicCoinptag.style.fontFamily = 'Roboto, sans-serif';
+
     etcClassicCoinpopup.style.position = 'relative';
     etcClassicCoinpopup.style.width = '100%';
     etcClassicCoinpopup.style.height = '15%';
     etcClassicCoinpopup.style.backgroundColor = 'dimgray';
     etcClassicCoinpopup.style.borderBottom = '0.4vh solid lightgray'; 
 
-    // Set styles for the Ethereum logo container (ethlogo)
     etcClassicCoinlogo.style.display = 'inline-block';
     etcClassicCoinlogo.style.height = '100%'; 
     etcClassicCoinlogo.style.width = '20%';
@@ -1364,17 +1159,15 @@ function addCryptoTokens(div){
     etcClassicCoinlogo.style.backgroundRepeat = 'no-repeat';
     etcClassicCoinlogo.style.backgroundPosition = 'center'; 
 
-    // Set styles for the Ethereum price container (ethptagContainer)
     etcClassicCoinptagContainer.style.display = 'inline-block';
     etcClassicCoinptagContainer.style.height = '100%'; 
     etcClassicCoinptagContainer.style.width = '80%';
     etcClassicCoinptagContainer.style.backgroundColor = 'none';
     etcClassicCoinptagContainer.style.fontSize = '2.4vh';
-    etcClassicCoinptagContainer.style.textAlign = 'center'; // Center the content horizontally
-    etcClassicCoinptagContainer.style.verticalAlign = 'top'; // Align content to the top
+    etcClassicCoinptagContainer.style.textAlign = 'center';
+    etcClassicCoinptagContainer.style.verticalAlign = 'top'; 
     etcClassicCoinptagContainer.classList.add('ETCPriceContainer');
 
-    // Append the ptag element to the ethptagContainer
     etcClassicCoinptagContainer.appendChild(etcClassicCoinptag);
     etcClassicCoinpopup.appendChild(etcClassicCoinlogo);
     etcClassicCoinpopup.appendChild(etcClassicCoinptagContainer);
@@ -1384,44 +1177,41 @@ function addCryptoTokens(div){
 
     const dogeCoinpopup = document.createElement('div');
     const dogeCoinlogo = document.createElement('div');
-    const dogeCoinptagContainer = document.createElement('div'); // Rename ethptag to ethptagContainer
+    const dogeCoinptagContainer = document.createElement('div'); 
     const dogeCoinptag = document.createElement('p');
 
     dogeCoinptag.textContent = 'Loading...'; 
     dogeCoinptag.style.margin = '0'; 
-    dogeCoinptag.style.top = '25%'; // Align content to the top
+    dogeCoinptag.style.top = '25%';
     dogeCoinptag.style.position = 'relative';
     dogeCoinptag.style.height = '50%';
     dogeCoinptag.style.width = '70%';
     dogeCoinptag.style.left = '2.5%';
-    dogeCoinptag.style.fontFamily = 'Roboto, sans-serif'; // Change 'Roboto' to the desired font name
-    // Set styles for the parent container (ethpopup)
+    dogeCoinptag.style.fontFamily = 'Roboto, sans-serif'; 
+
     dogeCoinpopup.style.position = 'relative';
     dogeCoinpopup.style.width = '100%';
     dogeCoinpopup.style.height = '15%';
     dogeCoinpopup.style.backgroundColor = 'dimgray';
     dogeCoinpopup.style.borderBottom = '0.4vh solid lightgray'; 
 
-    // Set styles for the Ethereum logo container (ethlogo)
     dogeCoinlogo.style.display = 'inline-block';
     dogeCoinlogo.style.height = '100%'; 
     dogeCoinlogo.style.width = '20%';
-    dogeCoinlogo.style.backgroundImage = 'url("/images/dogelogo.png")';
+    dogeCoinlogo.style.backgroundImage = 'url("/images/dogelogo.PNG")';
     dogeCoinlogo.style.backgroundSize = 'contain';
     dogeCoinlogo.style.backgroundRepeat = 'no-repeat';
     dogeCoinlogo.style.backgroundPosition = 'center'; 
 
-    // Set styles for the Ethereum price container (ethptagContainer)
     dogeCoinptagContainer.style.display = 'inline-block';
     dogeCoinptagContainer.style.height = '100%'; 
     dogeCoinptagContainer.style.width = '80%';
     dogeCoinptagContainer.style.backgroundColor = 'none';
     dogeCoinptagContainer.style.fontSize = '2.4vh';
-    dogeCoinptagContainer.style.textAlign = 'center'; // Center the content horizontally
-    dogeCoinptagContainer.style.verticalAlign = 'top'; // Align content to the top
+    dogeCoinptagContainer.style.textAlign = 'center'; 
+    dogeCoinptagContainer.style.verticalAlign = 'top';
     dogeCoinptagContainer.classList.add('dogePriceContainer');
 
-    // Append the ptag element to the ethptagContainer
     dogeCoinptagContainer.appendChild(dogeCoinptag);
     dogeCoinpopup.appendChild(dogeCoinlogo);
     dogeCoinpopup.appendChild(dogeCoinptagContainer);
@@ -1430,7 +1220,6 @@ function addCryptoTokens(div){
     getDogecoinPrice(dogeCoinptag); 
 };
 
-// Call the function every second
 function moveLeftAndRight(parentDiv, timeFrame, movementPercentages) {
     if (!parentDiv || !(parentDiv instanceof Element)) {
         console.error("Parent div is not provided or is not a valid DOM element.");
@@ -1442,68 +1231,39 @@ function moveLeftAndRight(parentDiv, timeFrame, movementPercentages) {
         return;
     }
 
-    // Initialize movement directions for each tag
     const moveRightFlags = [true, true, true, true, true];
 
-    // Function to move the li tags
     function moveLiTags() {
-        // Iterate through each li tag
         for (let i = 1; i <= 5; i++) {
             const div = parentDiv.querySelector(`.liTag${i}`);
             if (div) {
-                // Get the current left position of the div
                 let currentPosition = parseFloat(div.style.left) || 0;
-
-                // Update the position of the div based on the movement percentage for this tag
                 currentPosition += movementPercentages[i - 1] * (moveRightFlags[i - 1] ? 1 : -1);
-
-                // Start moving left a bit sooner
                 if (currentPosition > 30) {
                     currentPosition += (movementPercentages[i - 1] > 0 ? -0.2 : 0.2);
                 }
-
-                // Limit the maximum right position
-                const maxRightPosition = 90; // Adjust as needed
+                const maxRightPosition = 90; 
                 if (currentPosition > maxRightPosition) {
                     currentPosition = maxRightPosition;
-                    // Change the movement direction to left
                     moveRightFlags[i - 1] = false;
                 }
-
-                // Limit the minimum left position
-                const minLeftPosition = 0; // Adjust as needed
+                const minLeftPosition = 0; 
                 if (currentPosition < minLeftPosition) {
                     currentPosition = minLeftPosition;
-                    // Change the movement direction to right
                     moveRightFlags[i - 1] = true;
                 }
-
-                // Apply the new position to the div
                 div.style.left = currentPosition + "%";
             }
         }
     }
 
-    // Call the function to move the li tags every second
     setInterval(moveLiTags, timeFrame);
 }
 
-// Example 
-
-
 function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPercent) {
-
-
-    // needs acess to call makePaintGrid(array, parentElement, numColumns, gridWidthPercent) when elements are clicked 
-    // call the function with appropriate gridth length depending on the doc window 
-    // make 5 functions that take in an array and reorganizes it and returns an array 
-    // call this function with the appriopriate orginzer function when elements are clicked
-
-    // Check if parentDiv is provided and is a valid DOM element
     if (!parentDiv || !(parentDiv instanceof Element)) {
         console.error("Parent div is not provided or is not a valid DOM element.");
     }else{
-        // Create the ul container element
         const ulContainer = document.createElement('div');
         ulContainer.style.position = 'relative';
         ulContainer.style.width = '100%';
@@ -1511,13 +1271,11 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
         ulContainer.style.overflow = 'hidden';
         ulContainer.className = `treeListContainer`;
 
-        // Create the ul element
         const ul = document.createElement('div');
         ul.style.padding = '0';
         ul.style.position = 'absolute';
         ul.style.top = '20%'; 
         ul.style.left = '0%'; 
-        //ul.style.transform = 'translate(-50%, -50%)'; // Center the ul precisely
         ul.style.height = '60%'; 
         ul.style.width = '100%'; 
         ul.style.backgroundColor = 'none';
@@ -1526,9 +1284,7 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
         ul.style.borderTop = '.4vh solid lightgray';
         ul.style.paddingTop = '10%';
 
-        // Create and append div elements with class names and text content
-
-        const numTags = 5; // Number of tags
+        const numTags = 5;
         for (let i = 1; i <= numTags; i++) {
             const div = document.createElement('div');
             div.className = `liTag${i}`; 
@@ -1536,18 +1292,14 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
             div.style.fontSize = '2vh'; 
             div.style.color = 'white';
             
-            div.style.cursor = 'pointer'; // Change cursor to pointer on hover
-            //div.style.borderRadius = '1.2vh'; // Fixed border radius
-            div.style.display = 'flex'; // Use flexbox for vertical centering
-            div.style.alignItems = 'center'; // Vertically center text
-            div.style.justifyContent = 'center'; // Horizontally center text
-            div.style.textShadow = '0px 2px 4px rgba(0, 0, 0, 0.3)'; // Add shadow effect
-            //div.style.borderBottom = '.3vh solid lightgray';
+            div.style.cursor = 'pointer'; 
+            div.style.display = 'flex'; 
+            div.style.alignItems = 'center'; 
+            div.style.justifyContent = 'center'; 
+            div.style.textShadow = '0px 2px 4px rgba(0, 0, 0, 0.3)'; 
             div.style.position = 'relative';
             div.style.backgroundColor = '#505050';
             div.style.borderRadius = '1vh';
-            //div.style.background = 'linear-gradient(to bottom, lightgray, dimgray)';
-            // Add hover effect
             div.addEventListener('mouseenter', () => {
                 div.style.transform = 'translateY(-2px)';
                 div.style.boxShadow = '0px 2px 4px rgba(0, 0, 0, 0.3)';
@@ -1565,11 +1317,8 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
 
             if(i == 1){
                 div.textContent = `Newest`;
-                div.style.width = '40%'; // Ensure div spans full width of ul
-                //div.style.borderLeft = '.1vh solid lightgray';
+                div.style.width = '40%'; 
                 div.style.left = ((100 - parseFloat(div.style.width)) / 2).toString() + "%";
-                //div.style.borderLeft = '.2vh solid lightgray';
-
                 div.addEventListener('click', async function(){
                     let organizedArray = await organizePaintingArrayByMostRecent(currentPaintingArray);
                     currentPaintingArray = organizedArray;
@@ -1593,8 +1342,6 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
                 div.textContent = `Oldest`;
                 div.style.width = '40%'; 
                 div.style.left = ((100 - parseFloat(div.style.width)) / 2).toString() + "%";
-                //div.style.borderRight = '.2vh solid lightgray';
-
                 div.addEventListener('click', async function(){
                     let organizedArray = await organizePaintingArrayByOldest(currentPaintingArray);
                     currentPaintingArray = organizedArray;
@@ -1615,8 +1362,6 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
                 div.textContent = `Cheapeast`;
                 div.style.width = '60%'; 
                 div.style.left = ((100 - parseFloat(div.style.width)) / 2).toString() + "%";
-                //div.style.borderLeft = '.2vh solid lightgray';
-
                 div.addEventListener('click', async function(){
                     let organizedArray = await organizePaintingArrayByLeastExpensive(currentPaintingArray);
                     currentPaintingArray = organizedArray;
@@ -1637,8 +1382,6 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
                 div.textContent = `Most Expensive`;
                 div.style.width = '70%'; 
                 div.style.left = ((100 - parseFloat(div.style.width)) / 2).toString() + "%";
-                //div.style.borderRight = '.2vh solid lightgray';
-
                 div.addEventListener('click', async  function(){
                     let organizedArray = await organizePaintingArrayByMostExpensive(currentPaintingArray);
                     currentPaintingArray = organizedArray;
@@ -1659,9 +1402,6 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
                 div.textContent = `Most Viewed`;
                 div.style.width = '80%'; 
                 div.style.left = ((100 - parseFloat(div.style.width)) / 2).toString() + "%";
-                //div.style.borderLeft = '.2vh solid lightgray';
-                //div.style.borderBottom = 'none';
-
                 div.addEventListener('click', async  function(){
                     let organizedArray = await organizePaintingArrayByMostViewed(currentPaintingArray);
                     currentPaintingArray = organizedArray;
@@ -1682,7 +1422,6 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
             ul.appendChild(div);
         }
 
-        // Append ul to parentDiv
         ulContainer.appendChild(ul);
         parentDiv.appendChild(ulContainer);
 
@@ -1725,7 +1464,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     var gridFoward = document.createElement('div');
     var gridBack = document.createElement('div');
 
-    // Loop through the items array and create list items for each item
     var community =  ["X", "Instagram", "Threads"];
     var commnityList = document.createElement("ul");
     
@@ -1738,7 +1476,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     links.forEach(function(itemText) {
         var li = document.createElement("li");
         const atag = document.createElement('a');
-        //li.textContent = itemText;
         li.style.marginBottom = '1vh';
         li.style.fontSize = '3.2vh';
         atag.textContent = itemText;
@@ -1752,19 +1489,17 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else if(atag.textContent == 'Linkedin'){
              atag.href = 'https://www.linkedin.com/in/roy-burson-396ab51b7/';
         }else if(atag.textContent == 'MathOverflow'){
-              atag.href = 'https://mathoverflow.net/users/525490/roy-burson';
+              atag.href = 'https://mathoverflow.net/users/528543/the-potato-eater';
         }
        
         li.appendChild(atag);
-        linkList.appendChild(li); // Append the list item to the unordered list
+        linkList.appendChild(li);
     });
 
-    // Loop through the items array and create list items for each item
     community.forEach(function(itemText) {
         var li = document.createElement("li");
         const atag = document.createElement('a');
 
-        //li.textContent = itemText;
         li.style.marginBottom = '1vh';
         li.style.fontSize = '3.2vh';
         atag.textContent = itemText;
@@ -1772,27 +1507,19 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         if(atag.textContent == 'X'){
             atag.href = 'https://twitter.com/bursonskullz/';
         }else if(atag.textContent == 'Instagram'){
-            // might want to add check and see if URL is available if not dont add it 
             atag.href = 'https://www.instagram.com/bursonskullz/';
         }else if(atag.textContent == 'Threads'){
             atag.href = 'https://www.threads.net/@bursonskullz2024';
         }
 
         li.appendChild(atag);
-        commnityList.appendChild(li); // Append the list item to the unordered list
+        commnityList.appendChild(li); 
     });
 
 
-
-    
-   
-
-    // Loop through the items array and create list items for each item
     resources.forEach(function(itemText) {
         var li = document.createElement("li");
         const atag = document.createElement('a');
-
-        //li.textContent = itemText;
         li.style.marginBottom = '1vh';
         li.style.fontSize = '3.2vh';
         atag.textContent = itemText;
@@ -1800,8 +1527,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         if(atag.textContent == 'Help'){
             atag.href = 'https://metamask.io/faqs/';
         }else if(atag.textContent == 'Privacy Policy'){
-            // might want to add check and see if URL is available if not dont add it 
-            //atag.href = 'https://policies.google.com/privacy';
             atag.href = 'privacyPolicy.html';
         }else if(atag.textContent == 'Terms of Service'){
             atag.href = 'termsOfService.html';
@@ -1810,10 +1535,9 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }
 
         li.appendChild(atag);
-        resourcesList.appendChild(li); // Append the list item to the unordered list
+        resourcesList.appendChild(li);
     });
 
-    // styling elements
     welcomeDiv.style.width = '80%';
     welcomeDiv.style.position = 'absolute';
     welcomeDiv.style.left = '10%';
@@ -1822,7 +1546,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     welcomeDiv.style.height = '10%';
     welcomeDiv.style.top = '0%';
     welcomeDiv.style.justifyContent = 'center';
-    //welcomeDiv.textContent = "Welcome";
     welcomeDiv.classList.add("blinking"); 
 
     welcomeDiv.appendChild(welcomeDivPTAG);
@@ -1854,13 +1577,13 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     resourcesList.style.padding = '0%';
 
 
-    acceptableCoins.style.width =  sideElementsWidth; // replace with input width
+    acceptableCoins.style.width =  sideElementsWidth; 
     acceptableCoins.style.height = '35%';
     acceptableCoins.style.position = 'absolute';
     acceptableCoins.style.right = '1%';
     acceptableCoins.style.top = '10%';
     acceptableCoins.style.backgroundColor = '#9b9999';
-    acceptableCoins.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)'; /* Adding shadow */
+    acceptableCoins.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)'; 
     acceptableCoins.style.borderRadius = '2vh';
     acceptableCoins.style.overflowY = 'scroll';
     acceptableCoins.className = 'acceptibleCoins';
@@ -1869,14 +1592,9 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     acceptableCoins.style.msOverflowStyle = 'none'; // For Internet Explorer/Edge
     acceptableCoins.style.webkitScrollbarWidth = '0'; // For Webkit (Chrome, Safari)
 
-
-    //add overlay same size with .5 opacity and black 
-    // make sure message background of message is none
-
-    //const acceptableCoinsOverlay = document.createElement('div');
-    //acceptableCoinsOverlay.style.position = 'absolute'; 
-
-    addCryptoTokens(acceptableCoins);
+    addCryptoTokens(acceptableCoins).then(()=>{
+        console.log('we called to get toke data');
+    });
     
     unknownDiv.id = 'crypto-chat-room';
     unknownDiv.className = 'crypto-chat-room';
@@ -1886,11 +1604,11 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     unknownDiv.style.right = '1%';
     unknownDiv.style.top = '47%';
     unknownDiv.style.backgroundColor = '#9b9999';
-    unknownDiv.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)'; /* Adding shadow */
+    unknownDiv.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)';
     unknownDiv.style.borderRadius = '2vh';
-    document.body.appendChild(unknownDiv); // Append the main container to the body
+    document.body.appendChild(unknownDiv); 
 
-    // Create chat elements
+
     const chatBox = document.createElement('div');
     chatBox.classList.add('chatBox');
     chatBox.className = 'chatBox';
@@ -1899,20 +1617,16 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     chatBox.style.left = '0%';
     chatBox.style.width = '100%';
     chatBox.style.overflowY = 'scroll';
-    //chatBox.style.padding = '3px';
     chatBox.style.position = 'relative';
     chatBox.style.borderBottom = '1px solid #ccc';
-    //chatBox.style.overflowX = 'hidden';
     chatBox.style.backgroundColor = 'dimgray';
-    chatBox.style.borderTopLeftRadius = '1vh'; // Add border radius to top left corner
-    chatBox.style.borderTopRightRadius = '1vh'; // Add border radius to top right corner
-    chatBox.style.borderBottomLeftRadius = '0'; // Remove border radius from bottom left corner
-    chatBox.style.borderBottomRightRadius = '0'; // Remove border radius from bottom right corner
+    chatBox.style.borderTopLeftRadius = '1vh'; 
+    chatBox.style.borderTopRightRadius = '1vh';
+    chatBox.style.borderBottomLeftRadius = '0'; 
+    chatBox.style.borderBottomRightRadius = '0'; 
 
     unknownDiv.appendChild(chatBox);
 
-
-    // Create the emoji container button
     const emojiButton = document.createElement('div');
     emojiButton.classList.add('emoji-button');
     emojiButton.textContent = '➕'; 
@@ -1926,7 +1640,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     emojiButton.style.cursor = 'pointer';
     emojiButton.style.fontSize = '10px';
 
-    // Create the changeUserName button
     const changeUserName = document.createElement('div');
     changeUserName.classList.add('emoji-button');
     changeUserName.textContent = '🖊️'; 
@@ -1940,20 +1653,16 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     changeUserName.style.cursor = 'pointer';
     changeUserName.style.fontSize = '10px';
 
-    // Add event listener to the changeUserName button
     changeUserName.addEventListener('click', async () => {
         createChangeUsernamePopup().then(()=>{
             console.log('we fired the createChangeUsernamePopup() function ');
         });
     });
 
-    // Append the emoji button to the parent element (e.g., unknownDiv)
     unknownDiv.appendChild(emojiButton);
     unknownDiv.appendChild(changeUserName);
 
-    // Event listener to show emoji menu when the button is clicked
     emojiButton.addEventListener('click', (event) => {
-        // Create the emoji menu container
         const emojiMenuIsOpen = document.querySelector('.emoji-menu');
 
         if(emojiMenuIsOpen){
@@ -1963,55 +1672,47 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             emojiMenu.classList.add('emoji-menu');
             emojiMenu.style.position = 'absolute';
             emojiMenu.className =' emoji-Menu';
-            
-            // Calculate the position of the message input field
+
             const inputRect = messageInput.getBoundingClientRect();
             const inputTop = inputRect.top + window.scrollY;
 
-            // Set the bottom of the emoji menu to align with the top of the input field
             emojiMenu.style.bottom = `12%`; 
             emojiMenu.style.left = '0%';
-            emojiMenu.style.width = '99.5%'; // Span the same width as the chat box
+            emojiMenu.style.width = '99.5%'; 
             emojiMenu.style.backgroundColor = 'lightgray';
             emojiMenu.style.border = '1px solid black';
-            emojiMenu.style.zIndex = '1000'; // Ensure it has a higher z-index
+            emojiMenu.style.zIndex = '1000'; 
             emojiMenu.className = 'emoji-menu';
             emojiMenu.style.display = 'flex-start';
-            //emojiMenu.style.display = ''
 
-            // Create the cancel button
             const cancelButton = document.createElement('div');
             cancelButton.textContent = 'Cancel';
             cancelButton.style.height = '32px';
             cancelButton.style.width = '30%'; 
-            cancelButton.style.margin = '0 auto'; // Center the button horizontally
+            cancelButton.style.margin = '0 auto'; 
             cancelButton.style.marginBottom = '5px';
-            cancelButton.style.backgroundColor = 'lightgray'; // Add background color for better visibility
-            cancelButton.style.cursor = 'pointer'; // Add cursor style for better interaction
-            cancelButton.style.display = 'flex'; // Enable flexbox for vertical alignment
-            cancelButton.style.alignItems = 'center'; // Center the content vertically
-            cancelButton.style.justifyContent = 'center'; // Center the content horizontally
-            cancelButton.style.border = '1px solid #ccc'; // Add outline border
-            cancelButton.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'; // Add shadow underneath
-            cancelButton.style.transition = 'background-color 0.3s ease'; // Add transition for hover effect
+            cancelButton.style.backgroundColor = 'lightgray'; 
+            cancelButton.style.cursor = 'pointer'; 
+            cancelButton.style.display = 'flex';
+            cancelButton.style.alignItems = 'center'; 
+            cancelButton.style.justifyContent = 'center'; 
+            cancelButton.style.border = '1px solid #ccc'; 
+            cancelButton.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'; 
+            cancelButton.style.transition = 'background-color 0.3s ease'; 
 
             cancelButton.addEventListener('mouseover', () => {
-                cancelButton.style.backgroundColor = '#f0f0f0'; // Change background color on hover
+                cancelButton.style.backgroundColor = '#f0f0f0'; 
             });
             cancelButton.addEventListener('mouseout', () => {
-                cancelButton.style.backgroundColor = 'lightgray'; // Restore original background color when not hovered
+                cancelButton.style.backgroundColor = 'lightgray'; 
             });
 
             cancelButton.addEventListener('click', () => {
-                // Remove the emoji menu when cancel button is clicked
                 emojiMenu.remove();
             });
 
             emojiMenu.appendChild(cancelButton);
 
-
-
-            // Create a container for the emoji options
             const emojiOptionsContainer = document.createElement('div');
             emojiOptionsContainer.style.display = 'block';
             emojiOptionsContainer.style.width = '100%';
@@ -2023,9 +1724,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
             emojiMenu.appendChild(emojiOptionsContainer);
 
-
-
-            // Populate the emoji menu with emoji options
             const emojis = ['😊', '🖕🏻',  '😁', '😎', '😍', '👍', '❤️', '🎉', '🌟', '🍕', '🎈', '🎨', '🚀', '💡', '🔥', '🌈', '🙌', '👏', '🤩', '💯', '🙏',
                    '🎶', '💪', '💥', '💖', '🌺', '🌸', '🌼', '🍦', '🍭', '🍩', '🍬', '🍔', '🍟', '🥇', '🏆', '🏅', '🎖️', '🏵️', '🎯', '🚗',
                    '🚲', '🚄', '🚢', '✈️', '🚀', '🛸', '🚁', '🎠', '🎡', '🏰', '🏯', '🏟️', '⛲', '🌆', '🌉', '🏞️', '🏝️', '🏖️', '⛱️',
@@ -2034,8 +1732,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
             emojis.forEach(emoji => {
                 const emojiOption = document.createElement('button');
-                emojiOption.style.backgroundColor = 'transparent'; // Set background color to transparent
-                emojiOption.style.border = 'none'; // Remove border
+                emojiOption.style.backgroundColor = 'transparent'; 
+                emojiOption.style.border = 'none';
                 emojiOption.textContent = emoji;
                 emojiOption.addEventListener('click', () => {
                     const currentMessage = messageInput.value;
@@ -2043,8 +1741,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 });
                 emojiOptionsContainer.appendChild(emojiOption);
             });
-
-            // Append the emoji menu to the parent element (e.g., unknownDiv)
             unknownDiv.appendChild(emojiMenu);
         }
         
@@ -2052,47 +1748,37 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
     const messageInput = document.createElement('input');
 
-
     messageInput.id = 'message-input';
     messageInput.placeholder = 'Type your message...';
     messageInput.style.width = '80%';
     messageInput.style.height = '5%';
-    //messageInput.style.marginTop = '10%';
     messageInput.style.right = '4%';
     messageInput.style.bottom = '5%';
     messageInput.style.position = 'absolute';
     //messageInput.style.display = 'block';
     messageInput.style.backgroundColor = 'lightgray';
     messageInput.style.color = 'black';
-    messageInput.style.border = '1px solid black'; // Set the default black border
+    messageInput.style.border = '1px solid black'; 
     messageInput.style.borderRadius = '2vh';
-    messageInput.style.outline = 'none'; // Remove the default outline
-    messageInput.style.margin = 'auto'; // Center horizontally within flex container
-    messageInput.style.overflowWrap = 'break-word'; // Allow long words to break and wrap
-    messageInput.style.whiteSpace = 'nowrap'; // Prevent text from wrapping
+    messageInput.style.outline = 'none'; 
+    messageInput.style.margin = 'auto';
+    messageInput.style.overflowWrap = 'break-word';
+    messageInput.style.whiteSpace = 'nowrap'; 
 
-
-    // Add event listeners to change border color when focused and blurred
     messageInput.addEventListener('focus', () => {
-        messageInput.style.border = '1px solid black'; // Change border color when focused
+        messageInput.style.border = '1px solid black'; 
     });
 
     messageInput.addEventListener('blur', () => {
         messageInput.style.border = '1px solid black'; 
     });
-
-
     unknownDiv.appendChild(messageInput);
-
-
-    if(isSocketPresent){
+    if(isSocketPresent && typeof socket != 'undefined'){
         console.log('socket is already present no need to add again');
     }else{
         isSocketPresent = true;
         socket.on('updateCurrentPaintings', data => {
-                // Access the data sent from the server
             console.log('Received data from server:', data);
-
             for(const myObj of currentPaintingArray){
                 if(myObj._id == data.Id && myObj.inStock == true){
                     myObj.inStock = false;
@@ -2113,7 +1799,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                         }catch(error){
                             console.log(error);
                         }
-                    }, 15000); // 15 seconds then remove form if active
+                    }, 15000); 
 
 
                 }else{
@@ -2122,16 +1808,22 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }
 
         });
-        socket.on('message', (myobject) => {        
+
+        socket.on('message', (myobject) => {   
+            console.log('trying to add message from server');
+
             if(myobject.coolDown <= 10){
                 addMessage(myobject.msg, myobject.username, myobject.time); 
             }else{
                 alert('you cannot send anymore messages for 24 hours');
-            }   
+            }
+            
         });
+
+
         socket.on('updatePaintingChunk', (data) => {
-           paintingChunks[data.index] = data.chunk;
-           totalChunks = data.total;
+            paintingChunks[data.index] = data.chunk;
+            totalChunks = data.total;
 
             if (paintingChunks.length === totalChunks && paintingChunks.every(chunk => chunk !== undefined)) {
                 const paintingString = paintingChunks.join('');
@@ -2142,15 +1834,12 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
         socket.on('updatePaintingComplete', () => {
             console.log('All chunks have been received.');
-            alert('A new painting has been added.');
+            alert('A new painting has been added. Please refresh the page');
             paintingChunks = [];
             totalChunks = 0;
         });
     }
 
-
-
-    // Event listener for send button
     messageInput.addEventListener('keypress', (event) => {
 
 
@@ -2169,7 +1858,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }
 
     });
-    //unknownDiv.style.opacity = '.6';
 
     tree.style.width = sideElementsWidth;
     tree.style.height = '54%';
@@ -2177,7 +1865,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     tree.style.left = '2.4%';
     tree.style.top = '10%';
     tree.style.backgroundColor = 'dimgrey';
-    tree.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)'; /* Adding shadow */
+    tree.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)';
     tree.style.borderRadius = '2vh';
     //tree.style.opacity = '.6';
     tree.setAttribute("id", "tree");
@@ -2186,10 +1874,10 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
     addTreeList(tree, currentPaintingArray, parentElement, numColumns, gridWidthPercent); 
 
-    const timeFrame = 15; // 1000 milliseconds = 1 second
-    const movementPercentages = [1, 1.5, 0.5, 0.8, 1.2]; // Movement percentages for each tag
+    const timeFrame = 15; 
+    const movementPercentages = [1, 1.5, 0.5, 0.8, 1.2]; 
     moveLeftAndRight(tree, timeFrame, movementPercentages);
-    printInfo(welcomeDivPTAG);// need to fix and make sure its not calling when string is present
+    printInfo(welcomeDivPTAG);
 
     setInterval(function() {
         if(currentlyPrinted){
@@ -2206,30 +1894,22 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     recentSells.style.left = '2.4%';
     recentSells.style.top = '66%';
     recentSells.style.backgroundColor = '#9b9999';
-    recentSells.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)'; /* Adding shadow */
+    recentSells.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)';
     recentSells.style.borderRadius = '2vh';
     recentSells.className = 'recentSells';
-    //recentSells.style.padding = '0%';
-    //recentSells.style.opacity = '.6'; //make overlay so it can look like terminal
-
 
 
     if(purchaseArray.length == 0){
-        // apend a div the same width the sells sells at the top
-        // Create a new div for the text
         var textDiv = document.createElement("div");
         textDiv.textContent = "Recent Sells";
         textDiv.style.position = "absolute";
         textDiv.style.top = "0%";
         textDiv.style.left = "50%";
         textDiv.style.transform = "translateX(-50%)";
-        //textDiv.style.left = "5vh";
-        //textDiv.style.transform = "translate(-50%, -50%)";
-        textDiv.style.color = "white"; // Adjust text color as needed
-        textDiv.style.fontSize = "2.5vh"; // Adjust text size as needed
-        textDiv.style.fontWeight = "bold"; // Adjust font weight as needed
+        textDiv.style.color = "white"; 
+        textDiv.style.fontSize = "2.5vh"; 
+        textDiv.style.fontWeight = "bold"; 
 
-        // Append the text div to the parent of recentSells
         recentSells.appendChild(textDiv);
         recentSells.style.backgroundImage = 'url("/Gifs/HourGlass/loading2.gif")';
         recentSells.style.backgroundSize = 'cover';
@@ -2239,19 +1919,15 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
 
     }else{
-        recentSells.style.overflowY = 'auto'; // Make the container scrollable when content exceeds height
-        //recentSells.style.padding = '1vh'; // Add padding for spacing
-
-        recentSells.style.display = "flex"; // Use flexbox for vertical stacking
-        recentSells.style.flexDirection = "column"; // Stack items vertically
+        recentSells.style.overflowY = 'auto'; 
+        recentSells.style.display = "flex"; 
+        recentSells.style.flexDirection = "column"; 
         recentSells.style.overflowY = 'auto';
 
         var purchaseIndex = 0;
 
 
         purchaseArray.forEach(purchase => {
-            // Create a div element for each purchase
-
             const purchaseDiv = document.createElement("div");
             purchaseDiv.style.borderBottomStyle = 'solid';
             purchaseDiv.style.borderBottomWidth = '0.2vh'; 
@@ -2261,10 +1937,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             purchaseDiv.style.position = 'relative';
             purchaseDiv.style.width = '110%';
 
-            //purchaseDiv.style.height = '35%';
-            // Create an image element
             const image = document.createElement("img");
-            image.src = purchase.productIMG; // Set the image source
+            image.src = purchase.productIMG; 
             image.style.width = '30%';
             image.style.height = '100%';
             image.style.left = '5%';
@@ -2281,20 +1955,10 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             infoContainer.style.fontSize = '1.6vh';
             infoContainer.backgroundColor = 'none';
             infoContainer.style.overflowY = 'scroll';
-            infoContainer.style.alignItems = "center"; // Center items horizontally
-            infoContainer.style.display = "flex"; // Use flexbox for vertical stacking
-            infoContainer.style.flexDirection = "column"; // Stack items vertically
+            infoContainer.style.alignItems = "center"; 
+            infoContainer.style.display = "flex";
+            infoContainer.style.flexDirection = "column"; 
 
-
-
-            // Create text nodes for date, first name, and price
-
-            /*
-            const dateTextNode = document.createTextNode(`Date: ${purchase.datePurchased}`);
-            const firstNameTextNode = document.createTextNode(`First Name: ${purchase.firstName}`);
-            const priceTextNode = document.createTextNode(`Price: $${purchase.price}`);
-
-            */
                                           
             const dateNode =  document.createElement("div");
             dateNode.textContent = `Date Purchased: ${purchase.datePurchased}`;
@@ -2306,46 +1970,30 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             console.log(purchase.price);
             priceDiv.textContent = `Price: ${purchase.price.$numberDecimal} ETH`;
 
-            //dateNode.style.position = 'absolute';
             dateNode.style.width = '80%';
             dateNode.style.height = '33%';
-            //dateNode.style.left = '10%';
-            ////dateNode.style.top = '2%';
             dateNode.style.fontSize = '1.6vh';
-            dateNode.style.display = 'flex'; // Use flexbox for vertical centering
-            dateNode.style.alignItems = 'center'; // Center text vertically
+            dateNode.style.display = 'flex'; 
+            dateNode.style.alignItems = 'center'; 
             dateNode.className = 'dateNode';
 
-            //firstNameDiv.style.position = 'absolute';
             firstNameDiv.style.width = '80%';
             firstNameDiv.style.height = '33%';
-            //firstNameDiv.style.left = '10%';
             firstNameDiv.style.fontSize = '1.6vh';
-            firstNameDiv.style.display = 'flex'; // Use flexbox for vertical centering
-            firstNameDiv.style.alignItems = 'center'; // Center text vertically
+            firstNameDiv.style.display = 'flex'; 
+            firstNameDiv.style.alignItems = 'center'; 
             firstNameDiv.className = 'purchasesfirstNameDiv';
-            //firstNameDiv.style.top = '23%';
-
-            //priceDiv.style.position = 'absolute';
             priceDiv.style.width = '80%';
             priceDiv.style.height = '33%';
-            //priceDiv.style.left = '10%';
             priceDiv.style.fontSize = '1.6vh';
-            priceDiv.style.display = 'flex'; // Use flexbox for vertical centering
-            priceDiv.style.alignItems = 'center'; // Center text vertically
+            priceDiv.style.display = 'flex'; 
+            priceDiv.style.alignItems = 'center';
             priceDiv.className = 'purchasesPriceDiv';
-            //priceDiv.style.top = '40%';
-
-
-            // Append image and text nodes to the purchaseDiv
         
             infoContainer.appendChild(dateNode);
-            //infoContainer.appendChild(priceDiv);
-            //infoContainer.appendChild(document.createElement("br")); // Add line break
             infoContainer.appendChild(priceDiv);
             infoContainer.appendChild(firstNameDiv);
 
-            // Add the purchaseDiv to the purchaseContainer
             purchaseDiv.appendChild(image);
             purchaseDiv.appendChild(infoContainer);
             recentSells.appendChild(purchaseDiv);
@@ -2379,13 +2027,11 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     headertext.style.position = 'absolute';
     headertext.style.display = 'block';
     headertext.style.backgroundColor = 'none'; 
-    headertext.style.backgroundImage = 'url("/images/bursonSKullText.png")'; // images created via Gimp
+    headertext.style.backgroundImage = 'url("/images/BursonSKullText.png")'; 
     headertext.style.backgroundSize = 'cover';
     headertext.style.backgroundRepeat = 'no-repeat';
     headertext.style.backgroundPosition = 'center'; 
 
-
-    //headertext.textContent = 'Burson Skullz';
     headertext.style.fontSize = '6vh';
     headertext.style.top = '0%';
     headertext.classList.add('header-text');
@@ -2405,7 +2051,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     backButton.style.top = '10%';
     backButton.style.borderRadius = '1vh';
     backButton.classList.add('back-button');
-    backButton.style.backgroundImage = 'url("/images/Homeicon.png")'; //https://www.iconfinder.com/search?q=home+icon+
+    backButton.style.backgroundImage = 'url("/images/Homeicon.png")'; 
     backButton.style.backgroundSize = 'contain';
     backButton.style.backgroundRepeat = 'no-repeat';
     backButton.style.backgroundPosition = 'center'; 
@@ -2413,13 +2059,10 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     backButton.addEventListener('click', function() {
         paintingClicked = false;
         const body = document.body;
-
-        // Clear all existing content from the body
         while (body.firstChild) {
             body.removeChild(body.firstChild);
         }
 
-        // Define the new HTML content for the body
         const newBodyContent = `
             <div class="Header">
                 <div class="buttonContainer"></div>
@@ -2433,7 +2076,9 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 </div>
             </div>
         `;
+
         body.innerHTML = newBodyContent;
+
         checkifConnected().then(() => {
             if(!isConnected){ 
                 const thisConnectBUtton =  document.querySelector(".connect-button");
@@ -2453,7 +2098,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 if(thisLoggedInBUtton){
                     thisLoggedInBUtton.addEventListener("click", async function(){
                         console.log('clicking current connect button');
-                        // makeLog(user);
                     });
                 }else{
                     console.log('cannot find the loggedIn-button');
@@ -2483,9 +2127,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             digitalElement.addEventListener('click', function() {
                 if(!NFTDivOverlay){
                     NFTDivOverlay = true;
-                    nft_section_click(digitalElement);
-                    // no need to reset boolean operators as function already does
-                    
+                    nft_section_click(digitalElement);                   
                 }
             }); 
         }else{
@@ -2498,8 +2140,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             mathElement.addEventListener('click', function() {
                 if(!mathOverlay){
                     mathOverlay = true;
-                    math_section_click(mathElement);
-                    
+                    math_section_click(mathElement);      
                 }
             }); 
         }else{
@@ -2518,6 +2159,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else{
             console.log('cannot find events div');
         }
+
+
     });
 
     commissionContainer.style.height = '90%';
@@ -2541,7 +2184,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     commission.style.backgroundPosition = 'center'; 
 
 
- commission.addEventListener('click', async function() {
+    commission.addEventListener('click', async function() {
         const containerChecker = document.querySelector('.commissionUserInputForm');
         if(containerChecker == null){
             let containerInput = document.createElement('div');
@@ -2631,6 +2274,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             container.style.left = '7.5%';
             container.style.top = '10%';
             container.style.position = 'absolute';
+            //container.style.padding = '20px';
             container.style.backgroundColor = 'none';
             container.style.overflowY = 'scroll';
             container.style.justifyContent = 'center'; 
@@ -2745,6 +2389,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 formGroup.appendChild(input);
                 container.appendChild(formGroup);
             });
+
+                // Create submit button
                 let submitButton = document.createElement('button');
                 submitButton.textContent = 'Submit';
                 submitButton.classList.add('form-submit');
@@ -2896,13 +2542,14 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else{
             console.log('commission form is already active');
         }
+
+
     });
 
 function isValidPhoneNumber(phoneNumber) {
     let phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
     return phoneRegex.test(phoneNumber);
 }
-
 
     AIbuttonContainer.style.height = '90%';
     AIbuttonContainer.style.width = iconHeaderWidth ;
@@ -2924,9 +2571,204 @@ function isValidPhoneNumber(phoneNumber) {
     AIbutton.style.backgroundRepeat = 'no-repeat';
     AIbutton.style.backgroundPosition = 'center'; 
 
-    
+    AIbutton.addEventListener('click', function(){
+        const botChecker = document.getElementById('botContainer');
+        if(botChecker == null){
+            const botContainer = document.createElement('div');
+            botContainer.id = 'botContainer';
+            botContainer.style.width = '350px';
+            botContainer.style.height = '70%';
+            botContainer.style.position = 'fixed';
+            botContainer.style.top = '50%';
+            botContainer.style.left = '50%';
+            botContainer.style.transform = 'translate(-50%, -50%)';
+            botContainer.style.backgroundColor = '#9b9999';
+            botContainer.style.zIndex = '9999999';
+            botContainer.style.borderRadius = '2vh';
+            botContainer.style.border = '1px solid black';
+            if (window.innerWidth > 700) {
+                botContainer.style.width = '500px';
+            }
+            document.body.appendChild(botContainer);
 
-AIbutton.addEventListener('click', function(){
+
+            let offsetX, offsetY;
+            let isDragging = false;
+
+            botContainer.addEventListener("mousedown", function (event) {
+                isDragging = true;
+                offsetX = event.clientX - parseFloat(window.getComputedStyle(botContainer).left);
+                offsetY = event.clientY - parseFloat(window.getComputedStyle(botContainer).top);
+            });
+
+            document.addEventListener("mousemove", function (event) {
+                if (isDragging) {
+                    botContainer.style.left = (event.clientX - offsetX) + "px";
+                    botContainer.style.top = (event.clientY - offsetY) + "px";
+                }
+            });
+
+            document.addEventListener("mouseup", function () {
+                isDragging = false;
+                botContainer.style.cursor = "grab";
+            });
+
+            const responseDiv = document.createElement('div');
+            responseDiv.id = 'responseDiv';
+            responseDiv.style.width = '90%';
+            responseDiv.style.height = '68%';
+            responseDiv.style.top = '5%';
+            responseDiv.style.margin = '2% auto'; 
+            responseDiv.style.backgroundColor = 'none';
+            responseDiv.style.border = '1px solid black';
+            responseDiv.style.overflowY = 'auto';
+            responseDiv.style.position = 'relative';
+            responseDiv.style.backgroundImage = 'url("/images/BursonSkull.png")';
+            responseDiv.style.backgroundSize = 'contain';
+            responseDiv.style.backgroundRepeat = 'no-repeat';
+            responseDiv.style.backgroundPosition = 'center'; 
+            responseDiv.style.borderRadius = '1vh';
+            responseDiv.style.overflowY = 'hidden';
+            botContainer.appendChild(responseDiv);
+
+            const overlay = document.createElement('div');
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.position = 'absolute';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.backgroundColor = 'black';
+            overlay.style.opacity = '0.73';
+            //overlay.style.overflowY = 'scroll';
+
+            responseDiv.appendChild(overlay);
+
+            const overlayMain = document.createElement('div');
+            overlayMain.style.width = '100%';
+            overlayMain.style.height = '100%';
+            overlayMain.style.top = '0';
+            overlayMain.style.left = '0';
+            overlayMain.style.backgroundColor = 'black';
+            overlayMain.style.opacity = '0.70';
+            overlayMain.style.color = 'white';
+            overlayMain.style.overflowY = 'scroll';
+            overlayMain.style.display = 'flex';
+            overlayMain.style.flexDirection = 'column';
+            overlayMain.style.justifyContent = 'flex-start'; 
+            overlayMain.style.alignItems = 'center'; 
+            overlayMain.style.overflowY = 'scroll';
+
+            // Hide scrollbar for Chrome, Safari, and Opera
+            //overlayMain.style.webkitOverflowScrolling = 'auto';
+            //overlayMain.style.webkitScrollbar = 'auto';
+
+            overlay.appendChild(overlayMain);
+
+            overlayMain.style.fontSize = '2vh';
+           
+            const inputParent = document.createElement('div');
+            inputParent.style.position = 'absolute';
+            inputParent.style.bottom = '7.2%'; 
+            inputParent.style.width = '90%'; 
+            inputParent.style.height = '8.5%'; 
+            inputParent.style.left = '3.2%'; 
+            botContainer.appendChild(inputParent);
+
+            const inputContainer = document.createElement('input');
+            inputContainer.id = 'inputContainer';
+            inputContainer.type = 'text';
+            inputContainer.style.border = 'none';
+            inputContainer.style.position = 'relative';
+            inputContainer.placeholder = 'Type here...';
+            inputContainer.style.width = '100%'; 
+            inputContainer.style.height = '100%'; 
+            inputContainer.style.left = '0%'; 
+            inputParent.appendChild(inputContainer);
+
+            inputContainer.addEventListener('keydown', async function(event) {
+                if (event.key === 'Enter') {
+                    const userInput = inputContainer.value;
+                    if(userInput == ''){
+                        // dont evaluate empty string
+                    }else{
+                        try{
+                            if(clientCanSendAIfetchRequest){
+                                overlayMain.innerHTML = '';
+                                let thisIndex = -1;
+                                let response = await getResponse(userInput);
+                                inputContainer.value = '';
+                                if(response != null){
+                                    if(response.code == 4){
+                                        overlayMain.innerHTML = '';
+                                        clientCanSendAIfetchRequest = false;
+                                        writeToParentDivWithDelay(response.serverMessage, overlayMain, 10,thisIndex);
+                                        setTimeout(() => {
+                                            clientCanSendAIfetchRequest = true;
+                                        }, 48 * 60 * 60 * 1000);
+                                    }else{
+                                        console.log(response);
+
+                                        if(response.serverAIResponse.length>0){
+                                             console.log(response.serverAIResponse);
+                                            for(const serverRSPDS of response.serverAIResponse){
+                                                thisIndex +=1;
+                                                console.log(serverRSPDS);
+                                                writeToParentDivWithDelay(serverRSPDS[0].rsp, overlayMain, 10,thisIndex);
+                                            }
+                                        }else{
+                                            console.log('unexpected error we did not get back an array', response.serverAIResponse);
+                                        }
+
+                                    }
+
+                                }else{
+                                    writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10, 1);
+                                }
+                            }else{
+                                overlayMain.innerHTML = '';
+                                const restrictedString = "We're sorry, but you've exceeded the maximum number of AI requests allowed within a 48-hour period. For security and system stability reasons, we kindly ask you to wait for 48 hours before making additional requests. Thank you for your understanding and cooperation.";
+                                writeToParentDivWithDelay(restrictedString, overlayMain, 10,1);
+                            }
+                            overlayMain.style.marginTop = '20px';
+                            overlayMain.style.height = `calc(100% - 20px)`; 
+                        }catch(error){
+                            console.log(error);
+                            writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10,1);
+                        }  
+                    }
+
+                    
+                }
+            });
+            const exitButton = document.createElement('div');
+            exitButton.id = 'exitButton';
+            exitButton.textContent = '❌';
+            exitButton.style.position = 'absolute';
+            exitButton.style.top = '1%';
+            exitButton.style.right = '95%';
+            exitButton.style.width = '5%';
+            exitButton.style.height = '5%'; 
+            exitButton.style.fontSize = '2vh';
+            exitButton.style.border = 'none'; 
+            exitButton.style.background = 'none'; 
+            exitButton.style.cursor = 'pointer'; 
+            exitButton.addEventListener('click', function() {
+                botContainer.remove();
+            });
+            botContainer.appendChild(exitButton);
+
+
+            inputContainer.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    console.log('User typed:', inputContainer.value);
+                    inputContainer.value = ''; 
+                }
+            }); 
+        }else{
+            console.log('AI container already exist');
+        }
+    });
+
     gridFowardContainer.style.height = '90%';
     gridFowardContainer.style.width = iconHeaderWidth;
     gridFowardContainer.style.top = '7%'; 
@@ -2938,6 +2780,7 @@ AIbutton.addEventListener('click', function(){
     gridFowardContainer.addEventListener('click', function() {
         let totalPageNumbers = Math.ceil(currentPaintingArray.length / 24);
         console.log('total pages = ', totalPageNumbers);
+
         if(gridPageNumber < totalPageNumbers){
             gridPageNumber += 1;
             let startIndex = (gridPageNumber - 1) * 24;
@@ -2959,7 +2802,7 @@ AIbutton.addEventListener('click', function(){
     gridFoward.style.top = '10%';
     gridFoward.style.borderRadius = '1vh';
     gridFoward.classList.add('gridFoward-button');
-    gridFoward.style.backgroundImage = 'url("/images/rightIcon3.png")';
+    gridFoward.style.backgroundImage = 'url("/images/righticon3.png")';
     gridFoward.style.backgroundSize = 'contain';
     gridFoward.style.backgroundRepeat = 'no-repeat';
     gridFoward.style.backgroundPosition = 'center'; 
@@ -2987,6 +2830,8 @@ AIbutton.addEventListener('click', function(){
         }
 
     });
+
+
     gridBack.style.position = 'absolute'; 
     gridBack.style.width = '70%';
     gridBack.style.height = '70%';
@@ -3001,13 +2846,16 @@ AIbutton.addEventListener('click', function(){
 
     header.style.backgroundColor = '#9b9999';
     header.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; 
+
+
     headerLogo.style.position = 'absolute'; 
     headerLogo.style.height = '8.5vh'
     headerLogo.style.width = '10%'; 
     headerLogo.style.left = '0%'; 
     headerLogo.style.top = '0%';
+
     headerLogo.style.backgroundColor = 'none'; 
-    headerLogo.style.backgroundImage = 'url(/images/bursonskull.png)';
+    headerLogo.style.backgroundImage = 'url(/images/BursonSkull.png)';
     headerLogo.style.backgroundSize = 'contain';
     headerLogo.style.backgroundRepeat = 'no-repeat';
     headerLogo.style.backgroundPosition = 'center';
@@ -3023,7 +2871,7 @@ AIbutton.addEventListener('click', function(){
 
 
     makePaintGrid(array, parentElement, numColumns, gridWidthPercent);
- 
+
     footer.style.position = 'relative';
     footer.style.height = '65vh';
     footer.style.width = '100%';
@@ -3070,23 +2918,23 @@ AIbutton.addEventListener('click', function(){
     footerLargeTextContainer.style.width = '75%'; 
     footerLargeTextContainer.style.right = '5%'; 
     footerLargeTextContainer.style.top = '0%';
-    footerLargeTextContainer.style.backgroundImage = 'url("/images/bursonSKullText.png")'; 
+    footerLargeTextContainer.style.backgroundImage = 'url("/images/BursonSKullText.png")'; 
     footerLargeTextContainer.style.backgroundSize = 'cover';
     footerLargeTextContainer.style.backgroundRepeat = 'no-repeat';
     footerLargeTextContainer.style.backgroundPosition = 'center';
+
 
     logo.style.position = 'relative'; 
     logo.style.height = '100%'
     logo.style.width = '15%'; 
     logo.style.left = '10%'; 
-    logo.style.backgroundImage = 'url(/images/bursonskull.png)';
+    logo.style.backgroundImage = 'url(/images/BursonSkull.png)';
     logo.style.backgroundSize = 'contain';
     logo.style.backgroundRepeat = 'no-repeat';
     logo.style.backgroundPosition = 'center';
 
     var row = document.createElement("div");
     row.classList.add("row");
-
     for (var i = 1; i <= 3; i++) {
         var column = document.createElement("div");
         column.classList.add("column");
@@ -3123,7 +2971,6 @@ AIbutton.addEventListener('click', function(){
 
     footContainer.appendChild(row);
     createSearchBar(header);
-    // use instead  accounts = await window.ethereum.request(); 
     if(isConnected == true && window.ethereum.selectedAddress == RoysWallet){
         createDatabaseUtility(header);
     }else{
@@ -3136,7 +2983,8 @@ AIbutton.addEventListener('click', function(){
     parentElement.appendChild(acceptableCoins);
     parentElement.appendChild(recentSells);
     parentElement.appendChild(unknownDiv);
- 
+
+
     backButtonContainer.appendChild(backButton);
     header.appendChild(backButtonContainer);
 
@@ -3178,19 +3026,20 @@ export async function getNFTs(contractAddress, providerUrl) {
     }
 }
 
+
 export function addMessage(message, username, timestamp) {
-    msgCount +=1 ;
+    msgCount +=1 ; 
     const p = document.createElement('p');
     p.textContent = message;
-    p.style.height = 'auto'; 
-    p.style.position = 'relative';
+    p.style.height = 'auto';
+    p.style.position = 'relative'; 
 
-                // Create username div
+
     const usernameDiv = document.createElement('div');
     usernameDiv.textContent = username;
     usernameDiv.style.position = 'absolute'; 
     usernameDiv.style.top = '0%'; 
-    usernameDiv.style.left = '0%';
+    usernameDiv.style.left = '0%'; 
     usernameDiv.style.padding = '4px'; 
     usernameDiv.style.backgroundColor = 'transparent'; 
     usernameDiv.style.color = 'black'; 
@@ -3202,36 +3051,40 @@ export function addMessage(message, username, timestamp) {
 
     const timestampDiv = document.createElement('div');
     timestampDiv.textContent = timestamp;
-    timestampDiv.style.position = 'absolute';
-    timestampDiv.style.bottom = '0%'; 
+    timestampDiv.style.position = 'absolute'; 
+    timestampDiv.style.bottom = '0%';
     timestampDiv.style.right = '0%'; 
     timestampDiv.style.padding = '0 5px'; 
-    timestampDiv.style.backgroundColor = 'transparent';
+    timestampDiv.style.backgroundColor = 'transparent'; 
     timestampDiv.style.color = 'white'; 
     timestampDiv.style.fontSize = '1.2vh'; 
     timestampDiv.style.marginTop = '2vh';
 
     const localChatBox = document.querySelector('.chatBox');
     localChatBox.appendChild(p);
+
     p.style.maxWidth = '80%';
     p.style.wordWrap = 'break-word'; 
     p.style.backgroundColor = 'dimgray';
     p.style.fontSize = '1.5vh';
-    p.style.marginBottom = '10px'; 
+    p.style.marginBottom = '10px';
     p.style.marginTop = '0px';
     p.style.overflowY = 'auto';
 
     p.style.borderBottomStyle = 'solid';
-    p.style.borderBottomWidth = '0.2vh';
+    p.style.borderBottomWidth = '0.2vh'; 
     p.style.borderBottomColor = 'lightgray'; 
 
     p.style.padding = '4vh'; 
     p.style.color = 'white';
+
     p.style.scrollbarWidth = 'thin'; 
     p.style.scrollbarColor = 'transparent dimgray'; 
     localChatBox.scrollTop = localChatBox.scrollHeight;
+
     p.classList.add('live-Messages');
     p.setAttribute('id', username + "Message" + msgCount.toString()); 
+
     p.appendChild(usernameDiv);
     p.appendChild(timestampDiv);
         
@@ -3239,6 +3092,7 @@ export function addMessage(message, username, timestamp) {
 
 async function getContractABI(contractAddress) {
     const apiUrl = `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=YourApiKeyToken`;
+
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -3253,7 +3107,9 @@ async function getContractABI(contractAddress) {
         return null;
     }
 }
- 
+
+
+
 export async function checkifConnected(){
     let connectButtton = document.createElement("div"); 
     let loggedInButton = document.createElement("div"); 
@@ -3345,8 +3201,10 @@ export async function checkifConnected(){
                         buttonPTAG.style.width = '100%';
                         buttonPTAG.style.height = '100%';
                         buttonPTAG.style.top = '0%';
+                        //buttonPTAG.style.left = '0%';
                         buttonPTAG.style.margin = '0%';
                         buttonPTAG.style.fontSize = '1.5vh';
+
                         buttonPTAG.style.display = 'flex';
                         buttonPTAG.style.justifyContent = 'center';
                         buttonPTAG.style.alignItems = 'center';
@@ -3354,17 +3212,21 @@ export async function checkifConnected(){
                     }
                 } catch (error) {
                     console.error('Error requesting accounts from MetaMask:', error);
-                }     
+                }
+
+            
         }
     }
     
 }
 
 async function createChangeUsernamePopup() {
+
     if(changeUserNamePopUpExist){
         console.log('popup already exist');
     }else{
         changeUserNamePopUpExist = true;
+
         const popupContainer = document.createElement('div');
         popupContainer.classList.add('popup-container');
         popupContainer.style.position = 'absolute';
@@ -3461,6 +3323,8 @@ async function createChangeUsernamePopup() {
             }catch(error){
                 console.log('error with response from server try and catch failed', error);
             }
+
+            
         });
 
         const attemptsMessage = document.createElement('p');
@@ -3561,6 +3425,9 @@ function ScrollDownArrow() {
    console.log('make Down arrow');
 }
 
+
+
+
 function createDatabaseUtility(parentElement){
     var dbIconContainer = document.createElement("div");
 
@@ -3616,7 +3483,10 @@ function createDatabaseUtility(parentElement){
     parentElement.appendChild(dbIconContainer);
 }
 
+
+
 function createSearchBar(parentElement) {
+    // Create search container
     var searchContainer = document.createElement("div");
     searchContainer.classList.add("search-container");
 
@@ -3833,8 +3703,36 @@ const calculateConversionFactor = (amount) => {
         return 0.0016805; 
     }else{
         return 1;
-    } 
+    } // must be a integer
 }; 
+
+
+
+/*
+const calculateConversionFactor = (amount) => {
+    // Check if the amount is a whole number
+    if (Number.isInteger(amount)) {
+        return 0.001;
+    }else{
+
+        // Get the fractional part by subtracting the integer part from the amount
+        const fractionalPart = amount - Math.floor(amount);
+        
+        console.log('the fractional part is', fractionalPart);
+        // Check if the fractional part matches any of the specified values
+        if (fractionalPart <= 0.2){
+            return 0.001 + 0.000100; // 20% the value of 0.001 because we split 5 times 
+        }else if( fractionalPart <= 0.4){
+           return 0.001 +  0.000200;
+        }else if( fractionalPart <= 0.6){
+           return 0.001 +  0.000400;
+        }else if( fractionalPart <= 0.8){
+           return 0.001 +  0.000600;
+        }
+    }
+};
+
+*/
 
 function printInfo(div) {
     var strings = [
@@ -3848,9 +3746,7 @@ function printInfo(div) {
         'Universe!'
     ];
 
-    // Clear existing content
     div.textContent = "";
-    //div.style.textDecoration = 'underline';
     div.style.fontSize = '2.1vh';
     div.style.width = '100%';
     div.style.left = '0%';
@@ -3859,6 +3755,7 @@ function printInfo(div) {
     div.style.color = 'white';
 
     function printString(index) {
+
         var stringToPrint = strings[index];
         if (!stringToPrint) return; 
         for (var i = 0; i < stringToPrint.length; i++) {
@@ -3866,8 +3763,9 @@ function printInfo(div) {
                 return function() {
                     div.textContent += char; 
                 };
-            }(stringToPrint[i]), i * 200); 
-        }         
+            }(stringToPrint[i]), i * 200);
+        }
+         
         setTimeout(function() {
             div.textContent = '';
             printString(index + 1);
@@ -3878,6 +3776,7 @@ function printInfo(div) {
             }
         }, stringToPrint.length * 250); 
     }
+
     printString(0);
     currentlyPrinted = true;
 }
@@ -3896,19 +3795,16 @@ export async function getVeChainPrice(element) {
                 return response.json();
             })
             .then(data => {
-                // Extract VeChain price from the response
                 const vechainPrice = data.vechain.usd;
-                element.textContent = '$' + '  ' + vechainPrice.toFixed(4); // Display the price on the element
-                retryCount = 0; // Reset retry count upon successful fetch
+                element.textContent = '$' + '  ' + vechainPrice.toFixed(4); 
+                retryCount = 0;
             })
             .catch(error => {
                 console.error('Error fetching VeChain price:', error);
-                // Retry fetching the data if maximum retries haven't been reached
-                // If error is due to internet connection, display "error"
                 element.textContent = 'error';
                 if (retryCount < maxRetries) {
                     retryCount++;
-                    setTimeout(fetchVETPrice, retryInterval); // Retry after the specified interval
+                    setTimeout(fetchVETPrice, retryInterval); 
                 }else{
                     fetch('https://api.coincap.io/v2/assets/vechain')
                         .then(response => {
@@ -3919,7 +3815,7 @@ export async function getVeChainPrice(element) {
                         })
                         .then(data => {
                             const vechainPrice = parseFloat(data.data.priceUsd);
-                            element.textContent = '$' +  '  ' +  vechainPrice.toFixed(2); // Display the price on the element
+                            element.textContent = '$' +  '  ' +  vechainPrice.toFixed(2); 
                             console.log('VeChain price:', vechainPrice);
                         })
                         .catch(error => {
@@ -3929,18 +3825,12 @@ export async function getVeChainPrice(element) {
             });
     }
 
-    // Initial fetch of VeChain price
     fetchVETPrice();
-
-    // Set interval to fetch VeChain price every 3 minutes (for testing)
     setInterval(fetchVETPrice, retryInterval);
 }
 
 function addSecretMenu() {
-    // Menu items array
     const menuItems = ['upload painting', 'remove painting', 'send tracking number'];
-
-    // Create the main menu container
     const secretMenu = document.createElement('div');
     secretMenu.className = 'secret-menu';
     secretMenu.style.width = '250px';
@@ -3954,34 +3844,29 @@ function addSecretMenu() {
     secretMenu.style.borderRadius = '2vh';
     secretMenu.style.border = '1px solid black';
 
-    // Create container for cancel button
     const closeButtonContainer = document.createElement('div');
     closeButtonContainer.style.position = 'absolute';
     closeButtonContainer.style.top = '10px';
     closeButtonContainer.style.right = '10px';
 
-    // Create the close button (X emoji)
     const closeButton = document.createElement('div');
     closeButton.textContent = '❌';
     closeButton.style.fontSize = '10px';
     closeButton.style.cursor = 'pointer';
-
-    // Add event listener to remove the menu form when close button is clicked
     closeButton.addEventListener('click', function() {
         document.body.removeChild(secretMenu);
     });
 
-    // Append the close button to its container
+
     closeButtonContainer.appendChild(closeButton);
 
-    // Append the close button container to the main menu
+
     secretMenu.appendChild(closeButtonContainer);
 
-    // Create list for menu items
-    const itemList = document.createElement('div');
-    itemList.style.marginTop = '50px'; // Adjust top margin to separate from the close button
 
-    // Loop through menu items array and create divs for each item
+    const itemList = document.createElement('div');
+    itemList.style.marginTop = '50px';
+
     menuItems.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.textContent = item;
@@ -3993,12 +3878,10 @@ function addSecretMenu() {
         itemDiv.style.borderRadius = '4px';
         itemDiv.style.borderBottom = '0.2vh solid lightgrey';
 
-          // Add hover effect
         itemDiv.addEventListener('mouseenter', function() {
             itemDiv.style.backgroundColor = '#585858';
         });
 
-        // Remove hover effect
         itemDiv.addEventListener('mouseleave', function() {
             itemDiv.style.backgroundColor = 'dimgray';
         });
@@ -4017,7 +3900,6 @@ function addSecretMenu() {
                 popupForm.appendChild(titleSpan);
 
                 popupForm.classList.add('dbPopup');
-                 // Add event listeners for dragging behavior
                     let offsetX, offsetY;
                     let isDragging = false;
                     popupForm.style.display = 'flex';
@@ -4039,17 +3921,13 @@ function addSecretMenu() {
                     isDragging = false;
                     popupForm.style.cursor = "grab";
                 });
-                // Create the form element
                 const form = document.createElement('form');
                 form.id = 'uploadForm';
-
-                // Create the image input field
                 const imageInput = document.createElement('input');
                 imageInput.type = 'file';
                 imageInput.id = 'imageInput';
                 imageInput.accept = 'image/*';
                 imageInput.addEventListener('change', function() {
-                    // Handle image selection and display preview
                     const file = imageInput.files[0];
                     if (file) {
                         const reader = new FileReader();
@@ -4057,11 +3935,10 @@ function addSecretMenu() {
                             preview.src = reader.result;
                         };
                         reader.readAsDataURL(file);
-                        exitButton.style.display = 'inline-block'; // Show exit button when image selected
+                        exitButton.style.display = 'inline-block';
                     }
                 });
 
-                // Create the preview area for the image
                 const previewContainer = document.createElement('div');
                 previewContainer.style.position = 'relative';
                 const preview = document.createElement('img');
@@ -4071,7 +3948,6 @@ function addSecretMenu() {
                 preview.style.marginTop = '10px';
                 previewContainer.appendChild(preview);
 
-                // Create the exit button for removing the selected image
                 const exitButton = document.createElement('button');
                 exitButton.type = 'button';
                 exitButton.textContent = '✕';
@@ -4083,38 +3959,34 @@ function addSecretMenu() {
                 exitButton.style.color = '#fff';
                 exitButton.style.fontSize = '20px';
                 exitButton.style.cursor = 'pointer';
-                exitButton.style.display = 'none'; // Initially hidden
+                exitButton.style.display = 'none'; 
                 exitButton.addEventListener('click', function() {
-                    preview.src = ''; // Remove the image
-                    imageInput.value = ''; // Clear the file input
-                    exitButton.style.display = 'none'; // Hide the exit button
+                    preview.src = ''; 
+                    imageInput.value = ''; 
+                    exitButton.style.display = 'none';
                 });
                 previewContainer.appendChild(exitButton);
 
-                // Create the date input field
+
                 const dateInput = document.createElement('input');
                 dateInput.type = 'date';
                 dateInput.id = 'dateInput';
 
-                // Create the span tag for "Date created"
+
                 const dateCreatedLabel = document.createElement('span');
                 dateCreatedLabel.textContent = 'Date created';
                 dateCreatedLabel.style.marginLeft = '10px';
 
-                // Create the boolean input field
+
                 const booleanInput = document.createElement('input');
                 booleanInput.type = 'checkbox';
                 booleanInput.id = 'booleanInput';
 
-                
-                // Create label for the boolean input field
                 const availabilityLabel = document.createElement('label');
                 availabilityLabel.textContent = 'Available';
                 availabilityLabel.htmlFor = 'booleanInput';
                 availabilityLabel.style.marginLeft = '10px';
 
-
-                // Create the text input fields
                 const stringInputs = [];
                 const placeholders = ['Artist', 'Description', 'LegalContract'];
                 for (let i = 0; i < placeholders.length; i++) {
@@ -4125,29 +3997,21 @@ function addSecretMenu() {
                     stringInputs.push(stringInput);
                 }
 
-
-                // Create the price input field
                 const uploadName = document.createElement('input');
                 uploadName.type = 'text';
                 uploadName.id = 'priceInput';
                 uploadName.placeholder = 'Painting Name';
 
-
-                // Create the price input field
                 const priceInput = document.createElement('input');
                 priceInput.type = 'text';
                 priceInput.id = 'priceInput';
                 priceInput.placeholder = 'Price in ETH';
-                //priceInput.style.display = 'flex-end';
 
-                // Create the price input field
                 const uploadPassword = document.createElement('input');
                 uploadPassword.type = 'text';
                 uploadPassword.id = 'priceInput';
                 uploadPassword.placeholder = 'passcode';
 
-
-                // Create the upload button
                 const uploadButton = document.createElement('button');
                 uploadButton.type = 'button';
                 uploadButton.id = 'uploadButton';
@@ -4160,7 +4024,6 @@ function addSecretMenu() {
                 uploadButton.style.borderRadius = '5px';
                 uploadButton.style.cursor = 'pointer';
 
-                // Create the cancel button
                 const cancelButton = document.createElement('button');
                 cancelButton.type = 'button';
                 cancelButton.id = 'uploadButton';
@@ -4173,8 +4036,6 @@ function addSecretMenu() {
                 cancelButton.style.borderRadius = '5px';
                 cancelButton.style.cursor = 'pointer';
 
-
-                // Append all input fields and buttons to the form
                 form.append(
                     imageInput, document.createElement('br'),
                     previewContainer, document.createElement('br'),
@@ -4185,17 +4046,8 @@ function addSecretMenu() {
                     form.append(input, document.createElement('br'));
                 });
                 form.append(uploadName, document.createElement('br'), priceInput, document.createElement('br'), uploadPassword,   document.createElement('br'), uploadButton, cancelButton);
-
-                //form.action = '/add-painting';
-                //form.method = 'post';
-
-                // Append the form to the popup
                 popupForm.appendChild(form);
-
-                // Append the popup to the document body
                 document.body.appendChild(popupForm);
-
-                // Show the popup
                 popupForm.style.display = 'block';
 
                 uploadButton.addEventListener('click', async () =>  {
@@ -4203,9 +4055,7 @@ function addSecretMenu() {
                     const price = parseFloat(priceInput.value);
 
                     if (isNaN(price)) {
-                        alert('Price must be a valid integer.');
-                        //return;
-                    }
+                        alert('Price must be a valid integer.');                    }
 
                     const currentDate = new Date();
                     const thisObj = {
@@ -4227,7 +4077,7 @@ function addSecretMenu() {
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify(thisObj) // Convert object to JSON string
+                            body: JSON.stringify(thisObj)
                         });
 
                         if (response.ok) {
@@ -4239,8 +4089,6 @@ function addSecretMenu() {
                                 console.log('message came back false', serverMessage.success)
                             }
                             console.log('Received paintings:', serverMessage);
-
-                            // Display success message or do something else with the response
                         } else {
                             console.error('Failed to add painting:', response.statusText);
                         }
@@ -4250,11 +4098,7 @@ function addSecretMenu() {
                 
                 });
 
-
-
-                // Add event listener to the cancel button
                 cancelButton.addEventListener('click', function() {
-                    // Close the popup
                     popupForm.style.display = 'none';
                 }); 
                 
@@ -4267,21 +4111,16 @@ function addSecretMenu() {
 
         itemDiv.addEventListener('click', function() {
             console.log(`${item} clicked`);
-            // You can add specific actions for each menu item here
         });
 
         itemList.appendChild(itemDiv);
     });
 
-    // Append the list of menu items to the main menu
     secretMenu.appendChild(itemList);
-
-    // Append the secret menu to the body
     document.body.appendChild(secretMenu);
 }
 
 function makeConfirmationForm() {
-    // Create the form container
     const formContainer = document.createElement('div');
     formContainer.className = 'confirmation-form';
     formContainer.style.width = '300px';
@@ -4305,7 +4144,6 @@ function makeConfirmationForm() {
     titleSpan.style.marginBottom = '10px';
     formContainer.appendChild(titleSpan);
 
-
     const titleSpan2 = document.createElement('span');
     titleSpan2.textContent = '(please send image of corresponding product)';
     titleSpan2.style.fontSize = '10px';
@@ -4313,8 +4151,6 @@ function makeConfirmationForm() {
     titleSpan2.style.marginBottom = '10px';
     formContainer.appendChild(titleSpan2);
 
-
-        // Create the close button (X emoji)
     const closeButton = document.createElement('div');
     closeButton.textContent = '❌';
     closeButton.style.fontSize = '10px';
@@ -4322,16 +4158,14 @@ function makeConfirmationForm() {
     closeButton.style.top = '10px';
     closeButton.style.right = '10px';
     closeButton.style.cursor = 'pointer';
-    closeButton.style.color = '#333'; // Change color of X icon
+    closeButton.style.color = '#333'; 
 
-    // Add event listener to remove the form container when close button is clicked
     closeButton.addEventListener('click', function() {
         document.body.removeChild(formContainer);
     });
 
-    // Append the close button to the form container
     formContainer.appendChild(closeButton);
-    // Create the form element
+
     const form = document.createElement('form');
     form.id = 'confirmationForm';
     form.style.display = 'flex';
@@ -4342,9 +4176,6 @@ function makeConfirmationForm() {
     form.style.top = '15%';
     form.style.position = 'absolute';
 
-    // Create the name field
-
-        // Create the email field
     const emailLabel = document.createElement('label');
     emailLabel.textContent = 'Email:';
     emailLabel.for = 'emailInput';
@@ -4367,7 +4198,6 @@ function makeConfirmationForm() {
     nameInput.required = true;
     form.appendChild(nameInput);
 
-    // Create the tracking number field
     const trackingLabel = document.createElement('label');
     trackingLabel.textContent = 'Tracking Number:';
     trackingLabel.for = 'trackingInput';
@@ -4379,7 +4209,6 @@ function makeConfirmationForm() {
     trackingInput.required = true;
     form.appendChild(trackingInput);
 
-    // Create the image field
     const imageLabel = document.createElement('label');
     imageLabel.textContent = 'Image:';
     imageLabel.for = 'imageInput';
@@ -4392,7 +4221,6 @@ function makeConfirmationForm() {
     imageInput.required = true;
     form.appendChild(imageInput);
 
-    // Create the passcode field
     const passcodeLabel = document.createElement('label');
     passcodeLabel.textContent = 'Passcode:';
     passcodeLabel.for = 'passcodeInput';
@@ -4404,38 +4232,24 @@ function makeConfirmationForm() {
     passcodeInput.required = true;
     form.appendChild(passcodeInput);
 
-    // Create the submit button
     const submitButton = document.createElement('input');
     submitButton.type = 'submit';
     submitButton.value = 'Submit';
     form.appendChild(submitButton);
-
-    // Append the form to the form container
     formContainer.appendChild(form);
 
-    // Append the form container to the body
     document.body.appendChild(formContainer);
-
-    // Prevent default form submission
     form.addEventListener('submit', function(event) {
         event.preventDefault();
-            // Create an object to store form data
-                // Create a new FileReader
         const reader = new FileReader();
-
-        // Define a function to handle the FileReader onload event
         reader.onload = function(event) {
-            // Create an object to store form data
-
-            // add email ( no need to check if it is valid because i will be sending it)
             const formData = {
                 email: emailInput.value,
                 name: nameInput.value,
                 tracking: trackingInput.value,
-                image: event.target.result, // Use event.target.result to get the base64 data
+                image: event.target.result, 
                 passcode: passcodeInput.value
             };
-
             console.log('tracking input is = ', formData.tracking);
 
             const loadingContainer = document.createElement("div");
@@ -4451,17 +4265,13 @@ function makeConfirmationForm() {
             loadingContainer.style.alignItems = "center";
             loadingContainer.style.backgroundColor = "none"; 
 
-                // Create and add the loading icon (GIF)
             const loadingIcon = document.createElement("img");
             loadingIcon.setAttribute("class", "loading-gif");
-            loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); // Replace 'path/to/your/loading.gif' with the actual path to your GIF file
-            loadingIcon.setAttribute("alt", "Loading..."); // Provide an alternative text for accessibility
-            loadingIcon.style.width = "50%"; // Adjust the width as needed
-            loadingIcon.style.height = "50%"; // Adjust the width as needed
-            // Append the loading icon to the loading container
+            loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+            loadingIcon.setAttribute("alt", "Loading..."); 
+            loadingIcon.style.width = "50%"; 
+            loadingIcon.style.height = "50%";
             loadingContainer.appendChild(loadingIcon);
-
-            // Append the loading container to the form container
             formContainer.appendChild(loadingContainer);
 
             fetch('/sendConfirmationEmail', {
@@ -4491,21 +4301,18 @@ function makeConfirmationForm() {
             .catch(error => {
                 loadingContainer.remove(); 
                 console.error('Error getting response from server:', error);
-                // Handle the error, notify user accordingly
             }); 
 
         } 
-        // Read the image file as a data URL
         reader.readAsDataURL(imageInput.files[0]);
     });
 }
 export async function getEthereumPrice(element) {
-    let retryCount = 0; // Track the number of retries
-    const maxRetries = 2; // Maximum number of retries
-    const retryInterval = 180000; // Interval between retries in milliseconds (5 seconds)
+    let retryCount = 0;
+    const maxRetries = 2; 
+    const retryInterval = 180000; 
 
     function fetchETHPrice() {
-        // Make an API request to fetch Ethereum price from CoinGecko
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
             .then(response => {
                 if (!response.ok) {
@@ -4514,19 +4321,16 @@ export async function getEthereumPrice(element) {
                 return response.json();
             })
             .then(data => {
-                // Extract Ethereum price from the response
                 const ethereumPrice = data.ethereum.usd;
-                element.textContent = '$' + '  ' +  ethereumPrice.toFixed(2); // Display the price on the element
-                retryCount = 0; // Reset retry count upon successful fetch
+                element.textContent = '$' + '  ' +  ethereumPrice.toFixed(2);
+                retryCount = 0; 
             })
             .catch(error => {
                 console.error('Error fetching Ethereum price:', error);
-                // Retry fetching the data if maximum retries haven't been reached
-                // if error is internet connection then put no connection
                  element.textContent = 'error';
                 if (retryCount < maxRetries) {
                     retryCount++;
-                    setTimeout(fetchETHPrice, retryInterval); // Retry after the specified interval
+                    setTimeout(fetchETHPrice, retryInterval); 
                 }else{
                     fetch('https://api.coincap.io/v2/assets/ethereum')
                         .then(response => {
@@ -4536,33 +4340,27 @@ export async function getEthereumPrice(element) {
                         return response.json();
                         })
                         .then(data => {
-                            // Extract Polygon price from the response
                         const ethereumPrice = parseFloat(data.data.priceUsd);
-                            element.textContent = '$' + '  ' +  ethereumPrice.toFixed(2); // Display the price on the element
+                            element.textContent = '$' + '  ' +  ethereumPrice.toFixed(2);
                         })
                         .catch(error => {
                             console.error('Error fetching Polygon price from CoinCap:', error);
-                            // Handle further error handling or fallback mechanisms as needed
-                            element.textContent = 'error'; // Display error message on the element
+                            element.textContent = 'error'; 
                         });
                 }
             });
     }
-
-    // Initial fetch of Ethereum price
     fetchETHPrice();
-
     
     setInterval(fetchETHPrice, 90000);  
 }
 
 export async function getBitcoinPrice(element) {
-    let retryCount = 0; // Track the number of retries
-    const maxRetries = 2; // Maximum number of retries
-    const retryInterval = 180000; // Interval between retries in milliseconds (3 minutes)
+    let retryCount = 0; 
+    const maxRetries = 2; 
+    const retryInterval = 180000;
 
     function fetchBTCPrice() {
-        // Make an API request to fetch Bitcoin price from CoinGecko
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
             .then(response => {
                 if (!response.ok) {
@@ -4571,19 +4369,16 @@ export async function getBitcoinPrice(element) {
                 return response.json();
             })
             .then(data => {
-                // Extract Bitcoin price from the response
                 const bitcoinPrice = data.bitcoin.usd;
-                element.textContent = '$' +  '  ' +  bitcoinPrice.toFixed(2); // Display the price on the element
-                retryCount = 0; // Reset retry count upon successful fetch
+                element.textContent = '$' +  '  ' +  bitcoinPrice.toFixed(2);
+                retryCount = 0; 
             })
             .catch(error => {
                 console.error('Error fetching Ethereum price:', error);
-                    // Retry fetching the data if maximum retries haven't been reached
-                    // if error is internet connection then put no connection
                  element.textContent = 'error';
                 if (retryCount < maxRetries) {
                     retryCount++;
-                    setTimeout(fetchBTCPrice, retryInterval); // Retry after the specified interval
+                    setTimeout(fetchBTCPrice, retryInterval); 
                 }else{
                     fetch('https://api.coincap.io/v2/assets/bitcoin')
                         .then(response => {
@@ -4593,34 +4388,28 @@ export async function getBitcoinPrice(element) {
                             return response.json();
                         })
                         .then(data => {
-                            // Extract Polygon price from the response
+
                             const bitcoinPrice = parseFloat(data.data.priceUsd);
-                            element.textContent = '$' + '  ' +  bitcoinPrice.toFixed(2); // Display the price on the element
+                            element.textContent = '$' + '  ' +  bitcoinPrice.toFixed(2); 
                         })
                         .catch(error => {
                             console.error('Error fetching Polygon price from CoinCap:', error);
-                            // Handle further error handling or fallback mechanisms as needed
-                            element.textContent = 'error'; // Display error message on the element
+                            element.textContent = 'error'; 
                         });      
                 }
 
             });
     }
-
-    // Initial fetch of Bitcoin price
     fetchBTCPrice();
-
-    // Set interval to fetch Bitcoin price every 3 minutes (for testing)
     setInterval(fetchBTCPrice, retryInterval);
 }
 
 export async function getShibaInuPrice(element) {
-    let retryCount = 0; // Track the number of retries
-    const maxRetries = 2; // Maximum number of retries
-    const retryInterval = 180000; // Interval between retries in milliseconds (3 minutes)
+    let retryCount = 0; 
+    const maxRetries = 2;
+    const retryInterval = 180000; 
 
     function fetchShibaInuPrice() {
-        // Make an API request to fetch Shiba Inu price from CoinGecko
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd')
             .then(response => {
                 if (!response.ok) {
@@ -4629,36 +4418,29 @@ export async function getShibaInuPrice(element) {
                 return response.json();
             })
             .then(data => {
-                // Extract Shiba Inu price from the response
                 const shibaInuPrice = data['shiba-inu'].usd;
-                element.textContent = '$' +  '  ' +  shibaInuPrice.toFixed(6); // Display the price on the element
-                retryCount = 0; // Reset retry count upon successful fetch
+                element.textContent = '$' +  '  ' +  shibaInuPrice.toFixed(6);
+                retryCount = 0; 
+                shibaInuPriceInUSD = element.textContent;
             })
             .catch(error => {
                 console.error('Error fetching Shiba Inu price:', error);
-                // Retry fetching the data if maximum retries haven't been reached
-                // If error is due to internet connection, display "error"
                 element.textContent = 'error';
                 if (retryCount < maxRetries) {
                     retryCount++;
-                    setTimeout(fetchShibaInuPrice, retryInterval); // Retry after the specified interval
+                    setTimeout(fetchShibaInuPrice, retryInterval); 
                 }
             });
     }
-
-    // Initial fetch of Shiba Inu price
     fetchShibaInuPrice();
-
-    // Set interval to fetch Shiba Inu price every 3 minutes (for testing)
     setInterval(fetchShibaInuPrice, retryInterval);
 }
 export async function getDogecoinPrice(element) {
-    let retryCount = 0; // Track the number of retries
-    const maxRetries = 2; // Maximum number of retries
-    const retryInterval = 180000; // Interval between retries in milliseconds (3 minutes)
+    let retryCount = 0; 
+    const maxRetries = 2; 
+    const retryInterval = 180000;
 
     function fetchDogecoinPrice() {
-        // Make an API request to fetch Dogecoin price from CoinGecko
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=dogecoin&vs_currencies=usd')
             .then(response => {
                 if (!response.ok) {
@@ -4667,22 +4449,18 @@ export async function getDogecoinPrice(element) {
                 return response.json();
             })
             .then(data => {
-                // Extract Dogecoin price from the response
                 const dogecoinPrice = data.dogecoin.usd;
-                element.textContent = '$' + '  ' +  dogecoinPrice.toFixed(5); // Display the price on the element
-                retryCount = 0; // Reset retry count upon successful fetch
+                element.textContent = '$' + '  ' +  dogecoinPrice.toFixed(5); 
+                retryCount = 0;
             })
             .catch(error => {
                 console.error('Error fetching Dogecoin price from CoinGecko:', error);
-                // Retry fetching the data if maximum retries haven't been reached
-                // if error is internet connection then put no connection
                 element.textContent = 'error';
 
                 if (retryCount < maxRetries) {
                     retryCount++;
-                     setTimeout(fetchDogecoinPrice, retryInterval); // Retry after the specified interval
+                     setTimeout(fetchDogecoinPrice, retryInterval); 
                  }else{
-                          // Make an API request to fetch Polygon price from CoinCap
                      fetch('https://api.coincap.io/v2/assets/dogecoin')
                          .then(response => {
                              if (!response.ok) {
@@ -4691,32 +4469,26 @@ export async function getDogecoinPrice(element) {
                              return response.json();
                          })
                          .then(data => {
-                             // Extract Polygon price from the response
                              const dogeCoinPrice = parseFloat(data.data.priceUsd);
-                             element.textContent = '$' + '  ' +  dogeCoinPrice.toFixed(2); // Display the price on the element
+                             element.textContent = '$' + '  ' +  dogeCoinPrice.toFixed(2); 
                          })
                          .catch(error => {
                              console.error('Error fetching Polygon price from CoinCap:', error);
-                             // Handle further error handling or fallback mechanisms as needed
-                             element.textContent = 'error'; // Display error message on the element
+                             element.textContent = 'error'; 
                          });
                  }
             });
     }
 
-    // Initial fetch of Dogecoin price
     fetchDogecoinPrice();
-
-    // Set interval to fetch Dogecoin price every 3 minutes (for testing)
     setInterval(fetchDogecoinPrice, retryInterval);
 }
 export async function getEthereumClassicPrice(element) {
-    let retryCount = 0; // Track the number of retries
-    const maxRetries = 2; // Maximum number of retries
-    const retryInterval = 180000; // Interval between retries in milliseconds (3 minutes)
+    let retryCount = 0;
+    const maxRetries = 2; 
+    const retryInterval = 180000; 
 
     function fetchETCPrice() {
-        // Make an API request to fetch Ethereum Classic price from CoinGecko
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum-classic&vs_currencies=usd')
             .then(response => {
                 if (!response.ok) {
@@ -4725,30 +4497,25 @@ export async function getEthereumClassicPrice(element) {
                 return response.json();
             })
             .then(data => {
-                // Extract Ethereum Classic price from the response
                 const etcPrice = data['ethereum-classic'].usd;
-                element.textContent = '$' + etcPrice.toFixed(2); // Display the price on the element
-                retryCount = 0; // Reset retry count upon successful fetch
+                element.textContent = '$' + etcPrice.toFixed(2); 
+                retryCount = 0;
+                etcPriceInUSD = element.textContent;
             })
             .catch(error => {
                 console.error('Error fetching Ethereum Classic price:', error);
-                // Retry fetching the data if maximum retries haven't been reached
-                // If error is due to internet connection, display "error"
                 element.textContent = 'error';
                 if (retryCount < maxRetries) {
                     retryCount++;
-                    setTimeout(fetchETCPrice, retryInterval); // Retry after the specified interval
+                    setTimeout(fetchETCPrice, retryInterval); 
                 }else{
                     console.error('Error fetching Ethereum price from CoinGecko:', error);
-                    // Retry fetching the data if maximum retries haven't been reached
-                    // if error is internet connection then put no connection
                     element.textContent = 'error';
 
                     if (retryCount < maxRetries) {
                         retryCount++;
-                        setTimeout(fetchPolygonPrice, retryInterval); // Retry after the specified interval
+                        setTimeout(fetchPolygonPrice, retryInterval); 
                     }else{
-                             // Make an API request to fetch Polygon price from CoinCap
                         fetch('https://api.coincap.io/v2/assets/ethereum-classic')
                             .then(response => {
                                 if (!response.ok) {
@@ -4757,34 +4524,28 @@ export async function getEthereumClassicPrice(element) {
                                 return response.json();
                             })
                             .then(data => {
-                                // Extract Polygon price from the response
                                 const etcPrice = parseFloat(data.data.priceUsd);
-                                element.textContent = '$' + etcPrice.toFixed(2); // Display the price on the element
+                                element.textContent = '$' + etcPrice.toFixed(2); 
                             })
                             .catch(error => {
                                 console.error('Error fetching Polygon price from CoinCap:', error);
-                                // Handle further error handling or fallback mechanisms as needed
-                                element.textContent = 'error'; // Display error message on the element
+                                element.textContent = 'error'; 
                             });
                     }
                 }
             });
     }
 
-    // Initial fetch of Ethereum Classic price
     fetchETCPrice();
-
-    // Set interval to fetch Ethereum Classic price every 3 minutes (for testing)
     setInterval(fetchETCPrice, retryInterval);
 }
 
 export async function getPolygonPrice(element) {
-    let retryCount = 0; // Track the number of retries
-    const maxRetries = 3; // Maximum number of retries
-    const retryInterval = 90000; // Interval between retries in milliseconds (3 minutes)
+    let retryCount = 0; 
+    const maxRetries = 3; 
+    const retryInterval = 90000; 
 
     function fetchPolygonPrice() {
-        // Make an API request to fetch Polygon price from CoinGecko
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=polygon&vs_currencies=usd')
             .then(response => {
                 if (!response.ok) {
@@ -4793,22 +4554,18 @@ export async function getPolygonPrice(element) {
                 return response.json();
             })
             .then(data => {
-                // Extract Polygon price from the response
                 const polygonPrice = data.polygon.usd;
-                element.textContent = '$' + polygonPrice.toFixed(2); // Display the price on the element
-                retryCount = 0; // Reset retry count upon successful fetch
+                element.textContent = '$' + polygonPrice.toFixed(2); 
+                retryCount = 0; 
             })
             .catch(error => {
                 console.error('Error fetching Polygon price from CoinGecko:', error);
-                // Retry fetching the data if maximum retries haven't been reached
-                // if error is internet connection then put no connection
                 element.textContent = 'error';
 
                 if (retryCount < maxRetries) {
                     retryCount++;
-                    setTimeout(fetchPolygonPrice, retryInterval); // Retry after the specified interval
+                    setTimeout(fetchPolygonPrice, retryInterval); 
                 }else{
-                         // Make an API request to fetch Polygon price from CoinCap
                     fetch('https://api.coincap.io/v2/assets/polygon')
                         .then(response => {
                             if (!response.ok) {
@@ -4817,64 +4574,46 @@ export async function getPolygonPrice(element) {
                             return response.json();
                         })
                         .then(data => {
-                            // Extract Polygon price from the response
                             const polygonPrice = parseFloat(data.data.priceUsd);
-                            element.textContent = '$' + polygonPrice.toFixed(2); // Display the price on the element
+                            element.textContent = '$' + polygonPrice.toFixed(2);
+                            polygonPriceInUSD = element.textContent;
                         })
                         .catch(error => {
                             console.error('Error fetching Polygon price from CoinCap:', error);
-                            // Handle further error handling or fallback mechanisms as needed
-                            element.textContent = 'error'; // Display error message on the element
+                            element.textContent = 'error'; 
                         });
                 }
             });
     }
 
-    // Initial fetch of Polygon price
     fetchPolygonPrice();
-
-    // Set interval to fetch Polygon price every 3 minutes
     setInterval(fetchPolygonPrice, retryInterval); 
 }
 
 export function handleResize() {
-    //grab current size and check if less than 921 
     if (window.innerWidth < 921 && window.innerWidth >= 675) {
         console.log("Window width = ", window.innerWidth);
         console.log("if 3 rows arent already present, then call with 3 elements");
-        // Select the div element
         const gridDiv = document.querySelector('div[style*="grid-template-columns"]');
-
         if (gridDiv) {
-            // Get the value of grid-template-columns
             const gridColumnValue = gridDiv.style.gridTemplateColumns;
-            
-            // Check if the value contains "repeat(4,"
             if (gridColumnValue.includes("repeat(4,")) {
                 console.log("The grid needs to be updated to 3.");
-                // grab current grid and remove it
-                // remove grid and call with 3 items instead
-                // make build grid function so we dont have to remove the header and recall the main function 
-                // build smaller function inside paintGrid() to call it will be faster
+
             } else {
                 console.log("The grid has already been updated do nothing.");
             }
         } else {
             console.log("No div element found with grid-template-columns property.");
         }
-        //myfunctions.mmakePaintingPage(mypaintingsArray, document.body, 3);
+
     }else if(window.innerWidth < 675 && window.innerWidth >= 300){
         console.log("remove the grid elements and refire with 2 items");
         console.log("Window width = ", window.innerWidth);
         console.log("if 3 rows arent already present, then call with 3 elements");
-        // Select the div element
         const gridDiv = document.querySelector('div[style*="grid-template-columns"]');
-
         if (gridDiv) {
-            // Get the value of grid-template-columns
             const gridColumnValue = gridDiv.style.gridTemplateColumns;
-            
-            // Check if the value contains "repeat(4,"
             if (gridColumnValue.includes("repeat(3,")) {
                 console.log("The grid needs to be updated to 2.");
             } else {
@@ -4883,13 +4622,10 @@ export function handleResize() {
         } else {
             console.log("No div element found with grid-template-columns property.");
         }
-        //myfunctions.makePaintingPage(mypaintingsArray, document.body, 3);
     }
-    // Attach event listener for window resize
     window.addEventListener('resize', handleResize);
 }
 
-// Function to fetch the Ethereum price in USD from CoinGecko API
 async function fetchEthereumPrice() {
     try {
         const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
@@ -4905,25 +4641,22 @@ async function fetchEthereumPrice() {
 }
 
 function addBuyButton(parentDiv, availabe, buttonClassName) {
-    // Create buy-button div
     var buyButton = document.createElement("div");
     buyButton.className =  'buy-button' + buttonClassName;
     buyButton.style.position = "fixed";
     buyButton.style.width = "100%";
     buyButton.style.height = "11.8%";
-    buyButton.style.bottom = "0";
+    buyButton.style.bottom = "0%";
     buyButton.style.backgroundColor = "lightgrey";
     buyButton.style.display = "flex";
     buyButton.style.alignItems = "center";
     buyButton.style.justifyContent = "center";
-    //buyButton.style.borderTopLeftRadius = '2vh'; // Adjust border radius at the top left corner
-    //buyButton.style.borderTopRightRadius = '2vh'; // Adjust border radius at the top right corner
     buyButton.style.backgroundColor = 'lightgray';
-    buyButton.style.border = "0.1vh solid black"; // Add border
+    buyButton.style.border = "0.1vh solid black"; 
+    buyButton.style.borderTopLeftRadius = '0.4vh';
+    buyButton.style.borderTopRightRadius = '0.4vh';
     buyButton.style.fontSize = '1.8vh';
-    // add class ID equivelennt to ID in DB 
 
-    // Create text node for "purchase"
     if(availabe){
         var buttonText = document.createTextNode("Purchase");
     }else{
@@ -4932,7 +4665,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
    
     buyButton.appendChild(buttonText);
 
-    // Add buy-button div to parent div
     parentDiv.appendChild(buyButton);
     let currentname; 
     for(const painting of currentPaintingArray){
@@ -4962,29 +4694,45 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                 formContainer.style.overflow = 'hidden';
                 formContainer.style.zIndex = '100000';
                 formContainer.id = parentDiv.id;
-                // Create the form
+
+                let offsetX, offsetY;
+                let isDragging = false;
+                formContainer.addEventListener("mousedown", function (event) {
+                    isDragging = true;
+                    offsetX = event.clientX - parseFloat(window.getComputedStyle(formContainer).left);
+                    offsetY = event.clientY - parseFloat(window.getComputedStyle(formContainer).top);
+                });
+
+                document.addEventListener("mousemove", function (event) {
+                    if (isDragging) {
+                        formContainer.style.left = (event.clientX - offsetX) + "px";
+                        formContainer.style.top = (event.clientY - offsetY) + "px";
+                    }
+                });
+
+                document.addEventListener("mouseup", function () {
+                    isDragging = false;
+                    formContainer.style.cursor = "grab";
+                });
+
                 const form = document.createElement("form");
                 form.className = "purchase-form";
-                // reset id to painting name below 
-                // Apply styles to form
                 form.style.display = "flex";
-                form.style.flexDirection = "column"; // Align inputs vertically
-                form.style.alignItems = "center"; // Center inputs horizontally
-                form.style.gap = "2px"; // Add space between inputs
+                form.style.flexDirection = "column"; 
+                form.style.alignItems = "center"; 
+                form.style.gap = "2px"; 
                 form.style.width = "100%";
                 form.style.height = '80%';
                 form.style.top = '10%';
                 form.style.position = 'absolute';
 
-                // Create the title div
                 const titleDiv = document.createElement("div");
                 titleDiv.className = "title";
-                titleDiv.innerText = "Purchase" + "  " + " " + currentname;// put name here 
+                titleDiv.innerText = "Purchase" + "  " + " " + currentname;
                 titleDiv.style.fontWeight = "bold";
                 titleDiv.style.textAlign = "center";
                 titleDiv.style.fontSize = '2vh';
 
-                // Create the inputs
                 const emailInput = document.createElement("input");
                 emailInput.setAttribute("type", "email");
                 emailInput.setAttribute("placeholder", "Email");
@@ -5023,7 +4771,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                 lastNameInput.style.position = 'absolute';
                 lastNameInput.style.top = '70%';
 
-                // Create the submit button
                 const submitButton = document.createElement("div");
                 submitButton.className = "submit-button";
                 submitButton.innerText = "Submit";
@@ -5084,7 +4831,7 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                             if (firstChecker.canUserAttemptPurchase) {
                                 console.log('server said it is okay to send transaction');
                     /*
-                                // comment 4970 and uncomment 5004 when sending real purchase
+                                // comment 4781--4978 and uncomment 4745-4778 when sending fake purchase
                                 fetch('/UpdateDB', {
                                     method: 'POST',
                                     headers: {
@@ -5125,10 +4872,7 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                     if(transactionInProgress){
 
                                     }else{
-                                        // to to make loading icon inside and remove if successful or bad input 
-                                        // can make after validateUserInfo
-                                        // need to restrict fecthes on server side 
-                                        const checkMyInfo = await validateUserInfo(data.email, data.address, data.firstName, data.lastName);
+                                        const checkMyInfo = await validateUserInatfo(da.email, data.address, data.firstName, data.lastName);
                                         console.log('checkMyInfo() returns', checkMyInfo);
 
                                         if(checkMyInfo.verified){   
@@ -5147,66 +4891,51 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                 loadingContainer.style.justifyContent = "center";
                                                 loadingContainer.style.alignItems = "center";
                                                 loadingContainer.style.backgroundColor = "none"; 
-
-                                                    // Create and add the loading icon (GIF)
                                                 const loadingIcon = document.createElement("img");
                                                 loadingIcon.setAttribute("class", "loading-gif");
-                                                loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); // Replace 'path/to/your/loading.gif' with the actual path to your GIF file
-                                                loadingIcon.setAttribute("alt", "Loading..."); // Provide an alternative text for accessibility
-                                                loadingIcon.style.width = "50%"; // Adjust the width as needed
-                                                loadingIcon.style.height = "50%"; // Adjust the width as needed
-                                                // Append the loading icon to the loading container
-                                                loadingContainer.appendChild(loadingIcon);
+                                                loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif");
+                                                loadingIcon.setAttribute("alt", "Loading..."); 
+                                                loadingIcon.style.width = "50%"; 
+                                                loadingIcon.style.height = "50%"; 
 
-                                                // Append the loading container to the form container
+                                                loadingContainer.appendChild(loadingIcon);
                                                 formContainer.appendChild(loadingContainer);
 
                                                 try{
-                                                    const amountToSendString = parentDiv.className.replace("grid-item", ""); // Removes "grid-item" from the string
+                                                    const amountToSendString = parentDiv.className.replace("grid-item", ""); 
                                                     const amountToSendFloat = parseFloat(amountToSendString);
-
                                                     const conversionFactor = calculateConversionFactor(amountToSendFloat);
-
                                                     console.log('the conversion factor is', conversionFactor);
-                                                    // try to find this one if it fails use the other function 
 
                                                     if(conversionFactor != null){
-                                                        // Request account access if needed
                                                         transactionInProgress = true;
                                                         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                                                         const userWallet = accounts[0];
                                                         const recipientWallet = RoysWallet; 
                                                         const weiParameter = amountToSendFloat*conversionFactor;
-                                                        const desiredDecimalPlaces = 7; // Variable for desired decimal places
-
-                                                        // Convert to string to count decimal places
+                                                        const desiredDecimalPlaces = 7; 
                                                         let weiParameterStr = weiParameter.toString();
                                                         let decimalIndex = weiParameterStr.indexOf('.');
 
                                                         if (decimalIndex !== -1) {
                                                           let decimalPlaces = weiParameterStr.length - decimalIndex - 1;
-
                                                           if (decimalPlaces > desiredDecimalPlaces) {
-                                                            // Limit to 6 decimal places
                                                             weiParameterStr = weiParameterStr.slice(0, decimalIndex + desiredDecimalPlaces + 1);
                                                           }
                                                         }
 
-                                                        // Convert back to number
                                                         const finalWeiParameter = parseFloat(weiParameterStr);
 
-                                                        const amountInWei = web3.utils.toWei(finalWeiParameter.toString(), 'ether') // Convert amount to wei
-                                                        // Construct the transaction object
+                                                        const amountInWei = web3.utils.toWei(finalWeiParameter.toString(), 'ether');
 
                                                         const transactionObject = {
-                                                            from: userWallet, // deprecated in firefox window.ethereum.selectedAddress,
+                                                            from: userWallet, 
                                                             to: recipientWallet,
                                                             value: amountInWei
                                                         };
                                                         console.log('trying to send', amountToSendFloat);
                                                         console.log('in WEI', amountInWei);
 
-                                                        // Send the transaction using MetaMask
                                                         const response = await window.ethereum.request({
                                                             method: 'eth_sendTransaction',
                                                             params: [transactionObject]
@@ -5218,7 +4947,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                             console.log(response.result);
                                                             console.log('User accepeted the transaction send the hash over to check on server');
 
-                                                            // Prepare data to send to the server
                                                             const data = {
                                                                 transactionHash: response.result,
                                                                 objectId: parentDiv.id
@@ -5234,7 +4962,7 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                                 .then(response => {
 
                                                                     if (response.ok) {
-                                                                        return response.json(); // Return the promise returned by response.json()
+                                                                        return response.json(); 
                                                                     } else {
                                                                         return Promise.reject('Failed to update database');
                                                                     }
@@ -5256,15 +4984,12 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                                     transactionInProgress = false;
                                                                     console.error('Error updating database:', error);
                                                                     formContainer.removeChild(loadingContainer);
-                                                                    // Handle the error, notify user accordingly
                                                                 });
                                                         }else{
                                                             submitButtonIsClicked = false;
                                                             transactionInProgress = false;
                                                             console.log('an unexpected error occured');
                                                         }
-
-                                                        //console.log('Transaction sent successfully!');
                                                         submitButtonIsClicked = false;
                                                     }else{
                                                         submitButtonIsClicked = false;
@@ -5289,7 +5014,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                             if (updateResponse.ok) {
                                                                 const serverMessage = await updateResponse.json();
                                                                 if(serverMessage.success == true){
-                                                                   // added a value but dont warn the user
                                                                    console.log('server message came back true and we updated the atemptedClient array');
                                                                 }else{
                                                                     console.log('we could not update the values. Server response false');
@@ -5301,9 +5025,7 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                             }catch(error){
                                                                 console.log('there was an error sending update fecth ',error);
                                                             }
-
                                                         }
-                                                    // Handle errors, such as insufficient balance or user rejection
                                                 }
                                                 console.log('User wallet:', userWallet);
                                                 console.log('User trying to send', amountToSendFloat)
@@ -5333,7 +5055,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                              console.log('there is an error we are getting Null for checkMyInfo() function');
                                         }else{
                                             console.log('an unepexected error occured');
-                                            // should never be called if code runs correctly 
                                         }
                                     }
 
@@ -5352,17 +5073,13 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                     console.log('Server says client is already trying to get the same painting. Please try again in 30 seconds.');
                                     warningTransactionPresent();
                                 }else if (firstChecker.code == 232585511 ) {
-                                    //alert('maximum number of attempts have been processed please check back in 48 hours');
                                     warningMaxTransactionProcessed();
                                 }else if (firstChecker.code == 232111119 ) {
-                                    //alert('maximum number of attempts have been processed please check back in 48 hours');
                                     console.log('Item is out of Stock');
                                 }else if (firstChecker.code == 6477665555) {
-                                    //alert('maximum number of attempts have been processed please check back in 48 hours');
                                     console.log('Cannot Find item in Db maybe the server is down');
                                 }                                
                                 submitButtonIsClicked = false;
-                                // send back error code
                             }
                         })
                         .catch(error => {
@@ -5373,42 +5090,37 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                     }                
                     
                 }); 
-                    // Create the cancel button
                     const cancelButton = document.createElement("div");
                     cancelButton.className = "cancelEmail-button";
                     cancelButton.innerText = "X";
                     cancelButton.style.cursor = "pointer";
-                    cancelButton.style.position = "absolute"; // Change position to absolute
+                    cancelButton.style.position = "absolute"; 
                     cancelButton.style.top = "0";
                     cancelButton.style.right = "0";
-                    cancelButton.style.width = "8vh"; // Adjust width as needed
-                    cancelButton.style.height = "10vh"; // Adjust height as needed
-                    cancelButton.style.backgroundColor = "none"; // Add red background color
-                    cancelButton.style.fontSize = "2vh"; // Adjust font size as needed
-                    cancelButton.style.display = "flex"; // Use flexbox
-                    cancelButton.style.justifyContent = "center"; // Center content horizontally
-                    cancelButton.style.alignItems = "center"; // Center content vertically
+                    cancelButton.style.width = "8vh"; 
+                    cancelButton.style.height = "10vh"; 
+                    cancelButton.style.backgroundColor = "none"; 
+                    cancelButton.style.fontSize = "2vh"; 
+                    cancelButton.style.display = "flex"; 
+                    cancelButton.style.justifyContent = "center"; 
+                    cancelButton.style.alignItems = "center";
 
-                    // Add event listener to cancel button
                     cancelButton.addEventListener("click", function() {
-                        // Remove the form from the document
                         document.body.removeChild(formContainer);
                         currentlyTryingToBuy = false;
                     });
 
-                    // Append elements to the form
+
                     form.appendChild(emailInput);
                     form.appendChild(addressInput);
                     form.appendChild(firstNameInput);
                     form.appendChild(lastNameInput);
                     form.appendChild(submitButton);
 
-                    // Append form elements to form container
                     formContainer.appendChild(titleDiv);
                     formContainer.appendChild(form);
                     formContainer.appendChild(cancelButton);
 
-                    // Append form container to document body
                     document.body.appendChild(formContainer);
             }else{
                 if(!isConnected){
@@ -5424,12 +5136,9 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
         });
     }else{
          console.log('painting not availabe');
-       
-        // prompt user the it is not avialable
     }
 }
 function  warningMaxTransactionProcessed(){
-        // Create modal elements
     var modal = document.createElement('div');
     modal.id = 'myModal';
     modal.classList.add('modal');
@@ -5442,17 +5151,14 @@ function  warningMaxTransactionProcessed(){
     closeDiv.textContent =  "X";
     closeDiv.style.fontSize = '2vh';
 
-
     var messageParagraph = document.createElement('p');
     messageParagraph.textContent = 'You have reached the maximum number of purchase attempts. Please try again in a few hours';
 
-    // Append elements
     modalContent.appendChild(closeDiv);
     modalContent.appendChild(messageParagraph);
     modal.appendChild(modalContent);
     document.body.appendChild(modal);
 
-    // Apply CSS
     modal.style.display = 'block';
     modal.style.position = 'fixed';
     modal.style.left = '50%';
@@ -5480,13 +5186,11 @@ function  warningMaxTransactionProcessed(){
     closeDiv.style.cursor = 'pointer';
 
     closeDiv.addEventListener('click', function() {
-        // Remove the modal from the document
         modal.parentNode.removeChild(modal);
     });
 
 }
 function warningTransactionPresent() {
-    // Create modal elements
     var modal = document.createElement('div');
     modal.id = 'myModal';
     modal.classList.add('modal');
@@ -5499,17 +5203,14 @@ function warningTransactionPresent() {
     closeDiv.textContent =  "X";
     closeDiv.style.fontSize = '2vh';
 
-
     var messageParagraph = document.createElement('p');
     messageParagraph.textContent = 'A client is already trying to purchase the same painting. Please try again in 30 seconds. If the transaction fails or the user doesn\'t execute their MetaMask request, we will reset the value for you.';
 
-    // Append elements
     modalContent.appendChild(closeDiv);
     modalContent.appendChild(messageParagraph);
     modal.appendChild(modalContent);
     document.body.appendChild(modal);
 
-    // Apply CSS
     modal.style.display = 'block';
     modal.style.position = 'fixed';
     modal.style.left = '50%';
@@ -5537,63 +5238,53 @@ function warningTransactionPresent() {
     closeDiv.style.cursor = 'pointer';
 
     closeDiv.addEventListener('click', function() {
-        // Remove the modal from the document
         modal.parentNode.removeChild(modal);
     });
 
 }
 
 
-function writeToParentDivWithDelay(text, parentDiv, delay) {
-
+function writeToParentDivWithDelay(text, parentDiv, delay, thisIndex) {
     const repsonseContainer = document.createElement('div');
-    repsonseContainer.style.height = 'auto';
+    repsonseContainer.style.height = '600px';
     repsonseContainer.style.width = '100%';
-    //repsonseContainer.style.position = 'absolute';
     repsonseContainer.style.opacity = '0.73';
     repsonseContainer.style.borderBottom = '0.2vh solid lightgrey';
-    //repsonseContainer.style.boxSizing = 'border-box';
     repsonseContainer.style.overflowY = 'scroll';
     repsonseContainer.style.marginBottom = '40px';
 
     parentDiv.appendChild(repsonseContainer);
 
     let index = 0;
+    let newText = `Response ${thisIndex+1}:` + " \n " +  text; 
     const intervalId = setInterval(() => {
-        if (index < text.length) {
-            repsonseContainer.textContent += text[index];
+        if (index < newText.length) {
+            repsonseContainer.textContent += newText[index];
             index++;
         } else {
-            clearInterval(intervalId); // Stop the interval when all characters are appended
+            clearInterval(intervalId); 
         }
     }, delay);
 
 }
 
-// Define getResponse as an asynchronous function
 async function getResponse(question) {
-    // Simulate an asynchronous operation that takes time
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate 2 seconds delay
-
-    // Convert the question to lowercase for case-insensitive matching
+    await new Promise(resolve => setTimeout(resolve, 2000)); 
     const lowercaseQuestion = question.toLowerCase();
 
     try{
         const response = await fetch('/AI-event', {
-            method: 'POST', // or 'GET' depending on your server setup
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ question: lowercaseQuestion })
         });
 
-            // Check if the response is successful
-
             if (!response.ok) {
                 console.log('response is not okay');
                 return null;
             }else{
-                // Parse the JSON response
                 console.log('trying to return data we got from server');
                 const data = await response.json();
                 return data;  
@@ -5659,12 +5350,9 @@ export async function getMessageHistory() {
 
 
 function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, price, productImageBase64, ProductName) {
-    // Remove all children elements of the form container
     while (formContainer.firstChild) {
         formContainer.removeChild(formContainer.firstChild);
     }
-
-    // Create the container
     const container = document.createElement('div');
     container.className = 'container';
     container.style.width = '100%';
@@ -5675,14 +5363,13 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
     container.style.padding = '20px';
     container.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
     container.style.overflow = 'hidden';
-    container.style.position = 'relative'; // Position relative for children positioning
+    container.style.position = 'relative'; 
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.justifyContent = 'center';
     container.style.alignItems = 'center';
     container.style.backgroundColor = 'lightgray';
 
-        // Add header with Burson-Skull image
     const header = document.createElement('div');
     header.className = 'header';
     header.style.position = 'absolute';
@@ -5693,7 +5380,7 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
     header.style.borderRadius = '5px 5px 0 0';
     header.style.marginBottom = '2px';
     header.style.backgroundImage = 'url("images/BursonSKullText.png")';
-    header.style.backgroundSize = 'cover'; // Optional: Adjust the size of the background image
+    header.style.backgroundSize = 'cover';
     header.style.backgroundRepeat = 'no-repeat';
     header.style.backgroundPosition = 'center'; 
     header.style.marginBottom = '5px';
@@ -5717,27 +5404,25 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
     exitPurchaseButton.style.borderRadius = '5px 5px 0 0';
     exitPurchaseButton.style.marginBottom = '0px';
     exitPurchaseButton.style.backgroundColor = 'none';
-    exitPurchaseButton.textContent = '❌'; // X emoji
-    exitPurchaseButton.style.fontSize = '2vh'; // Adjust font size
-    exitPurchaseButton.style.border = 'none'; // Remove border for a cleaner look
-    exitPurchaseButton.style.cursor = 'pointer'; // Change cursor to pointer on hover
+    exitPurchaseButton.textContent = '❌'; 
+    exitPurchaseButton.style.fontSize = '2vh'; 
+    exitPurchaseButton.style.border = 'none'; 
+    exitPurchaseButton.style.cursor = 'pointer'; 
 
     exitPurchaseButton.addEventListener('click', function() {
         console.log('trying to remove form');
         formContainer.remove();
     });
 
-  // Add centered container with background image
     const centeredDiv = document.createElement('div');
     centeredDiv.style.backgroundImage = `url(${productImageBase64})`;
-    centeredDiv.style.backgroundSize = 'cover'; // Optional: Adjust the size of the background image
-    //imageContainer.style.backgroundSize = 'cover';
+    centeredDiv.style.backgroundSize = 'cover'; 
     centeredDiv.style.width = '14vh';
     centeredDiv.style.height = '14vh';
     centeredDiv.style.borderRadius = '5px';
-    centeredDiv.style.zIndex = '1'; // Ensure it's above other elements
-    centeredDiv.style.position = 'absolute'; // Position relative for children positioning
-    centeredDiv.style.top = '10%'; // Adjust position as needed
+    centeredDiv.style.zIndex = '1';
+    centeredDiv.style.position = 'absolute'; 
+    centeredDiv.style.top = '10%'; 
     centeredDiv.style.left = '28%';
     centeredDiv.style.marginBottom = '2px';
     centeredDiv.style.backgroundRepeat = 'no-repeat';
@@ -5747,23 +5432,20 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
     centeredDiv.style.borderRadius = '5px';
     container.appendChild(centeredDiv);
 
-    // Add message
     const message = document.createElement('div');
     message.className = 'message';
-    message.style.position = 'absolute'; // Position relative for children positioning
+    message.style.position = 'absolute';
     message.style.fontSize = '1.8vh';
     message.style.width = '75%';
-    message.style.marginTop = '10px'; // Adjust margin to separate from the image
+    message.style.marginTop = '10px'; 
     message.style.textAlign = 'left';
     message.style.backgroundColor = 'none';
-    //message.style.height = '4%';
     message.style.bottom = '0%';
     message.style.top = '37%';
     message.style.left = '12.5%';
     message.style.height = '60%';
     message.style.overflow = 'scroll';
 
-    // Add scrollbar track styling
     message.style.cssText += `
         scrollbar-width: thin; /* For Firefox */
         scrollbar-color: transparent transparent; /* For Firefox */
@@ -5792,80 +5474,58 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
 
 
 function makeNewGrid(array, grid){
-    console.log('trying to make new grid!');
         array.forEach(item => {
-        // if viewport is computer fix heigh 
-        // otherwise set to relative
         var gridItem = document.createElement('div');
-        gridItem.classList.add('grid-item'+item.price.$numberDecimal.toString());// set class 
-        gridItem.setAttribute('id', item._id);// set ID
-        gridItem.textContent = item; // Set the content of the grid item
-        gridItem.style.position = 'relative'; // Position relative for absolute positioning of overlay
+        gridItem.classList.add('grid-item'+item.price.$numberDecimal.toString());
+        gridItem.setAttribute('id', item._id);
+        gridItem.textContent = item; 
+        gridItem.style.position = 'relative';
 
-        // Apply styles for grid item
-        gridItem.style.backgroundColor = '#aaaaaa'; // Set background color for grid item
+        gridItem.style.backgroundColor = '#aaaaaa'; 
         gridItem.style.width = '95%'; 
         gridItem.style.left = '2.5%'; 
-        gridItem.style.height = '94%'; // Set height of grid item to fill the container
+        gridItem.style.height = '94%'; 
         gridItem.style.top = '3%';
         gridItem.style.display = 'flex';
         gridItem.style.justifyContent = 'center';
         gridItem.style.alignItems = 'center';
-        gridItem.style.setProperty('border-radius', '10px', 'important'); // Round corners
-        //gridItem.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)'; /* Adding shadow */
-        gridItem.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; /* Adjust values for your shadow */
+        gridItem.style.setProperty('border-radius', '10px', 'important');
+        gridItem.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)';
         removeString(gridItem, "[object Object]");
-        //removeString(gridItem, " ");
-        // need to resize image before uplaoding
-        //gridItem.style.backgroundImage = 'url("/images/napolean.jpg")';// convert to 600x500 pixels
-        gridItem.style.backgroundImage = `url("${item.image}")`;// convert to 600x500 pixels
-        gridItem.style.backgroundSize = 'cover'; // Optional: Adjust the size of the background image
+        gridItem.style.backgroundImage = `url("${item.image}")`;
+        gridItem.style.backgroundSize = 'cover'; 
         gridItem.style.backgroundRepeat = 'no-repeat';
         gridItem.style.backgroundPosition = 'center'; 
-        gridItem.style.backgroundSize = '90% 100%'; // Decreases the width of the background image to 80% of its original size
-        // Set height of the grid item
-        //gridItem.style.height = '25vh';
+        gridItem.style.backgroundSize = '90% 100%'; 
 
-        //parentElement.style.backgroundColor = 'dimgray';
-        //parentElement.style.backgroundImage = 'url(/images/metalback2.png)';
-        //parentElement.style.backgroundSize = 'cover'; 
-
-        // Create a transparent overlay 
         var overlay = document.createElement('div');
         overlay.classList.add('overlay');
-        // Style the overlay
         overlay.style.position = 'absolute';
         overlay.style.width = '100%';
         overlay.style.height = '100%';
         overlay.style.top = 0;
         overlay.style.left = 0;
-        overlay.style.setProperty('border-radius', '10px', 'important'); // Round corners
-        overlay.style.backgroundColor = 'dimgray'; // Semi-transparent blue background
-        overlay.style.display = 'none'; // Initially hide the overlay
-        overlay.style.flexDirection = 'column'; // Stack buttons vertically
-        overlay.style.justifyContent = 'flex-end'; // Align buttons to the bottom
+        overlay.style.setProperty('border-radius', '10px', 'important');
+        overlay.style.backgroundColor = 'dimgray'; 
+        overlay.style.display = 'none';
+        overlay.style.flexDirection = 'column'; 
+        overlay.style.justifyContent = 'flex-end'; 
         overlay.style.opacity = '.6';
-
-        // add back button to header and reload main website url when clicked
 
         gridItem.addEventListener('mouseenter', async function() {
 
             gridItem.style.transform = 'translateY(-5px)';
-            // Show the overlay on hover
             overlay.style.display = 'flex';
-
-            // get inStock from currentPaintingArray
             var checkIfInStock = null;
             for(const myObj of currentPaintingArray){
                 if(myObj._id == gridItem.id){
                     checkIfInStock = myObj.inStock;
                 }else{
-                    //checkIfInStock = false;   
+
                 }
             }
 
             addBuyButton(gridItem, checkIfInStock, gridItem.id);
-            // Create a p element for description
 
             var descriptionP = document.createElement('p');
             descriptionP.className = 'descriptionPaintingPTAG';
@@ -5879,22 +5539,13 @@ function makeNewGrid(array, grid){
 
             for(const painting of currentPaintingArray){
                 if(painting._id == gridItem.id){
-                    descriptionP.innerHTML =  'Name:' + "    " + painting.name + '<br>'  + 'Approximated Price:' + "    " + painting.price.$numberDecimal + " ETH " +   '<br> <br>' +  painting.description;
+                    descriptionP.innerHTML =  'Name:' + "    " + painting.name + '<br>'  + 'Approximate Price:' + "    " + painting.price.$numberDecimal + " ETH " + '<br>'+ " Number of Views: "+  painting.views +  '<br> <br>' +  painting.description;
                 }
             }
             overlay.appendChild(descriptionP);
 
-            // get their Ip adress and only allow 1 time person 
-            // add the gridItemnumber and ip to array called viewedPainintgs
-
-            // check if currentViewedPaintings contains {paintingId: gridItem.id}
-            // do not send if it contains it 
-
-
-            // Check if the currentViewedPaintings array contains an item with the given paintingId
             const containsPaintingId = currentViewedPaintings.some(item => item.paintingId === gridItem.id);
 
-            // If the paintingId is not already in the array, push it
             if (!containsPaintingId) {
               currentViewedPaintings.push({paintingId: gridItem.id});
                 try {
@@ -5909,7 +5560,7 @@ function makeNewGrid(array, grid){
                     if (response.ok) {
                         const serverMessage = await response.json();
                         if(serverMessage.success == true){
-                           // added a value but dont warn the user
+
                         }else{
                             console.log('we could not update the db object came back as', serverMessage);
                         }
@@ -5920,16 +5571,14 @@ function makeNewGrid(array, grid){
                     console.error('Error adding painting:', error);
                 }
             }else{
-                // user has already clicked it while on the website
+
             }
 
 
 
         });
         gridItem.addEventListener('mouseleave', function() {
-            // Restore the original position on mouse leave
             gridItem.style.transform = 'translateY(0)';
-            // Hide the overlay on mouse leave
             overlay.style.display = 'none'; 
             const buyButton = document.querySelector('.buy-button' + gridItem.id.toString());
             const descriptionP = document.querySelector('.descriptionPaintingPTAG');
@@ -5939,22 +5588,14 @@ function makeNewGrid(array, grid){
             } else {
                 console.error('Buy button not found');
             }
-            //buyButton.style.display = 'hidden';
-            //document.remove(buyButton);
-            //gridItem.removeChild(buyButton);
         });
-
-        // Append the overlay to the grid item
         gridItem.appendChild(overlay);
-
-        // Append the grid item to the grid container
         grid.appendChild(gridItem);
     });
 
 }
 
 async function organizePaintingArrayByMostRecent(array) {
-     // Sort the array by dateCreated attribute in descending order
     array.sort((a, b) =>  {
 
         const dateA = new Date(a.dateCreated);
@@ -5964,27 +5605,18 @@ async function organizePaintingArrayByMostRecent(array) {
         if (dateA < dateB) return 1;
         if (dateA > dateB) return -1;
         return 0;
-
-
     });
     return array;
 }
 
-
 async function organizePaintingArrayByOldest(array) {
-
     array.sort((a, b) => {
         const dateA = new Date(a.dateCreated);
         const dateB = new Date(b.dateCreated);
-
-
-
-        // Compare dates
         if (dateA > dateB) return 1;
         if (dateA < dateB) return -1;
         return 0;
     });
-
     return array;
 }
 
