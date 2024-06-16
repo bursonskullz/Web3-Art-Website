@@ -94,7 +94,6 @@ export async function painting_section_click(parentElement) {
                     
             } else {
                 console.error('Failed to fetch paintings the response we not okay', response.statusText);
-                // Hide the loading animation if there's an error
                 document.body.removeChild(loadingAnimation);
             }
         } catch (error) {
@@ -3703,36 +3702,9 @@ const calculateConversionFactor = (amount) => {
         return 0.0016805; 
     }else{
         return 1;
-    } // must be a integer
+    } 
 }; 
 
-
-
-/*
-const calculateConversionFactor = (amount) => {
-    // Check if the amount is a whole number
-    if (Number.isInteger(amount)) {
-        return 0.001;
-    }else{
-
-        // Get the fractional part by subtracting the integer part from the amount
-        const fractionalPart = amount - Math.floor(amount);
-        
-        console.log('the fractional part is', fractionalPart);
-        // Check if the fractional part matches any of the specified values
-        if (fractionalPart <= 0.2){
-            return 0.001 + 0.000100; // 20% the value of 0.001 because we split 5 times 
-        }else if( fractionalPart <= 0.4){
-           return 0.001 +  0.000200;
-        }else if( fractionalPart <= 0.6){
-           return 0.001 +  0.000400;
-        }else if( fractionalPart <= 0.8){
-           return 0.001 +  0.000600;
-        }
-    }
-};
-
-*/
 
 function printInfo(div) {
     var strings = [
@@ -4639,7 +4611,19 @@ async function fetchEthereumPrice() {
         return null;
     }
 }
-
+async function checkNetwork(network_name) {
+    if (network_name.toLowerCase() === "ethereum") {
+        const networkId = await web3.eth.net.getId();
+        const ethNetworkId = 1; // Ethereum Mainnet ID
+        if (networkId === ethNetworkId) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
 function addBuyButton(parentDiv, availabe, buttonClassName) {
     var buyButton = document.createElement("div");
     buyButton.className =  'buy-button' + buttonClassName;
@@ -4908,93 +4892,99 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                     console.log('the conversion factor is', conversionFactor);
 
                                                     if(conversionFactor != null){
-                                                        transactionInProgress = true;
-                                                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                                                        const userWallet = accounts[0];
-                                                        const recipientWallet = RoysWallet; 
-                                                        const weiParameter = amountToSendFloat*conversionFactor;
-                                                        const desiredDecimalPlaces = 7; 
-                                                        let weiParameterStr = weiParameter.toString();
-                                                        let decimalIndex = weiParameterStr.indexOf('.');
+                                                        const networkStatus = await checkNetwork('ethereum'); 
+                                                        if(networkStatus){
+                                                            console.log('its okay to send transaction we are on the correct network');
+                                                            transactionInProgress = true;
+                                                            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                                                            const userWallet = accounts[0];
+                                                            const recipientWallet = RoysWallet; 
+                                                            const weiParameter = amountToSendFloat*conversionFactor;
+                                                            const desiredDecimalPlaces = 7; 
+                                                            let weiParameterStr = weiParameter.toString();
+                                                            let decimalIndex = weiParameterStr.indexOf('.');
 
-                                                        if (decimalIndex !== -1) {
-                                                          let decimalPlaces = weiParameterStr.length - decimalIndex - 1;
-                                                          if (decimalPlaces > desiredDecimalPlaces) {
-                                                            weiParameterStr = weiParameterStr.slice(0, decimalIndex + desiredDecimalPlaces + 1);
-                                                          }
-                                                        }
+                                                            if (decimalIndex !== -1) {
+                                                              let decimalPlaces = weiParameterStr.length - decimalIndex - 1;
+                                                              if (decimalPlaces > desiredDecimalPlaces) {
+                                                                weiParameterStr = weiParameterStr.slice(0, decimalIndex + desiredDecimalPlaces + 1);
+                                                              }
+                                                            }
 
-                                                        const finalWeiParameter = parseFloat(weiParameterStr);
+                                                            const finalWeiParameter = parseFloat(weiParameterStr);
 
-                                                        const amountInWei = web3.utils.toWei(finalWeiParameter.toString(), 'ether');
+                                                            const amountInWei = web3.utils.toWei(finalWeiParameter.toString(), 'ether');
 
-                                                        const transactionObject = {
-                                                            from: userWallet, 
-                                                            to: recipientWallet,
-                                                            value: amountInWei
-                                                        };
-                                                        console.log('trying to send', amountToSendFloat);
-                                                        console.log('in WEI', amountInWei);
-
-                                                        const response = await window.ethereum.request({
-                                                            method: 'eth_sendTransaction',
-                                                            params: [transactionObject]
-                                                        });
-
-                                                        if(response.error){
-                                                            console.log('an error occured', response.error.message);
-                                                        }else if(response.result){
-                                                            console.log(response.result);
-                                                            console.log('User accepeted the transaction send the hash over to check on server');
-
-                                                            const data = {
-                                                                transactionHash: response.result,
-                                                                objectId: parentDiv.id
+                                                            const transactionObject = {
+                                                                from: userWallet, 
+                                                                to: recipientWallet,
+                                                                value: amountInWei
                                                             };
-                                                                console.log('data looks good on the client side lets try and send');
-                                                                fetch('/UpdateDB', {
-                                                                    method: 'POST',
-                                                                    headers: {
-                                                                        'Content-Type': 'application/json'
-                                                                    },
-                                                                    body: JSON.stringify(data)
-                                                                })
-                                                                .then(response => {
+                                                            console.log('trying to send', amountToSendFloat);
+                                                            console.log('in WEI', amountInWei);
 
-                                                                    if (response.ok) {
-                                                                        return response.json(); 
-                                                                    } else {
-                                                                        return Promise.reject('Failed to update database');
-                                                                    }
-                                                                })
-                                                                .then(checker => { 
-                                                                    submitButtonIsClicked = false;
-                                                                    transactionInProgress = false;
-                                                                    if (checker.updated == true) {
-                                                                        currentlyTryingToBuy = false;
-                                                                        purchaseSuccessPopUp(formContainer, checker.firstName, checker.lastName, checker.Id, checker.price.$numberDecimal, checker.img, checker.productName);
+                                                            const response = await window.ethereum.request({
+                                                                method: 'eth_sendTransaction',
+                                                                params: [transactionObject]
+                                                            });
 
-                                                                    } else {
-                                                                        console.log('Prompt user reason it was unable to add like bad email');
+                                                            if(response.error){
+                                                                console.log('an error occured', response.error.message);
+                                                            }else if(response.result){
+                                                                console.log(response.result);
+                                                                console.log('User accepeted the transaction send the hash over to check on server');
+
+                                                                const data = {
+                                                                    transactionHash: response.result,
+                                                                    objectId: parentDiv.id
+                                                                };
+                                                                    console.log('data looks good on the client side lets try and send');
+                                                                    fetch('/UpdateDB', {
+                                                                        method: 'POST',
+                                                                        headers: {
+                                                                            'Content-Type': 'application/json'
+                                                                        },
+                                                                        body: JSON.stringify(data)
+                                                                    })
+                                                                    .then(response => {
+
+                                                                        if (response.ok) {
+                                                                            return response.json(); 
+                                                                        } else {
+                                                                            return Promise.reject('Failed to update database');
+                                                                        }
+                                                                    })
+                                                                    .then(checker => { 
+                                                                        submitButtonIsClicked = false;
+                                                                        transactionInProgress = false;
+                                                                        if (checker.updated == true) {
+                                                                            currentlyTryingToBuy = false;
+                                                                            purchaseSuccessPopUp(formContainer, checker.firstName, checker.lastName, checker.Id, checker.price.$numberDecimal, checker.img, checker.productName);
+
+                                                                        } else {
+                                                                            console.log('Prompt user reason it was unable to add like bad email');
+                                                                            formContainer.removeChild(loadingContainer);
+                                                                        }
+                                                                    })
+                                                                    .catch(error => {
+                                                                        submitButtonIsClicked = false;
+                                                                        transactionInProgress = false;
+                                                                        console.error('Error updating database:', error);
                                                                         formContainer.removeChild(loadingContainer);
-                                                                    }
-                                                                })
-                                                                .catch(error => {
-                                                                    submitButtonIsClicked = false;
-                                                                    transactionInProgress = false;
-                                                                    console.error('Error updating database:', error);
-                                                                    formContainer.removeChild(loadingContainer);
-                                                                });
-                                                        }else{
+                                                                    });
+                                                            }else{
+                                                                submitButtonIsClicked = false;
+                                                                transactionInProgress = false;
+                                                                console.log('an unexpected error occured');
+                                                            }
                                                             submitButtonIsClicked = false;
-                                                            transactionInProgress = false;
-                                                            console.log('an unexpected error occured');
+                                                        }else{
+                                                            alert('Make sure that you switch the network to Ethereum before proceeding with a transaction');
+                                                            submitButtonIsClicked = false;
                                                         }
-                                                        submitButtonIsClicked = false;
                                                     }else{
                                                         submitButtonIsClicked = false;
                                                     }
-                                                    
                                                 } catch (error) {
                                                     submitButtonIsClicked = false;
                                                     transactionInProgress = false;
