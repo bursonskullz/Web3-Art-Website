@@ -1,16 +1,16 @@
 // Name: Roy Burson 
-// Date last modified: 06-11-24
+// Date last modified: 06-16-24
 // purpose: Make web3 art website
 
 // to do list 
 
 /*
-1) find out how to upload code to digital ocean and cost 
-2) fix AI bot (roul) by training him from dataset. He needs to be able to write code and do math and perform logic (we can use openAI as temp solution).
-3) limit fetch request to DB (need to keep track of them per IP) for certain time period (like 48 hours) this prevents clog up or build up in mongo
-4) need to set fetches to bursonskullz.com/(your-fetches maybe)
-5) start solidity contract and mint new series and extract data to interact with sol contract
+1) Fix AI bot (roul) by training him from dataset. Do not use openAI!
+2) Limit fetch request to DB.
+3) set cookie in browser to limit fetches to server maybe (need to update all cookies on changes to DB).
+4) write solidity contract to make series 2 or try to use ETC coin instead.
 */
+
 
 // local variables to server
 const maxNumberOfAIEventsPerClient = 100;
