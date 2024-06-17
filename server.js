@@ -56,7 +56,7 @@ const dbURL = 'your-mongoose-db-string';
 const googleAPIKEY = 'your-google-api-maps-key';
 const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
 const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
-const myDomain = ''; // change to undefined or yourdomain.com to prevent multiple servers calling 
+const myDomain = ''; 
 const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
 });
@@ -1909,40 +1909,30 @@ try{
 
             const io = socketIo(server);
 
-            io.on('connection', (socket) => {
-
+io.on('connection', (socket) => {
                 console.log('A user connected');
-                
                 const ipAddress = socket.handshake.address;
-
                 let clientIP;
                 if (ipAddress.includes('::ffff:')) {
                     clientIP = ipAddress.split(':').pop();
                 } else {
                     clientIP = ipAddress;
                 }
-
-                let username;
-                let attempts = 0;
-                const maxAttempts = 1000;
-                do {
+                const sender = users.find(u => u.ip == clientIP);
+                if(sender){
+                    //do nothing because we found a user
+                }else{
+                    // generate random and push to users 
                     const randomIndex = Math.floor(Math.random() * randomNames.length);
                     username = randomNames[randomIndex];
-                    attempts++;
-                } while (messageHistory.some(obj => obj.username === username && attempts < maxAttempts));
-
-                if (attempts >= maxAttempts) {
-                    username = randomNames[0];
+                    const currentUser = { 
+                        ip: clientIP, 
+                        user: username, 
+                        coolDown: 0,
+                        nameChanges: 0
+                    };
+                    users.push(currentUser);
                 }
-
-                const currentUser = { 
-                    ip: clientIP, 
-                    user: username, 
-                    coolDown: 0,
-                    nameChanges: 0
-                };
-
-                users.push(currentUser);
                 socket.on('message', (message) => {
                     const ipAddress = socket.handshake.address;
                     const timeSent = new Date().toISOString();
@@ -1968,7 +1958,7 @@ try{
                             time: timeSent, 
                             coolDown: sender.coolDown,
                             nameChanges:0 
-                        };
+                    };
                     if(!checkString(obj.msg)){
                         obj.msg = 'Your input contains inappropriate content. Please ensure your message is respectful!';
                     }
@@ -1981,7 +1971,7 @@ try{
                         console.log('Restricted user trying to send message', obj.username);
                     }
 
-                    if(messageHistory.length > 100){
+                    if(messageHistory.length > 200){
                         messageHistory.pop();
                     }
                                
@@ -2251,9 +2241,7 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
             subject: 'Tracking Number', 
             html: HTML
     };
-
     try {
-
         let result = await transporter.sendMail(mailOptions);
         console.log('Email sent');
         return result;
@@ -2271,16 +2259,11 @@ async function getNewDefinition(word) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
     const data = await response.json();
-
-    //console.log(`we recieved data for the word ${word}:`, data);
-
     if (data.length === 0) {
       console.log('No definition found.');
       return null;
     }
-
     const entry = data[0];
-
     const wordInfo = {
       word: word,
       definition1: entry.shortdef[0] ? entry.shortdef[0] : null,
@@ -2302,8 +2285,6 @@ async function getNewDefinition(word) {
   }
 }
 
-
-
 async function verifyUserinputData(email, address, firstName, lastName){
     const isEmail = checkEmailString(email);
     const isAddress = await checkAddressString(address);
@@ -2319,8 +2300,6 @@ async function verifyUserinputData(email, address, firstName, lastName){
 
     return localObjectVerifier;
 }
-
-
 async function roulsResponse(question) {
     const lowercaseQuestion = question.toLowerCase();
     const artworkPurchaseKeywords = [
@@ -3476,63 +3455,56 @@ const handleHttpRequest = async (req, res, io) => {
         }
 
     } else if(req.method == 'POST' && req.url == '/UpdateUsername'){
-
         try{
             let body = '';
-
             req.on('data', chunk => {
                 body += chunk.toString();
 
             });
-
             req.on('end', async () =>{
                 const data = JSON.parse(body);
                 const clientIP = req.connection.remoteAddress;
-
-                // check numberOfchangesvalue
                 const userIndex = users.findIndex(user => user.ip === clientIP);
-
-                if (userIndex !== -1 && users[userIndex].nameChanges <= 7 && checkString(data.newUsername) && data.newUsername.length >=3) {
-                    users[userIndex].nameChanges +=1; 
-                    const usersOldName = users[userIndex].user;
-
-                    // change all messages with old name 
-                    messageHistory.forEach(message => {
-                        if (message.username === usersOldName) {
-                            message.username = data.newUsername;
+                if(userIndex!=-1){
+                    if (users[userIndex].nameChanges <= 7 && checkString(data.newUsername) && data.newUsername.length >=3) {
+                        users[userIndex].nameChanges +=1; 
+                        const usersOldName = users[userIndex].user;
+                        // change all messages with old name 
+                        messageHistory.forEach(message => {
+                            if (message.username === usersOldName) {
+                                message.username = data.newUsername;
+                            }
+                        });
+                        users[userIndex].user = data.newUsername;
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({success: true, oldName: usersOldName, newName: users[userIndex].user})); 
+                        console.log('We found a match and reset the username to ', users[userIndex].user);
+                    } else {
+                        if(users[userIndex].nameChanges > 7){
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({success: false, code: 101}));        
+                        }else if(!checkString(data.newUsername)){
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({success: false, code: 201}));  
+                        }else if(data.newUsername.length <3){
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({success: false, code: 301}));  
+                        }else{
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({success: false, code: 401}));     
                         }
-                    });
-                    
-                    // reset the name in array
-                    // can set a timestamp of last set name
-                    // if number of changes >7 and difference between stamps is less then say 1 month 
-                    users[userIndex].user = data.newUsername;
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({success: true, oldName: usersOldName, newName: users[userIndex].user})); 
-                    console.log('We found a match and reset the username to ', users[userIndex].user);
-                } else {
-                    if(users[userIndex].nameChanges > 7){
-                        res.writeHead(200, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({success: false, code: 101}));        
-                    }else if(!checkString(data.newUsername)){
-                        res.writeHead(200, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({success: false, code: 201}));  
-                    }else if(data.newUsername.length <3){
-                        res.writeHead(200, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({success: false, code: 301}));  
-                    }else{
-                        res.writeHead(200, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({success: false, code: 401}));     
                     }
-
+                }else{
+                    // this should never fire 
+                    console.log('this console log should never print');
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({success: false, code: 501}));    
                 }
-
             });
 
         }catch(error){
-            console.log('Error with fetch request /UpdateUsername');
+            console.log('Error with fetch request /UpdateUsername', error);
         }
-
     } else if(req.method == 'POST' && req.url == '/UpdatePaintingViewsValue'){
         try{
             let body = '';
@@ -3542,9 +3514,6 @@ const handleHttpRequest = async (req, res, io) => {
             });
 
             req.on('end', async () => {           
-
-                // might need to prevenet the same person from clicking multiple times 
-                // can be added later 
                 try {
                     const data = JSON.parse(body);
                     const updaterIPAddress = req.connection.remoteAddress;
@@ -3594,19 +3563,15 @@ const handleHttpRequest = async (req, res, io) => {
         }catch(error){
             console.log('Error with fetch request /UpdatePaintingViewsValue');
         }
-        
     } else {
         try{
-            // Handle requests for serving static files
             let filePath = '.' + req.url;
             if (filePath === './') {
-                filePath = './index.html'; // change to https://www.bursonskullz.com 
+                filePath = './index.html'; 
             }
         
             const extname = path.extname(filePath);
-            let contentType = 'text/html'; // Default content type
-        
-            // Set content type based on file extension
+            let contentType = 'text/html'; 
             switch (extname) {
                 case '.js':
                     contentType = 'text/javascript';
@@ -3629,8 +3594,51 @@ const handleHttpRequest = async (req, res, io) => {
                 if (err) {
                     if (err.code === 'ENOENT') {
                         // File not found
-                        res.writeHead(404);
-                        res.end('404 Not Found we got this back');
+                        // Set the status code to 404 (Not Found)
+                        res.writeHead(404, { 'Content-Type': 'text/html' });
+
+                        // Send back a custom HTML page
+                        res.write(`
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <title>List of Endpoints</title>
+                                <style>
+                                    body {
+                                        font-family: Arial, sans-serif;
+                                        text-align: center;
+                                        margin-top: 50px; /* Adjust as needed */
+                                    }
+                                    ul {
+                                        list-style-type: none;
+                                        padding: 0;
+                                    }
+                                    li {
+                                        font-size: 18px;
+                                        margin-bottom: 10px;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <h1>List of Endpoints</h1>
+                                <ul>
+                                    <li>/add-painting</li>
+                                    <li>/getALL-paintings</li>
+                                    <li>/add-commission</li>
+                                    <li>/UpdateInProgressAttribute</li>
+                                    <li>/AI-event</li>
+                                    <li>/sendConfirmationEmail</li>
+                                    <li>/UpdateDB</li>
+                                    <li>/validate_info</li>
+                                    <li>/UpdateUsername</li>
+                                    <li>/UpdatePaintingViewsValue</li>
+                                </ul>
+                            </body>
+                            </html>
+                        `);
+
+                        // End the response
+                        res.end();
                     } else {
                         // Server error
                         res.writeHead(500);
