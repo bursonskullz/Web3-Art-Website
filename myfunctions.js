@@ -4814,44 +4814,44 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                         .then(async firstChecker => {
                             if (firstChecker.canUserAttemptPurchase) {
                                 console.log('server said it is okay to send transaction');
-                    /*
-                                // comment 4781--4978 and uncomment 4745-4778 when sending fake purchase
-                                fetch('/UpdateDB', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify(data)
-                                })
-                                .then(response => {
+                                // test fetch without hash, leave commmented 
+                    /* 
+                            console.log('data looks good on the client side lets try and send');
+                            fetch('/UpdateDB', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(data)
+                            })
+                            .then(response => {
 
-                                    if (response.ok) {
-                                        return response.json(); // Return the promise returned by response.json()
-                                    } else {
-                                        return Promise.reject('Failed to update database');
-                                    }
-                                })
-                                .then(checker => { 
-                                    if (checker.updated == true) {
-                                        purchaseSuccessPopUp(formContainer, checker.firstName, checker.lastName, checker.Id, checker.price.$numberDecimal, checker.img, checker.productName);
-                                        submitButtonIsClicked = false;
-                                        if(currentlyTryingToBuy){
-                                            currentlyTryingToBuy = false;
-                                        }else{
+                                if (response.ok) {
+                                    return response.json(); 
+                                } else {
+                                    return Promise.reject('Failed to update database');
+                                }
+                            })
+                            .then(checkerArray => { 
+                                const checker = checkerArray[0];
+                                submitButtonIsClicked = false;
+                                transactionInProgress = false;
+                                if (checker.updated == true) {
+                                    currentlyTryingToBuy = false;
+                                    purchaseSuccessPopUp(formContainer, checker.firstName, checker.lastName, checker.Id, checker.price.$numberDecimal, checker.img, checker.productName);
 
-                                        }
-                                    } else {
-                                        console.log('Prompt user reason it was unable to add like bad email');
-                                    }
-                                })
-                                .catch(error => {
-                                    submitButtonIsClicked = false;
-                                    console.error('Error updating database:', error);
-                                    // Handle the error, notify user accordingly
-                                }); 
-                        */
-                        
-                                    
+                                } else {
+                                    console.log('Prompt user reason it was unable to add like bad email');
+                                    formContainer.removeChild(loadingContainer);
+                                }
+                            })
+                            .catch(error => {
+                                submitButtonIsClicked = false;
+                                transactionInProgress = false;
+                                console.error('Error updating database:', error);
+                                formContainer.removeChild(loadingContainer);
+                            });
+                        */              
                                 try{
                                     if(transactionInProgress){
 
@@ -4862,7 +4862,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                         if(checkMyInfo.verified){   
                                             if (typeof window.ethereum != 'undefined' && isConnected){
                                                  window.web3 = new Web3(window.ethereum);
-
                                                 const loadingContainer = document.createElement("div");
                                                 loadingContainer.className = "loading-container";
                                                 loadingContainer.style.position = "absolute";
@@ -4954,13 +4953,13 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                                             return Promise.reject('Failed to update database');
                                                                         }
                                                                     })
-                                                                    .then(checker => { 
+                                                                    .then(checkerArray => {
+                                                                        const checker = checkerArray[0]; 
                                                                         submitButtonIsClicked = false;
                                                                         transactionInProgress = false;
                                                                         if (checker.updated == true) {
                                                                             currentlyTryingToBuy = false;
                                                                             purchaseSuccessPopUp(formContainer, checker.firstName, checker.lastName, checker.Id, checker.price.$numberDecimal, checker.img, checker.productName);
-
                                                                         } else {
                                                                             console.log('Prompt user reason it was unable to add like bad email');
                                                                             formContainer.removeChild(loadingContainer);
@@ -5074,11 +5073,8 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                         })
                         .catch(error => {
                             console.error('Error getting first check from server', error);
-                        });
-                        
-                                        
+                        });   
                     }                
-                    
                 }); 
                     const cancelButton = document.createElement("div");
                     cancelButton.className = "cancelEmail-button";
@@ -5110,7 +5106,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                     formContainer.appendChild(titleDiv);
                     formContainer.appendChild(form);
                     formContainer.appendChild(cancelButton);
-
                     document.body.appendChild(formContainer);
             }else{
                 if(!isConnected){
