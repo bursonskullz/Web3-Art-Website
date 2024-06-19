@@ -1923,9 +1923,13 @@ io.on('connection', (socket) => {
                 if(sender){
                     //do nothing because we found a user
                 }else{
-                    // generate random and push to users 
-                    const randomIndex = Math.floor(Math.random() * randomNames.length);
-                    username = randomNames[randomIndex];
+                    // generate random and push to users
+                    let username;
+                    do {
+                        const randomIndex = Math.floor(Math.random() * randomNames.length);
+                        username = randomNames[randomIndex];
+                    } while (isUsernameTaken(username, users)); 
+                    
                     const currentUser = { 
                         ip: clientIP, 
                         user: username, 
@@ -2251,7 +2255,9 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
         throw error; 
     }
 }
-
+function isUsernameTaken(username, users) {
+    return users.some(user => user.user === username);
+}
 async function getNewDefinition(word) {
   const apiUrl =`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${MERRIAM_WEBSTER_API_KEY}`;
   try {
