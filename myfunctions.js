@@ -4832,8 +4832,7 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                     return Promise.reject('Failed to update database');
                                 }
                             })
-                            .then(checkerArray => { 
-                                const checker = checkerArray[0];
+                            .then(checker => { 
                                 submitButtonIsClicked = false;
                                 transactionInProgress = false;
                                 if (checker.updated == true) {
@@ -4953,8 +4952,7 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                                             return Promise.reject('Failed to update database');
                                                                         }
                                                                     })
-                                                                    .then(checkerArray => {
-                                                                        const checker = checkerArray[0]; 
+                                                                    .then(checker => {
                                                                         submitButtonIsClicked = false;
                                                                         transactionInProgress = false;
                                                                         if (checker.updated == true) {
