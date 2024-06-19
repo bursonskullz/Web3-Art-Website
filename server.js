@@ -1,11 +1,12 @@
 // Name: Roy Burson 
-// Date last modified: 06-16-24
+// Date last modified: 06-18-24
 // purpose: Make web3 art website
 
 // to do list 
 
 /*
-1) Fix AI bot (roul) by training him from dataset. Do not use openAI!
+1) fix bug in socket
+2) Fix AI bot (roul) by training him from dataset. Do not use openAI!
 2) Limit fetch request to DB.
 3) set cookie in browser to limit fetches to server maybe (need to update all cookies on changes to DB).
 4) write solidity contract to make series 2 or try to use ETC coin instead.
@@ -3276,14 +3277,10 @@ const handleHttpRequest = async (req, res, io) => {
             });
 
             req.on('end', async ()=> {
-                // Parse the JSON data from the request body
                 const data = JSON.parse(body);
                  try{ 
-
-
                     const { transactionHash, objectId, address, email, firstName, lastName } = data;
                     const clientIP = req.connection.remoteAddress;
-
                     const attemptedPurchaseClient = {
                         ipAddress: clientIP,
                         inProgress: true,
@@ -3298,7 +3295,7 @@ const handleHttpRequest = async (req, res, io) => {
                         { _id: objectId }, 
                         { $set: {
                              inStock: false,
-                              dateSold: new Date() // Set dateSold to the current date/time
+                              dateSold: new Date()
                             }
                         } 
                     );
@@ -3320,7 +3317,6 @@ const handleHttpRequest = async (req, res, io) => {
                     });
 
                     if(result.modifiedCount == 1){
-                        const dummyArray = [];
                         let thisObj = {
                             updated: true, 
                             Id: objectId,
@@ -3332,34 +3328,15 @@ const handleHttpRequest = async (req, res, io) => {
                             img: updatedPainting.image,
                             transactionHash: transactionHash,
                         };
-                        dummyArray.push(thisObj);
-                        const dummyData = zlib.gzipSync(JSON.stringify(dummyArray)); 
-                        res.setHeader('Content-Encoding', 'gzip');
-                        res.end(JSON.stringify(dummyData)); 
+                        res.setHeader('Content-Encoding', 'gzip'); 
+                        res.end(zlib.gzipSync(JSON.stringify(thisObj)));
                         io.emit('updateCurrentPaintings',{updated: true, Id: objectId} );
-                        // only send email if purchase is saved 
                         newPurchase.save()
                           .then(savedUser => {
                             attemptedClients = [];
                             sendEmail(email, address, firstName, lastName, objectId, updatedPainting.price, updatedPainting.name, updatedPainting.image)
                                 .then(result => {
-                                    /*
-                                    let foundIndex = -1 ;
-                                    for (let thisIndex = 0; thisIndex < attemptedClients.length; thisIndex++) {
-                                        thisIndex +=1 ;
-                                        if(client.paintingId == attemptedPurchaseClient.paintingId){
-                                            foundIndex = thisIndex;                        
-                                            if (foundIndex !== -1) {
-                                                attemptedClients.splice(foundIndex, 1); // Remove the element at foundIndex
-                                                console.log('Client removed:');
-                                            } else {
-                                                console.log('Client not found:');
-                                            }
-                                        }else{
-                                            console.log('cannot find paiting ID');
-                                        }
-                                    }*/
-
+                                    //do nothing with result
                                 })
                                 .catch(error => {
                                      attemptedClients = [];
