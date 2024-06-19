@@ -3320,17 +3320,22 @@ const handleHttpRequest = async (req, res, io) => {
                     });
 
                     if(result.modifiedCount == 1){
-                        res.end(JSON.stringify({
+                        const dummyArray = [];
+                        let thisObj = {
                             updated: true, 
                             Id: objectId,
-                            firstName :firstName,
+                            firstName: firstName,
                             lastName: lastName,
                             productID: updatedPainting._id,
                             productName: updatedPainting.name,
                             price: updatedPainting.price, 
                             img: updatedPainting.image,
                             transactionHash: transactionHash,
-                        })); 
+                        };
+                        dummyArray.push(thisObj);
+                        const dummyData = zlib.gzipSync(JSON.stringify(dummyArray)); 
+                        res.setHeader('Content-Encoding', 'gzip');
+                        res.end(JSON.stringify(dummyData)); 
                         io.emit('updateCurrentPaintings',{updated: true, Id: objectId} );
                         // only send email if purchase is saved 
                         newPurchase.save()
