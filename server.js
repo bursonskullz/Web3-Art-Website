@@ -1,15 +1,16 @@
 // Name: Roy Burson 
-// Date last modified: 06-18-24
+// Date last modified: 06-19-24
 // purpose: Make web3 art website
 
-// to do list 
+// to do list for main art div
 
 /*
-1) fix bug in socket
-2) Fix AI bot (roul) by training him from dataset. Do not use openAI!
-2) Limit fetch request to DB.
-3) set cookie in browser to limit fetches to server maybe (need to update all cookies on changes to DB).
-4) write solidity contract to make series 2 or try to use ETC coin instead.
+1) Fix socket names not working, and commission form needs centered.
+2) uploading painting failed online (but not on local host) to much data for droplet need to chunk or compress before sending to server.
+3) create pop up for selecting coins and change var usersChosenCoin to this value.
+4) check it network is on the selected coin network (use simple function).
+5) Fix AI bot (roul) by training him from dataset do not use OPENAI. 
+6) Limit fetch request to DB and digital ocean to reduce cost.
 */
 
 
