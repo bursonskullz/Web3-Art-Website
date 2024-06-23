@@ -94,6 +94,7 @@ export async function painting_section_click(parentElement) {
                     
             } else {
                 console.error('Failed to fetch paintings the response we not okay', response.statusText);
+                // Hide the loading animation if there's an error
                 document.body.removeChild(loadingAnimation);
             }
         } catch (error) {
@@ -1777,12 +1778,11 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     }else{
         isSocketPresent = true;
         socket.on('updateCurrentPaintings', data => {
-            console.log('Received data from server:', data);
+            //console.log('Received data from server:', data);
             for(const myObj of currentPaintingArray){
                 if(myObj._id == data.Id && myObj.inStock == true){
                     myObj.inStock = false;
-                    console.log('we updated the array item', myObj);
-
+                    //console.log('we updated the array item', myObj);
                     setTimeout( ()=> {
                         try{
                             const purchaseForm = document.querySelector('.purchase-form-container');
@@ -1966,7 +1966,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             firstNameDiv.textContent = `Buyer: ${purchase.firstName}`;
 
             const priceDiv = document.createElement("div");
-            console.log(purchase.price);
             priceDiv.textContent = `Price: ${purchase.price.$numberDecimal} ETH`;
 
             dateNode.style.width = '80%';
@@ -2402,12 +2401,10 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 submitButton.style.marginTop = '20px'; 
 
                 submitButton.addEventListener('click', async function() {
-
                     let formData = {};
                     formElements.forEach(element => {
                         formData[element.id] = document.getElementById(element.id).value;
                     });
-
                     if(formData.phone == ''){
                        alert('Please enter a phone number before proceeding');
                     }else{
@@ -2423,7 +2420,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                                         alert('Please enter title for your commission!');
                                     }else{
                                         const checkMyInfo = await validateUserInfo(formData.email, formData.address, formData.firstName, formData.lastName);
-
                                          if(checkMyInfo.verified){
                                             console.log('trying to send commission to Db!', formData);
                                             try {
@@ -2434,7 +2430,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                                                     },
                                                     body: JSON.stringify(formData) 
                                                 });
-
                                                 if (response.ok) {
                                                     const serverMessage = await response.json();
                                                     if(serverMessage.success == true){
@@ -2444,7 +2439,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                                                             document.getElementById(element.id).value = '';
                                                         });
                                                         containerInput.remove();
-
                                                         let successDiv = document.createElement('div');
                                                         successDiv.classList.add('success-message');
                                                         successDiv.style.position = 'fixed';
@@ -2532,10 +2526,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                             alert('Please enter a valid phone number');
                         }
                     }
-
                 });
-
-                container.appendChild(submitButton);
+            container.appendChild(submitButton);
             containerInput.appendChild(container);
             document.body.appendChild(containerInput);
         }else{
@@ -3702,9 +3694,36 @@ const calculateConversionFactor = (amount) => {
         return 0.0016805; 
     }else{
         return 1;
-    } 
+    } // must be a integer
 }; 
 
+
+
+/*
+const calculateConversionFactor = (amount) => {
+    // Check if the amount is a whole number
+    if (Number.isInteger(amount)) {
+        return 0.001;
+    }else{
+
+        // Get the fractional part by subtracting the integer part from the amount
+        const fractionalPart = amount - Math.floor(amount);
+        
+        console.log('the fractional part is', fractionalPart);
+        // Check if the fractional part matches any of the specified values
+        if (fractionalPart <= 0.2){
+            return 0.001 + 0.000100; // 20% the value of 0.001 because we split 5 times 
+        }else if( fractionalPart <= 0.4){
+           return 0.001 +  0.000200;
+        }else if( fractionalPart <= 0.6){
+           return 0.001 +  0.000400;
+        }else if( fractionalPart <= 0.8){
+           return 0.001 +  0.000600;
+        }
+    }
+};
+
+*/
 
 function printInfo(div) {
     var strings = [
@@ -4611,6 +4630,7 @@ async function fetchEthereumPrice() {
         return null;
     }
 }
+
 async function checkNetwork(network_name) {
     if (network_name.toLowerCase() === "ethereum") {
         const networkId = await web3.eth.net.getId();
@@ -4793,9 +4813,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                             firstName: EmailformData.firstName,
                             lastName: EmailformData.lastName
                         };
-
-
-
                         console.log('data looks good on the client side lets try and send');
 
                         fetch('/checkForAttemptedPurchases', {
@@ -4814,53 +4831,52 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                         .then(async firstChecker => {
                             if (firstChecker.canUserAttemptPurchase) {
                                 console.log('server said it is okay to send transaction');
-                                // test fetch without hash, leave commmented 
-                    /* 
-                            console.log('data looks good on the client side lets try and send');
-                            fetch('/UpdateDB', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(data)
-                            })
-                            .then(response => {
+                    /*
+                                // comment 4781--4978 and uncomment 4745-4778 when sending fake purchase
+                                fetch('/UpdateDB', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(data)
+                                })
+                                .then(response => {
 
-                                if (response.ok) {
-                                    return response.json(); 
-                                } else {
-                                    return Promise.reject('Failed to update database');
-                                }
-                            })
-                            .then(checker => { 
-                                submitButtonIsClicked = false;
-                                transactionInProgress = false;
-                                if (checker.updated == true) {
-                                    currentlyTryingToBuy = false;
-                                    purchaseSuccessPopUp(formContainer, checker.firstName, checker.lastName, checker.Id, checker.price.$numberDecimal, checker.img, checker.productName);
+                                    if (response.ok) {
+                                        return response.json(); // Return the promise returned by response.json()
+                                    } else {
+                                        return Promise.reject('Failed to update database');
+                                    }
+                                })
+                                .then(checker => { 
+                                    if (checker.updated == true) {
+                                        purchaseSuccessPopUp(formContainer, checker.firstName, checker.lastName, checker.Id, checker.price.$numberDecimal, checker.img, checker.productName);
+                                        submitButtonIsClicked = false;
+                                        if(currentlyTryingToBuy){
+                                            currentlyTryingToBuy = false;
+                                        }else{
 
-                                } else {
-                                    console.log('Prompt user reason it was unable to add like bad email');
-                                    formContainer.removeChild(loadingContainer);
-                                }
-                            })
-                            .catch(error => {
-                                submitButtonIsClicked = false;
-                                transactionInProgress = false;
-                                console.error('Error updating database:', error);
-                                formContainer.removeChild(loadingContainer);
-                            });
-                        */              
+                                        }
+                                    } else {
+                                        console.log('Prompt user reason it was unable to add like bad email');
+                                    }
+                                })
+                                .catch(error => {
+                                    submitButtonIsClicked = false;
+                                    console.error('Error updating database:', error);
+                                    // Handle the error, notify user accordingly
+                                }); 
+                        */
+                                                           
                                 try{
                                     if(transactionInProgress){
 
                                     }else{
-                                        const checkMyInfo = await validateUserInatfo(da.email, data.address, data.firstName, data.lastName);
+                                        const checkMyInfo = await validateUserInfo(data.email, data.address, data.firstName, data.lastName);
                                         console.log('checkMyInfo() returns', checkMyInfo);
-
                                         if(checkMyInfo.verified){   
                                             if (typeof window.ethereum != 'undefined' && isConnected){
-                                                 window.web3 = new Web3(window.ethereum);
+                                                window.web3 = new Web3(window.ethereum);
                                                 const loadingContainer = document.createElement("div");
                                                 loadingContainer.className = "loading-container";
                                                 loadingContainer.style.position = "absolute";
@@ -4952,12 +4968,13 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                                             return Promise.reject('Failed to update database');
                                                                         }
                                                                     })
-                                                                    .then(checker => {
+                                                                    .then(checker => { 
                                                                         submitButtonIsClicked = false;
                                                                         transactionInProgress = false;
                                                                         if (checker.updated == true) {
                                                                             currentlyTryingToBuy = false;
                                                                             purchaseSuccessPopUp(formContainer, checker.firstName, checker.lastName, checker.Id, checker.price.$numberDecimal, checker.img, checker.productName);
+
                                                                         } else {
                                                                             console.log('Prompt user reason it was unable to add like bad email');
                                                                             formContainer.removeChild(loadingContainer);
@@ -5071,8 +5088,11 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                         })
                         .catch(error => {
                             console.error('Error getting first check from server', error);
-                        });   
+                        });
+                        
+                                        
                     }                
+                    
                 }); 
                     const cancelButton = document.createElement("div");
                     cancelButton.className = "cancelEmail-button";
@@ -5104,6 +5124,7 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                     formContainer.appendChild(titleDiv);
                     formContainer.appendChild(form);
                     formContainer.appendChild(cancelButton);
+
                     document.body.appendChild(formContainer);
             }else{
                 if(!isConnected){
