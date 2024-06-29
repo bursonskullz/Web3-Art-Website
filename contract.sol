@@ -1,52 +1,58 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
+pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
+contract BursonSkullz is ERC721 {
+ // Using Counters for managing token IDs
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
 
-struct TokenMetadata {
-    string name;
-    string details;
-    string price; // keep as string in sol and convert to int data type in client side javascript because sol doesnt have type. 
-    bool forSale; // Boolean variable to indicate if the token is for sale
-}
+     // Roy's wallet address
+    address RoysWallet = 0x5CdaD7876270364242Ade65e8e84655b53398B76;
 
-contract MyNFT is ERC721, Ownable { // put contract here all functions!
-
-    mapping(uint256 => TokenMetadata) private _tokenMetadata;
-    uint256 private _currentTokenId = 0;
-    address private _roy;
-
-    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {
-        _roy = msg.sender; // Set the address of "roy" during contract deployment
+    // Struct to represent an NFT (Non-Fungible Token)
+    struct NFT {
+        uint256 id;         // Unique identifier for the NFT
+        string image;       // Image associated with the NFT (IPFS hash or URL)
+        uint256 price;      // Price of the NFT in wei (1 ether = 1e18 wei)
+        address owner;      // Current owner of the NFT
+        bool forSale;       // Flag indicating if the NFT is for sale
     }
+    // Mapping from token ID to NFT struct
+    mapping(uint256 => NFT) public nfts;
 
-    modifier onlyRoy() {
-        require(msg.sender == _roy, "Only Roy can call this function");
-        _;
-    }
+    // Events to track NFT minting, listing for sale, and sale
+    event NFTMinted(uint256 id, address owner);
+    event NFTForSale(uint256 id, uint256 price);
+    event NFTSold(uint256 id, address buyer, uint256 price);
+    // Constructor to initialize the ERC721 token
+    constructor() ERC721("BursonSkullz", "Burson_Skullz") {}
 
-    function mint(address to, string memory name, string memory details, bool forSale, uint256 price) public onlyRoy {
-        uint256 tokenId = _getNextTokenId();
-        _safeMint(to, tokenId);
-        _setTokenMetadata(tokenId, name, details, forSale, price);
-    }
+    // Function to mint a new NFT
+    function mintNFT(address recipient, uint256 price, string memory _image) external returns (bool) {
+        // returns true if able to mint and and false otherwise so javascript can handle
+        if(msg.sender != RoysWallet){
+            // not okay to send transaction
+            return false;
+        }else{
+            // add to array and return true
+            _tokenIds.increment();  // Increment token ID counter
+            uint256 newItemId = _tokenIds.current();  // Get the current token ID
+            _mint(recipient, newItemId);  // Mint the new token to the recipient
 
-    function setRoy(address newRoy) public onlyOwner {
-        _roy = newRoy;
-    }
+            // Create a new NFT and store it in the mapping
+            nfts[newItemId] = NFT({
+                id: newItemId,
+                image: _image,      
+                price: price,
+                owner: recipient,
+                forSale: true    
+            });
 
-    function getTokenMetadata(uint256 tokenId) public view returns (string memory name, string memory details) {
-        return (_tokenMetadata[tokenId].name, _tokenMetadata[tokenId].details);
-    }
-
-    function _getNextTokenId() private returns (uint256) {
-        _currentTokenId++;
-        return _currentTokenId;
-    }
-
-    function _setTokenMetadata(uint256 tokenId, string memory name, string memory details) private {
-        _tokenMetadata[tokenId] = TokenMetadata(name, details);
+            // Emit an event to signify that a new NFT has been minted
+            emit NFTMinted(newItemId, recipient);
+            return true;
+        }
     }
 }
