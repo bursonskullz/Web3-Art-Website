@@ -55,4 +55,33 @@ contract BursonSkullz is ERC721 {
             return true;
         }
     }
+
+    function listNFT(uint256 tokenId) external {
+        require(ownerOf(tokenId) == msg.sender, "Only the owner can list the NFT");
+        nfts[tokenId].forSale = true;
+        emit NFTForSale(tokenId, nfts[tokenId].price);
+    }
+
+    function delistNFT(uint256 tokenId) external {
+        require(ownerOf(tokenId) == msg.sender, "Only the owner can delist the NFT");
+        nfts[tokenId].forSale = false;
+    }
+    function tokenByIndex(uint256 index) public view returns (uint256) {
+        require(index < _tokenIds.current(), "Index out of bounds");
+
+        // Iterate backwards to get token IDs
+        uint256 tokenId = _tokenIds.current() - index - 1;
+        return tokenId;
+    }
+    function getAllTokens() public view returns (NFT[] memory) {
+        uint256 totalTokens = _tokenIds.current();
+        NFT[] memory tokens = new NFT[](totalTokens);
+
+        for (uint256 i = 0; i < totalTokens; i++) {
+            uint256 tokenId = tokenByIndex(i);
+            tokens[i] = nfts[tokenId];
+        }
+
+        return tokens;
+    }
 }
