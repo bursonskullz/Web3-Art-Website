@@ -3821,7 +3821,7 @@ export async function getVeChainPrice(element) {
 }
 
 function addSecretMenu() {
-    const menuItems = ['upload painting', 'remove painting', 'send tracking number'];
+    const menuItems = ['upload painting', 'remove painting', 'send tracking number', 'Mint NFTs'];
     const secretMenu = document.createElement('div');
     secretMenu.className = 'secret-menu';
     secretMenu.style.width = '250px';
@@ -4095,7 +4095,12 @@ function addSecretMenu() {
                 
             }else if(item == 'send tracking number'){
                 makeConfirmationForm();
-            }   
+            }else if(item == 'Mint NFTs') {
+                console.log('calling makeMintingForm() function');
+                makeMintingForm();
+            }else{
+                console.log('button not found');
+            }    
         });
 
         itemList.appendChild(itemDiv);
@@ -4110,7 +4115,229 @@ function addSecretMenu() {
     secretMenu.appendChild(itemList);
     document.body.appendChild(secretMenu);
 }
+function makeMintingForm() {
+    const formContainer = document.createElement('div');
+    formContainer.className = 'Minting-form';
+    formContainer.style.width = '300px';
+    formContainer.style.height = '450px'; 
+    formContainer.style.position = 'fixed';
+    formContainer.style.top = '50%';
+    formContainer.style.left = '50%';
+    formContainer.style.transform = 'translate(-50%, -50%)';
+    formContainer.style.backgroundColor = 'dimgray';
+    formContainer.style.zIndex = '9999999';
+    formContainer.style.borderRadius = '8px';
+    formContainer.style.border = '1px solid black';
+    formContainer.style.padding = '20px';
+    formContainer.style.display = 'flex';
+    formContainer.style.flexDirection = 'column';
+    formContainer.style.alignItems = 'center';
 
+    let offsetX, offsetY;
+    let isDragging = false;
+    formContainer.addEventListener("mousedown", function (event) {
+        isDragging = true;
+        offsetX = event.clientX - parseFloat(window.getComputedStyle(formContainer).left);
+        offsetY = event.clientY - parseFloat(window.getComputedStyle(formContainer).top);
+    });
+
+    document.addEventListener("mousemove", function (event) {
+        if (isDragging) {
+            formContainer.style.left = (event.clientX - offsetX) + "px";
+            formContainer.style.top = (event.clientY - offsetY) + "px";
+        }
+    });
+
+    document.addEventListener("mouseup", function () {
+        isDragging = false;
+        formContainer.style.cursor = "grab";
+    });
+
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = 'Minting Form';
+    titleSpan.style.fontSize = '18px';
+    titleSpan.style.marginBottom = '10px';
+    formContainer.appendChild(titleSpan);
+
+    const closeButton = document.createElement('div');
+    closeButton.textContent = '❌';
+    closeButton.style.fontSize = '10px';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.color = '#333';
+
+    closeButton.addEventListener('click', function() {
+        document.body.removeChild(formContainer);
+    });
+
+    formContainer.appendChild(closeButton);
+
+    const dropArea = document.createElement('div');
+    dropArea.style.width = '100%';
+    dropArea.style.height = '150px';
+    dropArea.style.border = '2px dashed #ccc';
+    dropArea.style.borderRadius = '8px';
+    dropArea.style.display = 'flex';
+    dropArea.style.justifyContent = 'center';
+    dropArea.style.alignItems = 'center';
+    dropArea.style.marginBottom = '10px';
+    dropArea.textContent = 'Drag & Drop Folder Here or Click to Upload';
+    dropArea.style.color = '#fff';
+    dropArea.style.cursor = 'pointer';
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.webkitdirectory = true;
+    fileInput.style.display = 'none';
+
+    dropArea.addEventListener('dragover', function(event) {
+        event.preventDefault();
+        dropArea.style.borderColor = 'lightblue';
+    });
+
+    dropArea.addEventListener('dragleave', function() {
+        dropArea.style.borderColor = '#ccc';
+    });
+
+    dropArea.addEventListener('drop', function(event) {
+        event.preventDefault();
+        dropArea.style.borderColor = '#ccc';
+        const files = event.dataTransfer.files;
+        handleFiles(files);
+    });
+
+    dropArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function(event) {
+        const files = event.target.files;
+        handleFiles(files);
+    });
+
+    formContainer.appendChild(dropArea);
+    formContainer.appendChild(fileInput);
+
+    const imagePlaceholder = document.createElement('div');
+    imagePlaceholder.style.width = '100px';
+    imagePlaceholder.style.height = '100px';
+    imagePlaceholder.style.backgroundColor = '#fff';
+    imagePlaceholder.style.borderRadius = '8px';
+    imagePlaceholder.style.marginBottom = '10px';
+    imagePlaceholder.style.display = 'flex';
+    imagePlaceholder.style.justifyContent = 'center';
+    imagePlaceholder.style.alignItems = 'center';
+    imagePlaceholder.style.overflow = 'hidden';
+    imagePlaceholder.textContent = 'Folder Image';
+    imagePlaceholder.style.color = '#333';
+    formContainer.appendChild(imagePlaceholder);
+
+    const contractSelector = document.createElement('select');
+    contractSelector.style.width = '100%';
+    contractSelector.style.padding = '10px';
+    contractSelector.style.marginBottom = '10px';
+    contractSelector.style.borderRadius = '8px';
+    contractSelector.style.border = '1px solid #ccc';
+
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = 'Select contract';
+    placeholderOption.disabled = true;
+    placeholderOption.selected = true;
+    contractSelector.appendChild(placeholderOption);
+
+    const option1 = document.createElement('option');
+    option1.value = 'BursonSkullz';
+    option1.textContent = 'Burson Skullz';
+    contractSelector.appendChild(option1);
+
+    const option2 = document.createElement('option');
+    option2.value = 'CrazyDonkeys';
+    option2.textContent = 'Crazy Donkeys';
+    contractSelector.appendChild(option2);
+
+    formContainer.appendChild(contractSelector);
+
+    let selectedContract = contractSelector.value; 
+
+    contractSelector.addEventListener('change', function() {
+        selectedContract = contractSelector.value;
+        console.log(`Selected contract: ${selectedContract}`);
+    });
+
+    const submitButton = document.createElement('button');
+    submitButton.textContent = 'Submit';
+    submitButton.style.marginTop = 'auto';
+    submitButton.style.padding = '10px 20px';
+    submitButton.style.border = 'none';
+    submitButton.style.borderRadius = '8px';
+    submitButton.style.backgroundColor = '#333';
+    submitButton.style.color = '#fff';
+    submitButton.style.cursor = 'pointer';
+
+    let filesArray = [];
+
+    submitButton.addEventListener('click', function() {
+        if (!selectedContract) {
+            alert('Please select a contract.');
+            return;
+        }
+        const folderData = {
+            folderName: dropArea.textContent,
+            contract: selectedContract,
+            files: filesArray 
+        };
+        // compress folder data before sending to server 
+        // same with uploading painting form and make loading icon and remove when done or error
+        console.log(folderData);
+        // send fetch here. 
+        // hand web3 funtions on server after testing contract
+    });
+
+    formContainer.appendChild(submitButton);
+    document.body.appendChild(formContainer);
+
+
+function handleFiles(files) {
+        filesArray = [];
+        const firstImageFile = files.find(file => file.type.startsWith('image/'));
+        if (firstImageFile) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                imagePlaceholder.style.backgroundImage = `url(${event.target.result})`;
+                imagePlaceholder.style.backgroundSize = 'cover';
+                imagePlaceholder.style.backgroundPosition = 'center';
+                imagePlaceholder.textContent = '';
+                filesArray.push({
+                    name: firstImageFile.name,
+                    type: firstImageFile.type,
+                    size: firstImageFile.size,
+                    image: event.target.result
+                });
+            };
+            reader.readAsDataURL(firstImageFile);
+        } else {
+            imagePlaceholder.style.backgroundImage = '';
+            imagePlaceholder.textContent = 'Folder Image';
+        }
+        for (let i = 0; i < files.length; i++) {
+            if (files[i] !== firstImageFile) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    filesArray.push({
+                        name: files[i].name,
+                        type: files[i].type,
+                        size: files[i].size,
+                        image: event.target.result
+                    });
+                };
+                reader.readAsDataURL(files[i]);
+            }
+        }
+    }
+}
 function makeConfirmationForm() {
     const formContainer = document.createElement('div');
     formContainer.className = 'confirmation-form';
