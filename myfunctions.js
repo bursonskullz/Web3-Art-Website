@@ -4284,17 +4284,19 @@ function makeMintingForm() {
             alert('Please select a contract.');
             return;
         }
-        const filesArrayJSON = JSON.stringify(filesArray);
-        const compressedData = pako.gzip(filesArrayJSON);
-
+        
+        const compressedData = pako.gzip(JSON.stringify(filesArray)); // Convert to string
         const folderData = {
             folderName: dropArea.textContent,
             contract: selectedContract,
-            files: compressedData 
+            files: Array.from(compressedData) // Convert to array
         };
+
         fetch('/MintNFTs', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(folderData)
         })
         .then(response => {
@@ -4307,23 +4309,18 @@ function makeMintingForm() {
         .then(data => {
             console.log('Files uploaded successfully:', data);
             // Handle success
-            // remove form and alert success 
         })
         .catch(error => {
             console.error('Error uploading files:', error);
             // Handle error
-            // remove form and alert error
         });
     });
 
     formContainer.appendChild(submitButton);
     document.body.appendChild(formContainer);
 
-
     function handleFiles(files) {
         filesArray = [];
-
-        // Function to handle reading files via FileReader
         function readFile(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -4336,21 +4333,17 @@ function makeMintingForm() {
                 reader.readAsDataURL(file);
             });
         }
-
-        // Iterate through each file and read its contents
         const readFilePromises = [];
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            // Check if file type is image (you might want to refine this check)
             if (file.type.startsWith('image/')) {
                 const promise = readFile(file)
                     .then(result => {
-                        // Push file data to filesArray including image content
                         filesArray.push({
                             name: file.name,
                             type: file.type,
                             size: file.size,
-                            image: result  // Store the image data (base64 encoded)
+                            image: result  
                         });
                     })
                     .catch(error => {
@@ -4359,17 +4352,9 @@ function makeMintingForm() {
                 readFilePromises.push(promise);
             }
         }
-
-        // After all files are processed, you can do additional operations if needed
         Promise.all(readFilePromises)
             .then(() => {
-                // Optional: Perform any post-processing after all files are read
                 console.log('Files read and processed:', filesArray);
-
-                // 1) compress filesArray using Pako 
-                // 2) send to server using fetch 
-                // 3) print out on server make sure it is working
-                // 4) attempt to mint NFT from basic contract to see what happens
             })
             .catch(error => {
                 console.error('Error processing files:', error);
