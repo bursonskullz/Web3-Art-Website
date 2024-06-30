@@ -4260,7 +4260,7 @@ function makeMintingForm() {
 
     formContainer.appendChild(contractSelector);
 
-    let selectedContract = contractSelector.value; 
+    let selectedContract = contractSelector.value; // Initialize with the default value
 
     contractSelector.addEventListener('change', function() {
         selectedContract = contractSelector.value;
@@ -4292,50 +4292,66 @@ function makeMintingForm() {
         // compress folder data before sending to server 
         // same with uploading painting form and make loading icon and remove when done or error
         console.log(folderData);
-        // send fetch here. 
-        // hand web3 funtions on server after testing contract
     });
 
     formContainer.appendChild(submitButton);
     document.body.appendChild(formContainer);
 
 
-function handleFiles(files) {
+    function handleFiles(files) {
         filesArray = [];
-        const firstImageFile = files.find(file => file.type.startsWith('image/'));
-        if (firstImageFile) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                imagePlaceholder.style.backgroundImage = `url(${event.target.result})`;
-                imagePlaceholder.style.backgroundSize = 'cover';
-                imagePlaceholder.style.backgroundPosition = 'center';
-                imagePlaceholder.textContent = '';
-                filesArray.push({
-                    name: firstImageFile.name,
-                    type: firstImageFile.type,
-                    size: firstImageFile.size,
-                    image: event.target.result
-                });
-            };
-            reader.readAsDataURL(firstImageFile);
-        } else {
-            imagePlaceholder.style.backgroundImage = '';
-            imagePlaceholder.textContent = 'Folder Image';
-        }
-        for (let i = 0; i < files.length; i++) {
-            if (files[i] !== firstImageFile) {
+
+        // Function to handle reading files via FileReader
+        function readFile(file) {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    filesArray.push({
-                        name: files[i].name,
-                        type: files[i].type,
-                        size: files[i].size,
-                        image: event.target.result
-                    });
+                    resolve(event.target.result);
                 };
-                reader.readAsDataURL(files[i]);
+                reader.onerror = function(event) {
+                    reject(event.target.error);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Iterate through each file and read its contents
+        const readFilePromises = [];
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            // Check if file type is image (you might want to refine this check)
+            if (file.type.startsWith('image/')) {
+                const promise = readFile(file)
+                    .then(result => {
+                        // Push file data to filesArray including image content
+                        filesArray.push({
+                            name: file.name,
+                            type: file.type,
+                            size: file.size,
+                            image: result  // Store the image data (base64 encoded)
+                        });
+                    })
+                    .catch(error => {
+                        console.error(`Error reading ${file.name}: ${error}`);
+                    });
+                readFilePromises.push(promise);
             }
         }
+
+        // After all files are processed, you can do additional operations if needed
+        Promise.all(readFilePromises)
+            .then(() => {
+                // Optional: Perform any post-processing after all files are read
+                console.log('Files read and processed:', filesArray);
+
+                // 1) compress filesArray using Pako 
+                // 2) send to server using fetch 
+                // 3) print out on server make sure it is working
+                // 4) attempt to mint NFT from basic contract to see what happens
+            })
+            .catch(error => {
+                console.error('Error processing files:', error);
+            });
     }
 }
 function makeConfirmationForm() {
