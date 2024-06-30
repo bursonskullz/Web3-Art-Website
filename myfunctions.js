@@ -4284,14 +4284,36 @@ function makeMintingForm() {
             alert('Please select a contract.');
             return;
         }
+        const filesArrayJSON = JSON.stringify(filesArray);
+        const compressedData = pako.gzip(filesArrayJSON);
+
         const folderData = {
             folderName: dropArea.textContent,
             contract: selectedContract,
-            files: filesArray 
+            files: compressedData 
         };
-        // compress folder data before sending to server 
-        // same with uploading painting form and make loading icon and remove when done or error
-        console.log(folderData);
+        fetch('/MintNFTs', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(folderData)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to upload files');
+            }
+        })
+        .then(data => {
+            console.log('Files uploaded successfully:', data);
+            // Handle success
+            // remove form and alert success 
+        })
+        .catch(error => {
+            console.error('Error uploading files:', error);
+            // Handle error
+            // remove form and alert error
+        });
     });
 
     formContainer.appendChild(submitButton);
