@@ -3552,21 +3552,23 @@ const handleHttpRequest = async (req, res, io) => {
         }catch(error){
             console.log('Error with fetch request /UpdatePaintingViewsValue');
         }
-    }else if(req.method === 'POST' && req.url === '/MintNFTs') {
+    }else if (req.method === 'POST' && req.url === '/MintNFTs') {
         try {
             let body = '';
             req.on('data', chunk => {
-                body += chunk; 
+                body += chunk;
             });
 
             req.on('end', async () => {
                 try {
                     const data = JSON.parse(body);
-                    const compressedData = data.files;
-                    const decompressedData = zlib.gunzipSync(compressedData);
+                    const compressedDataArray = new Uint8Array(data.files);
+                    const decompressedData = zlib.gunzipSync(compressedDataArray);
                     const jsonData = decompressedData.toString('utf8');
-                    const filesArray = JSON.parse(jsonData); 
+                    const filesArray = JSON.parse(jsonData);
                     console.log('Decompressed data:', filesArray);
+                    // printing correctly compression works get passcode and attempt mint to sample contract
+                    // using remix virtual deployer
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ message: 'Files processed successfully' }));
                 } catch (error) {
@@ -3580,7 +3582,7 @@ const handleHttpRequest = async (req, res, io) => {
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Failed to handle mint NFT request' }));
         }
-    } else {
+}else {
         try{
             let filePath = '.' + req.url;
             if (filePath === './') {
