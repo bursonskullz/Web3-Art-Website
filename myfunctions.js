@@ -1,10 +1,11 @@
 import {gridNavigator} from './script.js';
 import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.0.8/dist/ethers.esm.min.js'; 
+//import pako from 'pako';
+
 const myWebDomain = 'http://localhost:27015/'; 
 var msgCount = 0; 
 const WEIFACTOR = 0.001;
 const RoysWallet = '0x5cdad7876270364242ade65e8e84655b53398b76';
-const abi = [/* Your contract ABI here */];
 const socket = io();
 const iconHeaderWidth = '11.4vh';
 const acceptableCoinsSelection = ['ether'];
@@ -29,7 +30,6 @@ let EmailformData  = {
 var etcPriceInUSD = '333.50';
 var shibaInuPriceInUSD = '333.50';
 var polygonPriceInUSD = '333.50';
-const contractAddress = "0x123abc...";
 
 export async function painting_section_click(parentElement) {
     console.log("Painting section clicked!"); 
@@ -2096,6 +2096,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 if(thisLoggedInBUtton){
                     thisLoggedInBUtton.addEventListener("click", async function(){
                         console.log('clicking current connect button');
+                        const functionNameString = 'getGreeting';
+                        callContractFunction(functionNameString);
                     });
                 }else{
                     console.log('cannot find the loggedIn-button');
@@ -2420,6 +2422,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                                         alert('Please enter title for your commission!');
                                     }else{
                                         const checkMyInfo = await validateUserInfo(formData.email, formData.address, formData.firstName, formData.lastName);
+
                                          if(checkMyInfo.verified){
                                             console.log('trying to send commission to Db!', formData);
                                             try {
@@ -2430,6 +2433,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                                                     },
                                                     body: JSON.stringify(formData) 
                                                 });
+
                                                 if (response.ok) {
                                                     const serverMessage = await response.json();
                                                     if(serverMessage.success == true){
@@ -2439,6 +2443,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                                                             document.getElementById(element.id).value = '';
                                                         });
                                                         containerInput.remove();
+
                                                         let successDiv = document.createElement('div');
                                                         successDiv.classList.add('success-message');
                                                         successDiv.style.position = 'fixed';
@@ -2536,11 +2541,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
 
     });
-
-function isValidPhoneNumber(phoneNumber) {
-    let phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
-    return phoneRegex.test(phoneNumber);
-}
 
     AIbuttonContainer.style.height = '90%';
     AIbuttonContainer.style.width = iconHeaderWidth ;
@@ -2996,27 +2996,73 @@ function isValidPhoneNumber(phoneNumber) {
     parentElement.appendChild(footerLEGAL);
 }
 
-
-
-export async function getNFTs(contractAddress, providerUrl) {
-    const provider = new ethers.providers.JsonRpcProvider(providerUrl);
-    let abi = await getContractABI(contractAddress); 
-    const contract = new ethers.Contract(contractAddress, abi, provider);
-
-    try {
-        const totalNFTs = await contract.totalSupply();
-        const NFTs = [];
-        for (let i = 1; i <= totalNFTs; i++) {
-            const owner = await contract.ownerOf(i);
-            NFTs.push({ tokenId: i, owner: owner });
-        }
-
-        return NFTs;
-    } catch (error) {
-        return [];
-    }
+function isValidPhoneNumber(phoneNumber) {
+    let phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+    return phoneRegex.test(phoneNumber);
 }
 
+export async function callContractFunction(contractFunctionName){
+    // define globally so we dont have to keep making each time we call function to blockchain
+    const baycContractAddress = '0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'; // Example Bored Ape Yacht Club contract address
+    const baycContractAbi = [{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxNftSupply","type":"uint256"},{"internalType":"uint256","name":"saleStart","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"BAYC_PROVENANCE","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_APES","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"REVEAL_TIMESTAMP","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"apePrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"baseURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencySetStartingIndexBlock","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"flipSaleState","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxApePurchase","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"numberOfTokens","type":"uint256"}],"name":"mintApe","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"reserveApes","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"_data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"saleIsActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"baseURI","type":"string"}],"name":"setBaseURI","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"provenanceHash","type":"string"}],"name":"setProvenanceHash","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"revealTimeStamp","type":"uint256"}],"name":"setRevealTimestamp","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"setStartingIndex","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startingIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startingIndexBlock","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+    if(contractFunctionName === 'getGreeting'){
+        console.log(' trying to call getGreeting() on solidiity');
+        if (typeof window.ethereum !== 'undefined') {
+            // Use MetaMask's provider
+            try{
+                const web3 = new Web3(window.ethereum);
+                // Request account access if needed
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                // Create a contract instance
+                console.log(`trying to set contract instance and call functions for: ${baycContractAddress}`);
+                //const contract = new web3.eth.Contract(BursonSkullzContractAbi, contractAddress);
+                const contract = new web3.eth.Contract(baycContractAbi, baycContractAddress);
+
+                // Interact with your contract functions
+                // Example: Call a function named 'myFunction' with some arguments
+                const accounts = await web3.eth.getAccounts();
+                const account = accounts[0];
+                console.log('access to contract granted', contract);
+                console.log('Contract methods:', contract._methods);
+ 
+
+                //const nft = await contract_methods.nfts(tokenId).call();
+                //const price = nft.price; // price is already in WEI
+
+                // purchase NFT with specifiec amount
+                //const tx = await contract.methods.purchaseSingleToken(tokenId).send({ from: account, value: price });
+
+
+                const networkId = await web3.eth.net.getId();
+                console.log('Network ID:', networkId);
+                const result = await contract._methods.name().call();//.call({ from: account,  gas: 1000000 });
+                console.log('Function call result:', result);
+            }catch(error){
+                console.log('Error accessing the contract', error);
+            }
+        } else {
+            console.log('No Web3 provider found. Please install MetaMask!');
+        }
+    }else{
+        console.log('calling a function that is not setup yet');
+    }
+}
+/*
+const tokenId = 1; // Example tokenId
+const price = await contract.methods.nfts(tokenId).call().then(nft => nft.price); // Get the price from the contract
+
+web3.eth.getAccounts().then(accounts => {
+    const sender = accounts[0];
+    contract.methods.purchaseSingleToken(tokenId).send({ from: sender, value: price })
+        .on('receipt', function(receipt) {
+            console.log('Transaction successful:', receipt);
+        })
+        .on('error', function(error) {
+            console.error('Transaction failed:', error);
+        });
+});
+
+*/
 
 export function addMessage(message, username, timestamp) {
     msgCount +=1 ; 
@@ -3079,24 +3125,6 @@ export function addMessage(message, username, timestamp) {
     p.appendChild(usernameDiv);
     p.appendChild(timestampDiv);
         
-}
-
-async function getContractABI(contractAddress) {
-    const apiUrl = `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=YourApiKeyToken`;
-
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        if (data.status == "1" && data.result != "") {
-            return JSON.parse(data.result);
-        } else {
-            console.error("Error fetching ABI:", data.message);
-            return null;
-        }
-    } catch (error) {
-        console.error("Error fetching ABI:", error);
-        return null;
-    }
 }
 
 
@@ -3835,6 +3863,27 @@ function addSecretMenu() {
     secretMenu.style.borderRadius = '2vh';
     secretMenu.style.border = '1px solid black';
 
+    let offsetX, offsetY;
+    let isDragging = false;
+    secretMenu.addEventListener("mousedown", function (event) {
+        isDragging = true;
+        offsetX = event.clientX - parseFloat(window.getComputedStyle(secretMenu).left);
+        offsetY = event.clientY - parseFloat(window.getComputedStyle(secretMenu).top);
+    });
+
+    document.addEventListener("mousemove", function (event) {
+        if (isDragging) {
+            secretMenu.style.left = (event.clientX - offsetX) + "px";
+            secretMenu.style.top = (event.clientY - offsetY) + "px";
+        }
+    });
+
+    document.addEventListener("mouseup", function () {
+        isDragging = false;
+        secretMenu.style.cursor = "grab";
+    });
+
+
     const closeButtonContainer = document.createElement('div');
     closeButtonContainer.style.position = 'absolute';
     closeButtonContainer.style.top = '10px';
@@ -3888,12 +3937,13 @@ function addSecretMenu() {
                 titleSpan.style.fontSize = '20px';
                 titleSpan.style.fontWeight = 'bold';
                 titleSpan.style.marginBottom = '15px';
-                popupForm.appendChild(titleSpan);
 
+                popupForm.appendChild(titleSpan);
                 popupForm.classList.add('dbPopup');
-                    let offsetX, offsetY;
-                    let isDragging = false;
-                    popupForm.style.display = 'flex';
+
+                let offsetX, offsetY;
+                let isDragging = false;
+                popupForm.style.display = 'flex';
                 popupForm.addEventListener("mousedown", function (event) {
                     isDragging = true;
                     offsetX = event.clientX - parseFloat(window.getComputedStyle(popupForm).left);
@@ -3912,6 +3962,7 @@ function addSecretMenu() {
                     isDragging = false;
                     popupForm.style.cursor = "grab";
                 });
+
                 const form = document.createElement('form');
                 form.id = 'uploadForm';
                 const imageInput = document.createElement('input');
@@ -4100,7 +4151,7 @@ function addSecretMenu() {
                 makeMintingForm();
             }else{
                 console.log('button not found');
-            }    
+            } 
         });
 
         itemList.appendChild(itemDiv);
@@ -4115,6 +4166,7 @@ function addSecretMenu() {
     secretMenu.appendChild(itemList);
     document.body.appendChild(secretMenu);
 }
+
 function makeMintingForm() {
     const formContainer = document.createElement('div');
     formContainer.className = 'Minting-form';
@@ -4260,7 +4312,7 @@ function makeMintingForm() {
 
     formContainer.appendChild(contractSelector);
 
-    let selectedContract = contractSelector.value; // Initialize with the default value
+    let selectedContract = contractSelector.value; 
 
     contractSelector.addEventListener('change', function() {
         selectedContract = contractSelector.value;
@@ -4285,11 +4337,11 @@ function makeMintingForm() {
             return;
         }
         
-        const compressedData = pako.gzip(JSON.stringify(filesArray)); // Convert to string
+        const compressedData = pako.gzip(JSON.stringify(filesArray)); 
         const folderData = {
             folderName: dropArea.textContent,
             contract: selectedContract,
-            files: Array.from(compressedData) // Convert to array
+            files: Array.from(compressedData) 
         };
 
         fetch('/MintNFTs', {
@@ -4318,6 +4370,7 @@ function makeMintingForm() {
 
     formContainer.appendChild(submitButton);
     document.body.appendChild(formContainer);
+
 
     function handleFiles(files) {
         filesArray = [];
@@ -4378,6 +4431,26 @@ function makeConfirmationForm() {
     formContainer.style.display = 'flex';
     formContainer.style.flexDirection = 'column';
     formContainer.style.alignItems = 'center';
+
+    let offsetX, offsetY;
+    let isDragging = false;
+    formContainer.addEventListener("mousedown", function (event) {
+        isDragging = true;
+        offsetX = event.clientX - parseFloat(window.getComputedStyle(formContainer).left);
+        offsetY = event.clientY - parseFloat(window.getComputedStyle(formContainer).top);
+    });
+
+    document.addEventListener("mousemove", function (event) {
+        if (isDragging) {
+            formContainer.style.left = (event.clientX - offsetX) + "px";
+            formContainer.style.top = (event.clientY - offsetY) + "px";
+        }
+    });
+
+    document.addEventListener("mouseup", function () {
+        isDragging = false;
+        formContainer.style.cursor = "grab";
+    });
 
     const titleSpan = document.createElement('span');
     titleSpan.textContent = 'Tracking Number Form';
@@ -4516,12 +4589,10 @@ function makeConfirmationForm() {
             formContainer.appendChild(loadingContainer);
 
             fetch('/sendConfirmationEmail', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(formData)
-                        })
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(formData)
+            })
             .then(response => {
                 if (response.ok) {
                     return response.json(); 
@@ -5176,14 +5247,15 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                             }
 
                                                             const finalWeiParameter = parseFloat(weiParameterStr);
-
+                                                            //console.log(finalWeiParameter.toString());
                                                             const amountInWei = web3.utils.toWei(finalWeiParameter.toString(), 'ether');
-
+                                                            //const amountInWei = web3.utils.toWei(amountToSendString, 'ether');
                                                             const transactionObject = {
                                                                 from: userWallet, 
                                                                 to: recipientWallet,
                                                                 value: amountInWei
                                                             };
+                                                            console.log('trying to send string:', amountToSendString);
                                                             console.log('trying to send', amountToSendFloat);
                                                             console.log('in WEI', amountInWei);
 
@@ -5827,9 +5899,6 @@ function makeNewGrid(array, grid){
             }else{
 
             }
-
-
-
         });
         gridItem.addEventListener('mouseleave', function() {
             gridItem.style.transform = 'translateY(0)';
