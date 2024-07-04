@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BursonSkullz is ERC721 {
  // Using Counters for managing token IDs
@@ -126,24 +127,22 @@ contract BursonSkullz is ERC721 {
             return false;
         }
     }
-    function checkIfOwnerOfArray(address recipient, uint256[] tokenIdArray) internal returns (bool){
-        bool isOwnerOfallTokens;
-        for(uint256 k=0; k< tokenIdArray; k++){
-            if(msg.sender == nfts[tokenIdArray[k].owner){
-                isOwnerOfallTokens = true;
-            }else{
-                isOwnerOfallTokens = false;
+    function checkIfOwnerOfArray(uint256[] memory tokenIdArray) public view returns (bool) {
+        for (uint256 k = 0; k < tokenIdArray.length; k++) {
+            if (msg.sender != nfts[tokenIdArray[k]].owner) {
+                return false; // Return false immediately if sender doesn't own any token
             }
         }
-        return isOwnerOfallTokens;
+        return true; // Return true if sender owns all tokens in the array
     }
-    function transferArrayOfNFTS(address recipient, uint256[] tokenIdArray) public returns (bool) {
-        if(checkIfOwnerOfArray(address recipient, uint256[] tokenIdArray)){
-            for(uint256 k=0; k< tokenIdArray; k++){
+
+    function transferArrayOfNFTS(address recipient, uint256[] memory tokenIdArray) public returns (bool) {
+        if (checkIfOwnerOfArray(tokenIdArray)) {
+            for (uint256 k = 0; k < tokenIdArray.length; k++) {
                 safeTransferFrom(msg.sender, recipient, tokenIdArray[k]);
             }
             return true;
-        }else {
+        } else {
             return false;
         }
     }
