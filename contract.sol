@@ -3,15 +3,11 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BursonSkullz is ERC721 {
  // Using Counters for managing token IDs
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-
-     // Roy's static wallet address
-    address RoysWallet = 0x5CdaD7876270364242Ade65e8e84655b53398B76;
 
     // Struct to represent an NFT (Non-Fungible Token)
     struct NFT {
@@ -36,11 +32,17 @@ contract BursonSkullz is ERC721 {
     address public contractCreator;
     string public artist;
     address[] internal owners;
+    uint256 creatorFee;
+    address public walletToReceiveFunds;
+    address public RoysWallet;
 
     constructor() ERC721("BursonSkullz", "Burson_Skullz") {
         contractCreator = msg.sender; // sets creator to whoever calls the constructor (or initialized the contract)
         artist = "Roy Burson";
         owners.push(contractCreator);
+        creatorFee = 10;
+        RoysWallet = 0x5CdaD7876270364242Ade65e8e84655b53398B76;
+        walletToReceiveFunds = RoysWallet;
     }
     function checkIfOwner(address _address) internal view returns (bool) {
         for (uint256 i = 0; i < owners.length; i++) {
@@ -119,8 +121,11 @@ contract BursonSkullz is ERC721 {
         return tokens;
     }
     
-    function transferSingleNFT(address recipient, uint256 tokenId) public returns (bool){
+    function transferSingleNFT(address recipient, uint256 tokenId) payable public returns (bool){
         if(msg.sender == nfts[tokenId].owner){
+            uint256 fee = msg.value / creatorFee;
+            payable(ownerOf(tokenId)).transfer(msg.value - fee);
+            payable(walletToReceiveFunds).transfer(fee);
             safeTransferFrom(msg.sender, recipient, tokenId);
             return true;
         }else{
@@ -145,5 +150,30 @@ contract BursonSkullz is ERC721 {
         } else {
             return false;
         }
+    }
+    function changeCreatorFee(uint256 newPercent) external returns(bool){
+        for(uint k = 0; k< owners.length; k++){
+            if(msg.sender == owners[k]){
+                creatorFee = newPercent;
+                return true;
+            }
+        }
+        return false;
+        
+    } 
+
+    function addOwner(address newOwner) external returns (bool){
+        for(uint k = 0; k< owners.length; k++){
+            if(msg.sender == owners[k]){
+                owners.push(newOwner);
+                return true;
+            }
+        }
+        return false;
+    }
+    function changeWalletToRecieveFunds(address newWalletProvider) external returns(bool) {
+        require(msg.sender == owners[0], "Error only owner in the first index of contract can change wallet address");
+        walletToReceiveFunds = newWalletProvider;
+        return true;
     }
 }
