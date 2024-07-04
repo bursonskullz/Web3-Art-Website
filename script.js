@@ -2,7 +2,6 @@
 // Author: Roy Burson 
 // Purpose: Selling painting via crytpo, NFTs on seperate contract, math lectures, ... etc   
 
-
 // Non-Global variables
 import * as myfunctions from './myfunctions.js';
 
@@ -12,21 +11,11 @@ const digitalElement = document.querySelector('.Digitial_art');
 const mathElement = document.querySelector('.Math_research'); 
 export const gridNavigator = document.querySelector('.Navigation_section'); 
 const header = document.querySelector('.Header'); 
-var contractAddress = "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D"; // example change to Burson Skullz when finished
 
-
-//var providerURL = "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID";
-// node to call functions on contract 
-//Infura provides a service that allows you to interact with the Ethereum blockchain without running your own Ethereum node
-
-
-
-//   notes 
-//1) need to fix server response for RoulsResponse 
-//2) test mobile on Jasmine or Mocha 
+// notes 
+//1) need to fix server response for RoulsResponse (train from database), and maybe socket names
+//2) start NFT section. Make contract, read from contract, add ability to interact with contract
 //3) keep track of number of fetches per IP adress in time interval to limite request to DB
-//4) use notes to upload to digital ocean or AWS 
-
 
 // global variables
 window.GridWidth = '65%';
@@ -40,17 +29,13 @@ window.updatesOverlay = false;
 window.isConnected = false;
 window.didGridChange = false;
 window.transactionInProgress = false;
+window.paintingClicked = false;
 window.currentPaintingArray = [];
 window.currentPurchaseArray = [];
 window.currentViewedPaintings = [];
-
-window.paintingClicked = false;
-
-window.myCurrentClick = {
-    // empty object we fill in later to pass into function 
-    // this be current object attached to
-};
-
+// Define the ABI of your contract
+window.contractAddress = '0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8';
+window.BursonSkullzContractAbi = [];
 
 document.addEventListener('DOMContentLoaded', function(){
 
@@ -73,7 +58,8 @@ document.addEventListener('DOMContentLoaded', function(){
             if(thisLoggedInBUtton){
                 thisLoggedInBUtton.addEventListener("click", async function(){
                     console.log('clicking current connect button');
-                    // makeLog(user);
+                    const functionNameString = 'getGreeting';
+                    myfunctions.callContractFunction(functionNameString);
                 });
             }else{
                 console.log('cannot find the loggedIn-button');
@@ -138,8 +124,6 @@ document.addEventListener('DOMContentLoaded', function(){
             myfunctions.upcoming_section_click(updatesElements);
         }
     }); 
-
-
 
 });
 
