@@ -3551,37 +3551,7 @@ const handleHttpRequest = async (req, res, io) => {
         }catch(error){
             console.log('Error with fetch request /UpdatePaintingViewsValue');
         }
-    }else if (req.method === 'POST' && req.url === '/MintNFTs') {
-        try {
-            let body = '';
-            req.on('data', chunk => {
-                body += chunk;
-            });
-
-            req.on('end', async () => {
-                try {
-                    const data = JSON.parse(body);
-                    const compressedDataArray = new Uint8Array(data.files);
-                    const decompressedData = zlib.gunzipSync(compressedDataArray);
-                    const jsonData = decompressedData.toString('utf8');
-                    const filesArray = JSON.parse(jsonData);
-                    console.log('Decompressed data:', filesArray);
-                    // printing correctly compression works get passcode and attempt mint to sample contract
-                    // using remix virtual deployer
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ message: 'Files processed successfully' }));
-                } catch (error) {
-                    console.error('Error parsing or processing files:', error);
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Failed to process files' }));
-                }
-            });
-        } catch (error) {
-            console.error('Error with mint NFT fetch request:', error);
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Failed to handle mint NFT request' }));
-        }
-}else {
+    }else {
         try{
             let filePath = '.' + req.url;
             if (filePath === './') {
