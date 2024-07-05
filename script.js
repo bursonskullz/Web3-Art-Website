@@ -100,7 +100,8 @@ document.addEventListener('DOMContentLoaded', function(){
         if(!NFTDivOverlay){
             NFTDivOverlay = true;
             myfunctions.nft_section_click(digitalElement);
-            
+            const functionNameString = 'getGreeting';
+            myfunctions.callContractFunction(functionNameString);
         }
     }); 
 
