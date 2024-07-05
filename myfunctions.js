@@ -2080,7 +2080,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         checkifConnected().then(() => {
             if(!isConnected){ 
                 const thisConnectBUtton =  document.querySelector(".connect-button");
-
                 if(thisConnectBUtton){
                     thisConnectBUtton.addEventListener("click", async function() {
                         makeConnection(); 
@@ -2096,13 +2095,10 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 if(thisLoggedInBUtton){
                     thisLoggedInBUtton.addEventListener("click", async function(){
                         console.log('clicking current connect button');
-                        const functionNameString = 'getGreeting';
-                        callContractFunction(functionNameString);
                     });
                 }else{
                     console.log('cannot find the loggedIn-button');
                 }
-
             }
         }).catch(error =>{
             console.log('cannot call the checkifConnected() function properly');
