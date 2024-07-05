@@ -1,6 +1,7 @@
 // Date initialized: March 20 2024
 // Author: Roy Burson 
-// Purpose: Selling painting via crytpo, NFTs on seperate contract, math lectures, ... etc   
+// Purpose: Selling painting via crytpo, NFTs on seperate contract, math research, ... etc   
+
 
 // Non-Global variables
 import * as myfunctions from './myfunctions.js';
@@ -12,10 +13,11 @@ const mathElement = document.querySelector('.Math_research');
 export const gridNavigator = document.querySelector('.Navigation_section'); 
 const header = document.querySelector('.Header'); 
 
-// notes 
-//1) need to fix server response for RoulsResponse (train from database), and maybe socket names
+//   notes 
+//1) need to fix server response for RoulsResponse (train from database) and possible socket names acting funny
 //2) start NFT section. Make contract, read from contract, add ability to interact with contract
-//3) keep track of number of fetches per IP adress in time interval to limite request to DB
+//3) keep track of number of fetches per IP adress in time interval to limite request to DB\
+
 
 // global variables
 window.GridWidth = '65%';
@@ -33,9 +35,11 @@ window.paintingClicked = false;
 window.currentPaintingArray = [];
 window.currentPurchaseArray = [];
 window.currentViewedPaintings = [];
+window.currentNFTArray = [];
 // Define the ABI of your contract
 window.contractAddress = '0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8';
 window.BursonSkullzContractAbi = [];
+
 
 document.addEventListener('DOMContentLoaded', function(){
 
@@ -89,30 +93,18 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     }
 
-
     myfunctions.addPaintingElementListener(paintingElement).then(()=>{
-        console.log('we added the listener to the paintingElement element');
+        console.log('we added the listener to the painting element');
     });
-
-
-
-    digitalElement.addEventListener('click', function() {
-        if(!NFTDivOverlay){
-            NFTDivOverlay = true;
-            myfunctions.nft_section_click(digitalElement);
-            const functionNameString = 'getGreeting';
-            myfunctions.callContractFunction(functionNameString);
-        }
-    }); 
-
-
+    myfunctions.addDigitalElementListener(digitalElement).then(()=>{
+        console.log('we added the listener to the digital element');
+    });
 
     mathElement.addEventListener('click', function() {
         if(!mathOverlay){
             mathOverlay = true;
             myfunctions.math_section_click(mathElement);
-            const functionNameString = 'getGreeting';
-            myfunctions.callContractFunction(functionNameString);
+            
         }
     }); 
 
