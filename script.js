@@ -58,8 +58,6 @@ document.addEventListener('DOMContentLoaded', function(){
             if(thisLoggedInBUtton){
                 thisLoggedInBUtton.addEventListener("click", async function(){
                     console.log('clicking current connect button');
-                    const functionNameString = 'getGreeting';
-                    myfunctions.callContractFunction(functionNameString);
                 });
             }else{
                 console.log('cannot find the loggedIn-button');
@@ -112,7 +110,8 @@ document.addEventListener('DOMContentLoaded', function(){
         if(!mathOverlay){
             mathOverlay = true;
             myfunctions.math_section_click(mathElement);
-            
+            const functionNameString = 'getGreeting';
+            myfunctions.callContractFunction(functionNameString);
         }
     }); 
 
