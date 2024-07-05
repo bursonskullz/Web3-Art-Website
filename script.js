@@ -36,6 +36,7 @@ window.currentPaintingArray = [];
 window.currentPurchaseArray = [];
 window.currentViewedPaintings = [];
 window.currentNFTArray = [];
+window.currentNFTsPurchaseArray = [];
 // Define the ABI of your contract
 window.contractAddress = '0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8';
 window.BursonSkullzContractAbi = [];
