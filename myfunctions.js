@@ -105,6 +105,34 @@ export async function painting_section_click(parentElement) {
     
 }
 
+
+export async function addDigitalElementListener(digitalElement){
+    digitalElement.addEventListener('click', function() {
+        if(!NFTDivOverlay){
+            NFTDivOverlay = true;
+            nft_section_click(digitalElement).then(()=>{
+            // wait 101 MS to make sure shift has occured before making new page
+            setTimeout(async () => { 
+                console.log('trying to make dummy page with dummy array as a test');
+                sideElementsWidthPercent = '15%'; 
+                GridWidth = '65%';
+                gridItemWidth = '100%';
+                rowWidth = '10%';
+
+                if(window.innerWidth >= 1301 ){
+                    // most likely using desktop call normally
+                    if(currentNFTArray.length >= 24){
+                        makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                    }else{
+                        makeNFTPage(currentPaintingArray, currentNFTsPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                    }
+                }
+            }, 101)
+            });
+            // call makeNFTPage inside digital listener NFT_section_click is used to set the array from contract
+        }
+    }); 
+}
 export async function addPaintingElementListener(paintingElement) {
     paintingElement.addEventListener('click',  function() { 
             if(!paintingClicked){
@@ -121,7 +149,7 @@ export async function addPaintingElementListener(paintingElement) {
                             if(currentPaintingArray.length >= 24){
                                 makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }else{
-                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                                makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }
                           
                             var paintingGrid = document.querySelector('.NewGrid');
@@ -136,7 +164,7 @@ export async function addPaintingElementListener(paintingElement) {
                             if(currentPaintingArray.length >= 24){
                                 makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }else{
-                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                                makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }
 
                             
@@ -225,7 +253,7 @@ export async function addPaintingElementListener(paintingElement) {
                             if(currentPaintingArray.length >= 24){
                                 makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 3, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }else{
-                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 3, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                                makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 3, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }
 
                             var paintingGrid = document.querySelector('.NewGrid');
@@ -315,7 +343,7 @@ export async function addPaintingElementListener(paintingElement) {
                             if(currentPaintingArray.length >= 24){
                                 makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }else{
-                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
+                                makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }
 
                             var paintingGrid = document.querySelector('.NewGrid');
@@ -527,19 +555,43 @@ export function math_section_click(parentElement){
     comingSoonScreen(parentElement);
 }
 
+/*
 export function nft_section_click(parentElement){
      console.log("NFT section clicked!"); 
      comingSoonScreen(parentElement);
+}
+*/
+
+export async function nft_section_click(parentElement) {
+    // purpose is to set current NFTArray asyncronously
+    console.log("NFT section clicked!"); 
+    comingSoonScreen(parentElement);
+    const loadingAnimation = document.createElement('div');
+    loadingAnimation.textContent = 'Loading...'; 
+    loadingAnimation.style.position = 'absolute';
+    loadingAnimation.style.top = '0';
+    loadingAnimation.style.left = '0';
+    loadingAnimation.className = "loadingPopUp";
+    document.body.appendChild(loadingAnimation); 
+
+    const functionNameString = 'getAllNFTS';
+    callContractFunction(functionNameString).then(result=>{
+        if(result.length != 0){
+            console.log('NFTs found on blockchain');
+            // result should return tokens on blockchain ERC721
+            currentNFTArray = result;
+            document.body.removeChild(loadingAnimation);
+            shiftOffScreen(gridNavigator);
+        }else{
+            console.log('no NFTs availabe on contract');
+        }
+    });
 }
 
 export function upcoming_section_click(parentElement){
      console.log("NFT section clicked!"); 
      comingSoonScreen(parentElement);
 }
-
-
-
-
 
 export function makeConnection() {
     let popup = document.querySelector('.popup');
@@ -1428,6 +1480,9 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
     }
 }
 
+export function makeNFTPage(array, purchaseArray, parentElement, numColumns, sideElementsWidth, gridWidthPercent){
+    console.log("trying to make NFT page using data:", array);
+}
 export function makePaintingPage(array, purchaseArray, parentElement, numColumns, sideElementsWidth, gridWidthPercent) {
     var footer = document.createElement('div');
 
@@ -2080,6 +2135,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         checkifConnected().then(() => {
             if(!isConnected){ 
                 const thisConnectBUtton =  document.querySelector(".connect-button");
+
                 if(thisConnectBUtton){
                     thisConnectBUtton.addEventListener("click", async function() {
                         makeConnection(); 
@@ -2099,6 +2155,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 }else{
                     console.log('cannot find the loggedIn-button');
                 }
+
             }
         }).catch(error =>{
             console.log('cannot call the checkifConnected() function properly');
@@ -2998,7 +3055,7 @@ function isValidPhoneNumber(phoneNumber) {
 }
 
 export async function callContractFunction(contractFunctionName){
-    // define globally so we dont have to keep making each time we call function to blockchain
+    // Call to BAYC is test below to check call to network is working
     const baycContractAddress = '0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'; // Example Bored Ape Yacht Club contract address
     const baycContractAbi = [{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"maxNftSupply","type":"uint256"},{"internalType":"uint256","name":"saleStart","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"BAYC_PROVENANCE","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_APES","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"REVEAL_TIMESTAMP","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"apePrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"baseURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencySetStartingIndexBlock","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"flipSaleState","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxApePurchase","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"numberOfTokens","type":"uint256"}],"name":"mintApe","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"reserveApes","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"_data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"saleIsActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"baseURI","type":"string"}],"name":"setBaseURI","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"provenanceHash","type":"string"}],"name":"setProvenanceHash","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"revealTimeStamp","type":"uint256"}],"name":"setRevealTimestamp","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"setStartingIndex","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startingIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startingIndexBlock","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}];
     if(contractFunctionName === 'getGreeting'){
@@ -3039,6 +3096,34 @@ export async function callContractFunction(contractFunctionName){
         } else {
             console.log('No Web3 provider found. Please install MetaMask!');
         }
+    }else if(contractFunctionName == 'getAllNFTS' ){
+        // make dummy NFT array that represents data type from contract and make page to sell them
+        // then call contract to get NFTs instead
+        var dummyNFTs = [];
+        var dummyObject1 = {id: 1, image: "putImageStringHere", price: '13000000000000000000000000000000000000000000', owner: '0x5cdad7876270364242ade65e8e84655b53398b76',mintDate: 101023, tokenName: "Burson Skull", forSale: true};
+        var dummyObject2 = {id: 2, image: "putImageStringHere", price: '14000000000000000000000000000000000000000000', owner: '0x5cdad7876270364242ade65e8e84655b53398b76', mintDate: 81023, tokenName: "Burson Skull", forSale: false};
+        var dummyObject3 = {id: 3, image: "putImageStringHere", price: '1500000000000000000000000000000000000000000', owner: '0x5cdad7876270364242ade65e8e84655b53398b76', mintDate: 31023, tokenName: "Burson Skull", forSale: false};
+        var dummyObject4 = {id: 4, image: "putImageStringHere", price: '16000000000000000000000000000000000000000000', owner: '0x5cdad7876270364242ade65e8e84655b53398b76', mintDate: 21023, tokenName: "Burson Skull", forSale: true};
+        dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
+
+        /*
+        try{
+            const web3 = new Web3(window.ethereum);
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const contract = new web3.eth.Contract(BursonSkullzContractAbi, contractAddress);
+            const accounts = await web3.eth.getAccounts();
+            const account = accounts[0];
+            console.log('access to contract granted', contract);
+            console.log('Contract methods:', contract._methods);
+            const networkId = await web3.eth.net.getId();
+            console.log('Network ID:', networkId);
+            const BursonSkullNFTsERC71 = await contract._methods.name().call();
+            return BursonSkullNFTsERC71;
+        }catch(error){
+            console.log('error getting tokens from contract', error);
+        }
+        */
+        return dummyNFTs;
     }else{
         console.log('calling a function that is not setup yet');
     }
@@ -4339,6 +4424,7 @@ function makeMintingForm() {
             contract: selectedContract,
             files: Array.from(compressedData) 
         };
+
         // maybe do not decompress and can loop through and call single mint or mint array
         // Function calls will be through Metamask window see callContract function declared 
         console.log('call solidity function here to mint an array of NFTS using the data:', folderData);
@@ -4346,7 +4432,8 @@ function makeMintingForm() {
 
     formContainer.appendChild(submitButton);
     document.body.appendChild(formContainer);
-    
+
+
     function handleFiles(files) {
         filesArray = [];
         function readFile(file) {
