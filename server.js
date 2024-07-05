@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 06-19-24
+// Date last modified: 07-04-24
 // purpose: Make web3 art website
 
 // to do list for main art div
@@ -12,7 +12,6 @@
 5) Fix AI bot (roul) by training him from dataset do not use OPENAI. 
 6) Limit fetch request to DB and digital ocean to reduce cost.
 */
-
 
 // local variables to server
 const maxNumberOfAIEventsPerClient = 100;
@@ -44,13 +43,12 @@ const axios = require('axios');
 const OpenAI = require('openai');
 require('dotenv').config();
 
-
 // collections db strings 
 const paintCollectionString = 'Painting';
 const purchasesCollectionString = 'Purchase';
 const commissionCollectionString = 'Commission';
 
-// security strings 
+// security strings (needs to be changed from person using code)
 const paintingUploadCode = 'Painting-code-here!';
 const appPasscode = 'google-app-passcode-here';
 const buisnessEmial = 'your-buisiness-email@gmail.com';
@@ -59,6 +57,7 @@ const googleAPIKEY = 'your-google-api-maps-key';
 const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
 const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
 const myDomain = ''; 
+
 const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
 });
