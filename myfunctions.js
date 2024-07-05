@@ -4343,35 +4343,14 @@ function makeMintingForm() {
             contract: selectedContract,
             files: Array.from(compressedData) 
         };
-
-        fetch('/MintNFTs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(folderData)
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Failed to upload files');
-            }
-        })
-        .then(data => {
-            console.log('Files uploaded successfully:', data);
-            // Handle success
-        })
-        .catch(error => {
-            console.error('Error uploading files:', error);
-            // Handle error
-        });
+        // maybe do not decompress and can loop through and call single mint or mint array
+        // Function calls will be through Metamask window see callContract function declared 
+        console.log('call solidity function here to mint an array of NFTS using the data:', folderData);
     });
 
     formContainer.appendChild(submitButton);
     document.body.appendChild(formContainer);
-
-
+    
     function handleFiles(files) {
         filesArray = [];
         function readFile(file) {
