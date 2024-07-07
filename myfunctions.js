@@ -15,6 +15,7 @@ let totalChunks = 0;
 var submitButtonIsClicked = false;
 var currentlyPrinted = false;
 var gridPageNumber = 1;
+var NFTPageNumber = 1;
 var changeUserNamePopUpExist = false;
 var currentlyTryingToBuy = false;
 var isSocketPresent = false;
@@ -565,7 +566,7 @@ export function nft_section_click(parentElement){
 export async function nft_section_click(parentElement) {
     // purpose is to set current NFTArray asyncronously
     console.log("NFT section clicked!"); 
-    comingSoonScreen(parentElement);
+    //comingSoonScreen(parentElement);
     const loadingAnimation = document.createElement('div');
     loadingAnimation.textContent = 'Loading...'; 
     loadingAnimation.style.position = 'absolute';
@@ -799,7 +800,7 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
     gridContainer.style.height = '100%'; 
     gridContainer.className = 'NewGrid';
     gridContainer.style.width = gridWidthPercent;
-    gridContainer.style.top = '10%'; 
+    gridContainer.style.top = '1%'; 
     gridContainer.style.padding = '4px';
     gridContainer.style.zIndex = '10'; 
     gridContainer.style.backgroundColor = 'none';
@@ -852,6 +853,15 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
         overlay.style.justifyContent = 'flex-end'; 
         overlay.style.opacity = '.6';
         gridContainer.appendChild(gridItem);
+
+        // add hover event to buy NFT 
+        // check if NFT is avaiabale (check from contract) then put purchase text content in button else put unavailable
+        // add attributes and info to overlay 
+        // add event listener to button if avaialable to call prucahse function to contract
+        // if contract returns false then alert user
+        // else make a successpopup like before may be able to use the same function 
+        // on hover out remove overlay
+        // make ability to sweep floor (toss multiple token ids into array and toss to contract if avaialabale)
     });
 
     
@@ -859,6 +869,62 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
 
 }
 
+
+export function makeNewNFTGrid(array, parentElement) {
+    array.forEach(item => {
+        console.log('trying to make items to append to grid')
+        var gridItem = document.createElement('div');
+        console.log(item.price);
+        gridItem.classList.add('grid-item'+ item.price);// price in classlist if needed to access later but contract handles that
+        gridItem.setAttribute('id', item.id);
+        gridItem.textContent = item; 
+        gridItem.style.position = 'relative';
+        gridItem.style.backgroundColor = '#aaaaaa'; 
+        gridItem.style.width = '95%'; 
+        gridItem.style.left = '2.5%'; 
+        gridItem.style.height = '94%'; 
+        gridItem.style.top = '3%';
+        gridItem.style.display = 'flex';
+        gridItem.style.justifyContent = 'center';
+        gridItem.style.alignItems = 'center';
+        gridItem.style.setProperty('border-radius', '10px', 'important'); 
+        gridItem.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; 
+        removeString(gridItem, "[object Object]");
+        gridItem.style.backgroundImage = `url("${item.image}")`;
+        gridItem.style.backgroundSize = 'cover'; 
+        gridItem.style.backgroundRepeat = 'no-repeat';
+        gridItem.style.backgroundPosition = 'center'; 
+        gridItem.style.backgroundSize = '100%'; 
+
+        var overlay = document.createElement('div');
+        overlay.classList.add('overlay');
+        overlay.style.position = 'absolute';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.setProperty('border-radius', '10px', 'important'); 
+        overlay.style.backgroundColor = 'dimgray'; 
+        overlay.style.display = 'none'; 
+        overlay.style.flexDirection = 'column'; 
+        overlay.style.justifyContent = 'flex-end'; 
+        overlay.style.opacity = '.6';
+        gridContainer.appendChild(gridItem);
+
+        // add hover event to buy NFT 
+        // check if NFT is avaiabale (check from contract) then put purchase text content in button else put unavailable
+        // add attributes and info to overlay 
+        // add event listener to button if avaialable to call prucahse function to contract
+        // if contract returns false then alert user
+        // else make a successpopup like before may be able to use the same function 
+        // on hover out remove overlay
+        // make ability to sweep floor (toss multiple token ids into array and toss to contract if avaialabale)
+    });
+
+    
+    parentElement.appendChild(gridContainer);
+
+}
 
 export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
     var numRows = Math.ceil(array.length / columns);
@@ -1918,6 +1984,7 @@ export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentEleme
     messageInput.addEventListener('blur', () => {
         messageInput.style.border = '1px solid black'; 
     });
+
     unknownDiv.appendChild(messageInput);
     if(isSocketPresent && typeof socket != 'undefined'){
         console.log('socket is already present no need to add again');
@@ -2288,6 +2355,21 @@ export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentEleme
 
 
     gridBackContainer.addEventListener('click', function() {
+        let totalPageNumbers = Math.ceil(currentNFTArray.length / 24);
+        console.log('total pages = ', totalPageNumbers);
+
+        if(NFTPageNumber < totalPageNumbers){
+            NFTPageNumber += 1;
+            let startIndex = (gridPageNumber - 1) * 24;
+            let endIndex = Math.min(NFTPageNumber * 24, currentNFTArray.length); 
+            let newGridArray = currentNFTArray.slice(startIndex, endIndex);
+            let thisGridContainer = document.querySelector('.NewGrid');
+
+            thisGridContainer.innerHTML = '';
+            makeNewNFTGrid(newGridArray, thisGridContainer);
+        }else{
+            alert('Shuffling pages in the Grid is unavailable until Roy makes over 24 paintings. Each page will have 24 Paintings.');
+        }
         console.log('trying to get previous page of nfts in array');
     });
 
@@ -2323,6 +2405,7 @@ export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentEleme
     backButton.style.backgroundSize = 'contain';
     backButton.style.backgroundRepeat = 'no-repeat';
     backButton.style.backgroundPosition = 'center'; 
+
     commissionContainer.style.height = '90%';
     commissionContainer.style.width = iconHeaderWidth;
     commissionContainer.style.top = '7%'; 
@@ -4443,7 +4526,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     gridFowardContainer.addEventListener('click', function() {
         let totalPageNumbers = Math.ceil(currentPaintingArray.length / 24);
         console.log('total pages = ', totalPageNumbers);
-
         if(gridPageNumber < totalPageNumbers){
             gridPageNumber += 1;
             let startIndex = (gridPageNumber - 1) * 24;
@@ -4724,6 +4806,14 @@ export async function callContractFunction(contractFunctionName){
         var dummyObject2 = {id: 2, image: dummyImageString, price: '14000000000000000000000000000000000000000000', owner: '0x5cdad7876270364242ade65e8e84655b53398b76', mintDate: 81023, tokenName: "Burson Skull", forSale: false};
         var dummyObject3 = {id: 3, image: dummyImageString, price: '1500000000000000000000000000000000000000000', owner: '0x5cdad7876270364242ade65e8e84655b53398b76', mintDate: 31023, tokenName: "Burson Skull", forSale: false};
         var dummyObject4 = {id: 4, image: dummyImageString, price: '16000000000000000000000000000000000000000000', owner: '0x5cdad7876270364242ade65e8e84655b53398b76', mintDate: 21023, tokenName: "Burson Skull", forSale: true};
+        dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
+        dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
+        dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
+        dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
+        dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
+        dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
+        dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
+        dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
         dummyNFTs.push(dummyObject1); dummyNFTs.push(dummyObject2); dummyNFTs.push(dummyObject3); dummyNFTs.push(dummyObject4);
 
         /*
@@ -5353,106 +5443,6 @@ function createSearchBar(parentElement) {
     }
     searchInput.addEventListener('keyup', handleSearch);
 }
-
-
-const calculateConversionFactor = (amount) => {
-    const baseFactor = 0.001;
-    if (amount >= 45) {
-        return baseFactor / 1.8; 
-    } else if (amount >= 35) {
-        return baseFactor / 1.75; 
-    } else if (amount >= 15) {
-        return baseFactor / 1.6;
-    }else if (amount >= 12) {
-        return baseFactor / 1.5;
-    }else if (amount >= 11) {
-       return baseFactor / 1.4;
-    }else if (amount >= 10) {
-         return baseFactor / 1.4;
-    }else if (amount >= 9) {
-        return baseFactor;
-    }else if (amount >= 8) {
-        return baseFactor;
-    }else if (amount >= 7) {
-        return baseFactor;
-    }else if (amount >= 6) {
-        return baseFactor;
-    }else if (amount >= 5) {
-        return baseFactor; 
-    }else if (amount >= 4) {
-        return 0.0009942; 
-    }else if (amount >= 3) {
-        //check
-        return 0.0009673; 
-    }else if (amount >= 2) {
-        //check
-         return 0.0009895; 
-    }else if (amount >= 1.6) {
-        // check
-        return 0.0009495;  
-    }else if (amount >= 1.2) {
-        // check
-        return 0.0009542;  
-    }else if (amount == 1) {
-        return 0.00100;   
-    }else if (amount == 0.9) {
-        //not good value
-        return 0.00124955; 
-    }else if (amount == 0.8) {
-        //not good value
-        return 0.00124955; 
-    }else if (amount == 0.7) {
-        //check
-        return 0.00142855; 
-    }else if (amount == 0.6) {
-        //check
-        return 0.00145;
-    }else if (amount == 0.5) {
-        //check
-        return 0.001412; 
-    }else if (amount == 0.4) {
-        //check
-        return 0.001495; 
-    }else if (amount == 0.3) {
-        //check
-       return 0.001495;  
-    }else if (amount == 0.2) {
-       return 0.0015005; 
-    }else if (amount == 0.1) {
-        //check
-        return 0.0016805; 
-    }else{
-        return 1;
-    } // must be a integer
-}; 
-
-
-
-/*
-const calculateConversionFactor = (amount) => {
-    // Check if the amount is a whole number
-    if (Number.isInteger(amount)) {
-        return 0.001;
-    }else{
-
-        // Get the fractional part by subtracting the integer part from the amount
-        const fractionalPart = amount - Math.floor(amount);
-        
-        console.log('the fractional part is', fractionalPart);
-        // Check if the fractional part matches any of the specified values
-        if (fractionalPart <= 0.2){
-            return 0.001 + 0.000100; // 20% the value of 0.001 because we split 5 times 
-        }else if( fractionalPart <= 0.4){
-           return 0.001 +  0.000200;
-        }else if( fractionalPart <= 0.6){
-           return 0.001 +  0.000400;
-        }else if( fractionalPart <= 0.8){
-           return 0.001 +  0.000600;
-        }
-    }
-};
-
-*/
 
 function printInfo(div) {
     var strings = [
@@ -6619,7 +6609,13 @@ export function handleResize() {
     }
     window.addEventListener('resize', handleResize);
 }
-
+function bigNumberToHex(bigNumber) {
+    let hexString = bigNumber.toString(16); // Get hex representation of the number
+    if (hexString.length % 2 !== 0) {
+        hexString = '0' + hexString; // Ensure even length hex string
+    }
+    return '0x' + hexString;
+}
 async function fetchEthereumPrice() {
     try {
         const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
@@ -6878,8 +6874,10 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                     }else{
                                         const checkMyInfo = await validateUserInfo(data.email, data.address, data.firstName, data.lastName);
                                         console.log('checkMyInfo() returns', checkMyInfo);
-                                        if(checkMyInfo.verified){   
+                                        if(checkMyInfo.verified){
+                                                console.log('checking if metamask is installed');   
                                             if (typeof window.ethereum != 'undefined' && isConnected){
+                                                console.log('creating loading icon');
                                                 window.web3 = new Web3(window.ethereum);
                                                 const loadingContainer = document.createElement("div");
                                                 loadingContainer.className = "loading-container";
@@ -6902,22 +6900,18 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
 
                                                 loadingContainer.appendChild(loadingIcon);
                                                 formContainer.appendChild(loadingContainer);
-
+                                                console.log('trying to call try statement line 6997');
                                                 try{
                                                     const amountToSendString = parentDiv.className.replace("grid-item", ""); 
                                                     const amountToSendFloat = parseFloat(amountToSendString);
-                                                    const conversionFactor = calculateConversionFactor(amountToSendFloat);
-
-                                                    console.log('the conversion factor is', conversionFactor);
-                                                    if(conversionFactor != null){
+                                                    if(true){
                                                         const networkStatus = await checkNetwork('ethereum'); 
                                                         if(networkStatus){
-                                                            console.log('its okay to send transaction we are on the correct network');
                                                             transactionInProgress = true;
                                                             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                                                             const userWallet = accounts[0];
                                                             const recipientWallet = RoysWallet; 
-                                                            const weiParameter = amountToSendFloat*conversionFactor;
+                                                            const weiParameter = amountToSendFloat;
                                                             const desiredDecimalPlaces = 7; 
                                                             let weiParameterStr = weiParameter.toString();
                                                             let decimalIndex = weiParameterStr.indexOf('.');
@@ -6930,22 +6924,18 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                             }
 
                                                             const finalWeiParameter = parseFloat(weiParameterStr);
-                                                            //console.log(finalWeiParameter.toString());
                                                             const amountInWei = web3.utils.toWei(finalWeiParameter.toString(), 'ether');
-                                                            //const amountInWei = web3.utils.toWei(amountToSendString, 'ether');
-                                                            // Convert Wei to Hex
                                                             const amountInHex = web3.utils.toHex(amountInWei);
-                                                            // might not be hexing correctly test individually
-                                                            console.log(`Amount in Hex: ${amountInHex}`); // This should print the hex value of '1400000000000000000'
                                                             const transactionObject = {
                                                                 from: userWallet, 
                                                                 to: recipientWallet,
-                                                                value: amountInWei
+                                                                value: amountInHex
                                                             };
                                                             console.log('trying to send string:', amountToSendString);
                                                             console.log('final Wei paramater', finalWeiParameter);
                                                             console.log('amount to send float', amountToSendFloat);
                                                             console.log('in WEI', amountInWei);
+                                                            console.log('in hex', amountInHex);
 
                                                             const response = await window.ethereum.request({
                                                                 method: 'eth_sendTransaction',
@@ -7073,6 +7063,7 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                     }
 
                                 }catch(error){
+                                    console.log(error);
                                     console.log('we could not fire the function checkMyInfo correctly');   
                                     const loadingContainer = document.querySelector('.loading-container');
                                     if(loadingContainer){
