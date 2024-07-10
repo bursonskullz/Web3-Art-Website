@@ -1,3 +1,17 @@
+// to do list (need to mint NFTS on blockchain before proceeding):
+
+// 1) edit javascript form that mints multiple NFT to blockchain and loop through and call mint function or you can try to call the mint array instead (see the contract.sol file)
+// 2) make form to mint single NFT instead of array. Print data to console as object on submit;
+// 3) after make try statement to call contract function to mint (will fail temporarily until we deploy to the mainnet)
+// 4) deploy test contract to mint few NFTs
+// 5) create hoverability to each NFT item to add data to overlay (owner, dateminted,.... should have access to attributes)
+// 6) create addNFTBuyButton() function to call purchase nft on solidity use same layout as addBuyButton() function 
+// 7) make sure that you keep track on attempted purchases on array to ensure clients cannot click purchase button at the same time 
+//                  - need to handle purchase events chronologically. Make seperate array of clients of when they click add them to the array and then for each item in the array
+//                  - you can check if item they want is available
+//                  - only allow a minute or so incase client is hovering in metamask not rejecting or approving transaction. 
+//                  - remove from array if they approve or deny and handle next event
+//                  
 import {gridNavigator} from './script.js';
 import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.0.8/dist/ethers.esm.min.js'; 
 //import pako from 'pako';
@@ -870,12 +884,13 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
 }
 
 
-export function makeNewNFTGrid(array, parentElement) {
+export function makeNewNFTGrid(array, grid) {
+    console.log('trying to make new grid');
     array.forEach(item => {
-        console.log('trying to make items to append to grid')
+        console.log('trying to make items to append to grid');
         var gridItem = document.createElement('div');
         console.log(item.price);
-        gridItem.classList.add('grid-item'+ item.price);// price in classlist if needed to access later but contract handles that
+        gridItem.classList.add('grid-item'+ item.price);
         gridItem.setAttribute('id', item.id);
         gridItem.textContent = item; 
         gridItem.style.position = 'relative';
@@ -909,7 +924,8 @@ export function makeNewNFTGrid(array, parentElement) {
         overlay.style.flexDirection = 'column'; 
         overlay.style.justifyContent = 'flex-end'; 
         overlay.style.opacity = '.6';
-        gridContainer.appendChild(gridItem);
+        grid.appendChild(gridItem);
+        console.log('we made a new grid'); 
 
         // add hover event to buy NFT 
         // check if NFT is avaiabale (check from contract) then put purchase text content in button else put unavailable
@@ -920,10 +936,6 @@ export function makeNewNFTGrid(array, parentElement) {
         // on hover out remove overlay
         // make ability to sweep floor (toss multiple token ids into array and toss to contract if avaialabale)
     });
-
-    
-    parentElement.appendChild(gridContainer);
-
 }
 
 export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
@@ -1516,7 +1528,8 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
                 div.style.left = ((100 - parseFloat(div.style.width)) / 2).toString() + "%";
 
                 div.addEventListener('click', async function(){
-                    console.log('need to shuffle currentNFTArray and maybe fix function');
+                    console.log('need to shuffle currentNFTArray by date created from blockchain or currentNFTArray[i].mintDate');
+                    console.log('makeNewOrganized array and shuffle data from blockchain mint date is string');
                     /*
                     let organizedArray = await organizePaintingArrayByMostRecent(currentPaintingArray);
                     currentPaintingArray = organizedArray;
@@ -2082,7 +2095,7 @@ export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentEleme
     tree.className = 'tree';
     tree.appendChild(welcomeDiv);  
 
-    addTreeList(tree, currentPaintingArray, parentElement, numColumns, gridWidthPercent); 
+    addTreeList(tree, currentNFTArray, parentElement, numColumns, gridWidthPercent); 
 
     const timeFrame = 15; 
     const movementPercentages = [1, 1.5, 0.5, 0.8, 1.2]; 
@@ -2331,6 +2344,19 @@ export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentEleme
 
     gridFowardContainer.addEventListener('click', function() {
         console.log('trying to get next page of nfts in array');
+        let totalPageNumbers = Math.ceil(currentNFTArray.length / 24);
+        console.log('total pages = ', totalPageNumbers);
+        if(NFTPageNumber < totalPageNumbers){
+            NFTPageNumber += 1;
+            let startIndex = (NFTPageNumber - 1) * 24;
+            let endIndex = Math.min(NFTPageNumber * 24, currentNFTArray.length); 
+            let newGridArray = currentNFTArray.slice(startIndex, endIndex);
+            let thisGridContainer = document.querySelector('.NewGrid');
+            thisGridContainer.innerHTML = '';
+            makeNewNFTGrid(newGridArray, thisGridContainer);
+        }else{
+            alert('We are on the last page of the paintings!');
+        }
     });
 
     gridFoward.style.position = 'absolute'; 
@@ -2358,19 +2384,18 @@ export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentEleme
         let totalPageNumbers = Math.ceil(currentNFTArray.length / 24);
         console.log('total pages = ', totalPageNumbers);
 
-        if(NFTPageNumber < totalPageNumbers){
-            NFTPageNumber += 1;
-            let startIndex = (gridPageNumber - 1) * 24;
+        if(NFTPageNumber > 1){
+            NFTPageNumber -= 1;
+            let startIndex = (NFTPageNumber - 1) * 24;
             let endIndex = Math.min(NFTPageNumber * 24, currentNFTArray.length); 
             let newGridArray = currentNFTArray.slice(startIndex, endIndex);
             let thisGridContainer = document.querySelector('.NewGrid');
-
             thisGridContainer.innerHTML = '';
             makeNewNFTGrid(newGridArray, thisGridContainer);
+            console.log('We shuffled pages');
         }else{
-            alert('Shuffling pages in the Grid is unavailable until Roy makes over 24 paintings. Each page will have 24 Paintings.');
+            alert('We are onn page 1 of the NFTS');
         }
-        console.log('trying to get previous page of nfts in array');
     });
 
 
@@ -4535,7 +4560,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             thisGridContainer.innerHTML = '';
             makeNewGrid(newGridArray, thisGridContainer);
         }else{
-            alert('Shuffling pages in the Grid is unavailable until Roy makes over 24 paintings. Each page will have 24 Paintings.');
+            alert('We are on the last page of the paintings!');
         }
 
     });
@@ -7479,7 +7504,7 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
 
 
 function makeNewGrid(array, grid){
-        array.forEach(item => {
+    array.forEach(item => {
         var gridItem = document.createElement('div');
         gridItem.classList.add('grid-item'+item.price.$numberDecimal.toString());
         gridItem.setAttribute('id', item._id);
