@@ -1,6 +1,6 @@
 // Date initialized: March 20 2024
 // Author: Roy Burson 
-// Purpose: Selling painting via crytpo, NFTs on seperate contract, math research, ... etc   
+// Purpose: Selling painting via crytpo, NFTs on seperate contract, math lectures, ... etc   
 
 
 // Non-Global variables
@@ -12,11 +12,6 @@ const digitalElement = document.querySelector('.Digitial_art');
 const mathElement = document.querySelector('.Math_research'); 
 export const gridNavigator = document.querySelector('.Navigation_section'); 
 const header = document.querySelector('.Header'); 
-
-//   notes 
-//1) need to fix server response for RoulsResponse (train from database) and possible socket names acting funny
-//2) start NFT section. Make contract, read from contract, add ability to interact with contract
-//3) keep track of number of fetches per IP adress in time interval to limite request to DB\
 
 
 // global variables
