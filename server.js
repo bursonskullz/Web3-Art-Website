@@ -1,16 +1,12 @@
 // Name: Roy Burson 
-// Date last modified: 07-04-24
+// Date last modified: 09-25-24
 // purpose: Make web3 art website
-
-// to do list for main art div
 
 /*
 1) Fix socket names not working, and commission form needs centered.
 2) uploading painting failed online (but not on local host) to much data for droplet need to chunk or compress before sending to server.
-3) create pop up for selecting coins and change var usersChosenCoin to this value.
-4) check it network is on the selected coin network (use simple function).
-5) Fix AI bot (roul) by training him from dataset do not use OPENAI. 
-6) Limit fetch request to DB and digital ocean to reduce cost.
+3) Fix AI bot (roul) by training him from dataset do not use OPENAI. 
+4) green light not removed on metamask app
 */
 
 // local variables to server
@@ -24,6 +20,10 @@ var timerIsAlreadyCalled = false;
 var userAIQuestions = [];
 var previousQuestion0 = [];
 var previousQuestion1 = [];
+let stringChunk = '';
+
+let Series2Holders = ["0x21331", "0x1122222"]; // Pull From contract add here (these are examples)
+let Series1Holders = []; // pull from contract and add them here!
 
 // packages
 const http = require('http');
@@ -37,18 +37,21 @@ const nodemailer = require('nodemailer');
 const puppeteer = require('puppeteer');
 const zlib = require('zlib');
 var inlineBase64 = require('nodemailer-plugin-inline-base64');
-const Web3 = require('web3');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const OpenAI = require('openai');
+const solc = require('solc');
+
 require('dotenv').config();
 
 // collections db strings 
 const paintCollectionString = 'Painting';
 const purchasesCollectionString = 'Purchase';
 const commissionCollectionString = 'Commission';
+const bursonSkullzModelString = 'Burson Skullz';
+const contractCollectionString = 'NFT Contracts';
 
-// security strings (needs to be changed from person using code)
+// security strings 
 const paintingUploadCode = 'Painting-code-here!';
 const appPasscode = 'google-app-passcode-here';
 const buisnessEmial = 'your-buisiness-email@gmail.com';
@@ -56,8 +59,13 @@ const dbURL = 'your-mongoose-db-string';
 const googleAPIKEY = 'your-google-api-maps-key';
 const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
 const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
-const myDomain = ''; 
+const addNFTCollectionDataPasscode = 'your-passcode-to-add-nfts';
+const deployableContractPasscode = 'passcode-to-deploy-contract';
 
+const modelsArray = [];
+const modelsMap = new Map(); // need to add any models with the contract name when the server is created!
+
+const myDomain = undefined;
 const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
 });
@@ -75,7 +83,6 @@ const paintingSchema = new mongoose.Schema({
     dateUploaded: { type: Date, default: Date.now }, 
     views: {type: Number, default: 0}
 }); 
-
 
 const purchaseSchema = new mongoose.Schema({
     firstName: String,
@@ -106,10 +113,26 @@ const commissionSchema = new mongoose.Schema({
     isActive: Boolean
 });
 
+const tokenSchema = new mongoose.Schema({
+    contractName: String,
+    contractAddress: String,
+    tokenID:  Number, 
+    image: String
+}); 
+
+const collectionSchema = new mongoose.Schema({
+    contractName: String,
+    contractAddress: String,
+    contractABI: String,
+    collectionBackgroundImage: String
+}); 
+
 // Create models 
 const paintingModel = mongoose.model(paintCollectionString, paintingSchema); 
 const purchaseModel = mongoose.model(purchasesCollectionString, purchaseSchema); 
 const commissionModel = mongoose.model(commissionCollectionString, commissionSchema); 
+const collectionModel = mongoose.model(contractCollectionString, collectionSchema); 
+
 
 const basicDefinitions = ['to', 'from', 'why', 'his', 'her', 'this','dad', 'mom',
   'and', 'the', 'a', 'an', 'in', 'on', 'at', 'with', 'he', 'she',
@@ -1910,7 +1933,7 @@ try{
 
             const io = socketIo(server);
 
-io.on('connection', (socket) => {
+            io.on('connection', (socket) => {
                 console.log('A user connected');
                 const ipAddress = socket.handshake.address;
                 let clientIP;
@@ -1929,7 +1952,6 @@ io.on('connection', (socket) => {
                         const randomIndex = Math.floor(Math.random() * randomNames.length);
                         username = randomNames[randomIndex];
                     } while (isUsernameTaken(username, users)); 
-                    
                     const currentUser = { 
                         ip: clientIP, 
                         user: username, 
@@ -1939,6 +1961,8 @@ io.on('connection', (socket) => {
                     users.push(currentUser);
                 }
                 socket.on('message', (message) => {
+                    // do not want to pass in username because users have ability to change it and socket it called once on creation 
+                    // for each user
                     const ipAddress = socket.handshake.address;
                     const timeSent = new Date().toISOString();
                     let clientIP;
@@ -1958,11 +1982,11 @@ io.on('connection', (socket) => {
                     }
 
                     const obj = {
-                            msg: message,
-                            username: senderName,
-                            time: timeSent, 
-                            coolDown: sender.coolDown,
-                            nameChanges:0 
+                        msg: message,
+                        username: senderName,
+                        time: timeSent, 
+                        coolDown: sender.coolDown,
+                        nameChanges:0 
                     };
                     if(!checkString(obj.msg)){
                         obj.msg = 'Your input contains inappropriate content. Please ensure your message is respectful!';
@@ -2088,18 +2112,27 @@ function checkEmailString(email) {
     const isValidEmail = emailRegex.test(email);
     return isValidEmail;
 }
+
+
 async function checkAddressString(address) {
+    // google maps does not regonize droplet IP address (need new method or configure setting)
+    // works on local host 
+    // 
     try {
         const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=`+googleAPIKEY);
         const data = await response.json();
         if (data.results && data.results.length > 0) {
             return true;
         } else {
-            return false;
+            return true;
+            console.log('The shipping address you entered could not be detected from google maps please make sure to review before proceeding');
+            // should return false dont know why API is restricting me
         }
     } catch (error) {
-        console.error('Error checking address:', error);
+        console.log('Error checking address:', error);
+        console.log('The shipping address you entered could not be detected from google maps please make sure to review before proceeding');
         return false;
+        // should return false dont know why API is restricting me
     }
 }
 
@@ -2246,7 +2279,9 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
             subject: 'Tracking Number', 
             html: HTML
     };
+
     try {
+
         let result = await transporter.sendMail(mailOptions);
         console.log('Email sent');
         return result;
@@ -2255,9 +2290,11 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
         throw error; 
     }
 }
+
 function isUsernameTaken(username, users) {
     return users.some(user => user.user === username);
 }
+
 async function getNewDefinition(word) {
   const apiUrl =`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${MERRIAM_WEBSTER_API_KEY}`;
   try {
@@ -2266,11 +2303,16 @@ async function getNewDefinition(word) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
     const data = await response.json();
+
+    //console.log(`we recieved data for the word ${word}:`, data);
+
     if (data.length === 0) {
       console.log('No definition found.');
       return null;
     }
+
     const entry = data[0];
+
     const wordInfo = {
       word: word,
       definition1: entry.shortdef[0] ? entry.shortdef[0] : null,
@@ -2292,6 +2334,43 @@ async function getNewDefinition(word) {
   }
 }
 
+async function getAllCollections() {
+    try {
+        // List all collections in the database
+        const collections = await mongoose.connection.db.listCollections().toArray();
+        
+        // Extract and return collection names
+        return collections.map(col => col.name);
+    } catch (error) {
+        console.error('Error fetching collections:', error);
+        return [];
+    }
+}
+
+async function getAllModels() {
+    const collectionNames = await getAllCollections();
+    const models = {};
+
+    collectionNames.forEach(name => {
+        try {
+            // Check if the model already exists in mongoose.models
+            if (mongoose.models[name]) {
+                // If it exists, use the existing model
+                models[name] = mongoose.models[name];
+            } else {
+                // Otherwise, create a new model with a flexible schema
+                const schema = new mongoose.Schema({}, { strict: false }); // Flexible schema
+                models[name] = mongoose.model(name, schema);
+            }
+        } catch (error) {
+            console.error(`Error handling model for collection "${name}":`, error);
+        }
+    });
+
+    return models; // Return an object containing all models
+}
+
+
 async function verifyUserinputData(email, address, firstName, lastName){
     const isEmail = checkEmailString(email);
     const isAddress = await checkAddressString(address);
@@ -2307,8 +2386,11 @@ async function verifyUserinputData(email, address, firstName, lastName){
 
     return localObjectVerifier;
 }
+
+
 async function roulsResponse(question) {
-    const lowercaseQuestion = question.toLowerCase();
+    const lowercaseQuestion = question.toLowerCase(); // Convert question to lowercase
+
     const artworkPurchaseKeywords = [
       'buy a painting',
       'buy art',
@@ -2586,20 +2668,24 @@ async function roulsResponse(question) {
           //const thisWord = part.substring(part.lastIndexOf(" ")+1);
           const stripedWord = thisWord.replace(/\s/g, "");
           //console.log(' seems like the user is asking for a definition of:', stripedWord);
+          
           let matchingObj = knownDefinitions.find(obj => obj.word === stripedWord);
 
           if (matchingObj) {
+              //console.log('We found a matching word:', matchingObj);
+
               let formattedString = Object.entries(matchingObj)
                   .filter(([key, value]) => value !== null) 
                   .map(([key, value]) => `${key}: ${value}`)
                   .join('\n\n'); 
 
               response = formattedString + '\n';
+              //console.log('we formatted the json object to string:', response);
           } else {
               response = 'We could not find the word you are looking for.\n\n';
           }
           
-        }  else {
+        } else {
             const questionHasAlreadyBeenAsked0 = previousQuestion0.findIndex(obj=> obj.question == part);
             const questionHasAlreadyBeenAsked1 = previousQuestion1.findIndex(obj=> obj.question == part);
 
@@ -2612,8 +2698,8 @@ async function roulsResponse(question) {
                 console.log('we found previous question in array2 no need to fetching OPENAI event');
                 response = previousQuestion1[questionHasAlreadyBeenAsked1].response;
             }else{
-                // calling openAI response temporaily until bursonAI is setup properly and trained
                 response = await fetchOpenAIResponse(part);
+                // push to array
                 const AIeventObject = {
                     question: part,
                     response: response
@@ -2624,7 +2710,7 @@ async function roulsResponse(question) {
                 }else if(questionHasAlreadyBeenAsked1.length <= max_array_length){
                     previousQuestion1.push(AIeventObject);
                 }else{
-                    console.log("System memory is full do not save");
+                    console.log('Memory system full do not push to array');
                 }
             }
             
@@ -2687,7 +2773,69 @@ async function validateTransaction(transactionHash) {
     }
 }
 
+// Function to compile Solidity contracts
+function compileContract(contractSource, contractName) {
+    console.log('trying to compile into bytcode');
+    try{
+        const input = {
+            language: 'Solidity',
+            sources: {
+                'Contract.sol': {
+                    content: contractSource,
+                },
+            },
+            settings: {
+                outputSelection: {
+                    '*': {
+                        '*': ['abi', 'evm.bytecode.object'],
+                    },
+                },
+            },
+        };
 
+        const output = JSON.parse(solc.compile(JSON.stringify(input)));
+        const compiledContract = output.contracts;
+        const myobj = compiledContract[Object.keys(compiledContract)[0]];
+        //console.log('compiled contract', compiledContract);
+        //console.log('compiled contract abi', myobj.testContract.abi);
+        //console.log('compiled contract bytecode', myobj.testContract.evm.bytecode);
+
+        if (myobj) {
+            return {
+                abi: myobj.testContract.abi, // does not return a string 
+                bytecode: myobj.testContract.evm.bytecode.object,
+            };
+        } else {
+            throw new Error('Compilation failed: ' + JSON.stringify(output.errors));
+        }
+        console.log('compiled contract successfully');
+    }catch(error){
+        console.log("Error calling the function compileContract(contractSource, contractName)", error);
+    }
+}
+
+// Function to deploy the contract to the specified network
+async function makeDeployableContract(contractData) {
+    console.log('deployableContract called');
+    
+    try {
+        const { solidityContract, name, token } = contractData;
+        const { abi, bytecode } = compileContract(solidityContract, name);
+
+        return {
+            abi,
+            bytecode,
+        };
+
+    } catch (error) {
+        console.error('Error deploying contract:', error);
+
+        return {
+            abi: null,
+            bytecode: null
+        };
+    }
+}
 const handleHttpRequest = async (req, res, io) => {
     let requestArray = [];
     if (req.method == 'POST' && req.url == '/add-painting') {
@@ -2754,6 +2902,42 @@ const handleHttpRequest = async (req, res, io) => {
         }catch(error){
         console.log('Error with fetch request /add-painting request');
         }
+    } else if (req.method === 'GET' && Series2Holders.includes(req.url.slice(1)) || Series1Holders.includes(req.url.slice(1)) ) {
+        try {
+            // logic to setup JS or HTML to send back to client 
+            // make sure utility is not accessible from client side!!!!
+            const userHTMLPAGE = '';
+            // send back HTML document from ownerPage.html!
+            console.log(`Accessing data for wallet address: ${req.url.slice(1)}`);
+        } catch (error) {
+            console.log('Error with fetch request:', req.url);
+        }
+    }else if (req.method === 'GET' && req.url == '/getALLDeployedCollections') {
+
+        try{
+            const contracts = async () => {
+                const contracts = await collectionModel.find({});
+                return contracts
+            };
+            contracts().then((result) => {
+                const data = zlib.gzipSync(JSON.stringify(result))
+                if (result.length > 0) {
+                    res.setHeader('Content-Encoding', 'gzip');
+                    res.end(data);
+                } else {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({success: false})); 
+                }
+            }).catch((error) => {
+                // if  errno: -3008,the error is internet connection 
+                console.error(error); 
+                console.log('There was an error calling the paintings() function, if  errno: -3008,the error is internet');
+            });
+
+        }catch(error){
+            console.log('Error with fetch request /getALL-paintings');
+        }
+
     }else if(req.method == 'GET' && req.url == '/getALL-paintings'){
         try{
             const paintings = async () => {
@@ -2763,8 +2947,10 @@ const handleHttpRequest = async (req, res, io) => {
             paintings().then((result) => {
                 if (result.length > 0) {
                     const paintingsData = zlib.gzipSync(JSON.stringify(result)); 
-                     res.setHeader('Content-Encoding', 'gzip');
-                     res.end(paintingsData);
+                    //console.log('paintings before gzip applied:', result)
+                    //console.log(paintingsData);
+                    res.setHeader('Content-Encoding', 'gzip');
+                    res.end(paintingsData);
                 } else {
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ success: false })); 
@@ -2777,6 +2963,153 @@ const handleHttpRequest = async (req, res, io) => {
 
         }catch(error){
             console.log('Error with fetch request /getALL-paintings');
+        }
+
+    }else if(req.method == 'POST' && req.url == '/saveNFTCollection'){
+        try {
+            let body = '';
+
+            // Accumulate incoming data chunks
+            req.on('data', (chunk) => {
+                body += chunk.toString();
+            });
+
+            req.on('end', async () => {
+                try {
+                    const data = JSON.parse(body);
+                    console.log('Attempting to save data to database -->', data);
+
+                    const collectionModelInstance = new collectionModel({
+                        contractName: data.contractName,
+                        contractAddress: data.contractAddress,
+                        contractABI: JSON.stringify(data.contractABI), // check data matches before proceeding
+                        collectionBackgroundImage: data.collectionBackground // Fixed the typo here
+                    });
+
+                    // Save the model instance to the database
+                    await collectionModelInstance.save();
+                    console.log('Item saved to database');
+
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: true, code: 100 }));
+                } catch (error) {
+                    console.error("Error saving item to database", error);
+
+                    // Internal server error response
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: false, code: 102, error: error.message }));
+                }
+            });
+
+            // Error handling for request-level issues
+            req.on('error', (error) => {
+                console.error('Request error:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, code: 103, error: error.message }));
+            });
+        } catch (error) {
+            console.error('Error handling fetch request /saveNFTCollection', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, code: 104, error: error.message }));
+        }
+
+    }else if(req.method == 'POST' && req.url == '/deploy-a-contract'){
+        try{
+            let body = '';
+            // Accumulate incoming data chunks
+            req.on('data', (chunk) => {
+                body += chunk.toString();
+            });
+
+            req.on('end', async () => {
+                const data = JSON.parse(body);
+
+                if(data.passcode == deployableContractPasscode){
+                    if(data.lastChunk == true){                    
+                        stringChunk += data.backgroundImage;
+                        data.backgroundImage = stringChunk;
+                        stringChunk = '';
+                        console.log('trying to compile contract using data', data);
+                        const deployableContract = await makeDeployableContract(data); // returns abi, and bytecode
+                        console.log("deployableContract returns", deployableContract);
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ success: true, contractABI: deployableContract.abi, bytecode: deployableContract.bytecode, error: null })); 
+                    }else{
+                        //console.log('current string chunk', stringChunk);
+                        stringChunk += data.backgroundImage;
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({success: false, contractABI: null, bytecode: null, error: 10200299222222 }));
+                    }
+                }else{
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({success: false, contractABI: null, bytecode: null, error: 10983838122 }));
+                }
+            });
+        }catch(error){
+            console.log('Error with fetch request /deploy-a-contract');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, contractABI: null, bytecode: null, error: error })); 
+        }
+
+    }else if(req.method == 'POST' && req.url == '/getALL-NFTs'){
+
+        try{
+            let body = '';
+            // Accumulate incoming data chunks
+            req.on('data', (chunk) => {
+                body += chunk.toString();
+            });
+
+            req.on('end', async () => {
+                const data = JSON.parse(body);
+
+                // Function to fetch NFTs using the model name provided
+
+
+                const getNFTs = async (name, limitLength) => {
+                    let tokens = [];
+                    try{
+                        const allModels = await getAllModels();
+                        const specificModel = allModels[name];
+
+                        if (specificModel) {
+                            // Use the model for querying or other operations
+                            console.log(`Successfully accessed model: ${specificModel.modelName}`);
+                                        
+                            // Example operation: Find all documents in the model
+                            const documents = await specificModel.find({}).limit(limitLength);
+                            console.log('Documents:', documents);
+                            tokens = documents;
+
+                        } else {
+                           // model was not found we can create it! overwrite
+                           const specificModel = mongoose.model(name, tokenSchema);
+                            const documents = await specificModel.find({}).limit(limitLength);
+                            console.log('Documents:', documents);
+                            tokens = documents;
+                        }
+
+                        return tokens;
+                    }catch(error){
+                        console.log('error finding tokens in databse', error);
+                        return [];
+                    }
+                };
+
+                // Call getNFTs with the contract name from the request data
+                getNFTs(data.contractName, 24).then((result) => {
+                    const compressedData = zlib.gzipSync(JSON.stringify(result)); 
+                    res.setHeader('Content-Encoding', 'gzip');
+                    res.end(compressedData);
+                }).catch((error) => {
+                    console.error(error); 
+                    console.log('There was an error calling the getNFTs() function. If errno: -3008, it indicates an internet connection issue.');
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: false, code: 100 })); 
+                });
+            });
+        }catch(error){
+            console.log('Error with fetch request /getALL-NFTs');
         }
 
     }else if(req.method == 'POST' && req.url == '/add-commission'){
@@ -3283,10 +3616,14 @@ const handleHttpRequest = async (req, res, io) => {
             });
 
             req.on('end', async ()=> {
+                // Parse the JSON data from the request body
                 const data = JSON.parse(body);
                  try{ 
+
+
                     const { transactionHash, objectId, address, email, firstName, lastName } = data;
                     const clientIP = req.connection.remoteAddress;
+
                     const attemptedPurchaseClient = {
                         ipAddress: clientIP,
                         inProgress: true,
@@ -3301,7 +3638,7 @@ const handleHttpRequest = async (req, res, io) => {
                         { _id: objectId }, 
                         { $set: {
                              inStock: false,
-                              dateSold: new Date()
+                              dateSold: new Date() 
                             }
                         } 
                     );
@@ -3336,13 +3673,14 @@ const handleHttpRequest = async (req, res, io) => {
                         };
                         res.setHeader('Content-Encoding', 'gzip'); 
                         res.end(zlib.gzipSync(JSON.stringify(thisObj)));
-                        io.emit('updateCurrentPaintings',{updated: true, Id: objectId} );
+                        io.emit('updateCurrentPaintings',{updated: true, Id: objectId});
+                        // only send email if purchase is saved 
                         newPurchase.save()
                           .then(savedUser => {
                             attemptedClients = [];
                             sendEmail(email, address, firstName, lastName, objectId, updatedPainting.price, updatedPainting.name, updatedPainting.image)
                                 .then(result => {
-                                    //do nothing with result
+                                    // dont do anything with the result maybe log it out
                                 })
                                 .catch(error => {
                                      attemptedClients = [];
@@ -3381,17 +3719,12 @@ const handleHttpRequest = async (req, res, io) => {
                     const data = JSON.parse(body);
                     verifyUserinputData(data.email, data.address, data.firstName, data.lastName)
                         .then((result) => {
-
-                            //console.log(result);
-
                             let verifiedValue = null; 
-
                             if (result.email == true && result.address == true && result.firstName == true && result.lastName == true) {
                                 verifiedValue = true;
                             } else {
                                 verifiedValue = false;
                             }
-
                             const newData = {
                                 verified: verifiedValue,
                                 email: result.email,
@@ -3445,24 +3778,29 @@ const handleHttpRequest = async (req, res, io) => {
     } else if(req.method == 'POST' && req.url == '/UpdateUsername'){
         try{
             let body = '';
+
             req.on('data', chunk => {
                 body += chunk.toString();
 
             });
+
             req.on('end', async () =>{
                 const data = JSON.parse(body);
                 const clientIP = req.connection.remoteAddress;
+
+                // check numberOfchangesvalue
                 const userIndex = users.findIndex(user => user.ip === clientIP);
                 if(userIndex!=-1){
                     if (users[userIndex].nameChanges <= 7 && checkString(data.newUsername) && data.newUsername.length >=3) {
                         users[userIndex].nameChanges +=1; 
                         const usersOldName = users[userIndex].user;
-                        // change all messages with old name 
+
                         messageHistory.forEach(message => {
                             if (message.username === usersOldName) {
                                 message.username = data.newUsername;
                             }
                         });
+                        
                         users[userIndex].user = data.newUsername;
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({success: true, oldName: usersOldName, newName: users[userIndex].user})); 
@@ -3481,6 +3819,7 @@ const handleHttpRequest = async (req, res, io) => {
                             res.writeHead(200, { 'Content-Type': 'application/json' });
                             res.end(JSON.stringify({success: false, code: 401}));     
                         }
+
                     }
                 }else{
                     // this should never fire 
@@ -3493,6 +3832,7 @@ const handleHttpRequest = async (req, res, io) => {
         }catch(error){
             console.log('Error with fetch request /UpdateUsername', error);
         }
+
     } else if(req.method == 'POST' && req.url == '/UpdatePaintingViewsValue'){
         try{
             let body = '';
@@ -3551,15 +3891,75 @@ const handleHttpRequest = async (req, res, io) => {
         }catch(error){
             console.log('Error with fetch request /UpdatePaintingViewsValue');
         }
+        
+    }else if(req.method == 'POST' && req.url == '/add-token-to-collection'){
+        // make sure to check IP Adress and adress from wallet to ensure its roy minting
+        try{
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+
+            req.on('end', async ()=> {
+                const data = JSON.parse(body);
+                //console.log(' received data from client to save token to data:', data);
+                try {
+                    if(data.passcode == addNFTCollectionDataPasscode){
+                        let specificModel;
+                        console.log('trying to access model');
+                        const allModels = await getAllModels();
+                        specificModel = allModels[data.contractName];
+                        //console.log('we found models', allModels);
+                        if(specificModel){
+                            console.log('successfully accessed model successfully', specificModel);
+                        }else{
+                            console.log('we had to make a new model');
+
+                           specificModel = mongoose.model(data.contractName, tokenSchema); 
+                        }
+                        const thisNFT = new specificModel({
+                            contractName: data.contractName,
+                            contractAddress: data.contractAddress,
+                            tokenID: data.tokenID,
+                            image: data.tokenURI,
+                        });
+
+                        thisNFT.save().then((result)=>{
+                            console.log('mongo result (maybe need to check if result is success )-->', result);
+                            res.setHeader('Content-Type', 'application/json');
+                            res.end(JSON.stringify({ success: true, code: 222102999221121, tokenID: data.tokenID}));
+                        }).catch((error) =>{
+                            console.log("Error saving data to database check erro to see if it is internet");
+                            console.log(error);
+                            res.setHeader('Content-Type', 'application/json');
+                            res.end(JSON.stringify({success: false, code: 21202021122344, tokenID: data.tokenID})); 
+                        });
+                    }else{
+                        console.log("passcode is incorrect");
+                        res.setHeader('Content-Type', 'application/json');
+                        res.end(JSON.stringify({success: false, code: 83939111110001, tokenID: data.tokenID})); 
+                    }
+                } catch (error) {
+                    // edit error code for any errors 
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({success: false, code: 29292929100999, tokenID: data.tokenID})); 
+                }
+
+             });   
+        }catch(error){
+            console.log('Error with fetch request /add-token-to-collection');
+        }   
     }else {
         try{
             let filePath = '.' + req.url;
             if (filePath === './') {
                 filePath = './index.html'; 
             }
-        
+
             const extname = path.extname(filePath);
             let contentType = 'text/html'; 
+        
+            // Set content type based on file extension
             switch (extname) {
                 case '.js':
                     contentType = 'text/javascript';
@@ -3579,6 +3979,8 @@ const handleHttpRequest = async (req, res, io) => {
             }
         
             fs.readFile(filePath, (err, content) => {
+                console.log('err from filepath gives', err);
+                console.log('content varibale gives', content);
                 if (err) {
                     if (err.code === 'ENOENT') {
                         // File not found
