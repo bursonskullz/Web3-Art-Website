@@ -1,13 +1,6 @@
 // Name: Roy Burson 
-// Date last modified: 09-25-24
-// purpose: Make web3 art website
-
-/*
-1) Fix socket names not working, and commission form needs centered.
-2) uploading painting failed online (but not on local host) to much data for droplet need to chunk or compress before sending to server.
-3) Fix AI bot (roul) by training him from dataset do not use OPENAI. 
-4) green light not removed on metamask app
-*/
+// Date last modified: 09-07-24
+// purpose: Make web3 art website to coincide with research related life
 
 // local variables to server
 const maxNumberOfAIEventsPerClient = 100;
@@ -21,6 +14,7 @@ var userAIQuestions = [];
 var previousQuestion0 = [];
 var previousQuestion1 = [];
 let stringChunk = '';
+let soliditychunk;
 
 let Series2Holders = ["0x21331", "0x1122222"]; // Pull From contract add here (these are examples)
 let Series1Holders = []; // pull from contract and add them here!
@@ -51,6 +45,7 @@ const commissionCollectionString = 'Commission';
 const bursonSkullzModelString = 'Burson Skullz';
 const contractCollectionString = 'NFT Contracts';
 
+
 // security strings 
 const paintingUploadCode = 'Painting-code-here!';
 const appPasscode = 'google-app-passcode-here';
@@ -63,7 +58,7 @@ const addNFTCollectionDataPasscode = 'your-passcode-to-add-nfts';
 const deployableContractPasscode = 'passcode-to-deploy-contract';
 
 const modelsArray = [];
-const modelsMap = new Map(); // need to add any models with the contract name when the server is created!
+const modelsMap = new Map(); // might not need this can comment and check
 
 const myDomain = undefined;
 const openai = new OpenAI({
@@ -3023,13 +3018,16 @@ const handleHttpRequest = async (req, res, io) => {
 
             req.on('end', async () => {
                 const data = JSON.parse(body);
-
-                if(data.passcode == deployableContractPasscode){
-                    if(data.lastChunk == true){                    
+                //console.log('trying to compile contract using data', data);
+                if(data.passcode === deployableContractPasscode){
+                    if(data.lastChunk == true){                  
                         stringChunk += data.backgroundImage;
                         data.backgroundImage = stringChunk;
+                        data.solidityContract = soliditychunk;
                         stringChunk = '';
-                        console.log('trying to compile contract using data', data);
+                        soliditychunk = '';
+                        console.log('trying to make contract using data', data);  
+                        console.log('trying to call makeDeployableContract() function inside server');
                         const deployableContract = await makeDeployableContract(data); // returns abi, and bytecode
                         console.log("deployableContract returns", deployableContract);
                         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -3037,6 +3035,7 @@ const handleHttpRequest = async (req, res, io) => {
                     }else{
                         //console.log('current string chunk', stringChunk);
                         stringChunk += data.backgroundImage;
+                        soliditychunk += data.solidityContract;
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({success: false, contractABI: null, bytecode: null, error: 10200299222222 }));
                     }
