@@ -6167,24 +6167,13 @@ function makeDeployerForm() {
         const tokenCount = tokenCountInput.value;
         const attemptedClientPasscode = deployContractPasscode.value;
 
-        // make sure these variables (selectedContract, creatorEarning, tokenCount, and attemptedClientPasscode ) are not empty or null
-        // if so throw error and warn client
-
-        //const selectedOptions = booleanOptions.map(option => {
-        //    const checkbox = formContainer.querySelector(`input[value="${option.value}"]`);
-        //    const input = checkbox.parentElement.parentElement.querySelector('input[type="text"]');
-        //    return checkbox.checked && input ? { option: option.value, inputValue: input.value } : null;
-        //}).filter(Boolean);
-
-
-        // Collect selected options and associated input values
         const selectedOptions = booleanOptions.map(option => {
             const checkbox = formContainer.querySelector(`input[value="${option.value}"]`);
             const input = checkbox.parentElement.parentElement.querySelector('input[type="text"]');
             if (checkbox.checked) {
-                return { option: option.value};
+                return { option: option.value, active: true};
             }else{
-                return {option: null}
+                return {option: option.value, active: false};
             }
         });
 
@@ -6192,9 +6181,11 @@ function makeDeployerForm() {
         console.log('select coin type', contractSelect.value);
 
         if(contractSelect.value == 'matic'){
-            ERCStandard = 'ERC115';
+            ERCStandard = 'ERC1155';
         }else if(contractSelect.value == 'eth'){
             ERCStandard = 'ERC721';
+        }else if(contractSelect.value == 'etc'){
+            ERCStandard = 'ERC20';
         }else{
             ERCStandard = null;
         }
@@ -6215,14 +6206,11 @@ function makeDeployerForm() {
 
         const contractString = createContract(contractData); // return the actual contract in a string 
         contractData.solidityContract = contractString; // resets null attribute
-        console.log('trying to make contract using data', contractData);
-        console.log('compressedData on client side');
+        console.log('trying to chunk and send data to sever', contractData);
 
-        //const compressedData = pako.gzip(JSON.stringify(contractData));
-
-        // send send a bunch of fetches with string chunks insteads
         deployContractUsingServer(contractData).then(result =>{
             if(result.success == false){
+                console.log('result from function deployContractUsingServer() returns', result);
                 //alert('failed to compile bytecode please try again');
                 //loadingContainer.remove();
             }else{
@@ -6234,8 +6222,6 @@ function makeDeployerForm() {
             alert('unexpected error occured');
             loadingContainer.remove();
         });
-
-
     });
 
     // Add custom styles for toggle switches
