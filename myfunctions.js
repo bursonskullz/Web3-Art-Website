@@ -110,53 +110,11 @@ export async function painting_section_click(parentElement) {
     
 }
 
-function makeUserForm(title) {
-    const formContainer = document.createElement('div');
-    formContainer.className = 'Minting-form';
-    formContainer.style.width = '300px';
-    formContainer.style.height = '450px';
-    formContainer.style.position = 'fixed';
-    formContainer.style.top = '50%';
-    formContainer.style.left = '50%';
-    formContainer.style.transform = 'translate(-50%, -50%)';
-    formContainer.style.backgroundColor = 'dimgray';
-    formContainer.style.zIndex = '9999999';
-    formContainer.style.borderRadius = '8px';
-    formContainer.style.border = '1px solid black';
-    formContainer.style.padding = '20px';
-    formContainer.style.display = 'flex';
-    formContainer.style.flexDirection = 'column';
-    formContainer.style.alignItems = 'center';
 
-    // Make the element draggable if you have that function
-    // makeElementDraggable(formContainer); // Uncomment if you have this function defined
-
-    const titleSpan = document.createElement('span');
-    titleSpan.textContent = title; // Set the form title based on the clicked item
-    titleSpan.style.fontSize = '18px';
-    titleSpan.style.marginBottom = '10px';
-    formContainer.appendChild(titleSpan);
-
-    const closeButton = document.createElement('div');
-    closeButton.textContent = '❌';
-    closeButton.style.fontSize = '10px';
-    closeButton.style.position = 'absolute';
-    closeButton.style.top = '10px';
-    closeButton.style.right = '10px';
-    closeButton.style.cursor = 'pointer';
-    closeButton.style.color = '#333';
-
-    closeButton.addEventListener('click', function () {
-        document.body.removeChild(formContainer);
-    });
-
-    formContainer.appendChild(closeButton);
-    return formContainer;
-}
 
 
 function makeSelectorForm(){
-        // Create a form element and apply styles for the pop-up
+    // Create a form element and apply styles for the pop-up
     const form = document.createElement('form');
     form.className = 'contract-selector-form';
 
@@ -321,7 +279,7 @@ export async function addDigitalElementListener(digitalElement){
                         contractDiv.style.padding = '5px';
                         contractDiv.style.border = '1px solid #ccc';
                         contractDiv.style.marginBottom = '5px';
-                        contractDiv.style.borderBottom = '0.4vh solid lightgray'; 
+                        //contractDiv.style.borderBottom = '0.4vh solid lightgray'; 
                         contractDiv.style.transition = 'background-color 0.3s';
                         contractDiv.style.width = '100%'; // Make the div span all the way across
                         contractDiv.style.backgroundColor = 'dimgray'; // Add light gray background
@@ -2225,27 +2183,36 @@ function createCircularSweeper(container) {
     sweeperCircle.classList.add('sweeper-circle');
     container.appendChild(sweeperCircle);
 
-    const knot = document.createElement('div');
-    knot.classList.add('knot');
-    sweeperCircle.appendChild(knot);
+    // Create the emoji for the center
+    const sun = document.createElement('div');
+    sun.classList.add('sun');
+    sun.textContent = '🌕'; // Earth emoji
+    sweeperCircle.appendChild(sun);
 
+    // Create the emoji element for the sweep
+    const emoji = document.createElement('div');
+    emoji.classList.add('emoji');
+    emoji.textContent = '🌍'; // Moon emoji
+    sweeperCircle.appendChild(emoji);
+
+    // Create a span for showing sweep information
     const infoSpan = document.createElement('span');
     infoSpan.classList.add('info-span');
     container.appendChild(infoSpan);
 
     let isDragging = false;
-    const radius = sweeperCircle.offsetWidth / 2 - knot.offsetWidth / 2;
+    const radius = sweeperCircle.offsetWidth / 2 - emoji.offsetWidth / 2;
     const maxItems = 25;
-    let angle = -Math.PI / 2; // Start angle at the left edge (top-center of the circle)
+    let angle = -Math.PI / 2; // Start angle at the top of the circle
 
-    function updateKnotPosition() {
-        // Calculate the position of the knot based on the current angle
+    function updateEmojiPosition() {
+        // Calculate the position of the emoji based on the current angle
         const x = radius * Math.cos(angle) + sweeperCircle.offsetWidth / 2;
         const y = radius * Math.sin(angle) + sweeperCircle.offsetHeight / 2;
 
-        // Update the knot position to keep it on the edge
-        knot.style.left = `${x - knot.offsetWidth / 2}px`;
-        knot.style.top = `${y - knot.offsetHeight / 2}px`;
+        // Update the emoji position to keep it on the edge
+        emoji.style.left = `${x - emoji.offsetWidth / 2}px`;
+        emoji.style.top = `${y - emoji.offsetHeight / 2}px`;
 
         // Update the sweep information
         updateSweepInfo();
@@ -2255,7 +2222,8 @@ function createCircularSweeper(container) {
         // Calculate the percentage based on the angle
         const percent = (angle + Math.PI / 2) / (2 * Math.PI) * 100; // Normalize angle to 0 to 100%
         const items = Math.round((percent / 100) * maxItems); // Convert percentage to item count
-        infoSpan.textContent = `Sweep ${items} items`;
+        infoSpan.textContent = `Sweep ${items} items`;// sweep this many items in the grid, grab token ID and try to purchase
+
         sweeperCircle.style.background = `conic-gradient(#4caf50 ${percent}%, transparent ${percent}%)`;
     }
 
@@ -2264,11 +2232,11 @@ function createCircularSweeper(container) {
             const rect = sweeperCircle.getBoundingClientRect();
             const x = event.clientX - rect.left - sweeperCircle.offsetWidth / 2;
             const y = event.clientY - rect.top - sweeperCircle.offsetHeight / 2;
-            angle = Math.atan2(y, x); // Calculate angle without the + Math.PI / 2 adjustment
+            angle = Math.atan2(y, x); // Calculate angle
 
             if (angle < -Math.PI / 2) angle += 2 * Math.PI; // Adjust angle to start from the top-center position
 
-            updateKnotPosition();
+            updateEmojiPosition();
         }
     }
 
@@ -2283,14 +2251,787 @@ function createCircularSweeper(container) {
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
-    knot.addEventListener('mousedown', onMouseDown);
+    emoji.addEventListener('mousedown', onMouseDown);
 
-    // Initialize knot position on the edge of the circle
-    updateKnotPosition();
+    // Initialize emoji position on the edge of the circle
+    updateEmojiPosition();
 }
 
+async function makeUtilityPage(sideElementsWidth) {
+    const form = document.createElement('div');
+    form.className = 'makeUtilityPage';
+    form.style.width = sideElementsWidth;
+    form.style.color = 'white';
+    form.style.fontSize = '1.5vh';
+    form.style.position = 'absolute';
+    form.style.left = '0.5%';
+    form.style.top = '62vh';
+    form.style.height = '40%';
+    form.style.padding = '0px';
+    form.style.boxSizing = 'border-box';
+    form.style.backgroundColor = '#404a5c';
+    form.style.border = '1px solid black';
+    form.style.borderWidth = '2px';
+    form.style.overflowY = 'scroll';
 
-export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentElement, numColumns, gridWidthPercent, gridItemWidth) {
+        // Create the small header element
+    const utilitySmallHeader = document.createElement('div');
+    utilitySmallHeader.style.top = '0%';
+    utilitySmallHeader.className = 'Utilities';
+    utilitySmallHeader.style.position = 'relative'; 
+    utilitySmallHeader.textContent = 'Utilities'; 
+    utilitySmallHeader.style.height = '20px'; 
+    utilitySmallHeader.style.width = '100%'; 
+    utilitySmallHeader.style.backgroundColor = 'transparent'; 
+    utilitySmallHeader.style.color = 'white'; 
+    utilitySmallHeader.style.boxSizing = 'border-box';
+    utilitySmallHeader.style.display = 'flex';
+    utilitySmallHeader.style.alignItems = 'center';
+    utilitySmallHeader.style.justifyContent = 'center'; // Center text horizontally
+    utilitySmallHeader.style.marginBottom = '20px'; // Adds space below the small header
+
+
+    const utilityCloseButtom = document.createElement('div');
+    utilityCloseButtom.textContent = '×'; 
+    utilityCloseButtom.style.height = '10px'; // Adjust height as needed
+    utilityCloseButtom.style.width = '10px';  // Adjust width as needed
+    utilityCloseButtom.style.backgroundColor = 'transparent'; // No background
+    utilityCloseButtom.style.position = 'absolute'; // Position absolutely
+    utilityCloseButtom.style.top = '2px'; // Position from the top
+    utilityCloseButtom.style.right = '2px'; // Position from the right
+    utilityCloseButtom.style.cursor = 'pointer'; 
+    utilityCloseButtom.style.fontSize = '17px'; // Adjust font size for visibility
+    utilityCloseButtom.style.color = 'red'; // Icon color
+
+    utilitySmallHeader.appendChild(utilityCloseButtom);
+    form.appendChild(utilitySmallHeader);
+
+    utilityCloseButtom.addEventListener('click', ()=>{
+        document.body.removeChild(form);
+    });
+
+
+    // Create a list of utilities
+    const utilities = [
+        'Utility 1: Fractional ownership of Burson Research Articles',
+        'Utility 2: Access to exclusive web3 software.',
+        'Utility 3: Exclusive Content and Updates.',
+        'Utility 4: Early access to new collection releases.',
+        'Utility 5: Special discounts and offers.',
+        'Utility 6: Priority support and consultations.',
+    ];
+
+    // Create a container for the utilities
+    const utilitiesContainer = document.createElement('div');
+    utilitiesContainer.style.padding = '5px';
+
+    // Create a list element
+    const ul = document.createElement('ul');
+    ul.style.listStyleType = 'none'; // Remove bullet points for cleaner look
+    ul.style.padding = '0'; // Reset padding for cleaner alignment
+    ul.style.margin = '0'; // Reset margin for cleaner layout
+    ul.style.fontSize = '7px';
+
+    utilities.forEach((utility) => {
+        // Create a flex container for each utility item
+        const utilityItem = document.createElement('li');
+        utilityItem.style.display = 'flex';
+        utilityItem.style.justifyContent = 'space-between';
+        utilityItem.style.alignItems = 'center';
+        utilityItem.style.borderBottom = '1px solid #eee'; // Lighter divider for a softer look
+        utilityItem.style.padding = '2px 0';
+        utilityItem.style.fontSize = '10px'; // Consistent font size
+        utilityItem.style.color = 'black'; // Subtle color for text
+
+        // Create paragraph for the utility description
+        const paragraph = document.createElement('p');
+        paragraph.textContent = utility;
+        paragraph.style.margin = '0'; // Remove default margin
+        paragraph.style.flex = '1'; // Allow paragraph to take available space
+        paragraph.style.paddingRight = '5px'; // Add space between text and button
+
+        // Create access button
+        const button = document.createElement('button');
+        button.textContent = 'Coming Soon';
+        button.style.padding = '1px 2px';
+        button.style.backgroundColor = '#007bff';
+        button.style.color = 'white';
+        button.style.border = 'none';
+        button.style.borderRadius = '4px';
+        button.style.cursor = 'pointer';
+        button.style.fontSize = '10px';
+        button.style.transition = 'background-color 0.3s, box-shadow 0.3s'; // Smooth transition
+        button.style.marginLeft = '5px'; // Add space between text and button
+
+        // Add shadow and interactive hover effect
+        button.style.boxShadow = '0 2px 4px rgba(0, 123, 255, 0.3)';
+        button.addEventListener('mouseenter', () => {
+            button.style.backgroundColor = '#0056b3';
+            button.style.boxShadow = '0 4px 8px rgba(0, 123, 255, 0.5)'; // Enhanced shadow on hover
+        });
+        button.addEventListener('mouseleave', () => {
+            button.style.backgroundColor = '#007bff';
+            button.style.boxShadow = '0 2px 4px rgba(0, 123, 255, 0.3)';
+        });
+
+        // Event listener for the button
+        button.addEventListener('click', () => {
+            console.log(`Accessing ${utility}`);
+            // Add access functionality here
+        });
+
+        // Append paragraph and button to the utility item
+        utilityItem.appendChild(paragraph);
+        utilityItem.appendChild(button);
+
+        // Append utility item to the list
+        ul.appendChild(utilityItem);
+    });
+
+    // Append list to the container
+    utilitiesContainer.appendChild(ul);
+
+    // Append container to the form
+    form.appendChild(utilitiesContainer);
+    document.body.appendChild(form);
+
+}
+async function makeOwnersPage(sideElementsWidth) {
+    console.log('Trying to get my tokens to display.');
+    const ownersContainer = document.createElement('div');
+    ownersContainer.className = 'userTokensContainer';
+    ownersContainer.style.width = sideElementsWidth;
+    ownersContainer.style.color = 'white';
+    ownersContainer.style.fontSize = '1.5vh';
+    ownersContainer.style.position = 'absolute';
+    ownersContainer.style.left = '0.5%';
+    ownersContainer.style.top = '62vh';
+    ownersContainer.style.height = '40%';
+    ownersContainer.style.padding = '0px';
+    ownersContainer.style.boxSizing = 'border-box';
+    ownersContainer.style.backgroundColor = '#404a5c';
+    ownersContainer.style.border = '1px solid black'; 
+    ownersContainer.style.borderWidth = '2px';
+    ownersContainer.style.overflowY = 'scroll';
+
+    // Create the small header element
+    const ownerSmallHeader = document.createElement('div');
+    ownerSmallHeader.style.top = '0%';
+    ownerSmallHeader.className = 'ownerSmallHeader';
+    ownerSmallHeader.style.position = 'relative'; 
+    ownerSmallHeader.textContent = 'Unique Owners'; 
+    ownerSmallHeader.style.height = '25px'; 
+    ownerSmallHeader.style.width = '100%'; 
+    ownerSmallHeader.style.backgroundColor = 'transparent'; 
+    ownerSmallHeader.style.color = 'white'; 
+    ownerSmallHeader.style.boxSizing = 'border-box';
+    ownerSmallHeader.style.display = 'flex';
+    ownerSmallHeader.style.alignItems = 'center';
+    ownerSmallHeader.style.justifyContent = 'center'; // Center text horizontally
+    ownerSmallHeader.style.marginBottom = '20px'; // Adds space below the small header
+
+
+    const closeOwnersPageButton = document.createElement('div');
+    closeOwnersPageButton.textContent = '×'; 
+    closeOwnersPageButton.style.height = '20px'; // Adjust height as needed
+    closeOwnersPageButton.style.width = '20px';  // Adjust width as needed
+    closeOwnersPageButton.style.backgroundColor = 'transparent'; // No background
+    closeOwnersPageButton.style.position = 'absolute'; // Position absolutely
+    closeOwnersPageButton.style.top = '0px'; // Position from the top
+    closeOwnersPageButton.style.right = '2px'; // Position from the right
+    closeOwnersPageButton.style.cursor = 'pointer'; 
+    closeOwnersPageButton.style.fontSize = '15px'; // Adjust font size for visibility
+    closeOwnersPageButton.style.color = 'red'; // Icon color
+
+    ownerSmallHeader.appendChild(closeOwnersPageButton);
+    ownersContainer.appendChild(ownerSmallHeader);
+
+    closeOwnersPageButton.addEventListener('click', ()=>{
+        document.body.removeChild(ownersContainer);
+    });
+    document.body.appendChild(ownersContainer);
+
+        let allOwnersAddressArray;
+
+        try{
+            allOwnersAddressArray = await contract.methods.getAllUniqueOwners().call();
+        }catch(error){
+            console.log('Error calling the function getAllOwners() on the contract');
+            allOwnersAddressArray = [];
+            
+        }
+
+        // test by uncommmenting next line 
+        allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
+
+        if (allOwnersAddressArray.length > 0) {
+            let count = 0; // Initialize count
+            allOwnersAddressArray.forEach(owner => {
+                count += 1;
+                console.log('Trying to display token data inside pop up allOwnersAddressArray');
+
+                // Create a container for each unique owner
+                const uniqueOwnerContainer = document.createElement('div');
+                uniqueOwnerContainer.classList.add('ownerItem', `-${count}`); // Add unique class using count
+                uniqueOwnerContainer.style.height = 'auto';
+                uniqueOwnerContainer.style.position = 'relative'; // For positioning price and date
+                uniqueOwnerContainer.style.overflow = 'hidden'; // Hide overflow to ensure image doesn't spill out
+                uniqueOwnerContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; // Optional background color for the item
+                uniqueOwnerContainer.style.borderRadius = '5px'; // Rounded corners for container
+                uniqueOwnerContainer.style.display = 'flex'; // Flexbox for layout
+                uniqueOwnerContainer.style.alignItems = 'center'; // Center items vertically
+                uniqueOwnerContainer.style.padding = '10px'; // Optional padding for better spacing
+
+                // Create a div for the owner address
+                const ownerAddressDiv = document.createElement('div');
+                ownerAddressDiv.style.flex = '1'; // Take up the full width for the owner address
+                ownerAddressDiv.style.wordWrap = 'break-word'; // Allow the address to break and wrap to the next line
+                ownerAddressDiv.style.overflow = 'hidden'; // Prevent overflowing
+                ownerAddressDiv.style.whiteSpace = 'normal'; // Allow the text to wrap normally
+                ownerAddressDiv.style.maxWidth = 'calc(100% - 50px)'; // Ensure it doesn't take up too much space
+                ownerAddressDiv.textContent = `Owner: ${owner}`; // Add the owner address text
+
+                // Create a smaller div for the item count placeholder
+                const itemCountDiv = document.createElement('div');
+                itemCountDiv.style.fontSize = '12px'; // Smaller font for item count
+                itemCountDiv.style.color = '#888'; // Light grey color for item count
+                itemCountDiv.textContent = '# items'; // Placeholder text for number of items
+
+                // Append the owner address and item count divs to the unique owner container
+                uniqueOwnerContainer.appendChild(ownerAddressDiv);
+                uniqueOwnerContainer.appendChild(itemCountDiv);
+
+                // Append the unique owner container to the parent container
+                ownersContainer.appendChild(uniqueOwnerContainer);
+            });
+        }else{
+            const noOwnersMessage = document.createElement('span');
+            noOwnersMessage.textContent = 'No Owners Yet';
+            noOwnersMessage.style.display = 'block';
+            noOwnersMessage.style.textAlign = 'center';
+            noOwnersMessage.style.marginTop = '20px';
+            noOwnersMessage.style.color = 'white'; // White text color
+            ownersContainer.appendChild(noOwnersMessage);
+        }
+
+}
+async function makeMytokensPage(contract, sideElementsWidth){
+    console.log('Trying to get my tokens to display.');
+    const userTokensContainer = document.createElement('div');
+    userTokensContainer.className = 'userTokensContainer';
+    userTokensContainer.style.width = sideElementsWidth;
+    userTokensContainer.style.color = 'white';
+    userTokensContainer.style.fontSize = '1.5vh';
+    userTokensContainer.style.position = 'absolute';
+    userTokensContainer.style.left = '0.5%';
+    userTokensContainer.style.top = '62vh';
+    userTokensContainer.style.height = '40%';
+    userTokensContainer.style.padding = '0px';
+    userTokensContainer.style.boxSizing = 'border-box';
+    userTokensContainer.style.backgroundColor = '#404a5c';
+    userTokensContainer.style.border = '1px solid black'; 
+    userTokensContainer.style.borderWidth = '2px';
+    userTokensContainer.style.overflowY = 'scroll';
+
+    // Create the small header element
+    const smallHeader = document.createElement('div');
+    smallHeader.style.top = '0%';
+    smallHeader.className = 'smallHeader';
+    smallHeader.style.position = 'relative'; 
+    smallHeader.textContent = 'Your Tokens'; 
+    smallHeader.style.height = '35px'; 
+    smallHeader.style.width = '100%'; 
+    smallHeader.style.backgroundColor = 'transparent'; 
+    smallHeader.style.color = 'white'; 
+    smallHeader.style.boxSizing = 'border-box';
+    smallHeader.style.display = 'flex';
+    smallHeader.style.alignItems = 'center';
+    smallHeader.style.justifyContent = 'center'; // Center text horizontally
+    smallHeader.style.marginBottom = '20px'; // Adds space below the small header
+
+    // Create the container for the "Bulk list" span tag on the left
+    const bulkListSPanTagContainer = document.createElement('div');
+    bulkListSPanTagContainer.style.position = 'absolute'; // Position absolute for the container
+    bulkListSPanTagContainer.style.bottom = '2%';
+    bulkListSPanTagContainer.style.left = '5%'; 
+    bulkListSPanTagContainer.style.height = '17%';
+    bulkListSPanTagContainer.style.width = '30%';
+
+    // Create the "Bulk list" span tag
+    const bulkListText = document.createElement('span');
+    bulkListText.textContent = 'Bulk list'; 
+    bulkListText.style.position = 'absolute';
+    bulkListText.style.top = '0%'; 
+    bulkListText.style.left = '0%';
+    bulkListText.style.cursor = 'pointer'; // Show a pointer cursor on hover
+    bulkListText.style.fontSize = '10px'; 
+    bulkListText.style.color = 'white'; 
+
+
+    bulkListText.addEventListener('click', () => {
+        console.log('Bulk list clicked!');
+        console.log('Need to create button to click for bulk list');
+
+        // Hide the delistTool
+        const delistTool = document.querySelector(".delistTool");
+        if (delistTool) {
+            delistTool.style.display = 'none';
+        }
+
+        // Get all .listedSpan elements
+        const listedSpans = document.querySelectorAll('.listedSpan');
+
+        let count = 0; // Initialize count
+
+        listedSpans.forEach(() => {
+            count += 1; // Increment count for each listedSpan
+
+            // Access the parent container using the unique class name with count
+            const parentContainer = document.querySelector(`.sold-item-${count}`);
+
+            if (parentContainer) {
+                // Find the checkbox within the parent container
+                const checkbox = parentContainer.querySelector('input[type="checkbox"]');
+
+                if (checkbox) {
+                    // Search for the word "active" anywhere inside the parent container's text
+                    const parentText = parentContainer.textContent.toLowerCase(); // Convert text to lowercase for consistent matching
+                    console.log(`Checking parent container ${count} for "active" text.`); // Debug line
+
+                    // Show checkboxes only if "active" is not found
+                    if (parentText.includes("inactive")) {
+                        checkbox.style.display = 'inline-block'; // Show checkbox if "active" is not found
+                        console.log(`Checkbox shown for parent container ${count} because it does not contain "Inactive".`);
+                    } else {
+                         checkbox.style.display = 'none'; // Hide checkbox if "active" is found
+                         console.log(`Checkbox hidden for parent container ${count} because it contains "active".`);
+                        
+                    }
+                } else {
+                    console.log(`Checkbox not found in parent container ${count}.`);
+                }
+            } else {
+                console.log(`Parent container not found for count: ${count}.`);
+            }
+        });
+    });
+
+    // Append the "Bulk list" span tag to its container
+    bulkListSPanTagContainer.appendChild(bulkListText);
+
+    // Append the "Bulk list" container to the small header
+    smallHeader.appendChild(bulkListSPanTagContainer);
+
+    // Create the container for the "Delist" span tag on the right
+    const delistSPanTagContainer = document.createElement('div');
+    delistSPanTagContainer.style.position = 'absolute'; // Position absolute for the container
+    delistSPanTagContainer.className = 'delistTool';
+    delistSPanTagContainer.style.bottom = '2%';
+    delistSPanTagContainer.style.right = '5%'; 
+    delistSPanTagContainer.style.height = '17%';
+    delistSPanTagContainer.style.width = '30%';
+
+    // Create the "Delist" span tag
+    const delistText = document.createElement('span');
+    delistText.textContent = 'Delist'; 
+    delistText.style.position = 'absolute';
+    delistText.style.bottom = '0px'; 
+    delistText.style.right = '0px';
+    delistText.style.cursor = 'pointer'; // Show a pointer cursor on hover
+    delistText.style.fontSize = '10px'; 
+    delistText.style.color = 'white'; 
+
+    // Add click functionality to the "Delist" span tag
+    delistText.addEventListener('click', () => {
+        console.log('Delist clicked!'); // Replace with your desired functionality
+        // only out check mark on token that are listed 
+    });
+
+    // Append the "Delist" span tag to its container
+    delistSPanTagContainer.appendChild(delistText);
+
+    // Append the "Delist" container to the small header
+    smallHeader.appendChild(delistSPanTagContainer);
+
+    userTokensContainer.appendChild(smallHeader);
+
+    const closeIcon = document.createElement('div');
+    closeIcon.textContent = '×'; 
+    closeIcon.style.height = '20px'; // Adjust height as needed
+    closeIcon.style.width = '20px';  // Adjust width as needed
+    closeIcon.style.backgroundColor = 'transparent'; // No background
+    closeIcon.style.position = 'absolute'; // Position absolutely
+    closeIcon.style.top = '0px'; // Position from the top
+    closeIcon.style.right = '2px'; // Position from the right
+    closeIcon.style.cursor = 'pointer'; 
+    closeIcon.style.fontSize = '15px'; // Adjust font size for visibility
+    closeIcon.style.color = 'red'; // Icon color
+
+    smallHeader.appendChild(closeIcon);
+
+    closeIcon.addEventListener('click', ()=>{
+        document.body.removeChild(userTokensContainer);
+    });
+
+    document.body.appendChild(userTokensContainer);
+
+
+    try {
+        if (isConnected) { // Check if the user is already connected
+            let thisAccount = window.ethereum.selectedAddress;
+            console.log('already connected trying to get nfts using the address', thisAccount);
+            makeTokenPage(thisAccount, contract, userTokensContainer);
+        } else {
+            if (typeof window.ethereum === 'undefined') { // If MetaMask is not installed
+                alert('You must install MetaMask or another Ethereum provider to see your tokens or purchase tokens.');
+            } else {
+                if (window.ethereum.isMetaMask) { // If MetaMask is detected
+                    try {
+                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        let thisAccount = accounts[0];
+                        makeTokenPage(thisAccount, contract, userTokensContainer);
+                    } catch (error) {
+                        if (error.code === -32002) { // Handling specific MetaMask error
+                            alert('Please open the MetaMask extension manually, sign in, and reload the page.');
+                        } else {
+                            alert(`Error: ${error.message || error}`); // Display other errors
+                        }
+                    }
+                } else { // If another Ethereum provider is detected
+                    alert('MetaMask not detected. Please install MetaMask to use this feature.');
+                }
+            }
+        }
+    } catch (error) {
+        alert('You must connect your MetaMask wallet to see your tokens.');
+    }
+}
+async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSells){
+    console.log('Trying to get recent sells to display.');
+    const recentSellsPopUpBox = document.createElement('div');
+    recentSellsPopUpBox.className = 'recentSellsPopUpBox';
+    recentSellsPopUpBox.style.width = sideElementsWidth;
+    recentSellsPopUpBox.style.color = 'white';
+    recentSellsPopUpBox.style.fontSize = '1.5vh';
+    recentSellsPopUpBox.style.position = 'absolute';
+    recentSellsPopUpBox.style.left = '0.5%';
+    recentSellsPopUpBox.style.top = '62vh';
+    recentSellsPopUpBox.style.height = '40%';
+    recentSellsPopUpBox.style.padding = '0px';
+    recentSellsPopUpBox.style.boxSizing = 'border-box';
+    recentSellsPopUpBox.style.backgroundColor = '#404a5c';
+    //recentSellsPopUpBox.style.backgroundColor = 'rgba(64, 74, 92, 0.7)';
+    recentSellsPopUpBox.style.border = '1px solid black'; 
+    recentSellsPopUpBox.style.borderWidth = '2px';
+
+    // Create header
+    const smallHeader = document.createElement('div');
+    smallHeader.style.top = '0%';
+    smallHeader.className = 'smallHeader';
+    smallHeader.style.position = 'relative'; 
+    smallHeader.textContent = 'Recent Sells'; 
+    smallHeader.style.height = '45px'; 
+    smallHeader.style.width = '100%'; 
+    smallHeader.style.backgroundColor = 'transparent'; 
+    smallHeader.style.color = 'white'; 
+    smallHeader.style.boxSizing = 'border-box';
+    smallHeader.style.display = 'flex';
+    smallHeader.style.alignItems = 'center';
+    smallHeader.style.justifyContent = 'center'; // Center text horizontally
+    //smallHeader.style.borderBottom = '1px solid #eee'; // Lighter divider for a softer look
+
+    recentSellsPopUpBox.appendChild(smallHeader);
+
+    const closeIcon = document.createElement('div');
+    closeIcon.textContent = '×'; 
+    closeIcon.style.height = '20px'; // Adjust height as needed
+    closeIcon.style.width = '20px';  // Adjust width as needed
+    closeIcon.style.backgroundColor = 'transparent'; // No background
+    closeIcon.style.position = 'absolute'; // Position absolutely
+    closeIcon.style.top = '5px'; // Position from the top
+    closeIcon.style.right = '5px'; // Position from the right
+    closeIcon.style.cursor = 'pointer'; 
+    closeIcon.style.fontSize = '25px'; // Adjust font size for visibility
+    closeIcon.style.color = 'red'; // Icon color
+
+    smallHeader.appendChild(closeIcon);
+
+    closeIcon.addEventListener('click', ()=>{
+        document.body.removeChild(recentSellsPopUpBox);
+    });
+
+    document.body.appendChild(recentSellsPopUpBox);
+
+    
+    const loadingContainer = document.createElement("div");
+    loadingContainer.className = "loading-container";
+    loadingContainer.style.position = "absolute";
+    loadingContainer.style.top = "50%";
+    loadingContainer.style.left = "50%";
+    loadingContainer.style.transform = "translate(-50%, -50%)";
+    loadingContainer.style.width = "80%";
+    loadingContainer.style.height = "60%";
+    loadingContainer.style.display = "flex";
+    loadingContainer.style.justifyContent = "center";
+    loadingContainer.style.alignItems = "center";
+    loadingContainer.style.backgroundColor = "none"; 
+
+    const loadingIcon = document.createElement("img");
+    loadingIcon.setAttribute("class", "loading-gif");
+    loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+    loadingIcon.setAttribute("alt", "Loading..."); 
+    loadingIcon.style.width = "50%"; 
+    loadingIcon.style.height = "50%";
+    loadingContainer.appendChild(loadingIcon);
+    recentSellsPopUpBox.appendChild(loadingContainer);
+
+    try{
+        recentSells = await contract.methods.getRecentSells().call();
+    }catch(error){
+        console.log('Error calling function on contract to get array of recent sells');
+        recentSells = null;
+    }
+
+    let testObj = {
+        image: "/images/BursonSKullText.png", // Use a plain URL string
+        tokenID: 1,
+        price: 14000000
+    };
+
+    let testArray = [];
+    testArray.push(testObj);
+    testArray.push(testObj);
+    testArray.push(testObj);
+    testArray.push(testObj);
+
+    recentSells = testArray; // comment to stop test
+
+    const css = `
+        .recentSellsPopUpBox {
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            width: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            position: relative; /* For positioning the close button */
+        }
+        
+        .sold-item {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        
+        .sold-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        
+        .sold-item p {
+            margin: 5px 0;
+        }
+        
+        .recentSellsPopUpBox span {
+            display: block;
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 20px;
+        }
+    `;
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+    document.head.appendChild(style);
+
+
+    if (recentSells != null && recentSells.length != 0) {
+        console.log('Trying to get corresponding image to each token contract returns and make div and display data inside');
+        console.log('Trying to loop through recent sells and display inside pop up');
+        
+        const tokenDataArray = [];
+
+        recentSells.forEach(sell => {
+            let image;
+            // Use sell.id to search currentNFTArray and find index
+            for (const token of currentNFTArray) {
+                if (token.tokenID === sell.tokenID) {
+                    image = token.image;
+                    break;
+                }
+            }
+
+            if (image !== undefined) {
+                let tokenData = {
+                    image: image,
+                    tokenID: sell.tokenID,
+                    price: sell.price
+                };
+                tokenDataArray.push(tokenData);
+            } else {
+                console.log('Cannot set token data: unable to find image for', sell.id);
+            }
+        });
+
+        const recentSellsPopUpBox = document.querySelector('.recentSellsPopUpBox'); 
+
+        if (tokenDataArray.length > 0) {
+            loadingContainer.remove();
+            tokenDataArray.forEach(token => {
+                console.log('Trying to display data inside pop up recentSellsPopUpBox');
+
+                const soldItem = document.createElement('div');
+                soldItem.classList.add('sold-item'); // Add a class for styling
+                soldItem.style.height = '100px';
+                soldItem.style.position = 'relative'; // For positioning price and date
+                soldItem.style.overflow = 'hidden'; // Hide overflow to ensure image doesn't spill out
+                soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; // Optional background color for the item
+                soldItem.style.borderRadius = '5px'; // Rounded corners for container
+                //soldItem.style.display = 'flex'; // Use flexbox for layout
+                //soldItem.style.alignItems = 'center'; // Center items vertically
+
+                // Create and append image
+
+                const imageContainer = document.createElement('div');
+                imageContainer.style.position = 'absolute';
+                imageContainer.style.height = '80%';
+                imageContainer.style.width = '35%';
+                imageContainer.style.left = '2.5%';
+                imageContainer.style.top = '10%';
+                soldItem.appendChild(imageContainer);
+
+                const img = document.createElement('img');
+                img.src = token.image;
+                img.alt = `Token ID ${token.tokenID}`;
+                img.style.width = '100%'; // Make image cover the width of the container
+                img.style.height = '100%'; // Make image cover the height of the container
+                //img.style.objectFit = 'cover'; // Ensure the image covers the container without distortion
+                img.style.borderRadius = '5px'; // Rounded corners for image
+                img.style.backgroundSize = 'cover';
+                img.style.backgroundRepeat = 'no-repeat';
+                img.style.backgroundPosition = 'center';
+                imageContainer.appendChild(img);
+
+                                            // Create and append price
+                const currentBuyer = document.createElement('p');
+                currentBuyer.textContent = `Buyer: N/A`;
+                currentBuyer.style.position = 'absolute';
+                currentBuyer.style.top = '0%';
+                currentBuyer.style.right = '10px';
+                currentBuyer.style.color = 'white'; // White text color
+                //currentBuyer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
+                currentBuyer.style.borderRadius = '3px'; // Rounded corners for background
+                soldItem.appendChild(currentBuyer);
+
+                const seller = document.createElement('p');
+                seller.textContent = `Seller: N/A`;
+                seller.style.position = 'absolute';
+                seller.style.top = '17%';
+                seller.style.right = '10px';
+                seller.style.color = 'white'; // White text color
+                //seller.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
+                seller.style.borderRadius = '3px'; // Rounded corners for background
+                soldItem.appendChild(seller);
+
+
+                // Create and append price
+                const price = document.createElement('p');
+                price.textContent = `Price: ${token.price}`;
+                price.style.position = 'absolute';
+                price.style.top = '34%';
+                price.style.right = '10px';
+                price.style.color = 'white'; // White text color
+                //price.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
+                price.style.padding = '5px'; // Add some padding for readability
+                price.style.borderRadius = '3px'; // Rounded corners for background
+                soldItem.appendChild(price);
+
+                // Create and append price
+                const currentTokenID = document.createElement('p');
+                currentTokenID.textContent = `Token ID: ${token.tokenID}`;
+                currentTokenID.style.position = 'absolute';
+                currentTokenID.style.top = '58%';
+                currentTokenID.style.right = '10px';
+                currentTokenID.style.color = 'white'; // White text color
+                //currentTokenID.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
+                currentTokenID.style.borderRadius = '3px'; // Rounded corners for background
+                soldItem.appendChild(currentTokenID);
+
+
+                // Create and append date (if available)
+                const date = document.createElement('p');
+                date.textContent = `Date Sold: ${token.date ? token.date : 'N/A'}`;
+                date.style.position = 'absolute';
+                date.style.top = '76%';
+                date.style.right = '10px';
+                date.style.color = 'white'; // White text color
+                //date.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
+                date.style.padding = '5px'; // Add some padding for readability
+                date.style.borderRadius = '3px'; // Rounded corners for background
+                soldItem.appendChild(date);
+
+                // Append soldItem to recentSellsPopUpBox
+                recentSellsPopUpBox.appendChild(soldItem);
+            });
+        } else {
+            // If no sales data, show a message
+            loadingContainer.remove();
+            const noSellsMessage = document.createElement('span');
+            noSellsMessage.textContent = 'No sells have occurred yet.';
+            noSellsMessage.style.display = 'block';
+            noSellsMessage.style.textAlign = 'center';
+            noSellsMessage.style.marginTop = '20px';
+            noSellsMessage.style.color = 'white'; // White text color
+            recentSellsPopUpBox.appendChild(noSellsMessage);
+        }
+
+    } else {
+        console.log('Prompt user: No sells have occurred yet. Make span tag in the middle of the recent sells pop up that says "No sells yet"');
+
+        // Create a container for the span
+        const spanContainer = document.createElement('div');
+        spanContainer.className = 'smallHeader';
+        spanContainer.style.position = 'absolute'; // Use absolute positioning for centering
+        spanContainer.style.top = '50%'; // Start centering from the middle
+        spanContainer.style.left = '50%'; // Start centering from the middle
+        spanContainer.style.transform = 'translate(-50%, -50%)'; // Perfectly center the container
+        spanContainer.style.height = 'auto'; 
+        spanContainer.style.width = '100%'; 
+        spanContainer.style.backgroundColor = 'transparent'; 
+        spanContainer.style.color = 'white'; 
+        spanContainer.style.display = 'flex'; // Use flexbox for centering
+        spanContainer.style.alignItems = 'center'; // Center items vertically
+        spanContainer.style.justifyContent = 'center'; // Center items horizontally
+        spanContainer.style.textAlign = 'center'; // Center text within the container
+        spanContainer.style.boxSizing = 'border-box';
+
+        // Create the span element with the text
+        const spanTextContent = document.createElement('span');
+        spanTextContent.textContent = 'No sells yet';
+        spanTextContent.style.color = 'white';
+        spanTextContent.style.fontSize = '12px';
+        loadingContainer.remove();
+
+        // Append the span text to the container
+        spanContainer.appendChild(spanTextContent);
+
+        // Append the span container to the recent sells pop up box
+        recentSellsPopUpBox.appendChild(spanContainer);
+
+    }
+    
+    console.log("called the recent sells function");
+            
+}
+export async function makeNFTPage(array, purchaseArray, sideElementsWidth, parentElement, numColumns, gridWidthPercent, gridItemWidth) {
     console.log('2) make header to hold collection logo directly above grid from database'); 
     console.log('3) make grid work on all screen sizes');
     console.log('4) test deploy contract function and start to call them on hover, ...etc. Make sure to test contract on IDE devloper or whatever');
@@ -2329,20 +3070,52 @@ export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentEleme
     contractInfoDiv.style.borderRadius = '5px';
     contractInfoDiv.style.borderWidth = '2px';
 
-    // Add contract information (replace with your actual data need to pull from contract)
-    // const currentContractData = getContractData(contractAddress, thisContractABI);
+    let maxSell;
+    let numberOfSells;
+    let recentSells;
+    let myTokens; 
+    let numberOfTokens;
+    let allOwners; 
+    let coin = "MATIC";// change later and make sure to get correct token for each contract (or make funciton to determine network from address) 
 
-    //let recentNFTSells = await getAllNFTSells(userSelectedContract.contractAddress, userSelectedContract.contractABI);// store data using contract
-    //             --- each time a transfer occurs we need to store it in a map or track the event and save it to the contract
-    // return an array of all tokens and data
-    //let maximumNFTSell = await getMaxNFTSell(userSelectedContract.contractAddress, userSelectedContract.contractABI);// store data using contract 
+
+    const web3 = new Web3(window.ethereum);
+    const contract = new web3.eth.Contract(JSON.parse(userSelectedContract.contractABI), userSelectedContract.contractAddress);
+
+    // set max sell 
+    try{
+        numberOfTokens = await contract.methods.getNumberOfTokens().call();
+    }catch(error){
+        console.log('Error calling function on contract to get maximum sell');
+        numberOfTokens = "Error";
+    }
+
+    // set max sell 
+    try{
+        maxSell = await contract.methods.getMaxSell().call();
+    }catch(error){
+        console.log('Error calling function on contract to get maximum sell');
+        maxSell = "Error";
+    }
+    // get number of sells 
+
+    try{
+        numberOfSells = await contract.methods.getNumberOfsells().call();
+    }catch(error){
+        console.log('Error calling function on contract to get number of sells');
+        numberOfSells = "Error";
+    }
+
+
+    console.log('access to contract granted trying to get number of token, Max Sell, and number of sells', contract);
+    console.log('Contract methods:', contract.methods);
 
     contractInfoDiv.innerHTML = `
         <h2 style="margin: 0; text-align: center;">Contract Information</h2>
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Address: ${userSelectedContract.contractAddress.substr(25)+ "~~~"}</p>
-        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Tokens: ${array.length}</p>
-        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Max Sale: 0 MATIC</p>
-        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Sells: 0</p> 
+        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Tokens: ${numberOfTokens}</p>
+        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Max Sale: ${maxSell} ${coin}</p> 
+        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Sells: ${numberOfSells}</p> 
     `;
 
     // Center content using Flexbox
@@ -2393,114 +3166,17 @@ export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentEleme
     parentElement.appendChild(options);
 
     document.querySelectorAll('.option-item').forEach((item) => {
-        item.addEventListener('click', function () {
-            // Use a unique identifier based on data-title to check for existing forms
-            const formIdentifier = `form-${this.getAttribute('data-title').replace(/\s+/g, '-')}`;
-            const existingForm = document.querySelector(`.${formIdentifier}`);
-
-            if (existingForm) {
-                console.log('Form is already active, no need to populate again');
-                return; // Stop further execution if form already exists
-            }
-
-            console.log('Trying to make form');
-            const title = this.getAttribute('data-title');
-            let form = makeUserForm(title);
-            form.className = formIdentifier; // Use unique identifier as class
-            document.body.appendChild(form);
-            makeElementDraggable(form);
-
+        item.addEventListener('click', async function () {
             if (item.textContent === "Recent Sells") {
-                console.log('Trying to get recent sells to display.');
+                makeRecentSellsPage(item, contract, sideElementsWidth, recentSells);
             } else if (item.textContent === "My Tokens") {
-                console.log('Trying to get my tokens to display.');
+                makeMytokensPage(contract, sideElementsWidth);
             } else if (item.textContent === "All Owners") {
                 console.log('Trying to get all Unique owners and how many they own and display.');
+                makeOwnersPage(sideElementsWidth);
             } else if (item.textContent === "Utility") {
-                console.log('Trying to show Utility page.');
-                form.style.width = window.innerWidth <= 500 ? '350px' : '450px';
-                form.style.height = '500px';
-                form.style.overflowY = 'scroll';
-
-                // Create a list of utilities
-                const utilities = [
-                    'Utility 1: Fractional ownership of Burson Research Articles',
-                    'Utility 2: Access To exclusive web3 software.',
-                    'Utility 3: Exclusive Content and Updates.',
-                    'Utility 4: Early access to new collection releases.',
-                    'Utility 5: Special discounts and offers.',
-                    'Utility 6: Priority support and consultations.',
-                ];
-
-                // Create a container for the utilities
-                const utilitiesContainer = document.createElement('div');
-                utilitiesContainer.style.padding = '15px';
-
-                // Create a list element
-                const ul = document.createElement('ul');
-                ul.style.listStyleType = 'disc';
-                ul.style.paddingLeft = '20px';
-                ul.style.fontSize = '15px';
-
-                utilities.forEach((utility) => {
-                    // Create a flex container for each utility item
-                    const utilityItem = document.createElement('div');
-                    utilityItem.style.display = 'flex';
-                    utilityItem.style.justifyContent = 'space-between';
-                    utilityItem.style.alignItems = 'center';
-                    utilityItem.style.borderBottom = '1px solid #eee'; // Lighter divider for a softer look
-                    utilityItem.style.padding = '10px 0';
-                    utilityItem.style.fontSize = '14px'; // Consistent font size
-                    utilityItem.style.color = 'black'; // Subtle color for text
-
-                    // Create paragraph for the utility description
-                    const paragraph = document.createElement('p');
-                    paragraph.textContent = utility;
-                    paragraph.style.margin = '0'; // Remove default margin
-                    paragraph.style.flex = '1'; // Allow paragraph to take available space
-
-                    // Create access button
-                    const button = document.createElement('button');
-                    button.textContent = 'Coming Soon';
-                    button.style.padding = '8px 14px';
-                    button.style.backgroundColor = '#007bff';
-                    button.style.color = 'white';
-                    button.style.border = 'none';
-                    button.style.borderRadius = '4px';
-                    button.style.cursor = 'pointer';
-                    button.style.fontSize = '14px';
-                    button.style.transition = 'background-color 0.3s, box-shadow 0.3s'; // Smooth transition
-
-                    // Add shadow and interactive hover effect
-                    button.style.boxShadow = '0 2px 4px rgba(0, 123, 255, 0.3)';
-                    button.addEventListener('mouseenter', () => {
-                        button.style.backgroundColor = '#0056b3';
-                        button.style.boxShadow = '0 4px 8px rgba(0, 123, 255, 0.5)'; // Enhanced shadow on hover
-                    });
-                    button.addEventListener('mouseleave', () => {
-                        button.style.backgroundColor = '#007bff';
-                        button.style.boxShadow = '0 2px 4px rgba(0, 123, 255, 0.3)';
-                    });
-
-                    // Event listener for the button
-                    button.addEventListener('click', () => {
-                        console.log(`Accessing ${utility}`);
-                        // Add access functionality here
-                    });
-
-                    // Append paragraph and button to the utility item
-                    utilityItem.appendChild(paragraph);
-                    utilityItem.appendChild(button);
-
-                    // Append utility item to the list
-                    ul.appendChild(utilityItem);
-                });
-
-                // Append list to the container
-                utilitiesContainer.appendChild(ul);
-
-                // Append container to the form
-                form.appendChild(utilitiesContainer);
+                console.log("trying to make Utility page");
+                makeUtilityPage(sideElementsWidth);
             }
         });
 
@@ -3510,7 +4186,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         if(currentlyPrinted){
 
         }else{
-            printInfo(welcomeDivPTAG);
+            printInfo(welcomeDivPTAG, strings);
         }
        
     }, 3000);
@@ -3715,7 +4391,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                         //addCoinbaseListener();
                     });
                 }else{
-                    console.log('User is loggedin or metamask not found');
+                    console.log('cannot find connect button');
                 }
             }else{
                 const thisLoggedInBUtton = document.querySelector('.loggedIn-button');
@@ -4738,56 +5414,53 @@ export async function checkifConnected(){
             loggedInButton.appendChild(connectButtonPTAG);
             toggleGreenLight(); 
         }else{
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                    
-                    if (accounts.length > 0 && window.ethereum.isMetaMask) {
-                        isConnected = true; 
-                        buttonContainer.appendChild(greenLight);
-                        buttonContainer.appendChild(loggedInButton);
-                        const connectButtonPTAG = document.createElement('p');
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0 && window.ethereum.isMetaMask) {
+                    isConnected = true; 
+                    buttonContainer.appendChild(greenLight);
+                    buttonContainer.appendChild(loggedInButton);
+                    const connectButtonPTAG = document.createElement('p');
 
-                        connectButtonPTAG.innerHTML = accounts[0].substring(0, 8) + '~~~'; 
-                        connectButtonPTAG.classList.add('centered-text'); 
+                    connectButtonPTAG.innerHTML = accounts[0].substring(0, 8) + '~~~'; 
+                    connectButtonPTAG.classList.add('centered-text'); 
 
-                        connectButtonPTAG.style.position = 'relative';
-                        connectButtonPTAG.style.width = '70%';
-                        connectButtonPTAG.style.height = '100%';
-                        connectButtonPTAG.style.top = '30%';
-                        connectButtonPTAG.style.left = '7%';
-                        connectButtonPTAG.style.margin = '0%';
-                        connectButtonPTAG.style.fontSize = '1.5vh';
-                        loggedInButton.appendChild(connectButtonPTAG);
-                        toggleGreenLight(); 
-                    } else {
-                        console.log('MetaMask is installed but not connected.');
-                        isConnected = false; 
-                        buttonContainer.appendChild(connectButtton);
+                    connectButtonPTAG.style.position = 'relative';
+                    connectButtonPTAG.style.width = '70%';
+                    connectButtonPTAG.style.height = '100%';
+                    connectButtonPTAG.style.top = '30%';
+                    connectButtonPTAG.style.left = '7%';
+                    connectButtonPTAG.style.margin = '0%';
+                    connectButtonPTAG.style.fontSize = '1.5vh';
+                    loggedInButton.appendChild(connectButtonPTAG);
+                    toggleGreenLight(); 
+                } else {
+                    console.log('MetaMask is installed but not connected.');
+                    isConnected = false; 
+                    buttonContainer.appendChild(connectButtton);
 
-                        connectButtton.style.boxShadow = '0px 0px 15px rgba(0, 0, 0, 0.5)'; 
+                    connectButtton.style.boxShadow = '0px 0px 15px rgba(0, 0, 0, 0.5)'; 
 
-                        const buttonPTAG = document.createElement('p');
-                        buttonPTAG.innerHTML = 'Connect';
-                        buttonPTAG.classList.add('centered-text');
+                    const buttonPTAG = document.createElement('p');
+                    buttonPTAG.innerHTML = 'Connect';
+                    buttonPTAG.classList.add('centered-text');
 
-                        buttonPTAG.style.position = 'relative';
-                        buttonPTAG.style.width = '100%';
-                        buttonPTAG.style.height = '100%';
-                        buttonPTAG.style.top = '0%';
-                        //buttonPTAG.style.left = '0%';
-                        buttonPTAG.style.margin = '0%';
-                        buttonPTAG.style.fontSize = '1.5vh';
+                    buttonPTAG.style.position = 'relative';
+                    buttonPTAG.style.width = '100%';
+                    buttonPTAG.style.height = '100%';
+                    buttonPTAG.style.top = '0%';
+                    //buttonPTAG.style.left = '0%';
+                    buttonPTAG.style.margin = '0%';
+                    buttonPTAG.style.fontSize = '1.5vh';
 
-                        buttonPTAG.style.display = 'flex';
-                        buttonPTAG.style.justifyContent = 'center';
-                        buttonPTAG.style.alignItems = 'center';
-                        connectButtton.appendChild(buttonPTAG);
-                    }
-                } catch (error) {
-                    console.error('Error requesting accounts from MetaMask:', error);
+                    buttonPTAG.style.display = 'flex';
+                    buttonPTAG.style.justifyContent = 'center';
+                    buttonPTAG.style.alignItems = 'center';
+                    connectButtton.appendChild(buttonPTAG);
                 }
-
-            
+            } catch (error) {
+                console.error('Error requesting accounts from MetaMask:', error);
+            }   
         }
     }
     
@@ -5211,6 +5884,229 @@ function createSearchBar(parentElement) {
     searchInput.addEventListener('keyup', handleSearch);
 }
 
+async function makeTokenPage(addressString, contract, parentContainer){
+    try{
+        let UsersNFTsIds;
+
+        try{
+            UsersNFTsIds = await contract.methods.getUsersTokens().call();
+        }catch(error){
+            console.log('Error calling the function getUsersTokens() on the contract');
+            UsersNFTsIds = [];
+            
+        }
+
+        // test by uncommmenting next line 
+        UsersNFTsIds = [1,2,3,4,5, 6,7, 8];
+
+        console.log('trying to token database to display');
+
+        if(UsersNFTsIds.length != 0){
+            // add span tag in small header that says list and delist. List on right side botom, delist on left side
+            // needs event listener after positioning is good
+            let userNFTARRay = [];
+
+            console.log('trying to loop through and get images for user tokens');
+            for (var i = 0; i < UsersNFTsIds.length; i++) {
+                if (UsersNFTsIds[i] === currentNFTArray[i].tokenID) {
+                    console.log('need to get attributes before sending');
+
+                    let currentObj; // Declare currentObj here
+
+                    if (i === 0) {
+                        currentObj = {
+                            tokenID: UsersNFTsIds[i],
+                            image: currentNFTArray[i].image,
+                            purchasePrice: "N/A",
+                            purchaseDate: "N/A",
+                            listed: "active"
+                        };
+                    } else {
+                        currentObj = {
+                            tokenID: UsersNFTsIds[i],
+                            image: currentNFTArray[i].image,
+                            purchasePrice: "N/A",
+                            purchaseDate: "N/A",
+                            listed: "Inactive"
+                        };
+                    }
+
+                    userNFTARRay.push(currentObj); // Push currentObj to the array
+                }
+            }
+
+
+            console.log('data has been extracted we are trying to loop through and set data using data:', userNFTARRay);
+
+            // 1) create list, delist token span tag in small header 
+            // 2) add functionality on click
+            let count = 0; // Initialize count
+            userNFTARRay.forEach(token => {
+                count+=1;
+                console.log('Trying to display token data inside pop up userTokensContainer');
+
+                const soldItem = document.createElement('div');
+                soldItem.classList.add('sold-item', `sold-item-${count}`); // Add unique class using count
+                soldItem.style.height = '100px';
+                soldItem.style.position = 'relative'; // For positioning price and date
+                soldItem.style.overflow = 'hidden'; // Hide overflow to ensure image doesn't spill out
+                soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; // Optional background color for the item
+                soldItem.style.borderRadius = '5px'; // Rounded corners for container
+                soldItem.style.display = 'flex'; // Flexbox for layout
+                soldItem.style.alignItems = 'center'; // Center items vertically
+                soldItem.style.padding = '10px'; // Optional padding for better spacing
+
+                // Create and style the checkbox
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.style.display = 'none'; // Hide checkbox initially
+                checkbox.style.marginRight = '10px'; // Space between checkbox and image
+                soldItem.appendChild(checkbox);
+
+                const imageContainer = document.createElement('div');
+                imageContainer.style.position = 'relative'; // Change to relative for better control
+                imageContainer.style.height = '80%';
+                imageContainer.style.width = '25%';
+                imageContainer.style.marginRight = '10px'; // Spacing between image and text
+                imageContainer.style.flexShrink = '0'; // Prevent image container from shrinking
+                imageContainer.style.backgroundColor = '#ddd'; // Placeholder styling
+                soldItem.appendChild(imageContainer);
+
+                const img = document.createElement('img');
+                img.src = token.image;
+                img.alt = `Token ID ${token.tokenID}`;
+                img.style.width = '100%'; // Make image cover the width of the container
+                img.style.height = '100%'; // Make image cover the height of the container
+                img.style.borderRadius = '5px'; // Rounded corners for image
+                img.style.objectFit = 'cover'; // Ensure the image covers the container without distortion
+                imageContainer.appendChild(img);
+
+                // Create a container for the text elements
+                const textContainer = document.createElement('div');
+                textContainer.style.flex = '1'; // Take up remaining space
+                textContainer.style.display = 'flex'; // Flexbox for vertical alignment
+                textContainer.style.flexDirection = 'column'; // Stack items vertically
+                textContainer.style.justifyContent = 'center'; // Center items vertically
+                textContainer.style.marginLeft = '10px'; // Optional spacing from image
+                soldItem.appendChild(textContainer);
+
+                // Create the "Listed" span tag
+                const listedSpan = document.createElement('div');
+                listedSpan.className = 'listedSpan';
+
+                // Create the text parts
+                const listedText = document.createElement('span');
+                listedText.textContent = 'Listed: ';
+
+                // Create the variable part
+                const statusSpan = document.createElement('span');
+                statusSpan.textContent = token.listed;
+
+                // Style the variable part based on the condition
+                if (token.listed === "active") {
+                    statusSpan.style.color = 'green'; // Text color
+                } else {
+                    statusSpan.style.color = 'red';
+                }
+
+                // Append text parts to the listedSpan
+                listedSpan.appendChild(listedText);
+                listedSpan.appendChild(statusSpan);
+
+                // Add spacing between text elements
+                listedSpan.style.marginBottom = '5px'; // Spacing between text elements
+                textContainer.appendChild(listedSpan);
+
+                const nameSpan = document.createElement('div');
+                nameSpan.textContent = `Token ID: ${token.tokenID}`; // Assuming `purchaseDate` is a property of token
+                nameSpan.style.color = 'white'; // Text color
+                textContainer.appendChild(nameSpan);
+
+                const priceSpan = document.createElement('div');
+                priceSpan.textContent = `Purchase Price: ${token.purchasePrice}`; // Assuming `purchasePrice` is a property of token
+                priceSpan.style.marginBottom = '5px'; // Spacing between text elements
+                priceSpan.style.color = 'white'; // Text color
+                textContainer.appendChild(priceSpan);
+
+                // Create the "Date Purchased" span tag
+                const dateSpan = document.createElement('div');
+                dateSpan.textContent = `Date Purchased: ${token.purchaseDate}`; // Assuming `purchaseDate` is a property of token
+                dateSpan.style.color = 'white'; // Text color
+                textContainer.appendChild(dateSpan);
+
+                parentContainer.appendChild(soldItem);
+            });
+            if (!document.querySelector('.nextButton')) {
+                const nextButton = document.createElement('button');
+                nextButton.className = 'nextButton'; 
+                nextButton.textContent = 'Next';
+                nextButton.style.position = 'relative';
+                nextButton.style.bottom = '0%';
+                nextButton.style.width = '30%';
+                nextButton.style.left = '35%';
+                nextButton.style.backgroundColor = 'grey';
+                nextButton.style.color = 'white';
+                nextButton.style.border = 'none';
+                nextButton.style.cursor = 'pointer';
+                nextButton.style.zIndex = '10';
+
+                parentContainer.appendChild(nextButton);
+
+                nextButton.addEventListener('click', () => {
+                    const selectedTokens = [];
+                    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                    
+                    checkboxes.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            // Get the parent element (soldItem div) that contains the checkbox
+                            const parentDiv = checkbox.closest('.sold-item');
+                            
+                            // Extract the count from the parent class, assuming the class has the format 'sold-item-<count>'
+                            const parentClass = parentDiv.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
+                            const tokenCount = parentClass ? parentClass.split('-')[2] : null; // Extract the count from 'sold-item-<count>'
+                            
+                            // Use the extracted count as your token ID (or for any other processing)
+                            if (tokenCount) {
+                                const inputContainer = parentDiv.querySelector('.inputContainer');
+                                const inputValue = inputContainer ? inputContainer.querySelector('input').value : '';
+                                selectedTokens.push({ tokenId: tokenCount, inputValue });
+                            }
+                        }
+                    });
+                    
+                    console.log('Selected Tokens with Input Values:', selectedTokens);
+                });
+            }
+        }else{
+            const spanContainer = document.createElement('div');
+            spanContainer.className = 'spanContainerForTokens';
+            spanContainer.style.position = 'absolute'; // Use absolute positioning for centering
+            spanContainer.style.top = '50%'; // Start centering from the middle
+            spanContainer.style.left = '50%'; // Start centering from the middle
+            spanContainer.style.transform = 'translate(-50%, -50%)'; // Perfectly center the container
+            spanContainer.style.height = 'auto'; 
+            spanContainer.style.width = '100%'; 
+            spanContainer.style.backgroundColor = 'transparent'; 
+            spanContainer.style.color = 'white'; 
+            spanContainer.style.display = 'flex'; // Use flexbox for centering
+            spanContainer.style.alignItems = 'center'; // Center items vertically
+            spanContainer.style.justifyContent = 'center'; // Center items horizontally
+            spanContainer.style.textAlign = 'center'; // Center text within the container
+            spanContainer.style.boxSizing = 'border-box';
+
+            // Create the span element with the text
+            const spanTextContent = document.createElement('span');
+            spanTextContent.textContent = 'No Tokens Yet';
+            spanTextContent.style.color = 'white';
+            spanTextContent.style.fontSize = '12px';
+
+            spanContainer.appendChild(spanTextContent);
+            parentElement.appendChild(spanContainer);
+        }
+    }catch(error){
+        console.log('Error calling function on contract to get array of recent sells');
+    }
+}
 function printInfo(div, strings) {
     div.textContent = "";
     div.style.fontSize = '2.1vh';
@@ -5635,275 +6531,318 @@ function createContract(data) {
     } else if (data.token === 'ERC20') {// etc classic
         minimalListingPrice = 3 * (15 * 10 ** 18); 
         minimalTransferFEE = 0.5 * (15 * 10 ** 18);
-    } 
+    }   
 
     const version = '^0.8.19'; // may need to ^0.8.19 depending on coin
     const contractString = `
-        // SPDX-License-Identifier: MIT
-    
-        pragma solidity ${version};
-    
-        contract ${data.name.replace(/ /g, '')}{
-            // Struct to declare NFT (Non-Fungible Token) data attributes stored on contract.
-            struct NFT {
-                uint256 id;         // Unique identifier for the NFT
-                uint256 price;      // Price of the NFT in wei (1 ether = 1e18 wei)
-                address owner;      // Current owner of the NFT
-                uint256 mintDate;   // Date of mint
-                string tokenName;   // Token name
-                bool forSale;       // Flag indicating if the NFT is for sale
-                bool flagged;
-            }
-    
-            // Mappings and arrays
-            mapping(uint256 => NFT) public nfts;
-            mapping(address => uint256[]) private userTokens; // Mapping from user address to array of token IDs owned by the user
-            uint256[] private recentSells; // Array to track recent sells
-    
-            // Events to track NFT minting, listing for sale, and sale
-            event NFTMinted(uint256 id, address owner);
-            event NFTForSale(uint256 id, uint256 price);
-            event NFTSells(uint256 id, uint256 price, uint256 date);
-            
-            // State variables to store the owners
-            address public contractCreator;
-            string public artist;
-            address[] internal owners;
-            uint256 creatorFee;
-            address public walletToReceiveFunds;
-            address public RoysWallet;
-            uint256 public minimalTransferFee;
-            uint256 public minimalListingPrice;// changes depending on deployment
-            uint256 public tokenCount;
-            uint256 maximumTokenCount;
-    
-            bool isRoyaltyFeeChangeable;
-            bool isManagerInitiated;
-            bool isContractSellable;
-            bool isTokensPausible;
-            bool isTokensBurnable;
-    
-            // constructor called once when code is initially deployed 
-            constructor () {
-                contractCreator = msg.sender; 
-                artist = "Roy Burson";
-                owners.push(contractCreator);
-                creatorFee = 10;
-                RoysWallet = 0x5CdaD7876270364242Ade65e8e84655b53398B76;
-                walletToReceiveFunds = RoysWallet;
-                minimalListingPrice = ${BigInt(minimalListingPrice)}; 
-                minimalTransferFee = ${BigInt(minimalTransferFEE)}; 
-                tokenCount = 0;
-                maximumTokenCount = ${data.royaltyFee};
-                isManagerInitiated = ${data.options[0].active};
-                isContractSellable = ${data.options[1].active};
-                isRoyaltyFeeChangeable = ${data.options[2].active};
-                isTokensPausible = ${data.options[3].active};
-                isTokensBurnable = ${data.options[4].active};
-            }
-    
-            function changeMinimalTransferFee(uint256 amountInWEI) external {
-                // Only the Owner in the first index (owner[0]) can change the minimal transfer fee 
-                require(msg.sender == owners[0], "Privilege denied");
-                minimalTransferFee = amountInWEI;
-            }
-    
-            function checkIfOwner(address _address) internal view returns (bool) {
-                for (uint256 i = 0; i < owners.length; i++) {
-                    if (owners[i] == _address) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-    
-            function mintNFT(uint256 price) public payable returns (bool) {
-                // any owner can mint
-                if (!checkIfOwner(msg.sender)) {
-                    return false;
-                } else { 
-                    uint256 newItemId = tokenCount; 
-                    //_mint(owners[0], newItemId);  
-                    tokenCount +=1;// plus one to the token count directly after mint
-    
-                    nfts[newItemId] = NFT({
-                        id: newItemId,
-                        price: price, // price in WEI
-                        owner: owners[0],
-                        mintDate: block.timestamp,
-                        tokenName: "${data.name}",
-                        forSale: true, 
-                        flagged: false    
-                    });
-    
-                    userTokens[owners[0]].push(newItemId); // Track ownership
-                    emit NFTMinted(newItemId, owners[0]);
+    // SPDX-License-Identifier: MIT
+
+    pragma solidity ${version};
+
+    contract ${data.name.replace(/ /g, '')}{
+        // Struct to declare NFT (Non-Fungible Token) data attributes stored on contract.
+        struct NFT {
+            uint256 id;            // Unique identifier for the NFT
+            uint256 price;         // Price of the NFT in wei (1 ether = 1e18 wei)
+            address owner;         // Current owner of the NFT
+            uint256 mintDate;      // Date of mint
+            string tokenName;      // Token name
+            bool forSale;          // Flag indicating if the NFT is for sale
+            bool flagged;          // Flag indicating if nfts has been marked as suspicious
+            uint256 lastSellData;  // changes each time a sell occurs
+        }
+
+        // Mappings and arrays
+        mapping(uint256 => NFT) public nfts;
+        mapping(address => uint256[]) private userTokens; // Mapping from user address to array of token IDs owned by the user
+        NFT[] private recentSells; // Array to track recent sells as NFT structs
+
+        // Events to track NFT minting, listing for sale, and sale
+        event NFTMinted(uint256 id, address owner);
+        event NFTForSale(uint256 id, uint256 price);
+        event NFTSells(uint256 id, uint256 price, uint256 date);
+        
+        // State variables to store the owners
+        address public contractCreator;
+        string public artist;
+        address[] internal owners;
+        uint256 creatorFee;
+        address public walletToReceiveFunds;
+        address public RoysWallet;
+        uint256 public minimalTransferFee;
+        uint256 public minimalListingPrice;// changes depending on deployment
+        uint256 public tokenCount;
+        uint256 maximumTokenCount;
+        uint256 numberOfSells;
+
+        bool isRoyaltyFeeChangeable;
+        bool isManagerInitiated;
+        bool isContractSellable;
+        bool isTokensPausible;
+        bool isTokensBurnable;
+
+        // constructor called once when code is initially deployed 
+        constructor () {
+            contractCreator = msg.sender; 
+            artist = "Roy Burson";
+            owners.push(contractCreator);
+            creatorFee = ${Number(data.numberOfTokens)}$;
+            RoysWallet = 0x5CdaD7876270364242Ade65e8e84655b53398B76;
+            walletToReceiveFunds = RoysWallet;
+            minimalListingPrice = ${BigInt(minimalListingPrice)}; 
+            minimalTransferFee = ${BigInt(minimalTransferFEE)}; 
+            tokenCount = 0;
+            numberOfSells = 0;
+            maximumTokenCount = ${data.royaltyFee};
+            isManagerInitiated = ${data.options[0].active};
+            isContractSellable = ${data.options[1].active};
+            isRoyaltyFeeChangeable = ${data.options[2].active};
+            isTokensPausible = ${data.options[3].active};
+            isTokensBurnable = ${data.options[4].active};
+        }
+
+        function changeMinimalTransferFee(uint256 amountInWEI) external {
+            // Only the Owner in the first index (owner[0]) can change the minimal transfer fee 
+            require(msg.sender == owners[0], "Privilege denied");
+            minimalTransferFee = amountInWEI;
+        }
+
+        function checkIfOwner(address _address) internal view returns (bool) {
+            for (uint256 i = 0; i < owners.length; i++) {
+                if (owners[i] == _address) {
                     return true;
                 }
             }
-    
-            function mintArrayOfNFTs(NFT[] memory nftArray) external payable returns (bool) {
-                // do not increment token count because mint function already does
-                for (uint256 i = 0; i < nftArray.length; i++) {
-                    if (!mintNFT(nftArray[i].price)) {
-                        return false;
-                    }
-                }
+            return false;
+        }
+
+        function mintNFT(uint256 price) public payable returns (bool) {
+            // any owner can mint
+            if (!checkIfOwner(msg.sender)) {
+                return false;
+            } else { 
+                uint256 newItemId = tokenCount; 
+                //_mint(owners[0], newItemId);  
+                tokenCount +=1;// plus one to the token count directly after mint
+
+                nfts[newItemId] = NFT({
+                    id: newItemId,
+                    price: price, // price in WEI
+                    owner: owners[0],
+                    mintDate: block.timestamp,
+                    tokenName: "${data.name}",
+                    forSale: true, 
+                    flagged: false,
+                    lastSellData: block.timestamp       
+                });
+
+                userTokens[owners[0]].push(newItemId); // Track ownership
+                emit NFTMinted(newItemId, owners[0]);
                 return true;
             }
-    
-            function listNFT(uint256 tokenId, uint256 userListPrice) external payable {
-                // remember to send 15 matic to Roy for listing fee
-                require(owners[tokenId] == msg.sender, "Only the owner can list the NFT");
-                require(userListPrice >= minimalListingPrice, "Price below minimum listing price");
-                payable(walletToReceiveFunds).transfer(minimalTransferFee); // send Roy minimal transfer fee
-                nfts[tokenId].forSale = true;
-                nfts[tokenId].price = userListPrice;
-                emit NFTForSale(tokenId, nfts[tokenId].price);
-            }
-    
-            function delistNFT(uint256 tokenId) external payable {
-                require(owners[tokenId] == msg.sender, "Only the owner can delist the NFT");
-                nfts[tokenId].forSale = false;
-            }
-    
-            function tokenByIndex(uint256 index) public view returns (uint256) {
-                // gets tokenId from index of array which should be identical if increment works correctly
-                require(index < tokenCount, "Index out of bounds");
-                uint256 tokenId = tokenCount - index - 1;
-                return tokenId;
-            }
-    
-            function getAllNFTS() public view returns (NFT[] memory) {
-                uint256 totalTokens = tokenCount;
-                NFT[] memory tokens = new NFT[](totalTokens); // Initialize array correctly
-    
-                for (uint256 i = 0; i < totalTokens; i++) {
-                    uint256 tokenId = tokenByIndex(i);
-                    tokens[i] = nfts[tokenId];
+        }
+
+        function mintArrayOfNFTs(NFT[] memory nftArray) external payable returns (bool) {
+            // do not increment token count because mint function already does
+            for (uint256 i = 0; i < nftArray.length; i++) {
+                if (!mintNFT(nftArray[i].price)) {
+                    return false;
                 }
-    
-                return tokens;
             }
-            
-            function purchaseSingleNFT(uint256 tokenId) payable public returns (bool) {
-                // Allows anyone that does not own the token to attempt purchase
-                require(msg.value >= nfts[tokenId].price, "Insufficient payment");
-                NFT storage nft = nfts[tokenId];
-                require(nft.forSale, "NFT is not for sale");
-                require(msg.value >= nft.price, "Insufficient payment");
-    
-                uint256 fee = (nft.price * creatorFee) / 100;
-                uint256 ownerShare = nft.price - fee;
+            return true;
+        }
+
+        function listNFT(uint256 tokenId, uint256 userListPrice) external payable {
+            // remember to send 15 matic to Roy for listing fee
+            require(owners[tokenId] == msg.sender, "Only the owner can list the NFT");
+            require(userListPrice >= minimalListingPrice, "Price below minimum listing price");
+            payable(walletToReceiveFunds).transfer(minimalTransferFee); // send Roy minimal transfer fee
+            nfts[tokenId].forSale = true;
+            nfts[tokenId].price = userListPrice;
+            emit NFTForSale(tokenId, nfts[tokenId].price);
+        }
+
+        function delistNFT(uint256 tokenId) external payable {
+            require(owners[tokenId] == msg.sender, "Only the owner can delist the NFT");
+            nfts[tokenId].forSale = false;
+        }
+
+        function tokenByIndex(uint256 index) public view returns (uint256) {
+            // gets tokenId from index of array which should be identical if increment works correctly
+            require(index < tokenCount, "Index out of bounds");
+            uint256 tokenId = tokenCount - index - 1;
+            return tokenId;
+        }
+
+        function getAllNFTS() public view returns (NFT[] memory) {
+            uint256 totalTokens = tokenCount;
+            NFT[] memory tokens = new NFT[](totalTokens); // Initialize array correctly
+
+            for (uint256 i = 0; i < totalTokens; i++) {
+                uint256 tokenId = tokenByIndex(i);
+                tokens[i] = nfts[tokenId];
+            }
+
+            return tokens;
+        }
+        
+        function purchaseSingleNFT(uint256 tokenId) payable public returns (bool) {
+            // Allows anyone that does not own the token to attempt purchase
+            require(msg.value >= nfts[tokenId].price, "Insufficient payment");
+            NFT storage nft = nfts[tokenId];
+            require(nft.forSale, "NFT is not for sale");
+            require(msg.value >= nft.price, "Insufficient payment");
+
+            uint256 fee = (nft.price * creatorFee) / 100;
+            uint256 ownerShare = nft.price - fee;
+
+            // Transfer the creator's fee
+            payable(walletToReceiveFunds).transfer(fee);
+            // Transfer the remaining amount to the NFT owner
+            payable(nft.owner).transfer(ownerShare);
+
+            // Transfer the NFT to the buyer
+            // safeTransferFrom(nft.owner, msg.sender, tokenId);
+
+            // Update the NFT details
+            nft.owner = msg.sender; // Change the owner after safeTransfer is complete
+            nft.forSale = false;
+            nft.lastSellData = block.timestamp; 
+
+            // Track recent sells by pushing the entire NFT struct
+            recentSells.push(nft);
+
+            // Keep the length of recentSells to a maximum of 1000 items
+            if (recentSells.length > 1000) {
+                // Remove the first element by shifting all other elements left
+                for (uint i = 0; i < recentSells.length - 1; i++) {
+                    recentSells[i] = recentSells[i + 1];
+                }
+                // Remove the last element
+                recentSells.pop();
+            }
+
+            emit NFTSells(tokenId, msg.value, block.timestamp);
+            numberOfSells += 1;
+            return true;
+        }
+        function getNumberOfsells() public views returns{
+            return numberOfSells;
+        }
+        function purchaseArrayOfNFT(uint256[] memory tokenIdArray) external payable returns (bool) {
+            // meant for sweep function
+            uint256 totalCost;
+            for (uint256 i = 0; i < tokenIdArray.length; i++) {
+                require(nfts[tokenIdArray[i]].forSale, "NFT not for sale");
+                totalCost += nfts[tokenIdArray[i]].price;
+                require(msg.sender != nfts[tokenIdArray[i]].owner, "Owner cannot purchase own NFT");
+            }
+            require(msg.value >= totalCost, "Insufficient payment");
+            for (uint256 i = 0; i < tokenIdArray.length; i++) {
+                purchaseSingleNFT(tokenIdArray[i]);
+            }
+            return true;
+        }
+
+        function checkIfOwnerOfArray(uint256[] memory tokenIdArray) public view returns (bool) {
+            // Checks if person is an owner of all tokens passed
+            for (uint256 k = 0; k < tokenIdArray.length; k++) {
+                if (msg.sender != nfts[tokenIdArray[k]].owner) {
+                    return false; // Return false immediately if sender doesn't own any token
+                }
+            }
+            return true; 
+        }
+
+        function transferSingleNFT(address recipient, uint256 tokenId) payable public returns (bool) {
+            // this is for owner of token to transfer to another wallet
+            require(msg.value >= minimalTransferFee, "Insufficient payment");
+            require(!nfts[tokenId].flagged, "NFT has been flagged; cannot be sold");
+            require(nfts[tokenId].forSale, "NFT is not for sale");
+            require(msg.sender == nfts[tokenId].owner, "Only owner can transfer NFT");
+            payable(walletToReceiveFunds).transfer(minimalTransferFee); // send Roy minimal transfer fee
+
+            nfts[tokenId].owner = recipient;
+            //safeTransferFrom(msg.sender, recipient, tokenId);
+            return true;
+        }
+
+        function transferArrayOfNFTS(address recipient, uint256[] memory tokenIdArray) public returns (bool) {
+            // meant for owners to transfer array of NFTs that they own to another wallet
+            require(checkIfOwnerOfArray(tokenIdArray), "Sender is not owner of one or more NFTs");
+            for (uint256 i = 0; i < tokenIdArray.length; i++) {
+                transferSingleNFT(recipient, tokenIdArray[i]);
+            }
+            return true;
+        }
+
+        function getMaxSell() public view returns (uint256 maxPrice) {
+            maxPrice = 0;
+            for (uint256 i = 1; i <= tokenCount; i++) {
+                if (nfts[i].price > maxPrice) {
+                    maxPrice = nfts[i].price;
+                }
+            }
+            return maxPrice;
+        }
+
+        function getNumberOfTokens() public view returns (uint256) {
+            return tokenCount;
+        }
+
+        function getRecentSells() public view returns (NFT[] memory) {
+            uint256 limit = recentSells.length;
+            NFT[] memory sells = new NFT[](limit);
+            for (uint256 i = 0; i < limit; i++) {
+                sells[i] = recentSells[i];
+            }
+            return sells;
+        }
+
+        function getUsersTokens(address user) public view returns (uint256[] memory) {
+            uint256[] memory tempTokens = new uint256[](tokenCount); // Temporary array to store token IDs
+            uint256 count = 0; // Counter to keep track of the number of tokens owned by the user
+
+            for (uint256 i = 0; i < tokenCount; i++) {
+                if (nfts[i].owner == user) {
+                    tempTokens[count] = nfts[i].id; // Add the token ID to the array
+                    count++; // Increment the counter
+                }
+            }
+
+            // Create a result array of the exact size
+            uint256[] memory userTokens = new uint256[](count);
+            for (uint256 j = 0; j < count; j++) {
+                userTokens[j] = tempTokens[j];
+            }
+
+            return userTokens; // Return the array of token IDs owned by the user
+        }
+
+        function checkIfTokenIsAvailable(uint256 tokenId) public view returns (bool) {
+            NFT storage nft = nfts[tokenId];
+            return !nft.flagged && nft.forSale;
+        }
+
+        function getAllUniqueOwners() public view returns (address[] memory) {
+            address[] memory owners = new address[](tokenCount); // Temporary array with maximum possible length
+            uint256 count = 0; // Counter for unique owners
+            mapping(address => bool) ownerExists; // Mapping to track if owner is already added
+
+            for (uint256 i = 0; i < tokenCount; i++) {
+                address currentOwner = nfts[i].owner; // Get the owner of the current NFT
                 
-                // Transfer the creator's fee
-                payable(walletToReceiveFunds).transfer(fee);
-                // Transfer the remaining amount to the NFT owner
-                payable(nft.owner).transfer(ownerShare);
-                
-                // Transfer the NFT to the buyer
-                //safeTransferFrom(nft.owner, msg.sender, tokenId);
-                
-                // Update the NFT details
-                nft.owner = msg.sender; // Change the owner after safeTransfer is complete
-                nft.forSale = false;
-    
-                // Track recent sells
-                recentSells.push(tokenId);
-                
-                // Keep the length of recentSells to a maximum of 1000 items
-                if (recentSells.length > 1000) {
-                    // Remove the first element by shifting all other elements left
-                    for (uint i = 0; i < recentSells.length - 1; i++) {
-                        recentSells[i] = recentSells[i + 1];
-                    }
-                    // Remove the last element
-                    recentSells.pop();
+                // If the owner is not already added, add them to the owners array
+                if (!ownerExists[currentOwner]) {
+                    owners[count] = currentOwner;
+                    ownerExists[currentOwner] = true; // Mark the owner as added
+                    count++; // Increment the count of unique owners
                 }
-    
-                emit NFTSells(tokenId, msg.value, block.timestamp);
-                return true;
             }
-    
-            function purchaseArrayOfNFT(uint256[] memory tokenIdArray) external payable returns (bool) {
-                // meant for sweep function
-                uint256 totalCost;
-                for (uint256 i = 0; i < tokenIdArray.length; i++) {
-                    require(nfts[tokenIdArray[i]].forSale, "NFT not for sale");
-                    totalCost += nfts[tokenIdArray[i]].price;
-                    require(msg.sender != nfts[tokenIdArray[i]].owner, "Owner cannot purchase own NFT");
-                }
-                require(msg.value >= totalCost, "Insufficient payment");
-                for (uint256 i = 0; i < tokenIdArray.length; i++) {
-                    purchaseSingleNFT(tokenIdArray[i]);
-                }
-                return true;
-            }
-    
-            function checkIfOwnerOfArray(uint256[] memory tokenIdArray) public view returns (bool) {
-                // Checks if person is an owner of all tokens passed
-                for (uint256 k = 0; k < tokenIdArray.length; k++) {
-                    if (msg.sender != nfts[tokenIdArray[k]].owner) {
-                        return false; // Return false immediately if sender doesn't own any token
-                    }
-                }
-                return true; 
-            }
-    
-            function transferSingleNFT(address recipient, uint256 tokenId) payable public returns (bool) {
-                // this is for owner of token to transfer to another wallet
-                require(msg.value >= minimalTransferFee, "Insufficient payment");
-                require(!nfts[tokenId].flagged, "NFT has been flagged; cannot be sold");
-                require(nfts[tokenId].forSale, "NFT is not for sale");
-                require(msg.sender == nfts[tokenId].owner, "Only owner can transfer NFT");
-                payable(walletToReceiveFunds).transfer(minimalTransferFee); // send Roy minimal transfer fee
-    
-                nfts[tokenId].owner = recipient;
-                //safeTransferFrom(msg.sender, recipient, tokenId);
-                return true;
-            }
-    
-            function transferArrayOfNFTS(address recipient, uint256[] memory tokenIdArray) public returns (bool) {
-                // meant for owners to transfer array of NFTs that they own to another wallet
-                require(checkIfOwnerOfArray(tokenIdArray), "Sender is not owner of one or more NFTs");
-                for (uint256 i = 0; i < tokenIdArray.length; i++) {
-                    transferSingleNFT(recipient, tokenIdArray[i]);
-                }
-                return true;
-            }
-    
-            function getMaxSell() public view returns (uint256 maxPrice) {
-                maxPrice = 0;
-                for (uint256 i = 1; i <= tokenCount; i++) {
-                    if (nfts[i].price > maxPrice) {
-                        maxPrice = nfts[i].price;
-                    }
-                }
-                return maxPrice;
-            }
-    
-            function getNumberOfTokens() public view returns (uint256) {
-                return tokenCount;
-            }
-    
-            function getRecentSells() public view returns (uint256[] memory) {
-                uint256 limit = recentSells.length > 1000 ? 1000 : recentSells.length;
-                uint256[] memory sells = new uint256[](limit);
-                for (uint256 i = 0; i < limit; i++) {
-                    sells[i] = recentSells[recentSells.length - i - 1];
-                }
-                return sells;
-            }
-    
-            function getUsersTokens(address user) public view returns (uint256[] memory) {
-                return userTokens[user];
-            }
-    
-            function checkIfTokenIsAvailable(uint256 tokenId) public view returns (bool) {
-                NFT storage nft = nfts[tokenId];
-                return !nft.flagged && nft.forSale;
-            }
-        }`;
+
+            return owners; // Return the array of owners (including possible extra slots)
+        }
+    }`;
     return contractString;
 }
 function makeDeployerForm() {
@@ -6018,7 +6957,7 @@ function makeDeployerForm() {
     contractSelect.style.border = '1px solid #333';
     contractSelect.style.width = '85%';
 
-    const options = ['Select Token', 'MATIC', 'ETH'];
+    const options = ['Select Token', 'MATIC', 'ETH', 'ETC'];
 
     options.forEach(optionText => {
         const option = document.createElement('option');
@@ -6222,6 +7161,8 @@ function makeDeployerForm() {
             alert('unexpected error occured');
             loadingContainer.remove();
         });
+
+
     });
 
     // Add custom styles for toggle switches
@@ -6289,29 +7230,21 @@ async function deployContractUsingServer(data){
     let deployedContractABI;
     let deployedAddress = null;
     let stringChunk = '';
-
-    // send fetch to server to handle deployment with a passcode 
     try {
-
-        // chunk up data.backgroundImage and send a bunnch of fetches 
         const maxChunkSize = 700;
         const numberOfChunks = Math.ceil(data.backgroundImage.length/maxChunkSize);
-        // check type is integer or convert 
         console.log('total number of chunks:', numberOfChunks);
 
         for (let i = 0; i < numberOfChunks; i++) {
             let start = i * maxChunkSize;
             let end = Math.min(start + maxChunkSize, data.backgroundImage.length);
-
-            // Extract chunk
             let stringChunk = data.backgroundImage.substring(start, end);
-
-            // Determine if this is the last chunk
             let isLastChunk = (i === numberOfChunks - 1);
-
-            // Prepare data to send
-            // send passcode with data
-            // throw error and exist loop if code is equal to bad passcode
+            let solidityEnd = Math.min(start + maxChunkSize, data.solidityContract.length);
+            let solidityStringChunk = data.solidityContract.length > start ? data.solidityContract.substring(start, solidityEnd) : "";
+            if (!data.solidityContract) {
+                console.warn('data.solidityContract is undefined or null');
+            }
             const newData = {
                 token: data.token,
                 address: data.address, // initially null
@@ -6319,7 +7252,7 @@ async function deployContractUsingServer(data){
                 royaltyFee: data.royaltyFee,
                 numberOfTokens: data.numberOfTokens,
                 backgroundImage: stringChunk,
-                solidityContract: data.solidityContract, // initially null  
+                solidityContract: solidityStringChunk,  
                 options: data.options,
                 passcode: data.passcode,
                 lastChunk: isLastChunk
@@ -6347,7 +7280,7 @@ async function deployContractUsingServer(data){
                     // Determine the intended network based on the token
                     let expectedNetwork;
 
-                    if (data.token === 'ERC115') {
+                    if (data.token === 'ERC1155') {
                         expectedNetwork = 'matic'; // Polygon network
                     } else if (data.token === 'ERC721') {
                         expectedNetwork = 'main'; // Ethereum mainnet
@@ -6439,6 +7372,11 @@ async function deployContractUsingServer(data){
                                     if (serverMessage.success === true) {
                                         console.log('Data saved successfully. Make a pop-up form containing information (ABI and Address with hyperlinks).');
                                         alert('data successfully saved to database');
+                                        return {
+                                            success: contractDeploymentSuccess,
+                                            abi: contractInformation.contractABI,
+                                            contractAddress: contractInformation.contractAddress  // initially null
+                                        };
                                     } else {
                                         console.log('serverMessage was false');
                                         alert('Error saving collection to database. Check your internet connection.');
@@ -6793,6 +7731,46 @@ async function makeMintingForm() {
                 console.log('checkDocumentsSuccess() returns', successChecker);
                 // if this returns true at least one document was added to the database
                 if(successChecker){
+                    let mintableArray = [];
+                    let numberOfNFTs = filesArray.length;
+                    let feePerNFTInMATIC = 0.01; // Example fee in MATIC
+                    let totalFee = feePerNFTInMATIC * numberOfNFTs;
+
+                    for(const k = 1; k<= filesArray.length; k++){ 
+                            let maticMintPrice = 20;
+
+                            let myNFTobjType = {
+                                id: k,
+                                price: maticMintPrice* 15*10**18, 
+                                owner: RoysWallet,
+                                mintDate: Math.floor(Date.now() / 1000), // Current timestamp
+                                tokenName: selectedContract.contractName,
+                                forSale: true, 
+                                flagged: false    
+                            };
+
+                            mintableArray.push(myNFTobjType);
+                    }
+                    console.log('trying to mint array of nfts');
+
+                    try {
+                        // Send the transaction to mint NFTs
+                        const totalFeeInWei = web3.utils.toWei(totalFee.toString(), 'ether'); // Adjust for MATIC if necessary
+
+                        const mintResult = await contract.methods.mintArrayOfNFTs(mintableArray).send({
+                            from: userAddress, // Ensure you provide the sender's address
+                            value: totalFeeInWei // Only if needed
+                        });
+
+                        // Check the result
+                        if (mintResult.status) { // Assumes mintResult contains a status field for success
+                            console.log('Mint was a success, lets check');
+                        } else {
+                            console.log('Error minting array, contract returned false');
+                        }
+                    } catch (error) {
+                        console.error('Error calling contract mintArrayOfNFTs:', error);
+                    }
                     mintCollectionSuccessPopUpForm(selectedContract, filesArray[0].image);
                     // use codes to check which documents where
                     // make this pop up form show them the tokens that did not save 
