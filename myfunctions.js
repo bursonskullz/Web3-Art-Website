@@ -1,6 +1,5 @@
 import {gridNavigator} from './script.js';
 import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.0.8/dist/ethers.esm.min.js'; 
-//import pako from 'pako';
 
 const myWebDomain = 'http://localhost:27015/'; 
 var msgCount = 0; 
@@ -110,11 +109,7 @@ export async function painting_section_click(parentElement) {
     
 }
 
-
-
-
 function makeSelectorForm(){
-    // Create a form element and apply styles for the pop-up
     const form = document.createElement('form');
     form.className = 'contract-selector-form';
 
@@ -133,16 +128,15 @@ function makeSelectorForm(){
     form.style.border = '1px solid #ccc';
     form.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
     form.style.padding = '10px';
-    form.style.overflow = 'hidden'; // No scrolling allowed
-    form.style.zIndex = '1000'; // Ensure it appears on top of other elements
+    form.style.overflow = 'hidden'; 
+    form.style.zIndex = '1000'; 
     makeElementDraggable(form);
 
-    // Create a header for the form
     const header = document.createElement('div');
     header.style.position = 'relative';
-    header.style.height = '30px'; // Height of the header
+    header.style.height = '30px'; 
     header.style.backgroundColor = 'dimgray';
-    header.style.color = '#fff'; // Text color for the header
+    header.style.color = '#fff'; 
     header.style.display = 'flex';
     header.style.alignItems = 'center';
     header.style.padding = '5px';
@@ -151,18 +145,17 @@ function makeSelectorForm(){
 
     const header2 = document.createElement('div');
     header2.style.position = 'relative';
-    header2.style.height = '30px'; // Height of the header
+    header2.style.height = '30px'; 
     header2.style.backgroundColor = 'dimgray';
-    header2.style.color = '#fff'; // Text color for the header
+    header2.style.color = '#fff'; 
     header2.style.display = 'flex';
     header2.style.alignItems = 'center';
     header2.style.padding = '5px';
     header2.style.fontSize = '18px';
     header2.style.fontWeight = 'bold';
 
-    // Create a close button for the pop-up with an "X"
     const closeButton = document.createElement('button');
-    closeButton.textContent = '×'; // Unicode character for "X"
+    closeButton.textContent = '×'; 
     closeButton.style.position = 'absolute';
     closeButton.style.top = '5px';
     closeButton.style.right = '5px';
@@ -170,7 +163,7 @@ function makeSelectorForm(){
     closeButton.style.border = 'none';
     closeButton.style.background = 'none';
     closeButton.style.fontSize = '18px';
-    closeButton.style.color = '#888'; // Gray color for a subtle look
+    closeButton.style.color = '#888'; 
     closeButton.style.padding = '5px';
     closeButton.style.lineHeight = '1';
     closeButton.style.fontWeight = 'bold';
@@ -182,9 +175,8 @@ function makeSelectorForm(){
     closeButton.style.justifyContent = 'center';
     closeButton.style.transition = 'background-color 0.3s, color 0.3s';
 
-    // Close button event listener
     closeButton.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent form submission
+        e.preventDefault(); 
         document.body.removeChild(form);
     });
 
@@ -193,7 +185,7 @@ function makeSelectorForm(){
     titleSpan.className = 'slectorFormTitleSpanTag';
     titleSpan.style.flex = '1';
     titleSpan.style.textAlign = 'center';
-    titleSpan.style.fontWeight = 'bold'; // Make the text bold
+    titleSpan.style.fontWeight = 'bold'; 
     header.appendChild(closeButton);
     header.appendChild(titleSpan);
     form.appendChild(header);
@@ -205,7 +197,7 @@ function makeSelectorForm(){
     msgSpanTag.textContent = 'Loading....';
     msgSpanTag.style.flex = '1';
     msgSpanTag.style.textAlign = 'center';
-    msgSpanTag.style.fontWeight = 'bold'; // Make the text bold
+    msgSpanTag.style.fontWeight = 'bold'; 
     header2.appendChild(msgSpanTag);
     var strings = [
         "Loading",
@@ -214,13 +206,11 @@ function makeSelectorForm(){
 
     printInfo(msgSpanTag, strings);
 
-    // Create a container for the form content
     const contentContainer = document.createElement('div');
     contentContainer.className = 'contentContainerNFTs';
-    contentContainer.style.overflow = 'auto'; // Allow scrolling if necessary
-    contentContainer.style.height = 'calc(100% - 40px)'; // Subtract header height
+    contentContainer.style.overflow = 'auto';
+    contentContainer.style.height = 'calc(100% - 40px)'; 
     form.appendChild(contentContainer);
-
     return form;
 }
 export async function addDigitalElementListener(digitalElement){
@@ -228,14 +218,12 @@ export async function addDigitalElementListener(digitalElement){
         if(!NFTDivOverlay){
             NFTDivOverlay = true;
             shiftOffScreen(gridNavigator);
-
             console.log('Trying to create the selector form');
             const checkIfFormIsActive = document.querySelector(".contract-selector-form");
             if(checkIfFormIsActive){
 
             }else{
                 const contractsForm = makeSelectorForm();
-
                 const loadingContainer = document.createElement("div");
                 loadingContainer.className = "loading-container";
                 loadingContainer.style.position = "absolute";
@@ -247,7 +235,6 @@ export async function addDigitalElementListener(digitalElement){
                 loadingContainer.style.display = "flex";
                 loadingContainer.style.justifyContent = "center";
                 loadingContainer.style.alignItems = "center";
-
                 loadingContainer.style.backgroundColor = "none"; 
 
                 const loadingIcon = document.createElement("img");
@@ -259,9 +246,6 @@ export async function addDigitalElementListener(digitalElement){
                 loadingContainer.appendChild(loadingIcon);
                 contractsForm.appendChild(loadingContainer);
 
-                
-
-                // this returns all the contracts dont call it yet 
                 nft_section_click(digitalElement).then(async (result) => {
                     console.log('collections data recived from database:', result);
                     currentNFTcollections = result;
@@ -270,7 +254,6 @@ export async function addDigitalElementListener(digitalElement){
                     titleSpanTag.textContent = 'Collections';
                     result.forEach((item) => {
                         console.log('trying to add collection to container');
-                        // Create a container div for each contract
                         const contractDiv = document.createElement('div');
 
                         contractDiv.style.display = 'flex';
@@ -279,52 +262,42 @@ export async function addDigitalElementListener(digitalElement){
                         contractDiv.style.padding = '5px';
                         contractDiv.style.border = '1px solid #ccc';
                         contractDiv.style.marginBottom = '5px';
-                        //contractDiv.style.borderBottom = '0.4vh solid lightgray'; 
                         contractDiv.style.transition = 'background-color 0.3s';
-                        contractDiv.style.width = '100%'; // Make the div span all the way across
-                        contractDiv.style.backgroundColor = 'dimgray'; // Add light gray background
+                        contractDiv.style.width = '100%';
+                        contractDiv.style.backgroundColor = 'dimgray';
 
-                        // Add a hover effect
                         contractDiv.addEventListener('mouseenter', () => {
                             contractDiv.style.backgroundColor = '#e0e0e0';
                         });
 
                         contractDiv.addEventListener('mouseleave', () => {
-                            contractDiv.style.backgroundColor = 'dimgray'; // Change this back to initial color
+                            contractDiv.style.backgroundColor = 'dimgray';
                         });
 
-                        // Create an image container for the collection background image
                         const imageContainer = document.createElement('div');
                         imageContainer.style.marginRight = '10px';
-                        imageContainer.style.width = '50px'; // Adjust width as needed
+                        imageContainer.style.width = '50px'; 
                         imageContainer.style.height = '50px';
                         imageContainer.style.overflow = 'hidden';
                         imageContainer.style.display = 'flex';
                         imageContainer.style.alignItems = 'center';
                         imageContainer.style.justifyContent = 'center';
 
-                        // Create the image element
                         const image = document.createElement('img');
                         image.src = item.collectionBackgroundImage;
                         image.style.width = '100%';
                         image.style.height = 'auto';
                         image.style.objectFit = 'cover';
 
-                        // Append the image to its container
                         imageContainer.appendChild(image);
 
-                        // Create a span for the contract name
                         const contractNameSpan = document.createElement('span');
                         contractNameSpan.textContent = item.contractName;
                         contractNameSpan.style.flex = '1';
                         contractNameSpan.style.textAlign = 'center';
-
-                        // Append the image and contract name to the contract div
                         contractDiv.appendChild(imageContainer);
                         contractDiv.appendChild(contractNameSpan);
 
-
-                        // Add click event to resolve the promise with the selected contract name
                         contractDiv.addEventListener('click', async () => {
                             if(!tryingToAccessData){
                                 const msgSpanTag = document.querySelector(".msgSpanTag");
@@ -368,7 +341,6 @@ export async function addDigitalElementListener(digitalElement){
                                 const nfts = await getNFTS(item.contractName);
                                 console.log('We got the documents', nfts);
                                 loadingContainer.remove();
-
 
                                 if(nfts.length!= 0){
                                     currentNFTArray = nfts;
@@ -464,8 +436,6 @@ export async function addDigitalElementListener(digitalElement){
                                 alert('Currently trying to fetch tokens on contract please wait a second before trying to select a different contract');
                             }
                         });
-
-                        // Append the contract div to the content container
                         const container = document.querySelector('.contentContainerNFTs');
                         container.appendChild(contractDiv);
                     });
@@ -623,7 +593,6 @@ export async function addPaintingElementListener(paintingElement) {
                             });
 
                             const purchasesInfoContainer = document.querySelector('.infoContainer');
-                            //purchasesInfoContainer.style.fontSize = '1.5vh';
                             if(purchasesInfoContainer){
                                 purchasesInfoContainer.style.marginTop = '0vh';
                             }
@@ -650,8 +619,6 @@ export async function addPaintingElementListener(paintingElement) {
                             if(purchasesInfoContainer){
                                 purchasesInfoContainer.style.marginTop = '1.1vh';
                             }
-
-
                             headerTextContainer.style.width = '38%';
                             backButtonContainer.style.left = '44.5%';
                             backButtonContainer.style.width = '6vh';
@@ -777,7 +744,6 @@ export async function addPaintingElementListener(paintingElement) {
                             gridItemWidth = '100%';
                             rowWidth = '50%';
 
-
                             if(currentPaintingArray.length >= 24){
                                 makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }else{
@@ -804,8 +770,6 @@ export async function addPaintingElementListener(paintingElement) {
                             const gridFowardContainer = document.querySelector('.gridFowardContainer');
                             const gridBackContainer = document.querySelector('.gridBackContainer');
 
-
-
                             const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
 
                             ptagDescriptions.forEach(itemDescription => {
@@ -823,8 +787,6 @@ export async function addPaintingElementListener(paintingElement) {
                             dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
                                 dpurchasesfirstNameDiv.style.fontSize = '.9vh'; 
                             });
-
-
 
                             const dppurchasesPriceDivs = document.querySelectorAll('.purchasesPriceDiv');
                             dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
@@ -844,8 +806,6 @@ export async function addPaintingElementListener(paintingElement) {
                             if (typeof greenLight !== 'undefined' && greenLight) {
                                 greenLight.remove();
                             }
-
-                            //greenLight?.remove();
                             
                             backButtonContainer.style.width = '4.2vh';
                             backButtonContainer.style.left = '46.5%';
@@ -863,7 +823,6 @@ export async function addPaintingElementListener(paintingElement) {
                             chatRoom.style.left = '11.5%';
                             chatRoom.style.top = '0%';
                             chatRoom.style.zIndex = '99999';
-
 
                             var listItems = document.getElementsByTagName('li');
                             var listH3Items = document.getElementsByTagName('h3');
@@ -902,13 +861,6 @@ export function math_section_click(parentElement){
     comingSoonScreen(parentElement);
 }
 
-/*
-export function nft_section_click(parentElement){
-     console.log("NFT section clicked!"); 
-     comingSoonScreen(parentElement);
-}
-*/
-
 function makeElementDraggable(element) {
     let offsetX, offsetY;
     let isDragging = false;
@@ -934,8 +886,6 @@ function makeElementDraggable(element) {
 }
 async function createContractSelectionForm(array) {
     console.log('Trying to create the selector form');
-
-    // Create a form element and apply styles for the pop-up
     const form = document.createElement('form');
     form.style.width = '400px';
     form.style.height = '400px';
@@ -947,25 +897,23 @@ async function createContractSelectionForm(array) {
     form.style.border = '1px solid #ccc';
     form.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
     form.style.padding = '10px';
-    form.style.overflow = 'hidden'; // No scrolling allowed
-    form.style.zIndex = '1000'; // Ensure it appears on top of other elements
+    form.style.overflow = 'hidden'; 
+    form.style.zIndex = '1000';
     makeElementDraggable(form);
 
-    // Create a header for the form
     const header = document.createElement('div');
     header.style.position = 'relative';
-    header.style.height = '30px'; // Height of the header
+    header.style.height = '30px';
     header.style.backgroundColor = 'dimgray';
-    header.style.color = '#fff'; // Text color for the header
+    header.style.color = '#fff'; 
     header.style.display = 'flex';
     header.style.alignItems = 'center';
     header.style.padding = '5px';
     header.style.fontSize = '18px';
     header.style.fontWeight = 'bold';
 
-    // Create a close button for the pop-up with an "X"
     const closeButton = document.createElement('button');
-    closeButton.textContent = '×'; // Unicode character for "X"
+    closeButton.textContent = '×';
     closeButton.style.position = 'absolute';
     closeButton.style.top = '5px';
     closeButton.style.right = '5px';
@@ -973,7 +921,7 @@ async function createContractSelectionForm(array) {
     closeButton.style.border = 'none';
     closeButton.style.background = 'none';
     closeButton.style.fontSize = '18px';
-    closeButton.style.color = '#888'; // Gray color for a subtle look
+    closeButton.style.color = '#888';
     closeButton.style.padding = '5px';
     closeButton.style.lineHeight = '1';
     closeButton.style.fontWeight = 'bold';
@@ -985,9 +933,8 @@ async function createContractSelectionForm(array) {
     closeButton.style.justifyContent = 'center';
     closeButton.style.transition = 'background-color 0.3s, color 0.3s';
 
-    // Close button event listener
     closeButton.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent form submission
+        e.preventDefault(); 
         document.body.removeChild(form);
     });
 
@@ -995,21 +942,17 @@ async function createContractSelectionForm(array) {
     titleSpan.textContent = 'Collections';
     titleSpan.style.flex = '1';
     titleSpan.style.textAlign = 'center';
-    titleSpan.style.fontWeight = 'bold'; // Make the text bold
+    titleSpan.style.fontWeight = 'bold';
     header.appendChild(closeButton);
     header.appendChild(titleSpan);
     form.appendChild(header);
 
-    // Create a container for the form content
     const contentContainer = document.createElement('div');
-    contentContainer.style.overflow = 'auto'; // Allow scrolling if necessary
-    contentContainer.style.height = 'calc(100% - 40px)'; // Subtract header height
+    contentContainer.style.overflow = 'auto'; 
+    contentContainer.style.height = 'calc(100% - 40px)';
 
-    // Create the promise here and handle the resolve function properly
     return new Promise((resolve) => {
-        // Loop through the array and create elements for each item
         array.forEach((item) => {
-            // Create a container div for each contract
             const contractDiv = document.createElement('div');
             contractDiv.style.display = 'flex';
             contractDiv.style.alignItems = 'center';
@@ -1019,63 +962,49 @@ async function createContractSelectionForm(array) {
             contractDiv.style.marginBottom = '5px';
             contractDiv.style.borderBottom = '0.4vh solid lightgray'; 
             contractDiv.style.transition = 'background-color 0.3s';
-            contractDiv.style.width = '100%'; // Make the div span all the way across
-            contractDiv.style.backgroundColor = 'dimgray'; // Add light gray background
+            contractDiv.style.width = '100%';
+            contractDiv.style.backgroundColor = 'dimgray'; 
 
-            // Add a hover effect
             contractDiv.addEventListener('mouseenter', () => {
                 contractDiv.style.backgroundColor = '#e0e0e0';
             });
 
             contractDiv.addEventListener('mouseleave', () => {
-                contractDiv.style.backgroundColor = 'dimgray'; // Change this back to initial color
+                contractDiv.style.backgroundColor = 'dimgray';
             });
 
-            // Create an image container for the collection background image
             const imageContainer = document.createElement('div');
             imageContainer.style.marginRight = '10px';
-            imageContainer.style.width = '50px'; // Adjust width as needed
+            imageContainer.style.width = '50px'; 
             imageContainer.style.height = '50px';
             imageContainer.style.overflow = 'hidden';
             imageContainer.style.display = 'flex';
             imageContainer.style.alignItems = 'center';
             imageContainer.style.justifyContent = 'center';
-
-            // Create the image element
             const image = document.createElement('img');
             image.src = item.collectionBackgroundImage;
             image.style.width = '100%';
             image.style.height = 'auto';
             image.style.objectFit = 'cover';
 
-            // Append the image to its container
             imageContainer.appendChild(image);
 
-            // Create a span for the contract name
             const contractNameSpan = document.createElement('span');
             contractNameSpan.textContent = item.contractName;
             contractNameSpan.style.flex = '1';
             contractNameSpan.style.textAlign = 'center';
 
-            // Append the image and contract name to the contract div
             contractDiv.appendChild(imageContainer);
             contractDiv.appendChild(contractNameSpan);
-
-            // Add click event to resolve the promise with the selected contract name
             contractDiv.addEventListener('click', () => {
                 console.log(`Contract selected: ${item.contractName}`);
-                document.body.removeChild(form); // Remove the form from the body
-                resolve(item.contractName); // Resolve the promise with the contract name
+                document.body.removeChild(form); 
+                resolve(item.contractName); 
             });
 
-            // Append the contract div to the content container
             contentContainer.appendChild(contractDiv);
         });
-
-        // Append the content container to the form
         form.appendChild(contentContainer);
-
-        // Append the form to the body or any other container
         document.body.appendChild(form);
     });
 }
@@ -1121,9 +1050,6 @@ export function makeConnection() {
         popup = document.createElement("div");
         popup.className = "popup";
         popup.style.overflow = 'hidden';
-        // append image 
-
-        // Create Sign In div and append
         const signInDiv = document.createElement("div");
 
         signInDiv.style.position = 'relative';
@@ -1155,7 +1081,6 @@ export function makeConnection() {
         const providers = ["Metamask", "Coinbase"]; 
         providers.forEach(providerName => {
             const providerDiv = document.createElement("div");
-            //providerDiv.textContent = providerName;
             providerDiv.style.position = 'relative';
             providerDiv.classList.add("provider");
             providerDiv.className = providerName;
@@ -1196,7 +1121,6 @@ export function makeConnection() {
         ptag.style.top = '25%';
         ptag.textContent = "Cancel";
         ptag.style.fontSize = '15px';
-
 
         cancelButton.classList.add("cancel-button");
         cancelButton.style.alignItems;
@@ -1318,9 +1242,8 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
     array.forEach(item => {
         console.log('trying to make items to append to grid')
         var gridItem = document.createElement('div');
-        gridItem.classList.add('grid-item'+ item.contractAddress);// price in classlist if needed to access later but contract handles that
+        gridItem.classList.add('grid-item'+ item.contractAddress);
         gridItem.setAttribute('id', item.tokenID);
-        //gridItem.textContent = item; 
         gridItem.style.position = 'relative';
         gridItem.style.backgroundColor = '#aaaaaa'; 
         gridItem.style.width = '95%'; 
@@ -1333,7 +1256,6 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
         gridItem.style.setProperty('border-radius', '10px', 'important'); 
         gridItem.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; 
         removeString(gridItem, "[object Object]");
-        //console.log('trying to set background image to', item.image);
         gridItem.style.backgroundImage = `url("${item.image}")`;
         gridItem.style.backgroundSize = 'cover'; 
         gridItem.style.backgroundRepeat = 'no-repeat';
@@ -1358,9 +1280,7 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
             console.log('we are hovering on the mouse');
             gridItem.style.transform = 'translateY(-5px)';
             overlay.style.display = 'flex';
-
-            var checkIfInStock = false; // call contract instead and get boolean value from contract
-
+            var checkIfInStock = false; 
             var descriptionP = document.createElement('p');
             descriptionP.className = 'descriptionNFTPTAG';
             descriptionP.style.width = '100%';
@@ -1370,10 +1290,8 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
             descriptionP.style.overflowY = 'scroll';
             descriptionP.style.fontSize = '1.8vh';
             descriptionP.style.color = 'white';
-
-            let maticValue = '50000'; // get value from contract instead this is dummy variable
-            let NFTOwner = '0x37277211111'; // get actually owner data from contract
-
+            let maticValue = '50000'; 
+            let NFTOwner = '0x37277211111'; 
             descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID + '<br>'  + 'Approximate Price:' + "    " + maticValue + " Matic " + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
             overlay.appendChild(descriptionP);
             gridItem.appendChild(overlay);
@@ -1399,14 +1317,6 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
         });
 
         gridContainer.appendChild(gridItem);
-        // add hover event to buy NFT 
-        // check if NFT is avaiabale (check from contract) then put purchase text content in button else put unavailable
-        // add attributes and info to overlay 
-        // add event listener to button if avaialable to call prucahse function to contract
-        // if contract returns false then alert user
-        // else make a successpopup like before may be able to use the same function 
-        // on hover out remove overlay
-        // make ability to sweep floor (toss multiple token ids into array and toss to contract if avaialabale)
     });
 
     
@@ -1457,15 +1367,6 @@ export function makeNewNFTGrid(array, grid) {
         overlay.style.opacity = '.6';
         grid.appendChild(gridItem);
         console.log('we made a new grid'); 
-
-        // add hover event to buy NFT 
-        // check if NFT is avaiabale (check from contract) then put purchase text content in button else put unavailable
-        // add attributes and info to overlay 
-        // add event listener to button if avaialable to call prucahse function to contract
-        // if contract returns false then alert user
-        // else make a successpopup like before may be able to use the same function 
-        // on hover out remove overlay
-        // make ability to sweep floor (toss multiple token ids into array and toss to contract if avaialabale)
     });
 }
 
@@ -1542,7 +1443,7 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
                 if(myObj._id == gridItem.id){
                     checkIfInStock = myObj.inStock;
                 }else{
-                    //checkIfInStock = false;   
+                     
                 }
             }
 
@@ -1559,14 +1460,11 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
             descriptionP.style.color = 'white';
 
             for(const painting of currentPaintingArray){
-                //console.log(painting);
                 if(painting._id == gridItem.id){
                     descriptionP.innerHTML =  'Name:' + "    " + painting.name + '<br>'  + 'Approximate Price:' + "    " + painting.price.$numberDecimal + " ETH " + '<br>'+ " Number of Views: "+  painting.views +  '<br> <br>' +  painting.description;
                 }
             }
             overlay.appendChild(descriptionP);
-
-
             const containsPaintingId = currentViewedPaintings.some(item => item.paintingId === gridItem.id);
 
             if (!containsPaintingId) {
@@ -2188,20 +2086,15 @@ function createCircularSweeper(container) {
     const sweeperCircle = document.createElement('div');
     sweeperCircle.classList.add('sweeper-circle');
     container.appendChild(sweeperCircle);
-
-    // Create the emoji for the center
     const sun = document.createElement('div');
     sun.classList.add('sun');
-    sun.textContent = '🌕'; // Earth emoji
+    sun.textContent = '🌕'; 
     sweeperCircle.appendChild(sun);
 
-    // Create the emoji element for the sweep
     const emoji = document.createElement('div');
     emoji.classList.add('emoji');
     emoji.textContent = '🌍'; // Moon emoji
     sweeperCircle.appendChild(emoji);
-
-    // Create a span for showing sweep information
     const infoSpan = document.createElement('span');
     infoSpan.classList.add('info-span');
     container.appendChild(infoSpan);
@@ -2209,27 +2102,20 @@ function createCircularSweeper(container) {
     let isDragging = false;
     const radius = sweeperCircle.offsetWidth / 2 - emoji.offsetWidth / 2;
     const maxItems = 25;
-    let angle = -Math.PI / 2; // Start angle at the top of the circle
+    let angle = -Math.PI / 2; 
 
     function updateEmojiPosition() {
-        // Calculate the position of the emoji based on the current angle
         const x = radius * Math.cos(angle) + sweeperCircle.offsetWidth / 2;
         const y = radius * Math.sin(angle) + sweeperCircle.offsetHeight / 2;
-
-        // Update the emoji position to keep it on the edge
         emoji.style.left = `${x - emoji.offsetWidth / 2}px`;
         emoji.style.top = `${y - emoji.offsetHeight / 2}px`;
-
-        // Update the sweep information
         updateSweepInfo();
     }
 
     function updateSweepInfo() {
-        // Calculate the percentage based on the angle
-        const percent = (angle + Math.PI / 2) / (2 * Math.PI) * 100; // Normalize angle to 0 to 100%
-        const items = Math.round((percent / 100) * maxItems); // Convert percentage to item count
-        infoSpan.textContent = `Sweep ${items} items`;// sweep this many items in the grid, grab token ID and try to purchase
-
+        const percent = (angle + Math.PI / 2) / (2 * Math.PI) * 100; 
+        const items = Math.round((percent / 100) * maxItems); 
+        infoSpan.textContent = `Sweep ${items} items`;
         sweeperCircle.style.background = `conic-gradient(#4caf50 ${percent}%, transparent ${percent}%)`;
     }
 
@@ -2238,9 +2124,8 @@ function createCircularSweeper(container) {
             const rect = sweeperCircle.getBoundingClientRect();
             const x = event.clientX - rect.left - sweeperCircle.offsetWidth / 2;
             const y = event.clientY - rect.top - sweeperCircle.offsetHeight / 2;
-            angle = Math.atan2(y, x); // Calculate angle
-
-            if (angle < -Math.PI / 2) angle += 2 * Math.PI; // Adjust angle to start from the top-center position
+            angle = Math.atan2(y, x); 
+            if (angle < -Math.PI / 2) angle += 2 * Math.PI; 
 
             updateEmojiPosition();
         }
@@ -2259,7 +2144,6 @@ function createCircularSweeper(container) {
     document.addEventListener('mouseup', onMouseUp);
     emoji.addEventListener('mousedown', onMouseDown);
 
-    // Initialize emoji position on the edge of the circle
     updateEmojiPosition();
 }
 
@@ -2280,7 +2164,6 @@ async function makeUtilityPage(sideElementsWidth) {
     form.style.borderWidth = '2px';
     form.style.overflowY = 'scroll';
 
-        // Create the small header element
     const utilitySmallHeader = document.createElement('div');
     utilitySmallHeader.style.top = '0%';
     utilitySmallHeader.className = 'Utilities';
@@ -2293,21 +2176,20 @@ async function makeUtilityPage(sideElementsWidth) {
     utilitySmallHeader.style.boxSizing = 'border-box';
     utilitySmallHeader.style.display = 'flex';
     utilitySmallHeader.style.alignItems = 'center';
-    utilitySmallHeader.style.justifyContent = 'center'; // Center text horizontally
-    utilitySmallHeader.style.marginBottom = '20px'; // Adds space below the small header
-
+    utilitySmallHeader.style.justifyContent = 'center';
+    utilitySmallHeader.style.marginBottom = '20px'; 
 
     const utilityCloseButtom = document.createElement('div');
     utilityCloseButtom.textContent = '×'; 
-    utilityCloseButtom.style.height = '10px'; // Adjust height as needed
-    utilityCloseButtom.style.width = '10px';  // Adjust width as needed
-    utilityCloseButtom.style.backgroundColor = 'transparent'; // No background
-    utilityCloseButtom.style.position = 'absolute'; // Position absolutely
-    utilityCloseButtom.style.top = '2px'; // Position from the top
-    utilityCloseButtom.style.right = '2px'; // Position from the right
+    utilityCloseButtom.style.height = '10px';
+    utilityCloseButtom.style.width = '10px';  
+    utilityCloseButtom.style.backgroundColor = 'transparent'; 
+    utilityCloseButtom.style.position = 'absolute';
+    utilityCloseButtom.style.top = '2px'; 
+    utilityCloseButtom.style.right = '2px';
     utilityCloseButtom.style.cursor = 'pointer'; 
-    utilityCloseButtom.style.fontSize = '17px'; // Adjust font size for visibility
-    utilityCloseButtom.style.color = 'red'; // Icon color
+    utilityCloseButtom.style.fontSize = '17px'; 
+    utilityCloseButtom.style.color = 'red';
 
     utilitySmallHeader.appendChild(utilityCloseButtom);
     form.appendChild(utilitySmallHeader);
@@ -2316,8 +2198,6 @@ async function makeUtilityPage(sideElementsWidth) {
         document.body.removeChild(form);
     });
 
-
-    // Create a list of utilities
     const utilities = [
         'Utility 1: Fractional ownership of Burson Research Articles',
         'Utility 2: Access to exclusive web3 software.',
@@ -2327,34 +2207,30 @@ async function makeUtilityPage(sideElementsWidth) {
         'Utility 6: Priority support and consultations.',
     ];
 
-    // Create a container for the utilities
     const utilitiesContainer = document.createElement('div');
     utilitiesContainer.style.padding = '5px';
 
-    // Create a list element
     const ul = document.createElement('ul');
-    ul.style.listStyleType = 'none'; // Remove bullet points for cleaner look
-    ul.style.padding = '0'; // Reset padding for cleaner alignment
-    ul.style.margin = '0'; // Reset margin for cleaner layout
+    ul.style.listStyleType = 'none';
+    ul.style.padding = '0'; 
+    ul.style.margin = '0'; 
     ul.style.fontSize = '7px';
 
     utilities.forEach((utility) => {
-        // Create a flex container for each utility item
         const utilityItem = document.createElement('li');
         utilityItem.style.display = 'flex';
         utilityItem.style.justifyContent = 'space-between';
         utilityItem.style.alignItems = 'center';
-        utilityItem.style.borderBottom = '1px solid #eee'; // Lighter divider for a softer look
+        utilityItem.style.borderBottom = '1px solid #eee'; 
         utilityItem.style.padding = '2px 0';
-        utilityItem.style.fontSize = '10px'; // Consistent font size
-        utilityItem.style.color = 'black'; // Subtle color for text
+        utilityItem.style.fontSize = '10px';
+        utilityItem.style.color = 'black'; 
 
-        // Create paragraph for the utility description
         const paragraph = document.createElement('p');
         paragraph.textContent = utility;
-        paragraph.style.margin = '0'; // Remove default margin
-        paragraph.style.flex = '1'; // Allow paragraph to take available space
-        paragraph.style.paddingRight = '5px'; // Add space between text and button
+        paragraph.style.margin = '0';
+        paragraph.style.flex = '1'; 
+        paragraph.style.paddingRight = '5px'; 
 
         // Create access button
         const button = document.createElement('button');
@@ -2366,38 +2242,31 @@ async function makeUtilityPage(sideElementsWidth) {
         button.style.borderRadius = '4px';
         button.style.cursor = 'pointer';
         button.style.fontSize = '10px';
-        button.style.transition = 'background-color 0.3s, box-shadow 0.3s'; // Smooth transition
-        button.style.marginLeft = '5px'; // Add space between text and button
+        button.style.transition = 'background-color 0.3s, box-shadow 0.3s'; 
+        button.style.marginLeft = '5px'; 
 
-        // Add shadow and interactive hover effect
         button.style.boxShadow = '0 2px 4px rgba(0, 123, 255, 0.3)';
         button.addEventListener('mouseenter', () => {
             button.style.backgroundColor = '#0056b3';
-            button.style.boxShadow = '0 4px 8px rgba(0, 123, 255, 0.5)'; // Enhanced shadow on hover
+            button.style.boxShadow = '0 4px 8px rgba(0, 123, 255, 0.5)'; 
         });
         button.addEventListener('mouseleave', () => {
             button.style.backgroundColor = '#007bff';
             button.style.boxShadow = '0 2px 4px rgba(0, 123, 255, 0.3)';
         });
 
-        // Event listener for the button
         button.addEventListener('click', () => {
             console.log(`Accessing ${utility}`);
-            // Add access functionality here
         });
 
-        // Append paragraph and button to the utility item
         utilityItem.appendChild(paragraph);
         utilityItem.appendChild(button);
 
-        // Append utility item to the list
         ul.appendChild(utilityItem);
     });
 
-    // Append list to the container
     utilitiesContainer.appendChild(ul);
 
-    // Append container to the form
     form.appendChild(utilitiesContainer);
     document.body.appendChild(form);
 
@@ -2420,7 +2289,6 @@ async function makeOwnersPage(sideElementsWidth) {
     ownersContainer.style.borderWidth = '2px';
     ownersContainer.style.overflowY = 'scroll';
 
-    // Create the small header element
     const ownerSmallHeader = document.createElement('div');
     ownerSmallHeader.style.top = '0%';
     ownerSmallHeader.className = 'ownerSmallHeader';
@@ -2433,21 +2301,20 @@ async function makeOwnersPage(sideElementsWidth) {
     ownerSmallHeader.style.boxSizing = 'border-box';
     ownerSmallHeader.style.display = 'flex';
     ownerSmallHeader.style.alignItems = 'center';
-    ownerSmallHeader.style.justifyContent = 'center'; // Center text horizontally
-    ownerSmallHeader.style.marginBottom = '20px'; // Adds space below the small header
-
+    ownerSmallHeader.style.justifyContent = 'center';
+    ownerSmallHeader.style.marginBottom = '20px'; 
 
     const closeOwnersPageButton = document.createElement('div');
     closeOwnersPageButton.textContent = '×'; 
-    closeOwnersPageButton.style.height = '20px'; // Adjust height as needed
-    closeOwnersPageButton.style.width = '20px';  // Adjust width as needed
-    closeOwnersPageButton.style.backgroundColor = 'transparent'; // No background
-    closeOwnersPageButton.style.position = 'absolute'; // Position absolutely
-    closeOwnersPageButton.style.top = '0px'; // Position from the top
-    closeOwnersPageButton.style.right = '2px'; // Position from the right
+    closeOwnersPageButton.style.height = '20px';
+    closeOwnersPageButton.style.width = '20px';  
+    closeOwnersPageButton.style.backgroundColor = 'transparent'; 
+    closeOwnersPageButton.style.position = 'absolute'; 
+    closeOwnersPageButton.style.top = '0px'; 
+    closeOwnersPageButton.style.right = '2px';
     closeOwnersPageButton.style.cursor = 'pointer'; 
-    closeOwnersPageButton.style.fontSize = '15px'; // Adjust font size for visibility
-    closeOwnersPageButton.style.color = 'red'; // Icon color
+    closeOwnersPageButton.style.fontSize = '15px'; 
+    closeOwnersPageButton.style.color = 'red'; 
 
     ownerSmallHeader.appendChild(closeOwnersPageButton);
     ownersContainer.appendChild(ownerSmallHeader);
@@ -2471,43 +2338,38 @@ async function makeOwnersPage(sideElementsWidth) {
         allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
 
         if (allOwnersAddressArray.length > 0) {
-            let count = 0; // Initialize count
+            let count = 0; 
             allOwnersAddressArray.forEach(owner => {
                 count += 1;
                 console.log('Trying to display token data inside pop up allOwnersAddressArray');
 
-                // Create a container for each unique owner
                 const uniqueOwnerContainer = document.createElement('div');
-                uniqueOwnerContainer.classList.add('ownerItem', `-${count}`); // Add unique class using count
+                uniqueOwnerContainer.classList.add('ownerItem', `-${count}`); 
                 uniqueOwnerContainer.style.height = 'auto';
-                uniqueOwnerContainer.style.position = 'relative'; // For positioning price and date
-                uniqueOwnerContainer.style.overflow = 'hidden'; // Hide overflow to ensure image doesn't spill out
-                uniqueOwnerContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; // Optional background color for the item
-                uniqueOwnerContainer.style.borderRadius = '5px'; // Rounded corners for container
-                uniqueOwnerContainer.style.display = 'flex'; // Flexbox for layout
-                uniqueOwnerContainer.style.alignItems = 'center'; // Center items vertically
-                uniqueOwnerContainer.style.padding = '10px'; // Optional padding for better spacing
+                uniqueOwnerContainer.style.position = 'relative'; 
+                uniqueOwnerContainer.style.overflow = 'hidden'; 
+                uniqueOwnerContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; 
+                uniqueOwnerContainer.style.borderRadius = '5px';
+                uniqueOwnerContainer.style.display = 'flex'; 
+                uniqueOwnerContainer.style.alignItems = 'center';
+                uniqueOwnerContainer.style.padding = '10px'; 
 
-                // Create a div for the owner address
                 const ownerAddressDiv = document.createElement('div');
-                ownerAddressDiv.style.flex = '1'; // Take up the full width for the owner address
-                ownerAddressDiv.style.wordWrap = 'break-word'; // Allow the address to break and wrap to the next line
-                ownerAddressDiv.style.overflow = 'hidden'; // Prevent overflowing
-                ownerAddressDiv.style.whiteSpace = 'normal'; // Allow the text to wrap normally
-                ownerAddressDiv.style.maxWidth = 'calc(100% - 50px)'; // Ensure it doesn't take up too much space
-                ownerAddressDiv.textContent = `Owner: ${owner}`; // Add the owner address text
+                ownerAddressDiv.style.flex = '1'; 
+                ownerAddressDiv.style.wordWrap = 'break-word'; 
+                ownerAddressDiv.style.overflow = 'hidden'; 
+                ownerAddressDiv.style.whiteSpace = 'normal'; 
+                ownerAddressDiv.style.maxWidth = 'calc(100% - 50px)';
+                ownerAddressDiv.textContent = `Owner: ${owner}`; 
 
-                // Create a smaller div for the item count placeholder
                 const itemCountDiv = document.createElement('div');
-                itemCountDiv.style.fontSize = '12px'; // Smaller font for item count
-                itemCountDiv.style.color = '#888'; // Light grey color for item count
-                itemCountDiv.textContent = '# items'; // Placeholder text for number of items
+                itemCountDiv.style.fontSize = '12px';
+                itemCountDiv.style.color = '#888'; 
+                itemCountDiv.textContent = '# items'; 
 
-                // Append the owner address and item count divs to the unique owner container
                 uniqueOwnerContainer.appendChild(ownerAddressDiv);
                 uniqueOwnerContainer.appendChild(itemCountDiv);
 
-                // Append the unique owner container to the parent container
                 ownersContainer.appendChild(uniqueOwnerContainer);
             });
         }else{
@@ -2516,7 +2378,7 @@ async function makeOwnersPage(sideElementsWidth) {
             noOwnersMessage.style.display = 'block';
             noOwnersMessage.style.textAlign = 'center';
             noOwnersMessage.style.marginTop = '20px';
-            noOwnersMessage.style.color = 'white'; // White text color
+            noOwnersMessage.style.color = 'white'; 
             ownersContainer.appendChild(noOwnersMessage);
         }
 
@@ -2539,7 +2401,6 @@ async function makeMytokensPage(contract, sideElementsWidth){
     userTokensContainer.style.borderWidth = '2px';
     userTokensContainer.style.overflowY = 'none';
 
-    // Create the small header element
     const smallHeader = document.createElement('div');
     smallHeader.style.top = '0%';
     smallHeader.className = 'smallHeader';
@@ -2552,13 +2413,12 @@ async function makeMytokensPage(contract, sideElementsWidth){
     smallHeader.style.boxSizing = 'border-box';
     smallHeader.style.display = 'flex';
     smallHeader.style.alignItems = 'center';
-    smallHeader.style.justifyContent = 'center'; // Center text horizontally
-    smallHeader.style.marginBottom = '17px'; // Adds space below the small header
+    smallHeader.style.justifyContent = 'center';
+    smallHeader.style.marginBottom = '17px'; 
 
-    // Create the container for the "Bulk list" span tag on the left
     const bulkListSPanTagContainer = document.createElement('div');
     bulkListSPanTagContainer.className ="bulkListTool";
-    bulkListSPanTagContainer.style.position = 'absolute'; // Position absolute for the container
+    bulkListSPanTagContainer.style.position = 'absolute'; 
     bulkListSPanTagContainer.style.bottom = '2%';
     bulkListSPanTagContainer.style.left = '5%'; 
     bulkListSPanTagContainer.style.height = '17%';
@@ -2570,56 +2430,37 @@ async function makeMytokensPage(contract, sideElementsWidth){
     bulkListText.style.position = 'absolute';
     bulkListText.style.top = '0%'; 
     bulkListText.style.left = '0%';
-    bulkListText.style.cursor = 'pointer'; // Show a pointer cursor on hover
+    bulkListText.style.cursor = 'pointer';
     bulkListText.style.fontSize = '10px'; 
     bulkListText.style.color = 'white'; 
 
-
     bulkListText.addEventListener('click', () => {
-        console.log('Bulk list clicked!');
-        console.log('Need to create button to click for bulk list');
-
-        // Hide the delistTool and bulk tool make them reclick
-        // change my tokens text to Delist or bulk depending on which they choose 
-        // change back when they close
-
         const delistTool = document.querySelector(".delistTool");
         const bulklistingTool = document.querySelector(".bulkListTool");
         if (delistTool) {
             delistTool.innerHTML ='';
             listingOrDelisting = "listing";
         }
-
         if(bulklistingTool){
             bulklistingTool.innerHTML = '';
         }        
-
-        // Get all .listedSpan elements
         const listedSpans = document.querySelectorAll('.listedSpan');
-
-        let count = 0; // Initialize count
-
+        let count = 0; 
         listedSpans.forEach(() => {
-            count += 1; // Increment count for each listedSpan
-
-            // Access the parent container using the unique class name with count
+            count += 1; 
             const parentContainer = document.querySelector(`.sold-item-${count}`);
 
             if (parentContainer) {
-                // Find the checkbox within the parent container
                 const checkbox = parentContainer.querySelector('input[type="checkbox"]');
 
                 if (checkbox) {
-                    // Search for the word "active" anywhere inside the parent container's text
-                    const parentText = parentContainer.textContent.toLowerCase(); // Convert text to lowercase for consistent matching
-                    console.log(`Checking parent container ${count} for "active" text.`); // Debug line
-
-                    // Show checkboxes only if "active" is not found
+                    const parentText = parentContainer.textContent.toLowerCase();
+                    console.log(`Checking parent container ${count} for "active" text.`); 
                     if (parentText.includes("inactive")) {
-                        checkbox.style.display = 'inline-block'; // Show checkbox if "active" is not found
+                        checkbox.style.display = 'inline-block';
                         console.log(`Checkbox shown for parent container ${count} because it does not contain "Inactive".`);
                     } else {
-                         checkbox.style.display = 'none'; // Hide checkbox if "active" is found
+                         checkbox.style.display = 'none'; 
                          console.log(`Checkbox hidden for parent container ${count} because it contains "active".`);
                         
                     }
@@ -2632,32 +2473,25 @@ async function makeMytokensPage(contract, sideElementsWidth){
         });
     });
 
-    // Append the "Bulk list" span tag to its container
     bulkListSPanTagContainer.appendChild(bulkListText);
-
-    // Append the "Bulk list" container to the small header
     smallHeader.appendChild(bulkListSPanTagContainer);
 
-    // Create the container for the "Delist" span tag on the right
     const delistSPanTagContainer = document.createElement('div');
-    delistSPanTagContainer.style.position = 'absolute'; // Position absolute for the container
+    delistSPanTagContainer.style.position = 'absolute'; 
     delistSPanTagContainer.className = 'delistTool';
     delistSPanTagContainer.style.bottom = '2%';
     delistSPanTagContainer.style.right = '5%'; 
     delistSPanTagContainer.style.height = '17%';
     delistSPanTagContainer.style.width = '30%';
 
-    // Create the "Delist" span tag
     const delistText = document.createElement('span');
     delistText.textContent = 'Delist'; 
     delistText.style.position = 'absolute';
     delistText.style.bottom = '0px'; 
     delistText.style.right = '0px';
-    delistText.style.cursor = 'pointer'; // Show a pointer cursor on hover
+    delistText.style.cursor = 'pointer';
     delistText.style.fontSize = '10px'; 
     delistText.style.color = 'white'; 
-
-    // Add click functionality to the "Delist" span tag
     delistText.addEventListener('click', () => {
         console.log('bulk delist tool clicked!');
 
@@ -2673,32 +2507,24 @@ async function makeMytokensPage(contract, sideElementsWidth){
             bulklistingTool.innerHTML = '';
         } 
 
-        // Get all .listedSpan elements
         const listedSpans = document.querySelectorAll('.listedSpan');
 
-        let count = 0; // Initialize count
-
+        let count = 0; 
         listedSpans.forEach(() => {
-            count += 1; // Increment count for each listedSpan
-
-            // Access the parent container using the unique class name with count
+            count += 1;
             const parentContainer = document.querySelector(`.sold-item-${count}`);
 
             if (parentContainer) {
-                // Find the checkbox within the parent container
                 const checkbox = parentContainer.querySelector('input[type="checkbox"]');
 
                 if (checkbox) {
-                    // Search for the word "active" anywhere inside the parent container's text
-                    const parentText = parentContainer.textContent.toLowerCase(); // Convert text to lowercase for consistent matching
-                    console.log(`Checking parent container ${count} for "active" text.`); // Debug line
-
-                    // Show checkboxes only if parent does not contain "inactive" 
+                    const parentText = parentContainer.textContent.toLowerCase(); 
+                    console.log(`Checking parent container ${count} for "active" text.`); 
                     if (!parentText.includes("inactive")) {
-                        checkbox.style.display = 'inline-block'; // Show checkbox if "active" is not found
+                        checkbox.style.display = 'inline-block';
                         console.log(`Checkbox shown for parent container ${count} because it does not contain "Inactive".`);
                     } else {
-                         checkbox.style.display = 'none'; // Hide checkbox if "active" is found
+                         checkbox.style.display = 'none';
                          console.log(`Checkbox hidden for parent container ${count} because it contains "active".`);
                         
                     }
@@ -2711,26 +2537,22 @@ async function makeMytokensPage(contract, sideElementsWidth){
         });
     });
 
-
-    // Append the "Delist" span tag to its container
     delistSPanTagContainer.appendChild(delistText);
-
-    // Append the "Delist" container to the small header
     smallHeader.appendChild(delistSPanTagContainer);
 
     userTokensContainer.appendChild(smallHeader);
 
     const closeIcon = document.createElement('div');
     closeIcon.textContent = '×'; 
-    closeIcon.style.height = '20px'; // Adjust height as needed
-    closeIcon.style.width = '20px';  // Adjust width as needed
-    closeIcon.style.backgroundColor = 'transparent'; // No background
-    closeIcon.style.position = 'absolute'; // Position absolutely
-    closeIcon.style.top = '0px'; // Position from the top
-    closeIcon.style.right = '2px'; // Position from the right
+    closeIcon.style.height = '20px'; 
+    closeIcon.style.width = '20px';  
+    closeIcon.style.backgroundColor = 'transparent'; 
+    closeIcon.style.position = 'absolute'; 
+    closeIcon.style.top = '0px';
+    closeIcon.style.right = '2px'; 
     closeIcon.style.cursor = 'pointer'; 
-    closeIcon.style.fontSize = '15px'; // Adjust font size for visibility
-    closeIcon.style.color = 'red'; // Icon color
+    closeIcon.style.fontSize = '15px';
+    closeIcon.style.color = 'red'; 
 
     smallHeader.appendChild(closeIcon);
 
@@ -2769,12 +2591,12 @@ async function makeMytokensPage(contract, sideElementsWidth){
 
     
     try {
-        if (isConnected) { // Check if the user is already connected
+        if (isConnected) {
             let thisAccount = window.ethereum.selectedAddress;
             console.log('already connected trying to get nfts using the address', thisAccount);
             makeTokenPage(thisAccount, contract, smallContainer, footer);
         } else {
-            if (typeof window.ethereum === 'undefined') { // If MetaMask is not installed
+            if (typeof window.ethereum === 'undefined') { 
                 alert('You must install MetaMask or another Ethereum provider to see your tokens or purchase tokens.');
             } else {
                 if (window.ethereum.isMetaMask) { // If MetaMask is detected
@@ -2783,13 +2605,13 @@ async function makeMytokensPage(contract, sideElementsWidth){
                         let thisAccount = accounts[0];
                         makeTokenPage(thisAccount, contract, smallContainer, footer);
                     } catch (error) {
-                        if (error.code === -32002) { // Handling specific MetaMask error
+                        if (error.code === -32002) { 
                             alert('Please open the MetaMask extension manually, sign in, and reload the page.');
                         } else {
-                            alert(`Error: ${error.message || error}`); // Display other errors
+                            alert(`Error: ${error.message || error}`);
                         }
                     }
-                } else { // If another Ethereum provider is detected
+                } else { 
                     alert('MetaMask not detected. Please install MetaMask to use this feature.');
                 }
             }
@@ -2799,7 +2621,8 @@ async function makeMytokensPage(contract, sideElementsWidth){
     }
     
 }
-async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSells){
+async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
+    let recentSells;
     console.log('Trying to get recent sells to display.');
     const recentSellsPopUpBox = document.createElement('div');
     recentSellsPopUpBox.className = 'recentSellsPopUpBox';
@@ -2817,7 +2640,6 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSell
     recentSellsPopUpBox.style.border = '1px solid black'; 
     recentSellsPopUpBox.style.borderWidth = '2px';
 
-    // Create header
     const smallHeader = document.createElement('div');
     smallHeader.style.top = '0%';
     smallHeader.className = 'smallHeader';
@@ -2830,22 +2652,20 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSell
     smallHeader.style.boxSizing = 'border-box';
     smallHeader.style.display = 'flex';
     smallHeader.style.alignItems = 'center';
-    smallHeader.style.justifyContent = 'center'; // Center text horizontally
-    //smallHeader.style.borderBottom = '1px solid #eee'; // Lighter divider for a softer look
-
+    smallHeader.style.justifyContent = 'center'; 
     recentSellsPopUpBox.appendChild(smallHeader);
 
     const closeIcon = document.createElement('div');
     closeIcon.textContent = '×'; 
-    closeIcon.style.height = '20px'; // Adjust height as needed
-    closeIcon.style.width = '20px';  // Adjust width as needed
-    closeIcon.style.backgroundColor = 'transparent'; // No background
-    closeIcon.style.position = 'absolute'; // Position absolutely
-    closeIcon.style.top = '5px'; // Position from the top
-    closeIcon.style.right = '5px'; // Position from the right
+    closeIcon.style.height = '20px'; 
+    closeIcon.style.width = '20px'; 
+    closeIcon.style.backgroundColor = 'transparent'; 
+    closeIcon.style.position = 'absolute'; 
+    closeIcon.style.top = '5px'; 
+    closeIcon.style.right = '5px';
     closeIcon.style.cursor = 'pointer'; 
-    closeIcon.style.fontSize = '25px'; // Adjust font size for visibility
-    closeIcon.style.color = 'red'; // Icon color
+    closeIcon.style.fontSize = '25px'; 
+    closeIcon.style.color = 'red'; 
 
     smallHeader.appendChild(closeIcon);
 
@@ -2886,9 +2706,9 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSell
     }
 
     let testObj = {
-        image: "/images/BursonSKullText.png", // Use a plain URL string
+        image: "/images/BursonSKullText.png", 
         tokenID: 1,
-        price: 14000000
+        price: 14000000000 
     };
 
     let testArray = [];
@@ -2897,7 +2717,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSell
     testArray.push(testObj);
     testArray.push(testObj);
 
-    recentSells = testArray; // comment to stop test
+    recentSells = testArray; // comment to stop test and remove test data
 
     const css = `
         .recentSellsPopUpBox {
@@ -2951,10 +2771,10 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSell
         console.log('Trying to loop through recent sells and display inside pop up');
         
         const tokenDataArray = [];
+        let tokenSingularData;
 
-        recentSells.forEach(sell => {
+        recentSells.forEach(async (sell) => {
             let image;
-            // Use sell.id to search currentNFTArray and find index
             for (const token of currentNFTArray) {
                 if (token.tokenID === sell.tokenID) {
                     image = token.image;
@@ -2962,11 +2782,35 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSell
                 }
             }
 
+            try{
+                tokenSingularData = await contract.methods.getTokenData(sell.tokenID).call();
+            }catch(error){
+                console.log('Error calling getTokenData() on contract');
+                console.log('making Temporary test data to pass into next function');
+
+                tokenSingularData = {
+                    id: sell.tokenID,
+                    price: 10020203333333333332022222,
+                    owner: RoysWallet,
+                    mintDate: 10000,
+                    tokenName: "Burson Skull",
+                    forSale: true,
+                    flagged: false,
+                    lastSellData: 10000000
+                };
+            }
+
             if (image !== undefined) {
                 let tokenData = {
                     image: image,
-                    tokenID: sell.tokenID,
-                    price: sell.price
+                    price: tokenSingularData.price,
+                    owner: tokenSingularData.owner,
+                    mintDate: tokenSingularData.mintDate,
+                    tokenName: tokenSingularData.tokenName,
+                    forSale: tokenSingularData.forSale,
+                    flagged: tokenSingularData.flagged,
+                    tokenID: tokenSingularData.id,
+                    dateOfLastSell: tokenSingularData.lastSellData
                 };
                 tokenDataArray.push(tokenData);
             } else {
@@ -2982,16 +2826,14 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSell
                 console.log('Trying to display data inside pop up recentSellsPopUpBox');
 
                 const soldItem = document.createElement('div');
-                soldItem.classList.add('sold-item'); // Add a class for styling
+                soldItem.classList.add('sold-item'); 
                 soldItem.style.height = '100px';
-                soldItem.style.position = 'relative'; // For positioning price and date
-                soldItem.style.overflow = 'hidden'; // Hide overflow to ensure image doesn't spill out
-                soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; // Optional background color for the item
-                soldItem.style.borderRadius = '5px'; // Rounded corners for container
-                //soldItem.style.display = 'flex'; // Use flexbox for layout
-                //soldItem.style.alignItems = 'center'; // Center items vertically
-
-                // Create and append image
+                soldItem.style.position = 'relative'; 
+                soldItem.style.overflow = 'hidden'; 
+                soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                soldItem.style.borderRadius = '5px'; 
+                //soldItem.style.display = 'flex';
+                //soldItem.style.alignItems = 'center';
 
                 const imageContainer = document.createElement('div');
                 imageContainer.style.position = 'absolute';
@@ -3004,24 +2846,23 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSell
                 const img = document.createElement('img');
                 img.src = token.image;
                 img.alt = `Token ID ${token.tokenID}`;
-                img.style.width = '100%'; // Make image cover the width of the container
-                img.style.height = '100%'; // Make image cover the height of the container
-                //img.style.objectFit = 'cover'; // Ensure the image covers the container without distortion
-                img.style.borderRadius = '5px'; // Rounded corners for image
+                img.style.width = '100%';
+                img.style.height = '100%'; 
+                //img.style.objectFit = 'cover';
+                img.style.borderRadius = '5px'; 
                 img.style.backgroundSize = 'cover';
                 img.style.backgroundRepeat = 'no-repeat';
                 img.style.backgroundPosition = 'center';
                 imageContainer.appendChild(img);
 
-                                            // Create and append price
                 const currentBuyer = document.createElement('p');
-                currentBuyer.textContent = `Buyer: N/A`;
+                currentBuyer.textContent = `Buyer: ${token.owner.substring(0, 7)}`;
                 currentBuyer.style.position = 'absolute';
                 currentBuyer.style.top = '0%';
                 currentBuyer.style.right = '10px';
-                currentBuyer.style.color = 'white'; // White text color
-                //currentBuyer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
-                currentBuyer.style.borderRadius = '3px'; // Rounded corners for background
+                currentBuyer.style.color = 'white'; 
+                //currentBuyer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
+                currentBuyer.style.borderRadius = '3px'; 
                 soldItem.appendChild(currentBuyer);
 
                 const seller = document.createElement('p');
@@ -3029,94 +2870,92 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, recentSell
                 seller.style.position = 'absolute';
                 seller.style.top = '17%';
                 seller.style.right = '10px';
-                seller.style.color = 'white'; // White text color
-                //seller.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
-                seller.style.borderRadius = '3px'; // Rounded corners for background
+                seller.style.color = 'white'; 
+                //seller.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
+                seller.style.borderRadius = '3px'; 
                 soldItem.appendChild(seller);
 
-
-                // Create and append price
+                let convertedPrice = ((token.price)/(10*15**18)).toFixed(4);
                 const price = document.createElement('p');
-                price.textContent = `Price: ${token.price}`;
+                price.textContent = `${convertedPrice}` + ` ${coin}`;
                 price.style.position = 'absolute';
                 price.style.top = '34%';
                 price.style.right = '10px';
-                price.style.color = 'white'; // White text color
-                //price.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
-                price.style.padding = '5px'; // Add some padding for readability
-                price.style.borderRadius = '3px'; // Rounded corners for background
+                price.style.color = 'white'; 
+                //price.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
+                price.style.padding = '5px'; 
+                price.style.borderRadius = '3px'; 
                 soldItem.appendChild(price);
 
-                // Create and append price
                 const currentTokenID = document.createElement('p');
                 currentTokenID.textContent = `Token ID: ${token.tokenID}`;
                 currentTokenID.style.position = 'absolute';
                 currentTokenID.style.top = '58%';
                 currentTokenID.style.right = '10px';
-                currentTokenID.style.color = 'white'; // White text color
-                //currentTokenID.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
-                currentTokenID.style.borderRadius = '3px'; // Rounded corners for background
+                currentTokenID.style.color = 'white';
+                //currentTokenID.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
+                currentTokenID.style.borderRadius = '3px'; 
                 soldItem.appendChild(currentTokenID);
 
-
-                // Create and append date (if available)
                 const date = document.createElement('p');
-                date.textContent = `Date Sold: ${token.date ? token.date : 'N/A'}`;
+                const dateSold = new Date(token.dateOfLastSell * 1000); 
+                date.textContent = `${dateSold.toLocaleDateString("en-US", { 
+                    year: '2-digit', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                })} at ${dateSold.toLocaleTimeString("en-US", { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: false 
+                })}`;
+
                 date.style.position = 'absolute';
                 date.style.top = '76%';
-                date.style.right = '10px';
-                date.style.color = 'white'; // White text color
-                //date.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent background
-                date.style.padding = '5px'; // Add some padding for readability
-                date.style.borderRadius = '3px'; // Rounded corners for background
+                date.style.fontSize = '1.5vh';
+                date.style.right = '8px';
+                date.style.color = 'white';
+                // date.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                date.style.padding = '5px'; 
+                date.style.borderRadius = '3px'; 
                 soldItem.appendChild(date);
-
-                // Append soldItem to recentSellsPopUpBox
                 recentSellsPopUpBox.appendChild(soldItem);
             });
         } else {
-            // If no sales data, show a message
             loadingContainer.remove();
             const noSellsMessage = document.createElement('span');
             noSellsMessage.textContent = 'No sells have occurred yet.';
             noSellsMessage.style.display = 'block';
             noSellsMessage.style.textAlign = 'center';
             noSellsMessage.style.marginTop = '20px';
-            noSellsMessage.style.color = 'white'; // White text color
+            noSellsMessage.style.color = 'white'; 
             recentSellsPopUpBox.appendChild(noSellsMessage);
         }
 
     } else {
         console.log('Prompt user: No sells have occurred yet. Make span tag in the middle of the recent sells pop up that says "No sells yet"');
-
-        // Create a container for the span
         const spanContainer = document.createElement('div');
         spanContainer.className = 'smallHeader';
-        spanContainer.style.position = 'absolute'; // Use absolute positioning for centering
-        spanContainer.style.top = '50%'; // Start centering from the middle
-        spanContainer.style.left = '50%'; // Start centering from the middle
-        spanContainer.style.transform = 'translate(-50%, -50%)'; // Perfectly center the container
+        spanContainer.style.position = 'absolute';
+        spanContainer.style.top = '50%';
+        spanContainer.style.left = '50%'; 
+        spanContainer.style.transform = 'translate(-50%, -50%)';
         spanContainer.style.height = 'auto'; 
         spanContainer.style.width = '100%'; 
         spanContainer.style.backgroundColor = 'transparent'; 
         spanContainer.style.color = 'white'; 
-        spanContainer.style.display = 'flex'; // Use flexbox for centering
-        spanContainer.style.alignItems = 'center'; // Center items vertically
-        spanContainer.style.justifyContent = 'center'; // Center items horizontally
-        spanContainer.style.textAlign = 'center'; // Center text within the container
+        spanContainer.style.display = 'flex'; 
+        spanContainer.style.alignItems = 'center'; 
+        spanContainer.style.justifyContent = 'center'; 
+        spanContainer.style.textAlign = 'center'; 
         spanContainer.style.boxSizing = 'border-box';
 
-        // Create the span element with the text
         const spanTextContent = document.createElement('span');
         spanTextContent.textContent = 'No sells yet';
         spanTextContent.style.color = 'white';
         spanTextContent.style.fontSize = '12px';
         loadingContainer.remove();
 
-        // Append the span text to the container
         spanContainer.appendChild(spanTextContent);
-
-        // Append the span container to the recent sells pop up box
         recentSellsPopUpBox.appendChild(spanContainer);
 
     }
@@ -3165,7 +3004,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
 
     let maxSell;
     let numberOfSells;
-    let recentSells;
     let myTokens; 
     let numberOfTokens;
     let allOwners; 
@@ -3186,7 +3024,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     const web3 = new Web3(window.ethereum);
     const contract = new web3.eth.Contract(JSON.parse(userSelectedContract.contractABI), userSelectedContract.contractAddress);
 
-    // set max sell 
     try{
         numberOfTokens = await contract.methods.getNumberOfTokens().call();
     }catch(error){
@@ -3194,14 +3031,12 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         numberOfTokens = "Error";
     }
 
-    // set max sell 
     try{
         maxSell = await contract.methods.getMaxSell().call();
     }catch(error){
         console.log('Error calling function on contract to get maximum sell');
         maxSell = "Error";
     }
-    // get number of sells 
 
     try{
         numberOfSells = await contract.methods.getNumberOfsells().call();
@@ -3209,7 +3044,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         console.log('Error calling function on contract to get number of sells');
         numberOfSells = "Error";
     }
-    // Dynamically set the URL for Etherscan or Polygonscan
+
     let scanURL = "";
     if (coin === "ETH") {
         scanURL = `https://etherscan.io/address/${userSelectedContract.contractAddress}`;
@@ -3218,7 +3053,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     } else if(coin == "ETC"){
         scanURL = `https://blockscout.com/etc/mainnet/address/${userSelectedContract.contractAddress}`;
     }else {
-        scanURL = "#"; // default or invalid URL
+        scanURL = "#"; 
     }
 
     console.log('access to contract granted trying to get number of token, Max Sell, and number of sells', contract);
@@ -3238,17 +3073,13 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Sells: ${numberOfSells}</p> 
     `;
 
-    // Center content using Flexbox
     contractInfoDiv.style.display = 'flex';
-    contractInfoDiv.style.flexDirection = 'column'; // Stack items vertically
-    contractInfoDiv.style.alignItems = 'center'; // Center items horizontally
-    contractInfoDiv.style.justifyContent = 'center'; // Center items vertically
-    contractInfoDiv.style.textAlign = 'center'; // Center text inside each <p>
+    contractInfoDiv.style.flexDirection = 'column'; 
+    contractInfoDiv.style.alignItems = 'center';
+    contractInfoDiv.style.justifyContent = 'center'; 
+    contractInfoDiv.style.textAlign = 'center'; 
 
-    // Append the contract info div to the parent element
     parentElement.appendChild(contractInfoDiv);
-
-    // Adjust the parent element's padding to make space for the contract info
     parentElement.style.paddingLeft = `${sideElementsWidth}px`;
 
     const options = document.createElement('div');
@@ -3275,20 +3106,17 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         <p class="option-item" data-title="All Owners" style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">All Owners</p>
         <p class="option-item" data-title="Utility" style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Utility</p> 
     `;
-    // Center content using Flexbox
     options.style.display = 'flex';
-    options.style.flexDirection = 'column'; // Stack items vertically
-    options.style.alignItems = 'center'; // Center items horizontally
-    options.style.justifyContent = 'center'; // Center items vertically
-    options.style.textAlign = 'center'; // Center text inside each <p>
-
-    // Append the contract info div to the parent element
+    options.style.flexDirection = 'column'; 
+    options.style.alignItems = 'center'; 
+    options.style.justifyContent = 'center'; 
+    options.style.textAlign = 'center'; 
     parentElement.appendChild(options);
 
     document.querySelectorAll('.option-item').forEach((item) => {
         item.addEventListener('click', async function () {
             if (item.textContent === "Recent Sells") {
-                makeRecentSellsPage(item, contract, sideElementsWidth, recentSells);
+                makeRecentSellsPage(item, contract, sideElementsWidth, coin);
             } else if (item.textContent === "My Tokens") {
                 makeMytokensPage(contract, sideElementsWidth);
             } else if (item.textContent === "All Owners") {
@@ -3300,15 +3128,14 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
             }
         });
 
-        // Add mouseenter and mouseleave events to create hover effect
         item.addEventListener('mouseenter', function () {
-            this.style.backgroundColor = '#5a647d'; // Change background color on hover
-            this.style.color = '#f0f0f0'; // Optional: Change text color
+            this.style.backgroundColor = '#5a647d'; 
+            this.style.color = '#f0f0f0'; 
         });
 
         item.addEventListener('mouseleave', function () {
-            this.style.backgroundColor = ''; // Reset background color
-            this.style.color = ''; // Reset text color
+            this.style.backgroundColor = ''; 
+            this.style.color = ''; 
         });
     });
     const tools = document.createElement('div');
@@ -3322,17 +3149,13 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     tools.style.height = '27%';
     tools.style.padding = '20px';
     tools.style.boxSizing = 'border-box';
-    tools.style.backgroundColor = '#404a5c';//#404a5c
+    tools.style.backgroundColor = '#404a5c';
     tools.style.border = '2px solid black';
     tools.style.borderRadius = '5px';
-
-
-    // Set the container to use Flexbox and distribute children evenly
     tools.style.display = 'flex';
-    tools.style.flexDirection = 'column'; // Stack items vertically
-    tools.style.justifyContent = 'space-between'; // Distribute space evenly between items
+    tools.style.flexDirection = 'column';
+    tools.style.justifyContent = 'space-between'; 
 
-    // Each <p> element will span the full width and have an even height
     tools.innerHTML = `
         <h2 style="margin: 0; text-align: center;">Tools</h2>
         <p class="option-item-2" style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Sweep</p>
@@ -3340,14 +3163,11 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         <p class="option-item-2" style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Search</p>
         <p class="option-item-2" style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">File a Report</p> 
     `;
-
-    // Center content using Flexbox
     tools.style.display = 'flex';
-    tools.style.flexDirection = 'column'; // Stack items vertically
-    tools.style.alignItems = 'center'; // Center items horizontally
-    tools.style.justifyContent = 'center'; // Center items vertically
-    tools.style.textAlign = 'center'; // Center text inside each <p>
-
+    tools.style.flexDirection = 'column'; 
+    tools.style.alignItems = 'center'; 
+    tools.style.justifyContent = 'center'; 
+    tools.style.textAlign = 'center'; 
     parentElement.appendChild(tools);
 
 
@@ -3356,26 +3176,21 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
             if(item.textContent == 'Sweep'){
                 console.log('trying to perform sweep');
                 const sweepBox = document.createElement('div');
-                // Copy the size and styling from the existing element
-                sweepBox.style.position = 'absolute'; // Position the new div on top of the existing element
+                sweepBox.style.position = 'absolute';
                 sweepBox.style.top = `${tools.offsetTop}px`;
                 sweepBox.style.left = `${tools.offsetLeft}px`;
                 sweepBox.style.width = `${tools.offsetWidth}px`;
                 sweepBox.style.height = `${tools.offsetHeight}px`;
-                sweepBox.style.backgroundColor = 'rgba(64, 74, 92, 0.7)'; // Set the background color to #404a5c with 70% opacity
-                sweepBox.style.border = '1px solid black'; // Optional: Border to visualize the new div
-
-                // Create the close icon
+                sweepBox.style.backgroundColor = 'rgba(64, 74, 92, 0.7)'; 
+                sweepBox.style.border = '1px solid black'; 
                 const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×'; // You can use Unicode or an icon library
+                closeIcon.textContent = '×';
                 closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px'; // Position it in the corner
+                closeIcon.style.top = '10px'; 
                 closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer'; // Show a pointer cursor on hover
-                closeIcon.style.fontSize = '20px'; // Size of the close icon
-                closeIcon.style.color = 'red'; // Color of the close icon
-
-                // Append the close icon to the new div
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px'; 
+                closeIcon.style.color = 'red';
                 sweepBox.appendChild(closeIcon);
                 closeIcon.addEventListener('click', ()=>{
                     document.body.removeChild(sweepBox);
@@ -3392,25 +3207,18 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
             }else{
                 console.log('unepexected click');
             }
-            // take grid and add loading container to each NFT you want to sweep
         });
-        // Add mouseenter and mouseleave events to create hover effect
         item.addEventListener('mouseenter', function () {
-            this.style.backgroundColor = '#5a647d'; // Change background color on hover
-            this.style.color = '#f0f0f0'; // Optional: Change text color
+            this.style.backgroundColor = '#5a647d';
+            this.style.color = '#f0f0f0'; 
         });
 
         item.addEventListener('mouseleave', function () {
-            this.style.backgroundColor = ''; // Reset background color
-            this.style.color = ''; // Reset text color
+            this.style.backgroundColor = ''; 
+            this.style.color = ''; 
         });
     });
-
-    // Adjust the parent element's padding to make space for the contract info
     parentElement.style.paddingLeft = `${sideElementsWidth}px`;
-
-    // Create the NFT grid to the right of the contract info
-
     var footer = document.createElement('div');
     const footContainer = document.createElement('div');
     const logoContainer = document.createElement('div');
@@ -3836,9 +3644,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
 
 }
 
-/*export function makeNFTPage(array, purchaseArray, sideElementsWidth, parentElement, numColumns, gridWidthPercent, gridItemWidth){
-    makeNFTGrid(array, parentElement, numColumns, gridWidthPercent);
-}*/
 export function makePaintingPage(array, purchaseArray, parentElement, numColumns, sideElementsWidth, gridWidthPercent, griditem) {
     var footer = document.createElement('div');
 
@@ -7170,6 +6975,10 @@ function createContract(data) {
             return tokens;
         }
         
+        function getTokenData(uint256 tokenID) public view returns (NFT[] memory) {
+            return nfts[tokenID];
+        }
+
         function purchaseSingleNFT(uint256 tokenId) payable public returns (bool) {
             // Allows anyone that does not own the token to attempt purchase
             require(msg.value >= nfts[tokenId].price, "Insufficient payment");
