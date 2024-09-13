@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 09-07-24
+// Date last modified: 09-13-24
 // purpose: Make web3 art website to coincide with research related life
 
 // local variables to server
@@ -16,8 +16,8 @@ var previousQuestion1 = [];
 let stringChunk = '';
 let soliditychunk;
 
-let Series2Holders = ["0x21331", "0x1122222"]; // Pull From contract add here (these are examples)
-let Series1Holders = []; // pull from contract and add them here!
+let Series2Holders = ["0x21331", "0x1122222"]; 
+let Series1Holders = []; 
 
 // packages
 const http = require('http');
@@ -117,6 +117,7 @@ const tokenSchema = new mongoose.Schema({
 
 const collectionSchema = new mongoose.Schema({
     contractName: String,
+    ERCStandard: String,
     contractAddress: String,
     contractABI: String,
     collectionBackgroundImage: String
@@ -2976,6 +2977,7 @@ const handleHttpRequest = async (req, res, io) => {
 
                     const collectionModelInstance = new collectionModel({
                         contractName: data.contractName,
+                        ERCStandard: data.token,
                         contractAddress: data.contractAddress,
                         contractABI: JSON.stringify(data.contractABI), // check data matches before proceeding
                         collectionBackgroundImage: data.collectionBackground // Fixed the typo here
