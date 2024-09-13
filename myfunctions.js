@@ -2383,7 +2383,7 @@ async function makeOwnersPage(sideElementsWidth) {
         }
 
 }
-async function makeMytokensPage(contract, sideElementsWidth){
+async function makeMytokensPage(contract, sideElementsWidth, coin){
     console.log('Trying to get my tokens to display.');
     const userTokensContainer = document.createElement('div');
     userTokensContainer.className = 'userTokensContainer';
@@ -2594,7 +2594,7 @@ async function makeMytokensPage(contract, sideElementsWidth){
         if (isConnected) {
             let thisAccount = window.ethereum.selectedAddress;
             console.log('already connected trying to get nfts using the address', thisAccount);
-            makeTokenPage(thisAccount, contract, smallContainer, footer);
+            makeTokenPage(thisAccount, contract, smallContainer, footer, coin);
         } else {
             if (typeof window.ethereum === 'undefined') { 
                 alert('You must install MetaMask or another Ethereum provider to see your tokens or purchase tokens.');
@@ -2603,7 +2603,7 @@ async function makeMytokensPage(contract, sideElementsWidth){
                     try {
                         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                         let thisAccount = accounts[0];
-                        makeTokenPage(thisAccount, contract, smallContainer, footer);
+                        makeTokenPage(thisAccount, contract, smallContainer, footer, coin);
                     } catch (error) {
                         if (error.code === -32002) { 
                             alert('Please open the MetaMask extension manually, sign in, and reload the page.');
@@ -3121,7 +3121,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
             if (item.textContent === "Recent Sells") {
                 makeRecentSellsPage(item, contract, sideElementsWidth, coin);
             } else if (item.textContent === "My Tokens") {
-                makeMytokensPage(contract, sideElementsWidth);
+                makeMytokensPage(contract, sideElementsWidth, coin);
             } else if (item.textContent === "All Owners") {
                 console.log('Trying to get all Unique owners and how many they own and display.');
                 makeOwnersPage(sideElementsWidth);
@@ -6170,7 +6170,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
         }
     }
 }
-async function makeTokenPage(addressString, contract, parentContainer, footer){
+async function makeTokenPage(addressString, contract, parentContainer, footer, coin){
     try{
         let UsersNFTsIds;
 
@@ -6181,41 +6181,66 @@ async function makeTokenPage(addressString, contract, parentContainer, footer){
             UsersNFTsIds = [];
             
         }
-
+        // comment to stop testing
         UsersNFTsIds = [1,2,3,4,5, 6,7, 8];
-
         console.log('trying to token database to display');
-
         if(UsersNFTsIds.length != 0){
             let userNFTARRay = [];
             console.log('trying to loop through and get images for user tokens');
             for (var i = 0; i < UsersNFTsIds.length; i++) {
                 if (UsersNFTsIds[i] === currentNFTArray[i].tokenID) {
                     console.log('need to get attributes before sending');
-
+                    let imageURL;
                     let currentObj;
-
-                    if (i === 0) {
-                        currentObj = {
-                            tokenID: UsersNFTsIds[i],
-                            image: currentNFTArray[i].image,
-                            purchasePrice: "N/A",
-                            purchaseDate: "N/A",
-                            listed: "active"
-                        };
-                    } else {
-                        currentObj = {
-                            tokenID: UsersNFTsIds[i],
-                            image: currentNFTArray[i].image,
-                            purchasePrice: "N/A",
-                            purchaseDate: "N/A",
-                            listed: "Inactive"
-                        };
+                        for (const token of currentNFTArray) {
+                            if (token.tokenID === UsersNFTsIds[i]) {
+                                imageURL = token.image;
+                                break;
+                            }
+                        }
+                    try{
+                        tokenData = await contract.methods.getTokenData(UsersNFTsIds[i]).call();
+                        if (tokenData.forSale == true) {
+                            currentObj = {
+                                tokenID: UsersNFTsIds[i],
+                                image: imageURL,
+                                purchasePrice: tokenData.price,
+                                purchaseDate:  tokenData.lastSellData,
+                                listed: "active"
+                            };
+                        } else {
+                            currentObj = {
+                                tokenID: UsersNFTsIds[i],
+                                image: imageURL,
+                                purchasePrice: tokenData.price,
+                                purchaseDate: tokenData.lastSellData,
+                                listed: "Inactive"
+                            };
+                        }
+                        userNFTARRay.push(currentObj); 
+                    }catch(error){
+                        // do not push uncomment this is a test 
+                        console.log('Error getting data from contract setting to dummy data');
+                        if(i==1 || i==3){    
+                            currentObj = {
+                                tokenID: UsersNFTsIds[i],
+                                image: imageURL,
+                                purchasePrice: 1000002222202020202002,
+                                purchaseDate: 22922211,
+                                listed: "active"
+                            }
+                        }else{
+                            currentObj = {
+                                tokenID: UsersNFTsIds[i],
+                                image: imageURL,
+                                purchasePrice: 92929291111122222222202,
+                                purchaseDate: 2211,
+                                listed: "Inactive"
+                            }
+                        }
+                        userNFTARRay.push(currentObj); 
                     }
-
-                    userNFTARRay.push(currentObj); 
                 }
-            }
             console.log('data has been extracted we are trying to loop through and set data using data:', userNFTARRay);
             let count = 0; 
             userNFTARRay.forEach(token => {
@@ -6233,85 +6258,83 @@ async function makeTokenPage(addressString, contract, parentContainer, footer){
                 soldItem.style.alignItems = 'center'; 
                 soldItem.style.padding = '10px'; 
 
-                // Create and style the checkbox
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.style.display = 'none'; // Hide checkbox initially
-                checkbox.style.marginRight = '10px'; // Space between checkbox and image
+                checkbox.style.display = 'none'; 
+                checkbox.style.marginRight = '10px'; 
                 soldItem.appendChild(checkbox);
 
                 const imageContainer = document.createElement('div');
-                imageContainer.style.position = 'relative'; // Change to relative for better control
+                imageContainer.style.position = 'relative';
                 imageContainer.style.height = '80%';
                 imageContainer.style.width = '25%';
-                imageContainer.style.marginRight = '10px'; // Spacing between image and text
-                imageContainer.style.flexShrink = '0'; // Prevent image container from shrinking
-                imageContainer.style.backgroundColor = '#ddd'; // Placeholder styling
+                imageContainer.style.marginRight = '10px'; 
+                imageContainer.style.flexShrink = '0';
+                imageContainer.style.backgroundColor = '#ddd';
                 soldItem.appendChild(imageContainer);
 
                 const img = document.createElement('img');
                 img.src = token.image;
                 img.alt = `Token ID ${token.tokenID}`;
-                img.style.width = '100%'; // Make image cover the width of the container
-                img.style.height = '100%'; // Make image cover the height of the container
-                img.style.borderRadius = '5px'; // Rounded corners for image
-                img.style.objectFit = 'cover'; // Ensure the image covers the container without distortion
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.borderRadius = '5px';
+                img.style.objectFit = 'cover'; 
                 imageContainer.appendChild(img);
 
-                // Create a container for the text elements
                 const textContainer = document.createElement('div');
                 textContainer.className = `textContainer:${count}`;
-                textContainer.style.flex = '1'; // Take up remaining space
-                textContainer.style.display = 'flex'; // Flexbox for vertical alignment
-                textContainer.style.flexDirection = 'column'; // Stack items vertically
-                textContainer.style.justifyContent = 'center'; // Center items vertically
-                textContainer.style.marginLeft = '10px'; // Optional spacing from image
+                textContainer.style.flex = '1'; 
+                textContainer.style.display = 'flex';
+                textContainer.style.flexDirection = 'column';
+                textContainer.style.justifyContent = 'center'; 
+                textContainer.style.marginLeft = '10px';
                 soldItem.appendChild(textContainer);
-
-                // Create the "Listed" span tag
                 const listedSpan = document.createElement('div');
                 listedSpan.className = 'listedSpan';
-
-                // Create the text parts
                 const listedText = document.createElement('span');
                 listedText.textContent = 'Listed: ';
 
-                // Create the variable part
                 const statusSpan = document.createElement('span');
                 statusSpan.textContent = token.listed;
 
-                // Style the variable part based on the condition
                 if (token.listed === "active") {
-                    statusSpan.style.color = 'green'; // Text color
+                    statusSpan.style.color = 'green'; 
                 } else {
                     statusSpan.style.color = 'red';
                 }
-
-                // Append text parts to the listedSpan
                 listedSpan.appendChild(listedText);
                 listedSpan.appendChild(statusSpan);
-
-                // Add spacing between text elements
-                listedSpan.style.marginBottom = '5px'; // Spacing between text elements
+                listedSpan.style.marginBottom = '5px'; 
                 textContainer.appendChild(listedSpan);
 
                 const nameSpan = document.createElement('div');
-                nameSpan.textContent = `Token ID: ${token.tokenID}`; // Assuming `purchaseDate` is a property of token
-                nameSpan.style.color = 'white'; // Text color
+                nameSpan.textContent = `Token ID: ${token.tokenID}`; 
+                nameSpan.style.color = 'white'; 
                 textContainer.appendChild(nameSpan);
 
+
                 const priceSpan = document.createElement('div');
-                priceSpan.textContent = `Purchase Price: ${token.purchasePrice}`; // Assuming `purchasePrice` is a property of token
-                priceSpan.style.marginBottom = '5px'; // Spacing between text elements
-                priceSpan.style.color = 'white'; // Text color
+                let convertedPrice = ((token.purchasePrice)/(10*15**18)).toFixed(3);
+                
+                priceSpan.textContent = `Purchase Price: `+ `${convertedPrice}` + ` ${coin}`; 
+                priceSpan.style.marginBottom = '5px'; 
+                priceSpan.style.color = 'white'; 
                 textContainer.appendChild(priceSpan);
-
-                // Create the "Date Purchased" span tag
+                
+                const datePurchased = new Date(token.purchaseDate * 1000); 
                 const dateSpan = document.createElement('div');
-                dateSpan.textContent = `Date Purchased: ${token.purchaseDate}`; // Assuming `purchaseDate` is a property of token
-                dateSpan.style.color = 'white'; // Text color
+                dateSpan.textContent = `${datePurchased.toLocaleDateString("en-US", { 
+                    year: '2-digit', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                })} at ${datePurchased.toLocaleTimeString("en-US", { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: false 
+                })}`;
+                dateSpan.style.color = 'white'; 
                 textContainer.appendChild(dateSpan);
-
                 parentContainer.appendChild(soldItem);
             });
             if (!document.querySelector('.nextButton')) {
