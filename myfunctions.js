@@ -2787,11 +2787,13 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
             }catch(error){
                 console.log('Error calling getTokenData() on contract');
                 console.log('making Temporary test data to pass into next function');
-
+                
+                // uncomment object below when contract is calling correctly
                 tokenSingularData = {
                     id: sell.tokenID,
                     price: 10020203333333333332022222,
                     owner: RoysWallet,
+                    lastOwner: RoysWallet,
                     mintDate: 10000,
                     tokenName: "Burson Skull",
                     forSale: true,
@@ -2805,6 +2807,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                     image: image,
                     price: tokenSingularData.price,
                     owner: tokenSingularData.owner,
+                    lastOwner: tokenSingularData.lastOwner,
                     mintDate: tokenSingularData.mintDate,
                     tokenName: tokenSingularData.tokenName,
                     forSale: tokenSingularData.forSale,
@@ -2866,7 +2869,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 soldItem.appendChild(currentBuyer);
 
                 const seller = document.createElement('p');
-                seller.textContent = `Seller: N/A`;
+                seller.textContent = `Seller: ${token.lastOwner.substring(0,12)}`;
                 seller.style.position = 'absolute';
                 seller.style.top = '17%';
                 seller.style.right = '10px';
@@ -6811,6 +6814,7 @@ function createContract(data) {
             uint256 id;            // Unique identifier for the NFT
             uint256 price;         // Price of the NFT in wei (1 ether = 1e18 wei)
             address owner;         // Current owner of the NFT
+            address lastOwner;     // last owner for purchases 
             uint256 mintDate;      // Date of mint
             string tokenName;      // Token name
             bool forSale;          // Flag indicating if the NFT is for sale
@@ -6895,6 +6899,7 @@ function createContract(data) {
                     id: newItemId,
                     price: price, // price in WEI
                     owner: owners[0],
+                    lastOwner: owners[0], // Initialize to owners wallet
                     mintDate: block.timestamp,
                     tokenName: "${data.name}",
                     forSale: true, 
@@ -6985,24 +6990,16 @@ function createContract(data) {
             NFT storage nft = nfts[tokenId];
             require(nft.forSale, "NFT is not for sale");
             require(msg.value >= nft.price, "Insufficient payment");
-
             uint256 fee = (nft.price * creatorFee) / 100;
             uint256 ownerShare = nft.price - fee;
-
-            // Transfer the creator's fee
             payable(walletToReceiveFunds).transfer(fee);
-            // Transfer the remaining amount to the NFT owner
             payable(nft.owner).transfer(ownerShare);
 
-            // Transfer the NFT to the buyer
-            // safeTransferFrom(nft.owner, msg.sender, tokenId);
-
             // Update the NFT details
-            nft.owner = msg.sender; // Change the owner after safeTransfer is complete
+            nft.lastOwner = nft.owner; // set to last owner before changing new owner directly below
+            nft.owner = msg.sender; 
             nft.forSale = false;
             nft.lastSellData = block.timestamp; 
-
-            // Track recent sells by pushing the entire NFT struct
             recentSells.push(nft);
 
             // Keep the length of recentSells to a maximum of 1000 items
