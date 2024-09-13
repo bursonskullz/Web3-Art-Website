@@ -332,8 +332,14 @@ export async function addDigitalElementListener(digitalElement){
                                 console.log(`Contract selected: ${item.contractName}`);
                                 console.log('setting contract data locally for client side access');
                                 tryingToAccessData = true;
-                                userSelectedContract = {contractName: item.contractName, contractAddress: item.contractAddress, contractABI: item.contractABI, collectionBackgroundImage: item.collectionBackgroundImage};
 
+                                userSelectedContract = {
+                                    contractName: item.contractName, 
+                                    ERCStandard: item.ERCStandard,
+                                    contractAddress: item.contractAddress, 
+                                    contractABI: item.contractABI, 
+                                    collectionBackgroundImage: item.collectionBackgroundImage
+                                };
                                 const loadingContainer = document.createElement("div");
                                 loadingContainer.className = "loading-container";
                                 loadingContainer.style.position = "absolute";
@@ -3163,7 +3169,18 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     let myTokens; 
     let numberOfTokens;
     let allOwners; 
-    let coin = "MATIC";// change later and make sure to get correct token for each contract (or make funciton to determine network from address) 
+    let coin;
+
+    if(userSelectedContract.ERCStandard === "ERC1155"){
+        // should be able to edit hyperlinks here
+        coin = "POL";
+    }else if(userSelectedContract.ERCStandard === "ERC721"){
+         coin = "ETH";
+    }else if(userSelectedContract.ERCStandard === "ERC20"){
+        coin = "ETC"
+    }else{
+         coin = "??";
+    }
 
 
     const web3 = new Web3(window.ethereum);
@@ -3192,14 +3209,30 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         console.log('Error calling function on contract to get number of sells');
         numberOfSells = "Error";
     }
-
+    // Dynamically set the URL for Etherscan or Polygonscan
+    let scanURL = "";
+    if (coin === "ETH") {
+        scanURL = `https://etherscan.io/address/${userSelectedContract.contractAddress}`;
+    } else if (coin === "POL") {
+        scanURL = `https://polygonscan.com/address/${userSelectedContract.contractAddress}`;
+    } else if(coin == "ETC"){
+        scanURL = `https://blockscout.com/etc/mainnet/address/${userSelectedContract.contractAddress}`;
+    }else {
+        scanURL = "#"; // default or invalid URL
+    }
 
     console.log('access to contract granted trying to get number of token, Max Sell, and number of sells', contract);
     console.log('Contract methods:', contract.methods);
 
     contractInfoDiv.innerHTML = `
         <h2 style="margin: 0; text-align: center;">Contract Information</h2>
-        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Address: ${userSelectedContract.contractAddress.substr(25)+ "~~~"}</p>
+
+        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">
+            Address: 
+            <a href="${scanURL}" target="_blank" style="color: white; text-decoration: underline;">
+                ${userSelectedContract.contractAddress.substr(25) + "~~~"}
+            </a>
+        </p>
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Tokens: ${numberOfTokens}</p>
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Max Sale: ${maxSell} ${coin}</p> 
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Sells: ${numberOfSells}</p> 
@@ -3350,12 +3383,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                 document.body.appendChild(sweepBox);
 
                 createCircularSweeper(sweepBox);
-                // add over tools the same size with exist button 
-
-                // pup up a circle with a knot on it that we can turn 
-                // if we move it all the way around the cicle the span tag should say the maximum amount to seep say 25
-                // the cirlce needs to pop up over the tools container and haveexit button without affecting other elements 
-                // needs to add broom gif to each container
             }else if(item.textContent == 'Sort'){
                 console.log('trying to pop up menu directly centered over the tools container');
             }else if(item.textContent == 'Sort'){
@@ -5972,113 +5999,108 @@ function createSearchBar(parentElement) {
 }
 
 async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlockChainAddress, contract, parentContainer){
-    // call list or delist on contract depending on the paramrter listOrDelistOptions
+    let tokenPricesInputsFilled = true;
+    let dictatedTokenPlaceHolder;
     if(listOrDelistOption === "listing"){
         console.log('trying to bulk list ');
         const failedTokens = [];
-        const successFullTokens = [];
         if (nextButton.textContent === 'Next') {
-            // Process tokens and display input fields
             const selectedTokens = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            
-            // Get all the 'sold-item' divs
             const soldItems = document.querySelectorAll('.sold-item');
-
-            // Loop through each 'sold-item' div
+            
+            const smallHeaderText = document.querySelector(".smallHeader");
+            if (smallHeaderText) {
+                smallHeaderText.firstChild.textContent = 'List Tokens';
+            }
+            if(userSelectedContract.ERCStandard === "ERC1155"){
+                dictatedTokenPlaceHolder = 'Price in POL';    
+            }else if(userSelectedContract.ERCStandard === "ERC70"){
+                dictatedTokenPlaceHolder = 'Price in ETH';
+            }else if (userSelectedContract.ERCStandard === "ERC20"){
+                dictatedTokenPlaceHolder = "Price in ETC"
+            }else{
+                dictatedTokenPlaceHolder = 'Price';
+            }
+            
             soldItems.forEach(soldItem => {
-                const checkbox = soldItem.querySelector('input[type="checkbox"]'); // Find the checkbox inside the sold-item
-
-                // If there is no checkbox, or the checkbox is not checked
+                const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
                 if (!checkbox || !checkbox.checked) {
-                    soldItem.remove(); // Remove the parent div
+                    soldItem.remove(); 
                 } else if (checkbox.checked) {
-                    // Extract the count from the parent class
                     const parentClass = soldItem.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
-                    const tokenCount = parentClass ? parentClass.split('-')[2] : null; // Extract the count from 'sold-item-<count>'
-
-                    // Get the textContainer using its class with the count
-                    const textContainer = soldItem.querySelector(`.textContainer\\:${tokenCount}`); // Escape the ":" in the class name
+                    const tokenCount = parentClass ? parentClass.split('-')[2] : null; 
+                    const textContainer = soldItem.querySelector(`.textContainer\\:${tokenCount}`); 
 
                     if (textContainer) {
-                        // Remove the "Purchase Price" div
                         const purchasePriceDiv = Array.from(textContainer.children).find(child => 
                             child.textContent.includes('Purchase Price:')
                         );
                         if (purchasePriceDiv) {
-                            textContainer.removeChild(purchasePriceDiv); // Remove purchase price div
+                            textContainer.removeChild(purchasePriceDiv); 
                         }
-
-                        // Remove the "Date Purchased" div
                         const datePurchasedDiv = Array.from(textContainer.children).find(child => 
                             child.textContent.includes('Date Purchased:')
                         );
                         if (datePurchasedDiv) {
-                            textContainer.removeChild(datePurchasedDiv); // Remove date purchased div
+                            textContainer.removeChild(datePurchasedDiv); 
                         }
-
-                        // Create the input field for the price inside the textContainer
                         const priceInput = document.createElement('input');
                         priceInput.type = 'text';
-                        priceInput.placeholder = 'Price in Matic'; // Placeholder text "Price"
-                        priceInput.style.marginRight = '10px'; // Add space between input and button
-                        priceInput.style.padding = '2px'; // Add padding for better UI
+                        priceInput.placeholder = dictatedTokenPlaceHolder; 
+                        priceInput.style.marginRight = '10px'; 
+                        priceInput.style.padding = '2px';
                         priceInput.style.left = '2px';
-                        priceInput.style.width = '80%'; // Set width of the input field
-                        priceInput.style.borderRadius = '5px'; // Rounded corners
-                        priceInput.style.border = '1px solid #ccc'; // Light border for the input
-
-                        // Add the input field to the textContainer
+                        priceInput.style.width = '80%'; 
+                        priceInput.style.borderRadius = '5px'; 
+                        priceInput.style.border = '1px solid #ccc';  
+                        priceInput.classList.add('price-input'); // Add class for placeholder styling
                         textContainer.appendChild(priceInput);
 
-                        // Use the extracted count as your token ID (or for any other processing)
                         if (tokenCount) {
-                            const inputValue = priceInput.value || ''; // Get the input value (price)
+                            const inputValue = priceInput.value || ''; 
                             selectedTokens.push({ tokenId: tokenCount, inputValue });
                         }
                     }
                 }
             });
-
             console.log('Selected Tokens with Input Values:', selectedTokens);
-
-            // Change the button text to "Submit" after processing
             nextButton.textContent = 'Submit';
         } else if (nextButton.textContent === 'Submit') {
-            // Handle form submission
             const selectedTokens = [];
+            let successFullTokens = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            
+            tokenPricesInputsFilled = true;
+
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
-                    // Get the parent element (soldItem div) that contains the checkbox
                     const parentDiv = checkbox.closest('.sold-item');
-                    
-                    // Extract the count from the parent class, assuming the class has the format 'sold-item-<count>'
                     const parentClass = parentDiv.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
-                    const tokenCount = parentClass ? parentClass.split('-')[2] : null; // Extract the count from 'sold-item-<count>'
-                    
-                    // Get the textContainer using its class with the count
-                    const textContainer = parentDiv.querySelector(`.textContainer\\:${tokenCount}`); // Escape the ":" in the class name
-
+                    const tokenCount = parentClass ? parentClass.split('-')[2] : null; 
+                    const textContainer = parentDiv.querySelector(`.textContainer\\:${tokenCount}`);
                     if (textContainer) {
                         const priceInput = textContainer.querySelector('input[type="text"]');
                         const inputValue = priceInput ? priceInput.value.trim() : '';
 
                         if (inputValue) {
-                            selectedTokens.push({ tokenId: tokenCount, inputValue });
+                            const parsedValue = parseFloat(inputValue);
+                            if (!isNaN(parsedValue)) {
+                                selectedTokens.push({ tokenId: tokenCount, inputValue: parsedValue });
+                            } else {
+                                tokenPricesInputsFilled = false;
+                                //alert(`Token ID ${tokenCount} has an invalid price.`);
+
+                            }
                         } else {
-                            alert(`Token ID ${tokenCount} has an empty price.`);
+                            tokenPricesInputsFilled = false;
+                            //alert(`Token ID ${tokenCount} has an empty price.`);
                         }
                     }
                 }
             });
 
-            if (selectedTokens.length > 0) {
+            if (selectedTokens.length > 0 && tokenPricesInputsFilled) {
                 console.log('Final Token Data to Submit:', selectedTokens);
-                // Proceed with submitting the data or any other action
-                // create a loading icon and remove the submit button until we get a response 
-                // add success or failure container after we get the response
                 nextButton.style.display = 'none';
                 const loadingContainer = document.createElement("div");
                 loadingContainer.className = "loading-container";
@@ -6103,101 +6125,143 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                 parentContainer.appendChild(loadingContainer);
 
                 console.log('Trying to use contract and get result');
-
-                const LISTING_FEE_MATIC = 0.001; // Fee per item in MATIC
                 const web3 = new Web3(window.ethereum);
-                const LISTING_FEE_WEI = web3.utils.toWei(LISTING_FEE_MATIC.toString(), 'mwei'); // Convert MATIC to WEI
 
+                // Prepare arrays for token IDs and prices
+                const tokenIds = [];
+                const prices = [];
+                
+                for (const token of selectedTokens) {
+                    tokenIds.push(parseInt(token.tokenId));
+                    const price_IN_WEI = web3.utils.toWei(token.inputValue.toString(), 'ether');
+                    prices.push(web3.utils.toBN(price_IN_WEI));
+                }
+
+                try {
+                    const gasEstimate = await contract.methods.listArrayOfNFTs(tokenIds, prices).estimateGas({ from: clientBlockChainAddress });
+                    const tx = await contract.methods.listArrayOfNFTs(tokenIds, prices).send({
+                        from: clientBlockChainAddress,
+                        gas: gasEstimate
+                    });
+                    
+                    console.log('Transaction successful:', tx);
+                    successFullTokens.push(tokenIds);
+                    
+                } catch (error) {
+                    failedTokens.push(tokenIds);
+                    console.error('Error calling listArrayOfNFTs:', error);
+                }
+                /*
                 for (let i = 0; i < selectedTokens.length; i++) {
                     const token = selectedTokens[i];
-                    const totalFee = LISTING_FEE_WEI; // Fee per item, adjust if needed for multiple items
-
                     try {
-                        // might need to check data type to ensure we call the contract with same datatype not strings
-                        const tx = await contract.methods.listNFT(token.tokenId, token.inputValue)
-                            .send({ from: clientBlockChainAddress, value: totalFee });
-                        console.log('Transaction successfull:', tx);
+                        const price_IN_WEI = web3.utils.toWei(token.inputValue.toString(), 'ether'); 
+                        const gasEstimate = await contract.methods.listNFT(parseInt(token.tokenId).estimateGas({ from: clientBlockChainAddress }));
+                        const tx = await contract.methods.listNFT(
+                            parseInt(token.tokenId), 
+                            web3.utils.toBN(price_IN_WEI) 
+                        ).send({ 
+                            from: clientBlockChainAddress, 
+                            gas: gasEstimate
+                        });
+                        console.log('Transaction successful:', tx);
                         successFullTokens.push(token.tokenId);
                     } catch (error) {
                         failedTokens.push(token.tokenId);
                         console.error(`Error calling listNFT with tokenId ${token.tokenId}:`, error);
                     }
-                }
-                // Remove the loading icon
+                }*/
+
                 loadingContainer.remove();
 
                 while (parentContainer.firstChild) {
                     parentContainer.removeChild(parentContainer.firstChild);
                 }
-
-                // Display list of failed tokens inside parentContainer with close icon
                 if (failedTokens.length > 0) {
-                    // Create a container for the list and close button
-                    const container = document.createElement('div');
-                    container.classList.add('failed-tokens-container'); // Add a class for styling
-                    // Create and append the list
-                    const list = document.createElement('ul');
+                    if (successFullTokens.length > 0) {
+                        const successContainer = document.createElement('div');
+                        successContainer.classList.add('success-tokens-container');
+                        const successList = document.createElement('ul');
+                        successFullTokens.forEach(tokenId => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `Successfully listed Token: ${tokenId}`;
+                            successList.appendChild(listItem);
+                        });
+                        successContainer.appendChild(successList);
+                        parentContainer.appendChild(successContainer);
+                    } else {
+                        const noSuccessMessage = document.createElement('div');
+                        noSuccessMessage.classList.add('no-success-message');
+                        noSuccessMessage.style.textAlign = 'center';
+                        noSuccessMessage.textContent = 'No tokens were successfully listed.';
+                        parentContainer.appendChild(noSuccessMessage);
+                    }
+                    const failedContainer = document.createElement('div');
+                    failedContainer.classList.add('failed-tokens-container'); 
+                    const failedList = document.createElement('ul');
+
+                    
                     failedTokens.forEach(tokenId => {
                         const listItem = document.createElement('li');
                         listItem.textContent = `Failed to list Token: ${tokenId}`;
-                        list.appendChild(listItem);
+                        failedList.appendChild(listItem);
                     });
-                    container.appendChild(list);
-                    parentContainer.appendChild(container);
-                }else{
-                    const successDiv = document.createElement('div');
-                    successDiv.style.position = 'relative';
-                    successDiv.style.width = '100%';
-                    successDiv.style.height = '50%';
-                    successDiv.style.top = '25%';
-                    successDiv.classList.add('successDelistSpanTag');
-                    successDiv.style.textAlign = 'center'; // Center items vertically
-                    successDiv.textContent = 'Your items have been listed!';
-                    parentContainer.appendChild(successDiv);
+                    failedContainer.appendChild(failedList);
+                    parentContainer.appendChild(failedContainer);
+                } else {
+                    if (successFullTokens.length > 0) {
+                        const successDiv = document.createElement('div');
+                        successDiv.style.position = 'relative';
+                        successDiv.style.width = '100%';
+                        successDiv.style.height = '50%';
+                        successDiv.style.top = '25%';
+                        successDiv.classList.add('successDelistSpanTag');
+                        successDiv.style.textAlign = 'center'; 
+                        successDiv.textContent = 'Your items have been Listed!.';
+                        parentContainer.appendChild(successDiv);
+                    }
                 }
             } else {
-                alert('No tokens have been selected or filled in correctly.');
+                if(tokenPricesInputsFilled === false){
+                     alert('Please make sure to fill out all input fields for your selected tokens');
+                }else{
+                     alert('An unexpected error has occured.');
+                }
+               
             }
         }
     }else{
         console.log('trying to delist items in bulk ');
         const failedTokens = [];
         if (nextButton.textContent === 'Next') {
-            // Process tokens and display input fields
             const selectedTokens = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            
-            // Get all the 'sold-item' divs
             const soldItems = document.querySelectorAll('.sold-item');
-
-            // Loop through each 'sold-item' div
+            
+            const smallHeaderText = document.querySelector(".smallHeader");
+            if (smallHeaderText) {
+                smallHeaderText.firstChild.textContent = 'Delist Tokens';
+            }
+        
             soldItems.forEach(soldItem => {
-                const checkbox = soldItem.querySelector('input[type="checkbox"]'); // Find the checkbox inside the sold-item
-
-                // If there is no checkbox, or the checkbox is not checked
+                const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
                 if (!checkbox || !checkbox.checked) {
-                    soldItem.remove(); // Remove the parent div
+                    soldItem.remove(); 
                 } 
             });
 
             console.log('Selected Tokens with Input Values:', selectedTokens);
-
-            // Change the button text to "Submit" after processing
             nextButton.textContent = 'Delist';
         } else if (nextButton.textContent === 'Delist') {
-            // Handle form submission
+            let successFullTokens = [];
             const selectedTokens = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            
+
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
-                    // Get the parent element (soldItem div) that contains the checkbox
                     const parentDiv = checkbox.closest('.sold-item');
-                    
-                    // Extract the count from the parent class, assuming the class has the format 'sold-item-<count>'
                     const parentClass = parentDiv.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
                     const tokenCount = parentClass ? parentClass.split('-')[2] : null; // Extract the count from 'sold-item-<count>'
-                    
                     selectedTokens.push(tokenCount);
                 }
             });
@@ -6206,58 +6270,91 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                 console.log('trying to delist array of tokens:', selectedTokens);
 
                 const web3 = new Web3(window.ethereum);
-                
+                /*
                 for (let i = 0; i < selectedTokens.length; i++) {
                     const tokenID = Number(selectedTokens[i]);
                     try {
-                        // Estimate gas required
                         const gasEstimate = await contract.methods.delistNFT(tokenID).estimateGas({ from: clientBlockChainAddress });
-                        
-                        // Get the current gas price
                         const gasPrice = await web3.eth.getGasPrice();
-                        
-                        // Send the transaction with the estimated gas and gas price
                         const tx = await contract.methods.delistNFT(tokenID)
-                            .send({ from: clientBlockChainAddress, gas: gasEstimate, gasPrice: gasPrice});
-                        
+                        .send({ from: clientBlockChainAddress, gas: gasEstimate, gasPrice: gasPrice});
                         console.log(' Delist Transaction successful:', tx);
                         successFullTokens.push(tokenID);
                     } catch (error) {
                         failedTokens.push(tokenID);
                         console.error(`Error calling delistNFT with tokenId ${tokenID}:`, error);
                     }
+                }*/
+
+                                // Prepare the token IDs
+                const tokenIds = selectedTokens.map(token => parseInt(token.tokenId));
+
+                try {
+                    // Estimate the gas for the entire transaction
+                    const gasEstimate = await contract.methods.delistNFTArray(tokenIds).estimateGas({ from: clientBlockChainAddress });
+                    
+                    // Send the transaction
+                    const tx = await contract.methods.delistNFTArray(tokenIds).send({
+                        from: clientBlockChainAddress,
+                        gas: gasEstimate
+                    });
+                    
+                    console.log('Transaction successful:', tx);
+                    successFullTokens.push(tokenIds);
+                    
+                } catch (error) {
+                    failedTokens.push(tokenIds);
+                    console.error('Error calling delistNFTArray:', error);
                 }
+
 
                 while (parentContainer.firstChild) {
                     parentContainer.removeChild(parentContainer.firstChild);
                 }
-
-                // Display list of failed tokens inside parentContainer with close icon
                 if (failedTokens.length > 0) {
-                    // Create a container for the list and close button
-                    const container = document.createElement('div');
-                    container.classList.add('failed-tokens-container'); // Add a class for styling
-                    // Create and append the list
-                    const list = document.createElement('ul');
+                    if (successFullTokens.length > 0) {
+                        const successContainer = document.createElement('div');
+                        successContainer.classList.add('success-tokens-container');
+                        const successList = document.createElement('ul');
+                        successFullTokens.forEach(tokenId => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `Successfully delisted Token: ${tokenId}`;
+                            successList.appendChild(listItem);
+                        });
+                        successContainer.appendChild(successList);
+                        parentContainer.appendChild(successContainer);
+                    } else {
+                        const noSuccessMessage = document.createElement('div');
+                        noSuccessMessage.classList.add('no-success-message');
+                        noSuccessMessage.style.textAlign = 'center';
+                        noSuccessMessage.textContent = 'No tokens were successfully delisted.';
+                        parentContainer.appendChild(noSuccessMessage);
+                    }
+
+                    const failedContainer = document.createElement('div');
+                    failedContainer.classList.add('failed-tokens-container'); 
+                    const failedList = document.createElement('ul');
+                    
                     failedTokens.forEach(tokenId => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `Failed to list Token: ${tokenId}`;
-                        list.appendChild(listItem);
+                        listItem.textContent = `Failed to delist Token: ${tokenId}`;
+                        failedList.appendChild(listItem);
                     });
-                    container.appendChild(list);
-                    parentContainer.appendChild(container);
-                }else{
-                    const successDiv = document.createElement('div');
-                    successDiv.style.position = 'relative';
-                    successDiv.style.width = '100%';
-                    successDiv.style.height = '50%';
-                    successDiv.style.top = '25%';
-                    successDiv.classList.add('successDelistSpanTag');
-                    successDiv.style.textAlign = 'center'; // Center items vertically
-                    successDiv.textContent = 'Your items have been delisted. Make to sure to come back and list them so i get my royalty fee homies.';
-                    parentContainer.appendChild(successDiv);
+                    failedContainer.appendChild(failedList);
+                    parentContainer.appendChild(failedContainer);
+                } else {
+                    if (successFullTokens.length > 0) {
+                        const successDiv = document.createElement('div');
+                        successDiv.style.position = 'relative';
+                        successDiv.style.width = '100%';
+                        successDiv.style.height = '50%';
+                        successDiv.style.top = '25%';
+                        successDiv.classList.add('successDelistSpanTag');
+                        successDiv.style.textAlign = 'center'; 
+                        successDiv.textContent = 'Your items have been delisted. Make sure to come back and list them so I get my royalty fee, homies.';
+                        parentContainer.appendChild(successDiv);
+                    }
                 }
-
 
             } else {
                 alert('No tokens have been selected to delist.');
@@ -6277,22 +6374,18 @@ async function makeTokenPage(addressString, contract, parentContainer, footer){
             
         }
 
-        // test by uncommmenting next line 
         UsersNFTsIds = [1,2,3,4,5, 6,7, 8];
 
         console.log('trying to token database to display');
 
         if(UsersNFTsIds.length != 0){
-            // add span tag in small header that says list and delist. List on right side botom, delist on left side
-            // needs event listener after positioning is good
             let userNFTARRay = [];
-
             console.log('trying to loop through and get images for user tokens');
             for (var i = 0; i < UsersNFTsIds.length; i++) {
                 if (UsersNFTsIds[i] === currentNFTArray[i].tokenID) {
                     console.log('need to get attributes before sending');
 
-                    let currentObj; // Declare currentObj here
+                    let currentObj;
 
                     if (i === 0) {
                         currentObj = {
@@ -6312,30 +6405,25 @@ async function makeTokenPage(addressString, contract, parentContainer, footer){
                         };
                     }
 
-                    userNFTARRay.push(currentObj); // Push currentObj to the array
+                    userNFTARRay.push(currentObj); 
                 }
             }
-
-
             console.log('data has been extracted we are trying to loop through and set data using data:', userNFTARRay);
-
-            // 1) create list, delist token span tag in small header 
-            // 2) add functionality on click
-            let count = 0; // Initialize count
+            let count = 0; 
             userNFTARRay.forEach(token => {
                 count+=1;
                 console.log('Trying to display token data inside pop up userTokensContainer');
 
                 const soldItem = document.createElement('div');
-                soldItem.classList.add('sold-item', `sold-item-${count}`); // Add unique class using count
+                soldItem.classList.add('sold-item', `sold-item-${count}`); 
                 soldItem.style.height = '100px';
-                soldItem.style.position = 'relative'; // For positioning price and date
-                soldItem.style.overflow = 'hidden'; // Hide overflow to ensure image doesn't spill out
-                soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; // Optional background color for the item
-                soldItem.style.borderRadius = '5px'; // Rounded corners for container
-                soldItem.style.display = 'flex'; // Flexbox for layout
-                soldItem.style.alignItems = 'center'; // Center items vertically
-                soldItem.style.padding = '10px'; // Optional padding for better spacing
+                soldItem.style.position = 'relative'; 
+                soldItem.style.overflow = 'hidden'; 
+                soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; 
+                soldItem.style.borderRadius = '5px'; 
+                soldItem.style.display = 'flex'; 
+                soldItem.style.alignItems = 'center'; 
+                soldItem.style.padding = '10px'; 
 
                 // Create and style the checkbox
                 const checkbox = document.createElement('input');
@@ -6468,7 +6556,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer){
             spanContainer.style.textAlign = 'center'; // Center text within the container
             spanContainer.style.boxSizing = 'border-box';
 
-            // Create the span element with the text
             const spanTextContent = document.createElement('span');
             spanTextContent.textContent = 'No Tokens Yet';
             spanTextContent.style.color = 'white';
@@ -7036,9 +7123,32 @@ function createContract(data) {
             emit NFTForSale(tokenId, nfts[tokenId].price);
         }
 
-        function delistNFT(uint256 tokenId) external payable {
+        function listArrayOfNFTs(uint256[] memory tokenIdArray, uint256[] memory userListPrice) external payable {
+            require(tokenIdArray.length == userListPrice.length, "Arrays must be of the same length");
+            uint256 totalFee = minimalTransferFee * tokenIdArray.length;
+            require(msg.value >= totalFee, "Insufficient funds for listing fee");
+            
+            for (uint256 i = 0; i < tokenIdArray.length; i++) {
+                uint256 id = tokenIdArray[i];
+                uint256 price = userListPrice[i];
+                listNFT(id, price);
+            }
+            
+            // Refund any excess funds sent by the user
+            if (msg.value > totalFee) {
+                payable(msg.sender).transfer(msg.value - totalFee);
+            }
+        }
+
+        function delistNFT(uint256 tokenId) external {
             require(owners[tokenId] == msg.sender, "Only the owner can delist the NFT");
             nfts[tokenId].forSale = false;
+        }
+
+        function delistNFTArray(uint256[] memory tokenIdArray) external {
+            for (var i = 0; i  < tokenIdArray.length; i++) {
+                delistNFT(tokenIdArray[i]);
+            }
         }
 
         function tokenByIndex(uint256 index) public view returns (uint256) {
@@ -7726,6 +7836,7 @@ async function deployContractUsingServer(data){
                             // Capture the contract information once deployment is confirmed
                             let contractInformation = {
                                 contractName: data.name,
+                                ERCStandard: data.token,
                                 contractAddress:  contractInstance.contractAddress,
                                 contractABI: serverMessage.contractABI,
                                 collectionBackground: data.backgroundImage
