@@ -2656,7 +2656,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     smallHeader.style.display = 'flex';
     smallHeader.style.alignItems = 'center';
     smallHeader.style.justifyContent = 'center'; 
-    smallHeader.style.marginBottom = '10px';
+    smallHeader.style.marginBottom = '30px';
     recentSellsPopUpBox.appendChild(smallHeader);
 
     const closeIcon = document.createElement('div');
@@ -2783,18 +2783,16 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 console.log('Trying to display data inside pop up recentSellsPopUpBox');
                 recentSellsPopUpBox.style.display = 'flex';
                 recentSellsPopUpBox.style.flexDirection = 'column';
-                //recentSellsPopUpBox.style.alignItems = 'center'; // Center items horizontally
-                //recentSellsPopUpBox.style.justifyContent = 'center'; // Center items vertically
-                recentSellsPopUpBox.style.gap = '5px'; 
+                recentSellsPopUpBox.style.alignItems = 'center'; 
 
                 const soldItem = document.createElement('div');
                 soldItem.classList.add('sold-item'); 
                 soldItem.style.height = '140px';
                 soldItem.style.width = '90%';
-                //soldItem.style.left = '2.5%;'
+                //soldItem.style.left = '5%;'
                 soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
                 soldItem.style.borderRadius = '5px'; 
-                soldItem.style.marginBottom = '5px';
+                soldItem.style.marginBottom = '20px';
                 soldItem.style.border = '1px solid white';
 
                 const imageContainer = document.createElement('div');
@@ -2830,7 +2828,8 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 currentBuyer.style.color = 'white'; 
                 //currentBuyer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
                 currentBuyer.style.borderRadius = '3px'; 
-                currentBuyer.style.textAlign = 'right'; // Align text to the right
+                currentBuyer.style.margin = '0';
+                currentBuyer.style.textAlign = 'right'; 
                 infoContainer.appendChild(currentBuyer);
 
                 const seller = document.createElement('p');
@@ -2839,7 +2838,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 //seller.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
                 seller.style.borderRadius = '3px'; 
                 seller.style.margin = "0";
-                seller.style.textAlign = 'right'; // Align text to the right
+                seller.style.textAlign = 'right'; 
                 infoContainer.appendChild(seller);
 
                 let convertedPrice = ((token.price)/(10*15**18)).toFixed(4);
@@ -2873,14 +2872,11 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                     hour12: false 
                 })}`;
 
-                date.style.position = 'absolute';
-                date.style.top = '76%';
-                date.style.fontSize = '1.5vh';
-                date.style.right = '8px';
                 date.style.color = 'white';
                 // date.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-                date.style.padding = '5px'; 
+                date.style.margin = "0";
                 date.style.borderRadius = '3px'; 
+                date.style.textAlign = 'right'; 
                 infoContainer.appendChild(date);
                 recentSellsPopUpBox.appendChild(soldItem);
             });
