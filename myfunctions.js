@@ -2132,17 +2132,17 @@ async function makeUtilityPage(sideElementsWidth) {
     form.className = 'makeUtilityPage';
     form.style.width = sideElementsWidth;
     form.style.color = 'white';
-    //form.style.fontSize = '1.5vh';
     form.style.position = 'absolute';
     form.style.left = '0.5%';
     form.style.top = '62vh';
-    form.style.height = '40%';
+    form.style.height = '50%';
     form.style.padding = '0px';
     form.style.boxSizing = 'border-box';
     form.style.backgroundColor = '#404a5c';
     form.style.border = '1px solid black';
     form.style.borderWidth = '2px';
     form.style.overflowY = 'scroll';
+    form.style.borderRadius = '5px';
 
     const utilitySmallHeader = document.createElement('div');
     utilitySmallHeader.style.top = '0%';
@@ -2264,13 +2264,14 @@ async function makeOwnersPage(sideElementsWidth) {
     ownersContainer.style.position = 'absolute';
     ownersContainer.style.left = '0.5%';
     ownersContainer.style.top = '62vh';
-    ownersContainer.style.height = '40%';
+    ownersContainer.style.height = '50%';
     ownersContainer.style.padding = '0px';
     ownersContainer.style.boxSizing = 'border-box';
     ownersContainer.style.backgroundColor = '#404a5c';
     ownersContainer.style.border = '1px solid black'; 
     ownersContainer.style.borderWidth = '2px';
     ownersContainer.style.overflowY = 'scroll';
+    ownersContainer.style.borderRadius = '5px';
 
     const ownerSmallHeader = document.createElement('div');
     ownerSmallHeader.style.top = '0%';
@@ -2383,7 +2384,6 @@ function addBTDListeners(transferText, bulkListText, delistText){
         const delistTool = document.querySelector(".delistTool");
         const bulklistingTool = document.querySelector(".bulkListTool");
         const tansferTool = document.querySelector(".transferTool");
-
         if (delistTool) {
             delistTool.innerHTML ='';
             listingOrDelisting = "Transfering";
@@ -2391,22 +2391,17 @@ function addBTDListeners(transferText, bulkListText, delistText){
         if(bulklistingTool){
             bulklistingTool.innerHTML = '';
         } 
-
         if(tansferTool){
             tansferTool.innerHTML = '';
         }
-   
         const listedSpans = document.querySelectorAll('.listedSpan');
         let count = 0; 
         listedSpans.forEach(() => {
             count += 1; 
             const parentContainer = document.querySelector(`.sold-item-${count}`);
-
             if (parentContainer) {
                 const checkbox = parentContainer.querySelector('input[type="checkbox"]');
-
                 if (checkbox) {
-                    // display checkbox regardless if token is active or inactive
                     const parentText = parentContainer.textContent.toLowerCase();
                      checkbox.style.display = 'inline-block';
                 } else {
@@ -2526,6 +2521,7 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     tokenContainer.style.border = '1px solid black'; 
     tokenContainer.style.borderWidth = '2px';
     tokenContainer.style.overflowY = 'scroll';
+    tokenContainer.style.borderRadius = '5px';
 
     const smallHeader = document.createElement('div');
     smallHeader.style.top = '0%';
@@ -2699,7 +2695,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     recentSellsPopUpBox.style.position = 'absolute';
     recentSellsPopUpBox.style.left = '0.5%';
     recentSellsPopUpBox.style.top = '62vh';
-    recentSellsPopUpBox.style.height = '40%';
+    recentSellsPopUpBox.style.height = '50%';
     recentSellsPopUpBox.style.padding = '0px';
     recentSellsPopUpBox.style.boxSizing = 'border-box';
     recentSellsPopUpBox.style.backgroundColor = '#404a5c';
@@ -2708,6 +2704,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     recentSellsPopUpBox.style.borderWidth = '2px';
     recentSellsPopUpBox.style.display = 'flex';
     recentSellsPopUpBox.style.overflowY = 'auto';
+    recentSellsPopUpBox.style.borderRadius = '5px';
 
 
     const smallHeader = document.createElement('div');
@@ -5952,8 +5949,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
 
                 console.log('Trying to use contract and get result');
                 const web3 = new Web3(window.ethereum);
-
-                // Prepare arrays for token IDs and prices
                 const tokenIds = [];
                 const prices = [];
                 
@@ -6077,18 +6072,24 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
 
                 const web3 = new Web3(window.ethereum);
                 const tokenIds = selectedTokens.map(token => parseInt(token.tokenId));
-
+                console.log("converted tokens to integer mapping");
                 try {
                     const gasEstimate = await contract.methods.delistNFTArray(tokenIds).estimateGas({ from: clientBlockChainAddress });
                     const tx = await contract.methods.delistNFTArray(tokenIds).send({
                         from: clientBlockChainAddress,
                         gas: gasEstimate
                     });
+
                     
                     console.log('Transaction successful:', tx);
-                    successFullTokens.push(tokenIds);
+                   for(i =0; i< tokenIds.length; i++){
+                        successFullTokens.push(tokenIds[i]);
+                   }
                     
                 } catch (error) {
+                    for(i =0; i< tokenIds.length; i++){
+                        failedTokens.push(tokenIds[i]);
+                   }
                     failedTokens.push(tokenIds);
                     console.error('Error calling delistNFTArray:', error);
                 }
@@ -6104,7 +6105,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         const successList = document.createElement('ul');
                         successFullTokens.forEach(tokenId => {
                             const listItem = document.createElement('li');
-                            listItem.textContent = `Successfully delisted Token: ${tokenId}`;
+                            listItem.textContent = `Successfully Transfered Token: ${tokenId}`;
                             successList.appendChild(listItem);
                         });
                         successContainer.appendChild(successList);
@@ -6113,7 +6114,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         const noSuccessMessage = document.createElement('div');
                         noSuccessMessage.classList.add('no-success-message');
                         noSuccessMessage.style.textAlign = 'center';
-                        noSuccessMessage.textContent = 'No tokens were successfully delisted.';
+                        noSuccessMessage.textContent = 'No tokens were successfully Transfered.';
                         parentContainer.appendChild(noSuccessMessage);
                     }
 
@@ -6123,7 +6124,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     
                     failedTokens.forEach(tokenId => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `Failed to delist Token: ${tokenId}`;
+                        listItem.textContent = `Failed to Transfer Token: ${tokenId}`;
                         failedList.appendChild(listItem);
                     });
                     failedContainer.appendChild(failedList);
@@ -6158,6 +6159,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             if (smallHeaderText) {
                 smallHeaderText.firstChild.textContent = 'Transfer Tokens';
             }
+        
             soldItems.forEach(soldItem => {
                 const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
                 if (!checkbox || !checkbox.checked) {
@@ -6196,6 +6198,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             inputWrapper.style.width = '100%'; 
             inputWrapper.style.height = '60%'; 
             inputWrapper.style.marginTop = '10px';
+            // Set up the input styles
             inputAddress.className = 'inputTrasnferAddress';
             inputAddress.style.width = '90%'; 
             inputAddress.style.height = '80%';
@@ -6276,6 +6279,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                 });
                 if (failedTokens.length > 0) {
                     if (successFullTokens.length > 0) {
+                        // display successful tokens with others
                         const successContainer = document.createElement('div');
                         successContainer.classList.add('success-tokens-container');
                         const successList = document.createElement('ul');
@@ -6329,10 +6333,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
     }else{
         console.log('unexpected data for listOrDelistOption variable');
     }
-
-    }else{
-        console.log('unexpected data for listOrDelistOption variable');
-    }
 }
 async function makeTokenPage(addressString, contract, parentContainer, footer, coin){
     try{
@@ -6381,6 +6381,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                         }
                         userNFTARRay.push(currentObj); 
                     }catch(error){
+                        // do not push uncomment this is a test 
                         console.log('Error getting data from contract setting to dummy data');
                         if(i==1 || i==3){    
                             currentObj = {
@@ -6510,6 +6511,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 nextButton.style.position = 'relative';
                 nextButton.style.bottom = '0%';
                 nextButton.style.width = '30%';
+                //nextButton.style.left = '35%';
                 nextButton.style.backgroundColor = 'grey';
                 nextButton.style.color = 'white';
                 nextButton.style.border = 'none';
