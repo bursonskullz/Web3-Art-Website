@@ -6158,7 +6158,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             if (smallHeaderText) {
                 smallHeaderText.firstChild.textContent = 'Transfer Tokens';
             }
-        
             soldItems.forEach(soldItem => {
                 const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
                 if (!checkbox || !checkbox.checked) {
@@ -6172,16 +6171,43 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
 
             const inputAddress = document.createElement('input');
             const inputContainer = document.querySelector('.smallHeader');
+            const delistTool = document.querySelector(".delistTool");
+            const bulklistingTool = document.querySelector(".bulkListTool");
+            const tansferTool = document.querySelector(".transferTool");
 
-            inputAddress.style.position = 'relative';
+            if (delistTool) {
+                delistTool.remove();
+            }
+            if (bulklistingTool) {
+                bulklistingTool.remove();
+            }
+            if (tansferTool) {
+                tansferTool.remove();
+            }
+            const inputWrapper = document.createElement('div');
+            inputContainer.style.height = '50px'; 
+            [...inputContainer.childNodes].forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node.remove(); 
+                }
+            });
+            inputWrapper.style.position = 'absolute';
+            inputWrapper.style.bottom = '0'; 
+            inputWrapper.style.width = '100%'; 
+            inputWrapper.style.height = '60%'; 
+            inputWrapper.style.marginTop = '10px';
             inputAddress.className = 'inputTrasnferAddress';
-            inputAddress.style.bottom = '0';
-            inputAddress.style.width = '90%';
+            inputAddress.style.width = '90%'; 
+            inputAddress.style.height = '80%';
+            inputAddress.style.marginLeft = '5%'; 
+            inputAddress.style.marginTop = '3px';
+            inputAddress.style.boxSizing = 'border-box'; 
             inputAddress.type = 'text';
             inputAddress.id = 'TransferInput';
             inputAddress.placeholder = 'Transfer Address';
 
-            inputContainer.appendChild(inputAddress);
+            inputWrapper.appendChild(inputAddress);
+            inputContainer.appendChild(inputWrapper);
 
         }else if (nextButton.textContent === 'Transfer') {
             console.log('trying to transfer tokens and call the contract');
@@ -6199,10 +6225,8 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     const classNames = soldItem.className.trim().split(/\s+/);
                     classNames.forEach(className => {
                         if (className.startsWith('sold-item-')) {
-                            // Extract the part after 'sold-item-'
                             const countStr = className.replace('sold-item-', '').trim();
                             const count = parseInt(countStr, 10);
-
                             if (!isNaN(count)) {
                                 console.log('Count:', count);
                                 transferTokenIds.push(count);
@@ -6257,7 +6281,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         const successList = document.createElement('ul');
                         successFullTokens.forEach(tokenId => {
                             const listItem = document.createElement('li');
-                            listItem.textContent = `Successfully delisted Token: ${tokenId}`;
+                            listItem.textContent = `Successfully Transfered Your Token: ${tokenId}`;
                             successList.appendChild(listItem);
                         });
                         successContainer.appendChild(successList);
@@ -6276,7 +6300,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     
                     failedTokens.forEach(tokenId => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `Failed to delist Token: ${tokenId}`;
+                        listItem.textContent = `Failed to Tranfer Token: ${tokenId}`;
                         failedList.appendChild(listItem);
                     });
                     failedContainer.appendChild(failedList);
@@ -6290,7 +6314,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         successDiv.style.top = '25%';
                         successDiv.classList.add('successDelistSpanTag');
                         successDiv.style.textAlign = 'center'; 
-                        successDiv.textContent = 'Your items have been delisted. Make sure to come back and list them so I get my royalty fee, homies.';
+                        successDiv.textContent = 'Your items have transfered. Make sure to check your wallet';
                         parentContainer.appendChild(successDiv);
                     }
                 }
@@ -6301,6 +6325,10 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
         }else{
             console.log('unexpected error occured with transfer text');
         }
+
+    }else{
+        console.log('unexpected data for listOrDelistOption variable');
+    }
 
     }else{
         console.log('unexpected data for listOrDelistOption variable');
@@ -6353,7 +6381,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                         }
                         userNFTARRay.push(currentObj); 
                     }catch(error){
-                        // do not push uncomment this is a test 
                         console.log('Error getting data from contract setting to dummy data');
                         if(i==1 || i==3){    
                             currentObj = {
@@ -6483,7 +6510,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 nextButton.style.position = 'relative';
                 nextButton.style.bottom = '0%';
                 nextButton.style.width = '30%';
-                //nextButton.style.left = '35%';
                 nextButton.style.backgroundColor = 'grey';
                 nextButton.style.color = 'white';
                 nextButton.style.border = 'none';
