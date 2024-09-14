@@ -140,7 +140,6 @@ function makeSelectorForm(){
     header.style.display = 'flex';
     header.style.alignItems = 'center';
     header.style.padding = '5px';
-    header.style.fontSize = '18px';
     header.style.fontWeight = 'bold';
 
     const header2 = document.createElement('div');
@@ -151,34 +150,7 @@ function makeSelectorForm(){
     header2.style.display = 'flex';
     header2.style.alignItems = 'center';
     header2.style.padding = '5px';
-    header2.style.fontSize = '18px';
-    header2.style.fontWeight = 'bold';
-
-    const closeButton = document.createElement('button');
-    closeButton.textContent = '×'; 
-    closeButton.style.position = 'absolute';
-    closeButton.style.top = '5px';
-    closeButton.style.right = '5px';
-    closeButton.style.cursor = 'pointer';
-    closeButton.style.border = 'none';
-    closeButton.style.background = 'none';
-    closeButton.style.fontSize = '18px';
-    closeButton.style.color = '#888'; 
-    closeButton.style.padding = '5px';
-    closeButton.style.lineHeight = '1';
-    closeButton.style.fontWeight = 'bold';
-    closeButton.style.borderRadius = '50%';
-    closeButton.style.width = '25px';
-    closeButton.style.height = '25px';
-    closeButton.style.display = 'flex';
-    closeButton.style.alignItems = 'center';
-    closeButton.style.justifyContent = 'center';
-    closeButton.style.transition = 'background-color 0.3s, color 0.3s';
-
-    closeButton.addEventListener('click', (e) => {
-        e.preventDefault(); 
-        document.body.removeChild(form);
-    });
+    header2.style.fontSize = '8px';
 
     const titleSpan = document.createElement('span');
     titleSpan.textContent = '';
@@ -186,7 +158,6 @@ function makeSelectorForm(){
     titleSpan.style.flex = '1';
     titleSpan.style.textAlign = 'center';
     titleSpan.style.fontWeight = 'bold'; 
-    header.appendChild(closeButton);
     header.appendChild(titleSpan);
     form.appendChild(header);
     form.appendChild(header2);
@@ -197,19 +168,22 @@ function makeSelectorForm(){
     msgSpanTag.textContent = 'Loading....';
     msgSpanTag.style.flex = '1';
     msgSpanTag.style.textAlign = 'center';
-    msgSpanTag.style.fontWeight = 'bold'; 
     header2.appendChild(msgSpanTag);
     var strings = [
         "Loading",
-        "Please Wait"
+        "Please Wait "
      ];
 
     printInfo(msgSpanTag, strings);
 
     const contentContainer = document.createElement('div');
     contentContainer.className = 'contentContainerNFTs';
-    contentContainer.style.overflow = 'auto';
-    contentContainer.style.height = 'calc(100% - 40px)'; 
+    contentContainer.style.position = 'relative';
+    contentContainer.style.overflowX = 'hidden';
+    contentContainer.style.overflowY = 'scroll';
+    contentContainer.style.height = '90%'; 
+    contentContainer.style.width = '100%';
+    contentContainer.style.bottom = '0%';
     form.appendChild(contentContainer);
     return form;
 }
@@ -255,23 +229,25 @@ export async function addDigitalElementListener(digitalElement){
                     result.forEach((item) => {
                         console.log('trying to add collection to container');
                         const contractDiv = document.createElement('div');
-
                         contractDiv.style.display = 'flex';
                         contractDiv.style.alignItems = 'center';
                         contractDiv.style.cursor = 'pointer';
-                        contractDiv.style.padding = '5px';
-                        contractDiv.style.border = '1px solid #ccc';
-                        contractDiv.style.marginBottom = '5px';
-                        contractDiv.style.transition = 'background-color 0.3s';
+                        contractDiv.style.position = 'relative';
+                        contractDiv.style.transition = 'background-color 0.3s, transform 0.2s';
                         contractDiv.style.width = '100%';
-                        contractDiv.style.backgroundColor = 'dimgray';
+                        contractDiv.style.padding = '10px'; // Adds padding for better spacing
+                        contractDiv.style.backgroundColor = 'dimgray'; // Light neutral color for background
+                        //contractDiv.style.borderBottom = '2px solid black'; // Light border at the bottom
 
                         contractDiv.addEventListener('mouseenter', () => {
-                            contractDiv.style.backgroundColor = '#e0e0e0';
+                            contractDiv.style.backgroundImage = 'linear-gradient(180deg, #2F2F2F, #4A4A4A)'; // Adds gradient from dark to lighter gray
+                            contractDiv.style.transform = 'translateY(-2px)'; // Adds a slight lift on hover
                         });
 
                         contractDiv.addEventListener('mouseleave', () => {
+                            contractDiv.style.backgroundImage = '';
                             contractDiv.style.backgroundColor = 'dimgray';
+                            contractDiv.style.transform = 'translateY(0)'; // Resets position on leave
                         });
 
                         const imageContainer = document.createElement('div');
@@ -282,6 +258,7 @@ export async function addDigitalElementListener(digitalElement){
                         imageContainer.style.display = 'flex';
                         imageContainer.style.alignItems = 'center';
                         imageContainer.style.justifyContent = 'center';
+                        imageContainer.style.borderRadius = '8px'; // Adds rounded corners to images
 
                         const image = document.createElement('img');
                         image.src = item.collectionBackgroundImage;
@@ -295,6 +272,9 @@ export async function addDigitalElementListener(digitalElement){
                         contractNameSpan.textContent = item.contractName;
                         contractNameSpan.style.flex = '1';
                         contractNameSpan.style.textAlign = 'center';
+                        contractNameSpan.style.fontSize = '16px'; // Adjusts font size for better readability
+                        contractNameSpan.style.color = 'white'; // Darker text for better contrast
+
                         contractDiv.appendChild(imageContainer);
                         contractDiv.appendChild(contractNameSpan);
 
@@ -2152,7 +2132,7 @@ async function makeUtilityPage(sideElementsWidth) {
     form.className = 'makeUtilityPage';
     form.style.width = sideElementsWidth;
     form.style.color = 'white';
-    form.style.fontSize = '1.5vh';
+    //form.style.fontSize = '1.5vh';
     form.style.position = 'absolute';
     form.style.left = '0.5%';
     form.style.top = '62vh';
@@ -2169,6 +2149,7 @@ async function makeUtilityPage(sideElementsWidth) {
     utilitySmallHeader.className = 'Utilities';
     utilitySmallHeader.style.position = 'relative'; 
     utilitySmallHeader.textContent = 'Utilities'; 
+    utilitySmallHeader.style.fontSize = '12px';
     utilitySmallHeader.style.height = '20px'; 
     utilitySmallHeader.style.width = '100%'; 
     utilitySmallHeader.style.backgroundColor = 'transparent'; 
@@ -2214,26 +2195,28 @@ async function makeUtilityPage(sideElementsWidth) {
     ul.style.listStyleType = 'none';
     ul.style.padding = '0'; 
     ul.style.margin = '0'; 
-    ul.style.fontSize = '7px';
+    ul.style.fontSize = '10px';
 
     utilities.forEach((utility) => {
         const utilityItem = document.createElement('li');
+        utilityItem.style.height = 'auto';
         utilityItem.style.display = 'flex';
         utilityItem.style.justifyContent = 'space-between';
         utilityItem.style.alignItems = 'center';
         utilityItem.style.borderBottom = '1px solid #eee'; 
-        utilityItem.style.padding = '2px 0';
-        utilityItem.style.fontSize = '10px';
-        utilityItem.style.color = 'black'; 
+        utilityItem.style.marginBottom = '5px';
+        utilityItem.style.fontSize = '16px';
+        utilityItem.style.color = 'white'; 
 
         const paragraph = document.createElement('p');
         paragraph.textContent = utility;
         paragraph.style.margin = '0';
         paragraph.style.flex = '1'; 
         paragraph.style.paddingRight = '5px'; 
+        //paragraph.style.fontSize = '2vh';
 
-        // Create access button
         const button = document.createElement('button');
+        button.style.height = '23px';
         button.textContent = 'Coming Soon';
         button.style.padding = '1px 2px';
         button.style.backgroundColor = '#007bff';
@@ -2274,7 +2257,7 @@ async function makeUtilityPage(sideElementsWidth) {
 async function makeOwnersPage(sideElementsWidth) {
     console.log('Trying to get my tokens to display.');
     const ownersContainer = document.createElement('div');
-    ownersContainer.className = 'userTokensContainer';
+    ownersContainer.className = 'OwnersContainer';
     ownersContainer.style.width = sideElementsWidth;
     ownersContainer.style.color = 'white';
     ownersContainer.style.fontSize = '1.5vh';
@@ -2336,10 +2319,11 @@ async function makeOwnersPage(sideElementsWidth) {
 
         // test by uncommmenting next line 
         allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
+        allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
 
         if (allOwnersAddressArray.length > 0) {
             let count = 0; 
-            allOwnersAddressArray.forEach(owner => {
+            allOwnersAddressArray.forEach(async (owner) => {
                 count += 1;
                 console.log('Trying to display token data inside pop up allOwnersAddressArray');
 
@@ -2362,10 +2346,20 @@ async function makeOwnersPage(sideElementsWidth) {
                 ownerAddressDiv.style.maxWidth = 'calc(100% - 50px)';
                 ownerAddressDiv.textContent = `Owner: ${owner}`; 
 
+        
+                let numberOfItemsOwned;
+                try{
+                    numberOfItemsOwned = await contract.methods.getNumberOfOwnedTokens().call();
+                }catch(error){
+                    console.log("Error calling contract function getNumberOfOwnedTokens()", error);
+                    console.log("setting owned tokens to zero");
+                    numberOfItemsOwned = 0;
+                }
+                
                 const itemCountDiv = document.createElement('div');
                 itemCountDiv.style.fontSize = '12px';
                 itemCountDiv.style.color = '#888'; 
-                itemCountDiv.textContent = '# items'; 
+                itemCountDiv.textContent = `  Total Owned: ${numberOfItemsOwned}`; 
 
                 uniqueOwnerContainer.appendChild(ownerAddressDiv);
                 uniqueOwnerContainer.appendChild(itemCountDiv);
@@ -2383,67 +2377,62 @@ async function makeOwnersPage(sideElementsWidth) {
         }
 
 }
-async function makeMytokensPage(contract, sideElementsWidth, coin){
-    console.log('Trying to get my tokens to display.');
-    const userTokensContainer = document.createElement('div');
-    userTokensContainer.className = 'userTokensContainer';
-    userTokensContainer.style.width = sideElementsWidth;
-    userTokensContainer.style.color = 'white';
-    userTokensContainer.style.fontSize = '1.5vh';
-    userTokensContainer.style.position = 'absolute';
-    userTokensContainer.style.left = '0.5%';
-    userTokensContainer.style.top = '62vh';
-    userTokensContainer.style.height = '40%';
-    userTokensContainer.style.padding = '0px';
-    userTokensContainer.style.boxSizing = 'border-box';
-    userTokensContainer.style.backgroundColor = '#404a5c';
-    userTokensContainer.style.border = '1px solid black'; 
-    userTokensContainer.style.borderWidth = '2px';
-    userTokensContainer.style.overflowY = 'none';
 
-    const smallHeader = document.createElement('div');
-    smallHeader.style.top = '0%';
-    smallHeader.className = 'smallHeader';
-    smallHeader.style.position = 'relative'; 
-    smallHeader.textContent = 'Your Tokens'; 
-    smallHeader.style.height = '33px'; 
-    smallHeader.style.width = '100%'; 
-    smallHeader.style.backgroundColor = 'transparent'; 
-    smallHeader.style.color = 'white'; 
-    smallHeader.style.boxSizing = 'border-box';
-    smallHeader.style.display = 'flex';
-    smallHeader.style.alignItems = 'center';
-    smallHeader.style.justifyContent = 'center';
-    smallHeader.style.marginBottom = '17px'; 
+function addBTDListeners(transferText, bulkListText, delistText){
+    transferText.addEventListener('click', () => {
+        const delistTool = document.querySelector(".delistTool");
+        const bulklistingTool = document.querySelector(".bulkListTool");
+        const tansferTool = document.querySelector(".transferTool");
 
-    const bulkListSPanTagContainer = document.createElement('div');
-    bulkListSPanTagContainer.className ="bulkListTool";
-    bulkListSPanTagContainer.style.position = 'absolute'; 
-    bulkListSPanTagContainer.style.bottom = '2%';
-    bulkListSPanTagContainer.style.left = '5%'; 
-    bulkListSPanTagContainer.style.height = '17%';
-    bulkListSPanTagContainer.style.width = '30%';
+        if (delistTool) {
+            delistTool.innerHTML ='';
+            listingOrDelisting = "Transfering";
+        }
+        if(bulklistingTool){
+            bulklistingTool.innerHTML = '';
+        } 
 
-    // Create the "Bulk list" span tag
-    const bulkListText = document.createElement('span');
-    bulkListText.textContent = 'Bulk list'; 
-    bulkListText.style.position = 'absolute';
-    bulkListText.style.top = '0%'; 
-    bulkListText.style.left = '0%';
-    bulkListText.style.cursor = 'pointer';
-    bulkListText.style.fontSize = '10px'; 
-    bulkListText.style.color = 'white'; 
+        if(tansferTool){
+            tansferTool.innerHTML = '';
+        }
+   
+        const listedSpans = document.querySelectorAll('.listedSpan');
+        let count = 0; 
+        listedSpans.forEach(() => {
+            count += 1; 
+            const parentContainer = document.querySelector(`.sold-item-${count}`);
+
+            if (parentContainer) {
+                const checkbox = parentContainer.querySelector('input[type="checkbox"]');
+
+                if (checkbox) {
+                    // display checkbox regardless if token is active or inactive
+                    const parentText = parentContainer.textContent.toLowerCase();
+                     checkbox.style.display = 'inline-block';
+                } else {
+                    console.log(`Checkbox not found in parent container ${count}.`);
+                }
+            } else {
+                console.log(`Parent container not found for count: ${count}.`);
+            }
+        });
+    });
 
     bulkListText.addEventListener('click', () => {
         const delistTool = document.querySelector(".delistTool");
         const bulklistingTool = document.querySelector(".bulkListTool");
+        const tansferTool = document.querySelector(".transferTool");
         if (delistTool) {
             delistTool.innerHTML ='';
             listingOrDelisting = "listing";
         }
         if(bulklistingTool){
             bulklistingTool.innerHTML = '';
-        }        
+        }
+        if(tansferTool){
+            tansferTool.innerHTML = '';
+        }
+        
         const listedSpans = document.querySelectorAll('.listedSpan');
         let count = 0; 
         listedSpans.forEach(() => {
@@ -2461,8 +2450,7 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
                         console.log(`Checkbox shown for parent container ${count} because it does not contain "Inactive".`);
                     } else {
                          checkbox.style.display = 'none'; 
-                         console.log(`Checkbox hidden for parent container ${count} because it contains "active".`);
-                        
+                         console.log(`Checkbox hidden for parent container ${count} because it contains "active".`); 
                     }
                 } else {
                     console.log(`Checkbox not found in parent container ${count}.`);
@@ -2473,31 +2461,12 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
         });
     });
 
-    bulkListSPanTagContainer.appendChild(bulkListText);
-    smallHeader.appendChild(bulkListSPanTagContainer);
-
-    const delistSPanTagContainer = document.createElement('div');
-    delistSPanTagContainer.style.position = 'absolute'; 
-    delistSPanTagContainer.className = 'delistTool';
-    delistSPanTagContainer.style.bottom = '2%';
-    delistSPanTagContainer.style.right = '5%'; 
-    delistSPanTagContainer.style.height = '17%';
-    delistSPanTagContainer.style.width = '30%';
-
-    const delistText = document.createElement('span');
-    delistText.textContent = 'Delist'; 
-    delistText.style.position = 'absolute';
-    delistText.style.bottom = '0px'; 
-    delistText.style.right = '0px';
-    delistText.style.cursor = 'pointer';
-    delistText.style.fontSize = '10px'; 
-    delistText.style.color = 'white'; 
     delistText.addEventListener('click', () => {
         console.log('bulk delist tool clicked!');
-
-
         const delistTool = document.querySelector(".delistTool");
         const bulklistingTool = document.querySelector(".bulkListTool");
+        const tansferTool = document.querySelector(".transferTool");
+
         if (delistTool) {
             delistTool.innerHTML = '';
             listingOrDelisting = "delisting";
@@ -2506,6 +2475,10 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
         if(bulklistingTool){
             bulklistingTool.innerHTML = '';
         } 
+
+        if(tansferTool){
+            tansferTool.innerHTML = '';
+        }
 
         const listedSpans = document.querySelectorAll('.listedSpan');
 
@@ -2526,7 +2499,6 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
                     } else {
                          checkbox.style.display = 'none';
                          console.log(`Checkbox hidden for parent container ${count} because it contains "active".`);
-                        
                     }
                 } else {
                     console.log(`Checkbox not found in parent container ${count}.`);
@@ -2536,11 +2508,101 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
             }
         });
     });
+}
+async function makeMytokensPage(contract, sideElementsWidth, coin){
+    console.log('Trying to get my tokens to display.');
+    const tokenContainer = document.createElement('div');
+    tokenContainer.className = 'tokenContainer';
+    tokenContainer.style.width = sideElementsWidth;
+    tokenContainer.style.color = 'white';
+    tokenContainer.style.fontSize = '1.5vh';
+    tokenContainer.style.position = 'absolute';
+    tokenContainer.style.left = '0.5%';
+    tokenContainer.style.top = '62vh';
+    tokenContainer.style.height = '50%';
+    tokenContainer.style.padding = '0px';
+    tokenContainer.style.boxSizing = 'border-box';
+    tokenContainer.style.backgroundColor = '#404a5c';
+    tokenContainer.style.border = '1px solid black'; 
+    tokenContainer.style.borderWidth = '2px';
+    tokenContainer.style.overflowY = 'scroll';
+
+    const smallHeader = document.createElement('div');
+    smallHeader.style.top = '0%';
+    smallHeader.className = 'smallHeader';
+    smallHeader.style.position = 'relative'; 
+    smallHeader.textContent = 'Your Tokens'; 
+    smallHeader.style.height = '50px'; 
+    smallHeader.style.width = '100%'; 
+    smallHeader.style.backgroundColor = 'transparent'; 
+    smallHeader.style.color = 'white'; 
+    smallHeader.style.boxSizing = 'border-box';
+    smallHeader.style.display = 'flex';
+    smallHeader.style.alignItems = 'center';
+    smallHeader.style.justifyContent = 'center';
+    smallHeader.style.marginBottom = '17px'; 
+
+    const bulkListSPanTagContainer = document.createElement('div');
+    bulkListSPanTagContainer.className ="bulkListTool";
+    bulkListSPanTagContainer.style.position = 'absolute'; 
+    bulkListSPanTagContainer.style.bottom = '2%';
+    bulkListSPanTagContainer.style.left = '5%'; 
+    bulkListSPanTagContainer.style.height = '17%';
+    bulkListSPanTagContainer.style.width = '30%';
+
+    const bulkListText = document.createElement('span');
+    bulkListText.textContent = 'Bulk list'; 
+    bulkListText.style.position = 'absolute';
+    bulkListText.style.top = '0%'; 
+    bulkListText.style.left = '0%';
+    bulkListText.style.cursor = 'pointer';
+    bulkListText.style.fontSize = '10px'; 
+    bulkListText.style.color = 'white'; 
+
+    const delistSPanTagContainer = document.createElement('div');
+    delistSPanTagContainer.style.position = 'absolute'; 
+    delistSPanTagContainer.className = 'delistTool';
+    delistSPanTagContainer.style.bottom = '2%';
+    delistSPanTagContainer.style.right = '5%'; 
+    delistSPanTagContainer.style.height = '17%';
+    delistSPanTagContainer.style.width = '30%';
+
+    const delistText = document.createElement('span');
+    delistText.textContent = 'Delist'; 
+    delistText.style.position = 'absolute';
+    delistText.style.bottom = '0px'; 
+    delistText.style.right = '0px';
+    delistText.style.cursor = 'pointer';
+    delistText.style.fontSize = '10px'; 
+    delistText.style.color = 'white'; 
+
+    const transferSPanTagContainer = document.createElement('div');
+    transferSPanTagContainer.style.position = 'absolute'; 
+    transferSPanTagContainer.className = 'transferTool';
+    transferSPanTagContainer.style.bottom = '0%';
+    transferSPanTagContainer.style.right = '37.5%'; 
+    transferSPanTagContainer.style.height = '17%';
+    transferSPanTagContainer.style.width = '37%';
+
+    const transferText = document.createElement('span');
+    transferText.textContent = 'Transfer Tokens'; 
+    transferText.style.position = 'absolute';
+    transferText.style.bottom = '0px'; 
+    transferText.style.right = '0px';
+    transferText.style.cursor = 'pointer';
+    transferText.style.fontSize = '10px'; 
+    transferText.style.color = 'white'; 
+
+    transferSPanTagContainer.appendChild(transferText);
+    smallHeader.appendChild(transferSPanTagContainer);
+
+    bulkListSPanTagContainer.appendChild(bulkListText);
+    smallHeader.appendChild(bulkListSPanTagContainer);
 
     delistSPanTagContainer.appendChild(delistText);
     smallHeader.appendChild(delistSPanTagContainer);
 
-    userTokensContainer.appendChild(smallHeader);
+    tokenContainer.appendChild(smallHeader);
 
     const closeIcon = document.createElement('div');
     closeIcon.textContent = '×'; 
@@ -2557,10 +2619,10 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     smallHeader.appendChild(closeIcon);
 
     closeIcon.addEventListener('click', ()=>{
-        document.body.removeChild(userTokensContainer);
+        document.body.removeChild(tokenContainer);
     });
 
-    document.body.appendChild(userTokensContainer);
+    document.body.appendChild(tokenContainer);
 
     const smallContainer = document.createElement('div');
     smallContainer.className = 'token-inside-Container';
@@ -2568,28 +2630,33 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     smallContainer.style.color = 'white';
     smallContainer.style.fontSize = '1.5vh';
     smallContainer.style.position = 'relative'; 
-    smallContainer.style.height = '70%'; 
+    smallContainer.style.height = '60%'; 
     smallContainer.style.padding = '0px';
+    //smallContainer.style.bottom = '0';
     smallContainer.style.boxSizing = 'border-box';
     smallContainer.style.backgroundColor = 'none';
     smallContainer.style.overflowY = 'scroll';
 
-    userTokensContainer.appendChild(smallContainer);
+    tokenContainer.appendChild(smallContainer);
 
     const footer = document.createElement('div');
     footer.className = 'footer';
     footer.style.width = '100%'; 
     footer.style.height = '17%';
+    footer.style.bottom = '0';
     footer.style.backgroundColor = '#404a5c'; 
-    footer.style.position = 'relative';
+    //footer.style.position = 'absolute';
+    footer.style.position = 'sticky';  // Change to sticky
     footer.style.color = 'white';
     footer.style.display = 'flex';
     footer.style.justifyContent = 'center';
     footer.style.alignItems = 'center';
 
-    userTokensContainer.appendChild(footer);
 
-    
+    tokenContainer.appendChild(footer);
+
+    addBTDListeners(transferText, bulkListText, delistText);
+
     try {
         if (isConnected) {
             let thisAccount = window.ethereum.selectedAddress;
@@ -2934,7 +3001,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     collectionBackgroundImageContainer.style.top = '-5%';
     collectionBackgroundImageContainer.style.left = '20%';
     collectionBackgroundImageContainer.style.height = '15%';
-    //collectionBackgroundImageContainer.style.backgroundColor = 'dimgray';
 
     collectionBackgroundImageContainer.style.backgroundImage = 'url("/images/BursonSKullText.png")'; 
     collectionBackgroundImageContainer.style.backgroundSize = 'cover';
@@ -2954,7 +3020,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     contractInfoDiv.style.height = '40%';
     contractInfoDiv.style.padding = '20px';
     contractInfoDiv.style.boxSizing = 'border-box';
-    contractInfoDiv.style.backgroundColor = '#404a5c';//#404a5c
+    contractInfoDiv.style.backgroundColor = '#404a5c';
     contractInfoDiv.style.borderStyle = 'solid';
     contractInfoDiv.style.borderColor = 'black';
     contractInfoDiv.style.borderRadius = '5px';
@@ -3021,9 +3087,9 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         <h2 style="margin: 0; text-align: center;">Contract Information</h2>
 
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">
-            Address: 
+            Address :  
             <a href="${scanURL}" target="_blank" style="color: white; text-decoration: underline;">
-                ${userSelectedContract.contractAddress.substr(25) + "~~~"}
+                ${userSelectedContract.contractAddress.substring(0,12) + "~~~"}
             </a>
         </p>
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Tokens: ${numberOfTokens}</p>
@@ -3048,10 +3114,10 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     options.style.position = 'absolute';
     options.style.left = '0.5%';
     options.style.top = '62vh';
-    options.style.height = '40%';
+    options.style.height = '50%';
     options.style.padding = '20px';
     options.style.boxSizing = 'border-box';
-    options.style.backgroundColor = '#404a5c';//#404a5c
+    options.style.backgroundColor = '#404a5c';
     options.style.borderStyle = 'solid';
     options.style.borderColor = 'black';
     options.style.borderWidth = '2px';
@@ -5817,7 +5883,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         priceInput.style.width = '80%'; 
                         priceInput.style.borderRadius = '5px'; 
                         priceInput.style.border = '1px solid #ccc';  
-                        priceInput.classList.add('price-input'); // Add class for placeholder styling
+                        priceInput.classList.add('price-input'); 
                         textContainer.appendChild(priceInput);
 
                         if (tokenCount) {
@@ -5844,19 +5910,16 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     if (textContainer) {
                         const priceInput = textContainer.querySelector('input[type="text"]');
                         const inputValue = priceInput ? priceInput.value.trim() : '';
-
                         if (inputValue) {
                             const parsedValue = parseFloat(inputValue);
                             if (!isNaN(parsedValue)) {
                                 selectedTokens.push({ tokenId: tokenCount, inputValue: parsedValue });
                             } else {
                                 tokenPricesInputsFilled = false;
-                                //alert(`Token ID ${tokenCount} has an invalid price.`);
 
                             }
                         } else {
                             tokenPricesInputsFilled = false;
-                            //alert(`Token ID ${tokenCount} has an empty price.`);
                         }
                     }
                 }
@@ -5914,26 +5977,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     failedTokens.push(tokenIds);
                     console.error('Error calling listArrayOfNFTs:', error);
                 }
-                /*
-                for (let i = 0; i < selectedTokens.length; i++) {
-                    const token = selectedTokens[i];
-                    try {
-                        const price_IN_WEI = web3.utils.toWei(token.inputValue.toString(), 'ether'); 
-                        const gasEstimate = await contract.methods.listNFT(parseInt(token.tokenId).estimateGas({ from: clientBlockChainAddress }));
-                        const tx = await contract.methods.listNFT(
-                            parseInt(token.tokenId), 
-                            web3.utils.toBN(price_IN_WEI) 
-                        ).send({ 
-                            from: clientBlockChainAddress, 
-                            gas: gasEstimate
-                        });
-                        console.log('Transaction successful:', tx);
-                        successFullTokens.push(token.tokenId);
-                    } catch (error) {
-                        failedTokens.push(token.tokenId);
-                        console.error(`Error calling listNFT with tokenId ${token.tokenId}:`, error);
-                    }
-                }*/
 
                 loadingContainer.remove();
 
@@ -5993,7 +6036,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                
             }
         }
-    }else{
+    }else if(listOrDelistOption === "delisting"){
         console.log('trying to delist items in bulk ');
         const failedTokens = [];
         if (nextButton.textContent === 'Next') {
@@ -6033,30 +6076,10 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                 console.log('trying to delist array of tokens:', selectedTokens);
 
                 const web3 = new Web3(window.ethereum);
-                /*
-                for (let i = 0; i < selectedTokens.length; i++) {
-                    const tokenID = Number(selectedTokens[i]);
-                    try {
-                        const gasEstimate = await contract.methods.delistNFT(tokenID).estimateGas({ from: clientBlockChainAddress });
-                        const gasPrice = await web3.eth.getGasPrice();
-                        const tx = await contract.methods.delistNFT(tokenID)
-                        .send({ from: clientBlockChainAddress, gas: gasEstimate, gasPrice: gasPrice});
-                        console.log(' Delist Transaction successful:', tx);
-                        successFullTokens.push(tokenID);
-                    } catch (error) {
-                        failedTokens.push(tokenID);
-                        console.error(`Error calling delistNFT with tokenId ${tokenID}:`, error);
-                    }
-                }*/
-
-                                // Prepare the token IDs
                 const tokenIds = selectedTokens.map(token => parseInt(token.tokenId));
 
                 try {
-                    // Estimate the gas for the entire transaction
                     const gasEstimate = await contract.methods.delistNFTArray(tokenIds).estimateGas({ from: clientBlockChainAddress });
-                    
-                    // Send the transaction
                     const tx = await contract.methods.delistNFTArray(tokenIds).send({
                         from: clientBlockChainAddress,
                         gas: gasEstimate
@@ -6123,12 +6146,169 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                 alert('No tokens have been selected to delist.');
             }
         }
+    }else if(listOrDelistOption === "transfering"){
+        console.log('trying to perform transfer token logic');
+        const failedTokens = [];
+        if (nextButton.textContent === 'Next') {
+            const selectedTokens = [];
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const soldItems = document.querySelectorAll('.sold-item');
+            
+            const smallHeaderText = document.querySelector(".smallHeader");
+            if (smallHeaderText) {
+                smallHeaderText.firstChild.textContent = 'Transfer Tokens';
+            }
+        
+            soldItems.forEach(soldItem => {
+                const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
+                if (!checkbox || !checkbox.checked) {
+                    soldItem.remove(); 
+                } 
+            });
+
+            console.log('Selected Tokens with Input Values:', selectedTokens);
+            nextButton.textContent = 'Transfer';
+            console.log('trying to make single input container to send all NFTs');
+
+            const inputAddress = document.createElement('input');
+            const inputContainer = document.querySelector('.smallHeader');
+
+            inputAddress.style.position = 'relative';
+            inputAddress.className = 'inputTrasnferAddress';
+            inputAddress.style.bottom = '0';
+            inputAddress.style.width = '90%';
+            inputAddress.type = 'text';
+            inputAddress.id = 'TransferInput';
+            inputAddress.placeholder = 'Transfer Address';
+
+            inputContainer.appendChild(inputAddress);
+
+        }else if (nextButton.textContent === 'Transfer') {
+            console.log('trying to transfer tokens and call the contract');
+            const inputChecker = document.querySelector('.inputTrasnferAddress');
+            const address = inputChecker.value.trim();
+            const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+            let transferTokenIds = [];
+            let failedTokens = [];
+            let successFullTokens = [];
+            if (ethAddressRegex.test(address)) {
+                console.log('Valid Ethereum address');
+                const soldItems = document.querySelectorAll('.sold-item');
+                console.log('found items to transfer', soldItems);
+                soldItems.forEach(soldItem => {
+                    const classNames = soldItem.className.trim().split(/\s+/);
+                    classNames.forEach(className => {
+                        if (className.startsWith('sold-item-')) {
+                            // Extract the part after 'sold-item-'
+                            const countStr = className.replace('sold-item-', '').trim();
+                            const count = parseInt(countStr, 10);
+
+                            if (!isNaN(count)) {
+                                console.log('Count:', count);
+                                transferTokenIds.push(count);
+                            } else {
+                                console.log('Invalid count in class name:', countStr);
+                            }
+                        }
+                    });
+                });
+                console.log('trying to tansfer array of NFTS using ID data', transferTokenIds);
+
+                try {
+                    const gasEstimate = await contract.methods.transferArrayOfNFTS(address, transferTokenIds).estimateGas({ from: clientBlockChainAddress });
+                    const tx = await contract.methods.transferArrayOfNFTS(address, transferTokenIds).send({
+                        from: clientBlockChainAddress,
+                        gas: gasEstimate
+                    });
+                    
+                    console.log('Transaction successful:', tx);
+                    successFullTokens.push(transferTokenIds);
+                    
+                } catch (error) {
+                    failedTokens.push(transferTokenIds);
+                    console.error('Error calling delistNFTArray:', error);
+                }
+
+                parentContainer.innerHTML = '';
+                const inputContainer = document.querySelector('.inputTrasnferAddress');
+                if(inputContainer){
+                    inputContainer.remove();
+                }
+                const footer = document.querySelector('.footer');
+                if(footer){
+                    footer.remove();
+                }
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×'; 
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '10px';
+                closeIcon.style.right = '10px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px';
+                closeIcon.style.color = '#000';
+
+                closeIcon.addEventListener('click', () => {
+                    parentContainer.remove();
+                });
+                if (failedTokens.length > 0) {
+                    if (successFullTokens.length > 0) {
+                        const successContainer = document.createElement('div');
+                        successContainer.classList.add('success-tokens-container');
+                        const successList = document.createElement('ul');
+                        successFullTokens.forEach(tokenId => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `Successfully delisted Token: ${tokenId}`;
+                            successList.appendChild(listItem);
+                        });
+                        successContainer.appendChild(successList);
+                        parentContainer.appendChild(successContainer);
+                    } else {
+                        const noSuccessMessage = document.createElement('div');
+                        noSuccessMessage.classList.add('no-success-message');
+                        noSuccessMessage.style.textAlign = 'center';
+                        noSuccessMessage.textContent = 'Sorry unable to transfer tokens';
+                        parentContainer.appendChild(noSuccessMessage);
+                    }
+
+                    const failedContainer = document.createElement('div');
+                    failedContainer.classList.add('failed-tokens-container'); 
+                    const failedList = document.createElement('ul');
+                    
+                    failedTokens.forEach(tokenId => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Failed to delist Token: ${tokenId}`;
+                        failedList.appendChild(listItem);
+                    });
+                    failedContainer.appendChild(failedList);
+                    parentContainer.appendChild(failedContainer);
+                } else {
+                    if (successFullTokens.length > 0) {
+                        const successDiv = document.createElement('div');
+                        successDiv.style.position = 'relative';
+                        successDiv.style.width = '100%';
+                        successDiv.style.height = '50%';
+                        successDiv.style.top = '25%';
+                        successDiv.classList.add('successDelistSpanTag');
+                        successDiv.style.textAlign = 'center'; 
+                        successDiv.textContent = 'Your items have been delisted. Make sure to come back and list them so I get my royalty fee, homies.';
+                        parentContainer.appendChild(successDiv);
+                    }
+                }
+
+            } else {
+                alert('Please enter a valid crypto address to transfer your tokens');
+            }
+        }else{
+            console.log('unexpected error occured with transfer text');
+        }
+
+    }else{
+        console.log('unexpected data for listOrDelistOption variable');
     }
 }
 async function makeTokenPage(addressString, contract, parentContainer, footer, coin){
     try{
         let UsersNFTsIds;
-
         try{
             UsersNFTsIds = await contract.methods.getUsersTokens().call();
         }catch(error){
@@ -6137,8 +6317,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
             
         }
         // comment to stop testing
-        UsersNFTsIds = [1,2,3,4,5, 6,7, 8];
-        console.log('trying to token database to display');
+        UsersNFTsIds = [1,2,3,4,5, 6,7,8];
         if(UsersNFTsIds.length != 0){
             let userNFTARRay = [];
             console.log('trying to loop through and get images for user tokens');
@@ -6196,11 +6375,12 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                         userNFTARRay.push(currentObj); 
                     }
                 }
+            }
             console.log('data has been extracted we are trying to loop through and set data using data:', userNFTARRay);
             let count = 0; 
             userNFTARRay.forEach(token => {
                 count+=1;
-                console.log('Trying to display token data inside pop up userTokensContainer');
+                console.log('Trying to display token data inside pop up tokenContainer');
 
                 const soldItem = document.createElement('div');
                 soldItem.classList.add('sold-item', `sold-item-${count}`); 
@@ -6220,33 +6400,35 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 soldItem.appendChild(checkbox);
 
                 const imageContainer = document.createElement('div');
-                imageContainer.style.position = 'relative';
+                imageContainer.style.position = 'relative'; 
                 imageContainer.style.height = '80%';
                 imageContainer.style.width = '25%';
                 imageContainer.style.marginRight = '10px'; 
-                imageContainer.style.flexShrink = '0';
-                imageContainer.style.backgroundColor = '#ddd';
+                imageContainer.style.flexShrink = '0'; 
+                imageContainer.style.backgroundColor = '#ddd'; 
                 soldItem.appendChild(imageContainer);
 
                 const img = document.createElement('img');
                 img.src = token.image;
                 img.alt = `Token ID ${token.tokenID}`;
                 img.style.width = '100%';
-                img.style.height = '100%';
-                img.style.borderRadius = '5px';
+                img.style.height = '100%'; 
+                img.style.borderRadius = '5px'; 
                 img.style.objectFit = 'cover'; 
                 imageContainer.appendChild(img);
 
                 const textContainer = document.createElement('div');
                 textContainer.className = `textContainer:${count}`;
                 textContainer.style.flex = '1'; 
-                textContainer.style.display = 'flex';
-                textContainer.style.flexDirection = 'column';
-                textContainer.style.justifyContent = 'center'; 
-                textContainer.style.marginLeft = '10px';
+                textContainer.style.display = 'flex'; 
+                textContainer.style.flexDirection = 'column'; 
+                textContainer.style.justifyContent = 'center';
+                textContainer.style.marginLeft = '10px'; 
                 soldItem.appendChild(textContainer);
+
                 const listedSpan = document.createElement('div');
                 listedSpan.className = 'listedSpan';
+
                 const listedText = document.createElement('span');
                 listedText.textContent = 'Listed: ';
 
@@ -6258,8 +6440,10 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 } else {
                     statusSpan.style.color = 'red';
                 }
+
                 listedSpan.appendChild(listedText);
                 listedSpan.appendChild(statusSpan);
+
                 listedSpan.style.marginBottom = '5px'; 
                 textContainer.appendChild(listedSpan);
 
@@ -6268,15 +6452,14 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 nameSpan.style.color = 'white'; 
                 textContainer.appendChild(nameSpan);
 
-
                 const priceSpan = document.createElement('div');
                 let convertedPrice = ((token.purchasePrice)/(10*15**18)).toFixed(3);
-                
+
                 priceSpan.textContent = `Purchase Price: `+ `${convertedPrice}` + ` ${coin}`; 
                 priceSpan.style.marginBottom = '5px'; 
                 priceSpan.style.color = 'white'; 
                 textContainer.appendChild(priceSpan);
-                
+
                 const datePurchased = new Date(token.purchaseDate * 1000); 
                 const dateSpan = document.createElement('div');
                 dateSpan.textContent = `${datePurchased.toLocaleDateString("en-US", { 
@@ -6288,12 +6471,12 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     minute: '2-digit', 
                     hour12: false 
                 })}`;
-                dateSpan.style.color = 'white'; 
+                dateSpan.style.color = 'white';
                 textContainer.appendChild(dateSpan);
+
                 parentContainer.appendChild(soldItem);
             });
             if (!document.querySelector('.nextButton')) {
-                // need to check if we are bulk listing or delisting at this point 
                 const nextButton = document.createElement('button');
                 nextButton.className = 'nextButton'; 
                 nextButton.textContent = 'Next';
@@ -6319,6 +6502,8 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                         sendListingOrDElistData(nextButton, "listing", addressString, contract, parentContainer);
                     }else if(listingOrDelisting === "delisting"){
                         sendListingOrDElistData(nextButton, "delisting", addressString, contract, parentContainer);
+                    }else if(listingOrDelisting === "Transfering"){
+                        sendListingOrDElistData(nextButton, "transfering", addressString, contract, parentContainer);
                     }else{
                        alert("an unexpected eror has occured");
                     }
@@ -6328,18 +6513,18 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
         }else{
             const spanContainer = document.createElement('div');
             spanContainer.className = 'spanContainerForTokens';
-            spanContainer.style.position = 'absolute'; // Use absolute positioning for centering
-            spanContainer.style.top = '50%'; // Start centering from the middle
-            spanContainer.style.left = '50%'; // Start centering from the middle
-            spanContainer.style.transform = 'translate(-50%, -50%)'; // Perfectly center the container
+            spanContainer.style.position = 'absolute'; 
+            spanContainer.style.top = '50%';
+            spanContainer.style.left = '50%'; 
+            spanContainer.style.transform = 'translate(-50%, -50%)';
             spanContainer.style.height = 'auto'; 
             spanContainer.style.width = '100%'; 
             spanContainer.style.backgroundColor = 'transparent'; 
             spanContainer.style.color = 'white'; 
-            spanContainer.style.display = 'flex'; // Use flexbox for centering
-            spanContainer.style.alignItems = 'center'; // Center items vertically
-            spanContainer.style.justifyContent = 'center'; // Center items horizontally
-            spanContainer.style.textAlign = 'center'; // Center text within the container
+            spanContainer.style.display = 'flex'; 
+            spanContainer.style.alignItems = 'center';
+            spanContainer.style.justifyContent = 'center';
+            spanContainer.style.textAlign = 'center';
             spanContainer.style.boxSizing = 'border-box';
 
             const spanTextContent = document.createElement('span');
@@ -6864,6 +7049,16 @@ function createContract(data) {
             return false;
         }
 
+        function getNumberOfOwnedTokens(address _address) public view returns (uint256) {
+            uint256 count = 0;
+            for (uint256 i = 0; i < totalTokens; i++) {
+                if(nfts[i].owner== _address){
+                    count +=1;
+                }
+            }
+            return count;
+        }
+
         function mintNFT(uint256 price) public payable returns (bool) {
             // any owner can mint
             if (!checkIfOwner(msg.sender)) {
@@ -6876,7 +7071,7 @@ function createContract(data) {
                 nfts[newItemId] = NFT({
                     id: newItemId,
                     price: price, // price in WEI
-                    owner: owners[0],
+                    owner: owners[0], 
                     lastOwner: owners[0], // Initialize to owners wallet
                     mintDate: block.timestamp,
                     tokenName: "${data.name}",
