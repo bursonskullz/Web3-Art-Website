@@ -3192,153 +3192,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     parentElement.appendChild(tools);
 
 
-    document.querySelectorAll('.option-item-2').forEach((item) => {
-        item.addEventListener('click', function () {
-            if(item.textContent == 'Sweep'){
-                console.log('trying to perform sweep');
-                const sweepBox = document.createElement('div');
-                sweepBox.style.position = 'absolute';
-                sweepBox.style.right = '1%';
-                sweepBox.style.top = '20vh';
-                sweepBox.style.height = '27%';
-                sweepBox.style.boxSizing = 'border-box';
-                sweepBox.style.width = sideElementsWidth;
-                sweepBox.style.backgroundColor = '#404a5c';
-                sweepBox.style.border = '2px solid black';
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px'; 
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px'; 
-                closeIcon.style.color = 'red';
-                sweepBox.appendChild(closeIcon);
-                closeIcon.addEventListener('click', ()=>{
-                    document.body.removeChild(sweepBox);
-                });
-                document.body.appendChild(sweepBox);
-
-                createCircularSweeper(sweepBox);
-                // add a sweep button at button of the container 
-                // on click get item amount 
-                // check grid if there is the amount they want to sweep
-                // if available try to sweep 
-                // esle do not sweep and warn user that they need to sweep less, change pages, or none are avaialable.
-            }else if (item.textContent == 'Search') {
-                console.log('call sort function');
-
-                const searchContainer = document.createElement('div');
-                searchContainer.style.position = 'absolute';
-                searchContainer.style.right = '1%';
-                searchContainer.style.top = '20vh';
-                searchContainer.style.height = '27%';
-                searchContainer.style.boxSizing = 'border-box';
-                searchContainer.style.width = sideElementsWidth;
-                searchContainer.style.borderRadius = '5px';
-                searchContainer.style.backgroundColor = '#404a5c';
-                searchContainer.style.border = '2px solid black';
-                searchContainer.style.display = 'flex';
-                searchContainer.style.flexDirection = 'column';
-                searchContainer.style.alignItems = 'center';
-                searchContainer.style.justifyContent = 'space-evenly';
-                searchContainer.style.overflowY = 'scroll';
-
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px';
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px';
-                closeIcon.style.color = 'red';
-
-                searchContainer.appendChild(closeIcon);
-                closeIcon.addEventListener('click', () => {
-                    document.body.removeChild(searchContainer);
-                });
-
-                const searchBar = document.createElement('input');
-                searchBar.setAttribute('type', 'text');
-                searchBar.setAttribute('placeholder', 'Search...');
-                searchBar.style.width = '70%';
-                searchBar.style.height = '6%'; 
-                searchBar.style.margin = '0'; 
-                searchBar.style.position = 'relative';
-                searchBar.style.top  = '0.5%';
-                searchBar.style.left = '0%';
-                searchBar.style.placeholder = 'Search for Token';
-
-                searchContainer.appendChild(searchBar);
-
-                const imageContainer = document.createElement('div');
-                imageContainer.style.width = '45%';
-                imageContainer.style.height = '32%'; 
-                imageContainer.style.top = '21%';
-                imageContainer.style.left = '17%';
-                imageContainer.style.backgroundColor = 'white';
-                imageContainer.style.textContent = "Tokens Image";
-                searchContainer.appendChild(imageContainer);
-
-                const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
-                const divContainer = document.createElement('div');
-                divContainer.style.width = '100%';
-                divContainer.style.display = 'flex';
-                divContainer.style.flexDirection = 'column';
-                divContainer.style.alignItems = 'center'; 
-                divContainer.style.height = '35%'; 
-                divContainer.style.bottom = '0%';
-                divContainer.style.fontSize = '2vh';
-
-                divData.forEach((text) => {
-                    const div = document.createElement('div');
-                    div.style.width = '90%';
-                    div.style.height = '20%'; 
-                    div.style.display = 'flex'; 
-                    div.style.alignItems = 'center'; 
-                    div.style.justifyContent = 'space-between'; 
-                    div.style.transition = 'background-color 0.3s, color 0.3s';
-                    div.style.cursor = 'pointer';
-                    div.style.boxSizing = 'border-box';
-
-                    const textContainer = document.createElement('div');
-                    textContainer.style.minWidth = '40%'; 
-                    textContainer.style.textAlign = 'left'; 
-                    textContainer.style.color = 'white';
-                    textContainer.textContent = text;
-
-                    const resultContainer = document.createElement('div');
-                    resultContainer.style.minWidth = '40%'; 
-                    resultContainer.style.textAlign = 'right'; 
-                    resultContainer.style.color = 'lightgray';
-                    resultContainer.textContent = 'Result';
-                    div.appendChild(textContainer);
-                    div.appendChild(resultContainer);
-                    divContainer.appendChild(div);
-                });
-
-                searchContainer.appendChild(divContainer);
-                document.body.appendChild(searchContainer);
-            }else if(item.textContent == 'Sort'){
-                console.log('make 4 div elements here');
-            }else if(item.textContent == 'File a Report'){
-                console.log('Call reportToken() function');
-            }else{
-                console.log('Unepexected click');
-            }
-        });
-        item.addEventListener('mouseenter', function () {
-            this.style.backgroundColor = '#5a647d';
-            this.style.color = '#f0f0f0'; 
-        });
-
-        item.addEventListener('mouseleave', function () {
-            this.style.backgroundColor = ''; 
-            this.style.color = ''; 
-        });
-    });
+    addToolsFunctionality(sideElementsWidth);
     parentElement.style.paddingLeft = `${sideElementsWidth}px`;
     var footer = document.createElement('div');
     const footContainer = document.createElement('div');
@@ -5291,7 +5145,388 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     parentElement.appendChild(footer);
     parentElement.appendChild(footerLEGAL);
 }
+function addToolsFunctionality(sideElementsWidth){
+        document.querySelectorAll('.option-item-2').forEach((item) => {
+        item.addEventListener('click', function () {
+            if(item.textContent == 'Sweep'){
+                console.log('trying to perform sweep');
+                const sweepBox = document.createElement('div');
+                sweepBox.style.position = 'absolute';
+                sweepBox.style.right = '1%';
+                sweepBox.style.top = '20vh';
+                sweepBox.style.height = '27%';
+                sweepBox.style.boxSizing = 'border-box';
+                sweepBox.style.width = sideElementsWidth;
+                sweepBox.style.backgroundColor = '#404a5c';
+                sweepBox.style.border = '2px solid black';
 
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '10px'; 
+                closeIcon.style.right = '10px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px'; 
+                closeIcon.style.color = 'red';
+                sweepBox.appendChild(closeIcon);
+                closeIcon.addEventListener('click', ()=>{
+                    document.body.removeChild(sweepBox);
+                });
+                document.body.appendChild(sweepBox);
+
+                createCircularSweeper(sweepBox);
+
+                const searchButton = document.createElement('button');
+                searchButton.style.position = 'absolute';
+                searchButton.textContent = 'Search';
+                searchButton.style.marginTop = '2px';
+                searchButton.style.backgroundColor = 'dimgray';
+                searchButton.style.width = '38%';
+                searchButton.style.radius = '1px';
+                searchButton.style.bottom = '0%';
+                searchButton.style.left = '31%';
+                sweepBox.appendChild(searchButton);
+
+                function sweepGrid(){
+                    console.log('trying to sweep grid with specified amount in span tag');
+                }
+                searchButton.addEventListener('click', sweepGrid);
+                // add a sweep button at button of the container 
+                // on click get item amount 
+                // check grid if there is the amount they want to sweep
+                // if available try to sweep 
+                // esle do not sweep and warn user that they need to sweep less, change pages, or none are avaialable.
+            }else if (item.textContent == 'Search') {
+                const searchContainer = document.createElement('div');
+                searchContainer.style.position = 'absolute';
+                searchContainer.style.right = '1%';
+                searchContainer.style.top = '20vh';
+                searchContainer.style.height = '27%';
+                searchContainer.style.boxSizing = 'border-box';
+                searchContainer.style.width = sideElementsWidth;
+                searchContainer.style.borderRadius = '5px';
+                searchContainer.style.backgroundColor = '#404a5c';
+                searchContainer.style.border = '2px solid black';
+                searchContainer.style.display = 'flex';
+                searchContainer.style.flexDirection = 'column';
+                searchContainer.style.alignItems = 'center';
+                searchContainer.style.justifyContent = 'space-evenly';
+                searchContainer.style.overflowY = 'scroll';
+
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '10px';
+                closeIcon.style.right = '10px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px';
+                closeIcon.style.color = 'red';
+
+                searchContainer.appendChild(closeIcon);
+                closeIcon.addEventListener('click', () => {
+                    document.body.removeChild(searchContainer);
+                });
+
+                const searchBar = document.createElement('input');
+                searchBar.setAttribute('type', 'text');
+                searchBar.setAttribute('placeholder', 'Search...');
+                searchBar.style.width = '70%';
+                searchBar.style.height = '6%'; 
+                searchBar.style.margin = '0'; 
+                searchBar.style.position = 'relative';
+                searchBar.style.top  = '1%';
+                searchBar.style.left = '0%';
+
+                searchContainer.appendChild(searchBar);
+                const searchButton = document.createElement('button');
+                searchButton.textContent = 'Search';
+                searchButton.style.marginTop = '10px';
+                searchButton.style.backgroundColor = 'dimgray';
+                searchButton.style.width = '38%';
+                searchButton.style.radius = '1px';
+                searchContainer.appendChild(searchButton);
+
+                const imageContainer = document.createElement('div');
+                imageContainer.style.width = '45%';
+                imageContainer.style.height = '32%'; 
+                imageContainer.style.top = '21%';
+                imageContainer.style.left = '17%';
+                imageContainer.style.backgroundColor = 'white';
+                imageContainer.style.display = 'none'; 
+                imageContainer.textContent = "Tokens Image";
+                searchContainer.appendChild(imageContainer);
+
+                const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
+                const divContainer = document.createElement('div');
+                divContainer.style.width = '100%';
+                divContainer.style.display = 'flex';
+                divContainer.style.flexDirection = 'column';
+                divContainer.style.alignItems = 'center'; 
+                divContainer.style.height = '35%'; 
+                divContainer.style.bottom = '0%';
+                divContainer.style.fontSize = '2vh';
+                divContainer.style.display = 'none';  
+
+                divData.forEach((text) => {
+                    const div = document.createElement('div');
+                    div.style.width = '90%';
+                    div.style.height = '20%'; 
+                    div.style.display = 'flex'; 
+                    div.style.alignItems = 'center'; 
+                    div.style.justifyContent = 'space-between'; 
+                    div.style.cursor = 'pointer';
+                    div.style.boxSizing = 'border-box';
+
+                    const textContainer = document.createElement('div');
+                    textContainer.style.minWidth = '40%'; 
+                    textContainer.style.textAlign = 'left'; 
+                    textContainer.style.color = 'white';
+                    textContainer.textContent = text;
+
+                    const resultContainer = document.createElement('div');
+                    resultContainer.style.minWidth = '40%'; 
+                    resultContainer.style.textAlign = 'right'; 
+                    resultContainer.style.color = 'lightgray';
+                    resultContainer.textContent = 'Result';
+                    div.appendChild(textContainer);
+                    div.appendChild(resultContainer);
+                    divContainer.appendChild(div);
+                });
+
+                searchContainer.appendChild(divContainer);
+                document.body.appendChild(searchContainer);
+
+                const promptMessage = document.createElement('p');
+                promptMessage.textContent = 'Please enter a token ID to retrieve its information';
+                promptMessage.style.color = 'white'; 
+                promptMessage.style.fontSize = '14px';  
+                promptMessage.style.textAlign = 'center';  
+                promptMessage.style.margin = '10px 0'; 
+
+                searchContainer.appendChild(searchBar);
+                searchContainer.appendChild(promptMessage); 
+                searchContainer.appendChild(searchButton);
+
+                function revealContent() {
+                    const tokenValue = searchBar.value.trim(); 
+                    
+                    if (isNaN(tokenValue) || tokenValue === '') {
+                        alert('Please enter a valid token ID (a number).');
+                        return; 
+                    }
+                    
+                    searchButton.remove();
+                    searchBar.remove();
+                    promptMessage.remove();
+                    
+                    imageContainer.style.display = 'block';
+                    divContainer.style.display = 'flex';
+                }
+
+                searchBar.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        revealContent();
+                    }
+                });
+
+                searchButton.addEventListener('click', revealContent);
+            }else if(item.textContent == 'Sort'){
+                console.log('make 4 div elements here');
+                const sortContainer = document.createElement('div');
+                sortContainer.style.position = 'absolute';
+                sortContainer.style.right = '1%';
+                sortContainer.style.top = '20vh';
+                sortContainer.style.height = '27%';
+                sortContainer.style.boxSizing = 'border-box';
+                sortContainer.style.width = sideElementsWidth;
+                sortContainer.style.borderRadius = '5px';
+                sortContainer.style.backgroundColor = '#404a5c';
+                sortContainer.style.border = '2px solid black';
+                sortContainer.style.display = 'flex';
+                sortContainer.style.flexDirection = 'column';
+                sortContainer.style.alignItems = 'center';
+                sortContainer.style.justifyContent = 'space-evenly';
+
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '10px';
+                closeIcon.style.right = '10px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px';
+                closeIcon.style.color = 'red';
+
+                sortContainer.appendChild(closeIcon);
+
+                closeIcon.addEventListener('click', () => {
+                    document.body.removeChild(sortContainer);
+                });
+
+                document.body.appendChild(sortContainer);
+                const sortingData = ['Listed', 'Not Listed', 'Highest Price', 'Lowest Price'];
+                const miniSortContainer = document.createElement('div');    
+                miniSortContainer.style.position = 'absolute';
+                miniSortContainer.style.width = "100%";
+                miniSortContainer.style.height = '85%';
+                miniSortContainer.style.left = '0%';
+                miniSortContainer.style.bottom = '1%';
+                sortContainer.appendChild(miniSortContainer);
+
+                sortingData.forEach((text) => {
+                    const div = document.createElement('div');
+                    div.style.width = '99%'; 
+                    div.style.left = '0.5%';
+                    div.style.height = '20%';
+                    div.style.display = 'flex';
+                    div.style.alignItems = 'center'; 
+                    div.style.justifyContent = 'center'; 
+                    div.style.textAlign = 'center';
+                    div.style.color = 'white';
+                    div.style.borderRadius = '5px';
+                    div.style.cursor = 'pointer';
+                    div.textContent = text;
+                    div.style.fontSize = '2vh';
+                    div.style.borderBottom = '1px solid white';
+
+                    div.addEventListener('mouseover', () => {
+                        div.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                        div.style.color = 'black';
+                    });
+                    div.addEventListener('mouseout', () => {
+                        div.style.backgroundColor = '#404a5c';
+                        div.style.color = 'white';
+                    });
+                    div.addEventListener('click', () => {
+                        // depending on the text sort differently here 
+                        // and then makeNEwNFT grid with the new current array 
+                        console.log('Hello World from', text);
+                    });
+
+                    miniSortContainer.appendChild(div);
+                });
+
+                const sortingata = ['Listed', 'Not listed', 'Highest Price', 'LowestPrice'];
+            }else if(item.textContent == 'File a Report'){
+                console.log('Opening report form');
+                const reportContainer = document.createElement('div');
+                reportContainer.style.position = 'absolute';
+                reportContainer.style.right = '1%';
+                reportContainer.style.top = '20vh';
+                reportContainer.style.height = '27%'; 
+                reportContainer.style.boxSizing = 'border-box';
+                reportContainer.style.width = sideElementsWidth;
+                reportContainer.style.borderRadius = '5px';
+                reportContainer.style.backgroundColor = '#404a5c';
+                reportContainer.style.border = '2px solid black';
+                reportContainer.style.display = 'flex';
+                reportContainer.style.flexDirection = 'column';
+                reportContainer.style.alignItems = 'center';
+                reportContainer.style.justifyContent = 'space-evenly';
+                reportContainer.style.overflowY = 'scroll';
+                //reportContainer.style.padding = '10px'; 
+
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '5px';
+                closeIcon.style.right = '5px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '16px';
+                closeIcon.style.color = 'red';
+                closeIcon.addEventListener('click', () => {
+                    document.body.removeChild(reportContainer);
+                });
+                reportContainer.appendChild(closeIcon);
+
+                const tokenIdLabel = document.createElement('label');
+                tokenIdLabel.textContent = 'Token ID';
+                tokenIdLabel.style.color = 'white';
+                tokenIdLabel.style.fontSize = '12px';
+                reportContainer.appendChild(tokenIdLabel);
+
+                const tokenIdInput = document.createElement('input');
+                tokenIdInput.type = 'number';
+                tokenIdInput.placeholder = 'Enter Token ID';
+                tokenIdInput.style.width = '80%';
+                tokenIdInput.style.height = '12%'; 
+                tokenIdInput.style.fontSize = '12px'; 
+                tokenIdInput.style.top = '2%';
+                tokenIdInput.style.position = 'relative';
+                tokenIdInput.min = '1'; 
+                tokenIdInput.step = '1';
+                reportContainer.appendChild(tokenIdInput);
+
+                const emailLabel = document.createElement('label');
+                emailLabel.textContent = 'Email';
+                emailLabel.style.color = 'white';
+                emailLabel.style.left = "5%";
+                emailLabel.style.fontSize = '12px'; 
+                reportContainer.appendChild(emailLabel);
+
+                const emailInput = document.createElement('input');
+                emailInput.type = 'email';
+                emailInput.placeholder = 'Enter your email';
+                emailInput.style.width = '80%';
+                emailInput.style.left = "5%";
+                emailInput.style.height = '12%';
+                emailInput.style.fontSize = '12px'; 
+                reportContainer.appendChild(emailInput);
+
+                const messageLabel = document.createElement('label');
+                messageLabel.textContent = 'Message';
+                messageLabel.style.color = 'white';
+                messageLabel.style.fontSize = '12px'; 
+                messageLabel.style.marginBottom = '5px';
+                reportContainer.appendChild(messageLabel);
+
+                const messageInput = document.createElement('textarea');
+                messageInput.placeholder = 'Enter your message';
+                messageInput.maxLength = 500; 
+                messageInput.style.width = '80%';
+                messageInput.style.height = '250px'; 
+                messageInput.style.fontSize = '10px'; 
+                messageInput.style.padding = '5px'; 
+                messageInput.style.left = "5%";
+                messageInput.style.resize = 'vertical';
+                reportContainer.appendChild(messageInput);
+
+                const fileButton = document.createElement('button');
+                fileButton.textContent = 'Submit';
+                fileButton.style.width = '40%';
+                fileButton.style.padding = '5px'; 
+                fileButton.style.backgroundColor = 'dimgray';
+                fileButton.style.color = 'white';
+                fileButton.style.border = 'none';
+                fileButton.style.borderRadius = '5px';
+                fileButton.style.cursor = 'pointer';
+                fileButton.style.fontSize = '12px';
+
+                fileButton.addEventListener('click', () => {
+                    const tokenID = tokenIdInput.value;
+                    const email = emailInput.value;
+                    const message = messageInput.value;
+
+                    console.log(`Token ID: ${tokenID}, Email: ${email}, Message: ${message}`);
+                    alert('Your report has been submitted.');
+                });
+
+                reportContainer.appendChild(fileButton);
+                document.body.appendChild(reportContainer);
+            }else{
+                console.log('Unepexected click');
+            }
+        });
+        item.addEventListener('mouseenter', function () {
+            this.style.backgroundColor = '#5a647d';
+            this.style.color = '#f0f0f0'; 
+        });
+
+        item.addEventListener('mouseleave', function () {
+            this.style.backgroundColor = ''; 
+            this.style.color = ''; 
+        });
+    });
+}
 function isValidPhoneNumber(phoneNumber) {
     let phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
     return phoneRegex.test(phoneNumber);
