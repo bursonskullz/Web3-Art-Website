@@ -3268,16 +3268,16 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                 searchBar.style.margin = '0'; 
                 searchBar.style.position = 'relative';
                 searchBar.style.top  = '0.5%';
-                searchBar.style.left = '15%';
+                searchBar.style.left = '0%';
                 searchBar.style.placeholder = 'Search for Token';
 
                 searchContainer.appendChild(searchBar);
 
                 const imageContainer = document.createElement('div');
                 imageContainer.style.width = '45%';
-                imageContainer.style.height = '35%'; 
-                imageContainer.style.top = '22%';
-                imageContainer.style.left = '15%';
+                imageContainer.style.height = '32%'; 
+                imageContainer.style.top = '21%';
+                imageContainer.style.left = '17%';
                 imageContainer.style.backgroundColor = 'white';
                 imageContainer.style.textContent = "Tokens Image";
                 searchContainer.appendChild(imageContainer);
@@ -3288,8 +3288,8 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                 divContainer.style.display = 'flex';
                 divContainer.style.flexDirection = 'column';
                 divContainer.style.alignItems = 'center'; 
-                divContainer.style.height = '30%'; 
-                divContainer.style.bottom = '5%';
+                divContainer.style.height = '35%'; 
+                divContainer.style.bottom = '0%';
                 divContainer.style.fontSize = '2vh';
 
                 divData.forEach((text) => {
@@ -3299,10 +3299,8 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                     div.style.display = 'flex'; 
                     div.style.alignItems = 'center'; 
                     div.style.justifyContent = 'space-between'; 
-                    div.style.margin = '5px 0';
                     div.style.transition = 'background-color 0.3s, color 0.3s';
                     div.style.cursor = 'pointer';
-                    div.style.padding = '10px';
                     div.style.boxSizing = 'border-box';
 
                     const textContainer = document.createElement('div');
@@ -3318,64 +3316,12 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                     resultContainer.textContent = 'Result';
                     div.appendChild(textContainer);
                     div.appendChild(resultContainer);
-                    div.addEventListener('mouseover', () => {
-                        div.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; 
-                        textContainer.style.color = 'black'; 
-                        resultContainer.style.color = 'black'; 
-                    });
-                    div.addEventListener('mouseout', () => {
-                        div.style.backgroundColor = '';
-                        textContainer.style.color = 'white'; 
-                        resultContainer.style.color = 'lightgray';
-                    });
-                    divContainer.appendChild(div);
-                    div.addEventListener('click', () => {
-                        console.log(`Hello world from ${text}`);
-                    });
                 });
 
                 searchContainer.appendChild(divContainer);
                 document.body.appendChild(searchContainer);
             }else if(item.textContent == 'Sort'){
-                const sortContainer = document.createElement('div');
-                sortContainer.style.position = 'absolute';
-                sortContainer.style.right = '1%';
-                sortContainer.style.top = '20vh';
-                sortContainer.style.height = '40vh'; 
-                sortContainer.style.boxSizing = 'border-box';
-                sortContainer.style.width = sideElementsWidth;
-                sortContainer.style.borderRadius = '5px';
-                sortContainer.style.backgroundColor = 'rgba(64, 74, 92, 0.7)';
-                sortContainer.style.border = '2px solid black';
-                sortContainer.style.display = 'flex';
-                sortContainer.style.flexDirection = 'column';
-                sortContainer.style.alignItems = 'center'; 
-                sortContainer.style.justifyContent = 'space-evenly';
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px';
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px';
-                closeIcon.style.color = 'red';
-
-                sortContainer.appendChild(closeIcon);
-                closeIcon.addEventListener('click', () => {
-                    document.body.removeChild(sortContainer);
-                });
-
-                const searchBar = document.createElement('input');
-                searchBar.setAttribute('type', 'text');
-                searchBar.setAttribute('placeholder', 'Search...');
-                searchBar.style.width = '90%';
-                searchBar.style.margin = '10px auto';
-                searchBar.style.display = 'block';
-                sortContainer.appendChild(searchBar);
-                document.body.appendChild(sortContainer);
-
-                console.log('call search function display token data that is found');
+                console.log('make 4 div elements here');
             }else if(item.textContent == 'File a Report'){
                 console.log('Call reportToken() function');
             }else{
