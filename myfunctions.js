@@ -3198,12 +3198,14 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                 console.log('trying to perform sweep');
                 const sweepBox = document.createElement('div');
                 sweepBox.style.position = 'absolute';
-                sweepBox.style.top = `${tools.offsetTop}px`;
-                sweepBox.style.left = `${tools.offsetLeft}px`;
-                sweepBox.style.width = `${tools.offsetWidth}px`;
-                sweepBox.style.height = `${tools.offsetHeight}px`;
-                sweepBox.style.backgroundColor = 'rgba(64, 74, 92, 0.7)'; 
-                sweepBox.style.border = '1px solid black'; 
+                sweepBox.style.right = '1%';
+                sweepBox.style.top = '20vh';
+                sweepBox.style.height = '27%';
+                sweepBox.style.boxSizing = 'border-box';
+                sweepBox.style.width = sideElementsWidth;
+                sweepBox.style.backgroundColor = '#404a5c';
+                sweepBox.style.border = '2px solid black';
+
                 const closeIcon = document.createElement('span');
                 closeIcon.textContent = '×';
                 closeIcon.style.position = 'absolute';
@@ -3219,14 +3221,165 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                 document.body.appendChild(sweepBox);
 
                 createCircularSweeper(sweepBox);
+                // add a sweep button at button of the container 
+                // on click get item amount 
+                // check grid if there is the amount they want to sweep
+                // if available try to sweep 
+                // esle do not sweep and warn user that they need to sweep less, change pages, or none are avaialable.
+            }else if (item.textContent == 'Search') {
+                console.log('call sort function');
+
+                const searchContainer = document.createElement('div');
+                searchContainer.style.position = 'absolute';
+                searchContainer.style.right = '1%';
+                searchContainer.style.top = '20vh';
+                searchContainer.style.height = '27%';
+                searchContainer.style.boxSizing = 'border-box';
+                searchContainer.style.width = sideElementsWidth;
+                searchContainer.style.borderRadius = '5px';
+                searchContainer.style.backgroundColor = '#404a5c';
+                searchContainer.style.border = '2px solid black';
+                searchContainer.style.display = 'flex';
+                searchContainer.style.flexDirection = 'column';
+                searchContainer.style.alignItems = 'center';
+                searchContainer.style.justifyContent = 'space-evenly';
+                searchContainer.style.overflowY = 'scroll';
+
+
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '10px';
+                closeIcon.style.right = '10px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px';
+                closeIcon.style.color = 'red';
+
+                searchContainer.appendChild(closeIcon);
+                closeIcon.addEventListener('click', () => {
+                    document.body.removeChild(searchContainer);
+                });
+
+                const searchBar = document.createElement('input');
+                searchBar.setAttribute('type', 'text');
+                searchBar.setAttribute('placeholder', 'Search...');
+                searchBar.style.width = '70%';
+                searchBar.style.height = '6%'; 
+                searchBar.style.margin = '0'; 
+                searchBar.style.position = 'relative';
+                searchBar.style.top  = '0.5%';
+                searchBar.style.left = '15%';
+                searchBar.style.placeholder = 'Search for Token';
+
+                searchContainer.appendChild(searchBar);
+
+                const imageContainer = document.createElement('div');
+                imageContainer.style.width = '45%';
+                imageContainer.style.height = '35%'; 
+                imageContainer.style.top = '22%';
+                imageContainer.style.left = '15%';
+                imageContainer.style.backgroundColor = 'white';
+                imageContainer.style.textContent = "Tokens Image";
+                searchContainer.appendChild(imageContainer);
+
+                const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
+                const divContainer = document.createElement('div');
+                divContainer.style.width = '100%';
+                divContainer.style.display = 'flex';
+                divContainer.style.flexDirection = 'column';
+                divContainer.style.alignItems = 'center'; 
+                divContainer.style.height = '30%'; 
+                divContainer.style.bottom = '5%';
+                divContainer.style.fontSize = '2vh';
+
+                divData.forEach((text) => {
+                    const div = document.createElement('div');
+                    div.style.width = '90%';
+                    div.style.height = '20%'; 
+                    div.style.display = 'flex'; 
+                    div.style.alignItems = 'center'; 
+                    div.style.justifyContent = 'space-between'; 
+                    div.style.margin = '5px 0';
+                    div.style.transition = 'background-color 0.3s, color 0.3s';
+                    div.style.cursor = 'pointer';
+                    div.style.padding = '10px';
+                    div.style.boxSizing = 'border-box';
+
+                    const textContainer = document.createElement('div');
+                    textContainer.style.minWidth = '40%'; 
+                    textContainer.style.textAlign = 'left'; 
+                    textContainer.style.color = 'white';
+                    textContainer.textContent = text;
+
+                    const resultContainer = document.createElement('div');
+                    resultContainer.style.minWidth = '40%'; 
+                    resultContainer.style.textAlign = 'right'; 
+                    resultContainer.style.color = 'lightgray';
+                    resultContainer.textContent = 'Result';
+                    div.appendChild(textContainer);
+                    div.appendChild(resultContainer);
+                    div.addEventListener('mouseover', () => {
+                        div.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; 
+                        textContainer.style.color = 'black'; 
+                        resultContainer.style.color = 'black'; 
+                    });
+                    div.addEventListener('mouseout', () => {
+                        div.style.backgroundColor = '';
+                        textContainer.style.color = 'white'; 
+                        resultContainer.style.color = 'lightgray';
+                    });
+                    divContainer.appendChild(div);
+                    div.addEventListener('click', () => {
+                        console.log(`Hello world from ${text}`);
+                    });
+                });
+
+                searchContainer.appendChild(divContainer);
+                document.body.appendChild(searchContainer);
             }else if(item.textContent == 'Sort'){
-                console.log('trying to pop up menu directly centered over the tools container');
-            }else if(item.textContent == 'Sort'){
-                console.log('')
-            }else if(item.textContent == 'Search'){
-                console.log('trying to make mini search bar in small pop up over tools container');
+                const sortContainer = document.createElement('div');
+                sortContainer.style.position = 'absolute';
+                sortContainer.style.right = '1%';
+                sortContainer.style.top = '20vh';
+                sortContainer.style.height = '40vh'; 
+                sortContainer.style.boxSizing = 'border-box';
+                sortContainer.style.width = sideElementsWidth;
+                sortContainer.style.borderRadius = '5px';
+                sortContainer.style.backgroundColor = 'rgba(64, 74, 92, 0.7)';
+                sortContainer.style.border = '2px solid black';
+                sortContainer.style.display = 'flex';
+                sortContainer.style.flexDirection = 'column';
+                sortContainer.style.alignItems = 'center'; 
+                sortContainer.style.justifyContent = 'space-evenly';
+
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '10px';
+                closeIcon.style.right = '10px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px';
+                closeIcon.style.color = 'red';
+
+                sortContainer.appendChild(closeIcon);
+                closeIcon.addEventListener('click', () => {
+                    document.body.removeChild(sortContainer);
+                });
+
+                const searchBar = document.createElement('input');
+                searchBar.setAttribute('type', 'text');
+                searchBar.setAttribute('placeholder', 'Search...');
+                searchBar.style.width = '90%';
+                searchBar.style.margin = '10px auto';
+                searchBar.style.display = 'block';
+                sortContainer.appendChild(searchBar);
+                document.body.appendChild(sortContainer);
+
+                console.log('call search function display token data that is found');
+            }else if(item.textContent == 'File a Report'){
+                console.log('Call reportToken() function');
             }else{
-                console.log('unepexected click');
+                console.log('Unepexected click');
             }
         });
         item.addEventListener('mouseenter', function () {
