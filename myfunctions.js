@@ -3316,6 +3316,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                     resultContainer.textContent = 'Result';
                     div.appendChild(textContainer);
                     div.appendChild(resultContainer);
+                    divContainer.appendChild(div);
                 });
 
                 searchContainer.appendChild(divContainer);
