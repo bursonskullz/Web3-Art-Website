@@ -5423,7 +5423,6 @@ function addToolsFunctionality(sideElementsWidth){
                 reportContainer.style.alignItems = 'center';
                 reportContainer.style.justifyContent = 'space-evenly';
                 reportContainer.style.overflowY = 'scroll';
-                //reportContainer.style.padding = '10px'; 
 
                 const closeIcon = document.createElement('span');
                 closeIcon.textContent = '×';
@@ -5501,13 +5500,92 @@ function addToolsFunctionality(sideElementsWidth){
                 fileButton.style.cursor = 'pointer';
                 fileButton.style.fontSize = '12px';
 
-                fileButton.addEventListener('click', () => {
+                fileButton.addEventListener('click', async () => { 
                     const tokenID = tokenIdInput.value;
                     const email = emailInput.value;
                     const message = messageInput.value;
 
                     console.log(`Token ID: ${tokenID}, Email: ${email}, Message: ${message}`);
-                    alert('Your report has been submitted.');
+                    const fields = [tokenID, email, message];
+                    const fieldNames = ['Token ID', 'Email', 'Message'];
+                    for (let i = 0; i < fields.length; i++) {
+                        if (!fields[i]) {
+                            alert(`Please make sure to properly fill out all fields`);
+                            return; 
+                        }
+                    }
+
+                    let walletSender;
+                    if(isConnected === false){
+                        alert('Please make sure to login to your main wallet before filing a report');
+                    }else{
+                        if(window.ethereum.selectedAddress != null && window.ethereum.isMetaMask){ 
+                            walletSender = window.ethereum.selectedAddress;
+                            let reportData = {
+                                clientWallet: walletSender,
+                                contractName: userSelectedContract.contractName,
+                                ERCStandard: userSelectedContract.ERCStandard,
+                                tokenID: tokenID.toString(),   
+                                email: email, 
+                                message: message
+                            };
+
+                            try {
+                                const reportResponse = await fetch('/file-a-report', {
+                                    method: "POST", 
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(reportData)
+                                });
+
+                                if (reportResponse.ok) {
+                                    const responseJson = await reportResponse.json();
+                                    if (responseJson.success === false) {
+                                        console.log('Did not get back expected response');
+                                        if(responseJson.code === 10002444222202 ){
+                                            alert('Make sure to entere a valid email address invalid email');
+                                        }else if(responseJson.code === 3433444 ){
+                                            alert('Error with try and catch on server');
+                                        }else if(responseJson.code === 1000202 ){
+                                            alert('Sorry we already dedicated that you filed a report. We will contact you as soon as possible');
+                                        }else if(responseJson.code === 34444411 ){
+                                            alert('error with response from server');
+                                        }else{
+                                            alert('unexpected code error');
+                                        }
+                                    }else {
+                                        try{
+                                            tokenIdLabel.remove();
+                                            tokenIdInput.remove();
+                                            emailLabel.remove();
+                                            emailInput.remove();
+                                            messageLabel.remove();
+                                            messageInput.remove();
+                                            fileButton.remove();
+
+                                            const successSpan = document.createElement('span');
+                                            successSpan.textContent = "Thank you for filing a report. We will get back to it as soon as possible and pause the token if we find an issue!";
+                                            successSpan.style.display = 'block';
+                                            successSpan.style.textAlign = 'center';
+                                            successSpan.style.marginTop = '20px';
+                                            reportContainer.appendChild(successSpan);
+                                        }catch(error){
+                                            console.log('Error', error);
+                                        }
+                                    }
+                                } else {
+                                    console.error('Failed to fetch: Response was not okay', reportResponse.statusText);
+                                    alert('An error occurred while sending the report please try again at a later time');
+                                }
+                            } catch (error) {
+                                console.error('Failed to fetch: An error occurred', error);
+                                alert('An error occurred while sending the report');
+                            }
+                        }else{
+                            alert('Please make sure to sign into a wallet before sending a report');
+                        }
+                    }
                 });
 
                 reportContainer.appendChild(fileButton);
