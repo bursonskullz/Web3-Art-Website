@@ -6591,6 +6591,7 @@ function createSearchBar(parentElement) {
 
 async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlockChainAddress, contract, parentContainer){
     let tokenPricesInputsFilled = true;
+    let minimalListingPriceChecker = true;
     let dictatedTokenPlaceHolder;
     if(listOrDelistOption === "listing"){
         console.log('trying to bulk list ');
@@ -6660,10 +6661,12 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
         } else if (nextButton.textContent === 'Submit') {
             const selectedTokens = [];
             let successFullTokens = [];
+            let minimalListingPrice;
+            let minimalListingPriceInETH;
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             tokenPricesInputsFilled = true;
-
-            checkboxes.forEach(checkbox => {
+            minimalListingPriceChecker = true;
+            checkboxes.forEach(async checkbox => {
                 if (checkbox.checked) {
                     const parentDiv = checkbox.closest('.sold-item');
                     const parentClass = parentDiv.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
@@ -6675,7 +6678,21 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         if (inputValue) {
                             const parsedValue = parseFloat(inputValue);
                             if (!isNaN(parsedValue)) {
-                                selectedTokens.push({ tokenId: tokenCount, inputValue: parsedValue });
+                                try {
+                                    minimalListingPrice = await contract.methods.minimalListingPrice().call();
+                                    minimalListingPriceInETH = (minimalListingPrice / (10 ** 18)).toFixed(2);
+                                    if(parsedValue>= minimalListingPriceInETH){
+                                        selectedTokens.push({ tokenId: tokenCount, inputValue: parsedValue });
+                                    }else{
+                                        minimalListingPriceChecker = false;
+                                    }
+                                    
+                                } catch (error) {
+                                    minimalListingPriceChecker = false;
+                                    minimalListingPriceInETH = 0.00;
+                                    console.error('Error fetching minimalListingPrice:', error);
+                                }
+
                             } else {
                                 tokenPricesInputsFilled = false;
 
@@ -6687,7 +6704,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                 }
             });
 
-            if (selectedTokens.length > 0 && tokenPricesInputsFilled) {
+            if (selectedTokens.length > 0 && tokenPricesInputsFilled &&  minimalListingPriceChecker) {
                 console.log('Final Token Data to Submit:', selectedTokens);
                 nextButton.style.display = 'none';
                 const loadingContainer = document.createElement("div");
@@ -6790,10 +6807,11 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             } else {
                 if(tokenPricesInputsFilled === false){
                      alert('Please make sure to fill out all input fields for your selected tokens');
+                }else if(minimalListingPriceChecker === false){
+                    alert(`Please make sure to list your tokens above the minimal listing price: ${minimalListingPriceInETH}`);
                 }else{
                      alert('An unexpected error has occured.');
                 }
-               
             }
         }
     }else if(listOrDelistOption === "delisting"){
