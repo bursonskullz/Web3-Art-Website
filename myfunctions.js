@@ -5147,792 +5147,897 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 }
 function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement, numColumns){
         document.querySelectorAll('.option-item-2').forEach((item) => {
-        item.addEventListener('click', function () {
-            if(item.textContent == 'Sweep'){
-                console.log('trying to perform sweep');
-                const sweepBox = document.createElement('div');
-                sweepBox.style.position = 'absolute';
-                sweepBox.style.right = '1%';
-                sweepBox.style.top = '20vh';
-                sweepBox.style.height = '27%';
-                sweepBox.style.boxSizing = 'border-box';
-                sweepBox.style.width = sideElementsWidth;
-                sweepBox.style.backgroundColor = '#404a5c';
-                sweepBox.style.border = '2px solid black';
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px'; 
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px'; 
-                closeIcon.style.color = 'red';
-                sweepBox.appendChild(closeIcon);
-                closeIcon.addEventListener('click', ()=>{
-                    document.body.removeChild(sweepBox);
-                });
-                document.body.appendChild(sweepBox);
-
-                createCircularSweeper(sweepBox);
-
-                const searchButton = document.createElement('button');
-                searchButton.style.position = 'absolute';
-                searchButton.textContent = 'Sweep';
-                searchButton.style.marginTop = '2px';
-                searchButton.style.backgroundColor = 'dimgray';
-                searchButton.style.width = '38%';
-                searchButton.style.radius = '1px';
-                searchButton.style.bottom = '0%';
-                searchButton.style.left = '29%';
-                searchButton.style.color = 'white';
-                searchButton.style.borderRadius = '1px';
-                sweepBox.appendChild(searchButton);
-
-                function sweepGrid(){
-                    console.log('trying to sweep grid with specified amount in span tag');
-                    try{
-                        const spanText = document.querySelector('.info-span');
-                        const spanTextContent = spanText.textContent.replace(/Sweep|items| /g, '');
-                        const integerValue = parseInt(spanTextContent.trim(), 10);  
-                        /*
-                        if (isNaN(integerValue)) {
-                            console.error('The resulting value is not a valid integer.');
-                        } else {
-                            console.log('Parsed integer:', integerValue);
-                        }*/
-                        console.log('trying to sweep this many items:', integerValue );
-                        // loop through grid and try to get id from classname 
-                        // use each classname to sweep and call contract purchaseArray() for each one listed 
-                        // only up to max they selected
-                    }catch(error){
-                        console.log('error getting item number for sweep', error);
-                    }
-                    
-                }
-                searchButton.addEventListener('click', sweepGrid);
-                // add a sweep button at button of the container 
-                // on click get item amount 
-                // check grid if there is the amount they want to sweep
-                // if available try to sweep 
-                // esle do not sweep and warn user that they need to sweep less, change pages, or none are avaialable.
-            }else if (item.textContent == 'Search') {
-                const searchContainer = document.createElement('div');
-                searchContainer.style.position = 'absolute';
-                searchContainer.style.right = '1%';
-                searchContainer.style.top = '20vh';
-                searchContainer.style.height = '27%';
-                searchContainer.style.boxSizing = 'border-box';
-                searchContainer.style.width = sideElementsWidth;
-                searchContainer.style.borderRadius = '5px';
-                searchContainer.style.backgroundColor = '#404a5c';
-                searchContainer.style.border = '2px solid black';
-                searchContainer.style.display = 'flex';
-                searchContainer.style.flexDirection = 'column';
-                searchContainer.style.alignItems = 'center';
-                searchContainer.style.justifyContent = 'space-evenly';
-                searchContainer.style.overflowY = 'scroll';
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px';
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px';
-                closeIcon.style.color = 'red';
-
-                searchContainer.appendChild(closeIcon);
-                closeIcon.addEventListener('click', () => {
-                    document.body.removeChild(searchContainer);
-                });
-
-                const searchBar = document.createElement('input');
-                searchBar.setAttribute('placeholder', 'Search By Token ID ...');
-                searchBar.style.width = '70%';
-                searchBar.style.height = '6%'; 
-                searchBar.style.margin = '0'; 
-                searchBar.style.position = 'relative';
-                searchBar.style.top  = '1%';
-                searchBar.style.left = '0%';
-                searchBar.type = 'number';
-
-                searchContainer.appendChild(searchBar);
-                const searchButton = document.createElement('button');
-                searchButton.textContent = 'Search';
-                searchButton.style.marginTop = '10px';
-                searchButton.style.backgroundColor = 'dimgray';
-                searchButton.style.width = '38%';
-                searchButton.style.borderRadius = '1px';
-                searchContainer.appendChild(searchButton);
-
-                const imageContainer = document.createElement('div');
-                imageContainer.style.width = '45%';
-                imageContainer.style.height = '32%'; 
-                imageContainer.style.top = '21%';
-                imageContainer.style.left = '17%';
-                imageContainer.style.display = 'none'; 
-                searchContainer.appendChild(imageContainer);
-
-                const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
-                const divContainer = document.createElement('div');
-                divContainer.style.width = '100%';
-                divContainer.style.display = 'flex';
-                divContainer.style.flexDirection = 'column';
-                divContainer.style.alignItems = 'center'; 
-                divContainer.style.height = '35%'; 
-                divContainer.style.bottom = '0%';
-                divContainer.style.fontSize = '2vh';
-                divContainer.style.display = 'none'; 
-                divData.forEach(async (text) => {
-                    const div = document.createElement('div');
-                    div.style.width = '90%';
-                    div.style.height = '20%'; 
-                    div.style.display = 'flex'; 
-                    div.style.alignItems = 'center'; 
-                    div.style.justifyContent = 'space-between'; 
-                    div.style.cursor = 'pointer';
-                    div.style.boxSizing = 'border-box';
-
-                    const textContainer = document.createElement('div');
-                    textContainer.style.minWidth = '40%'; 
-                    textContainer.style.textAlign = 'left'; 
-                    textContainer.style.color = 'white';
-                    textContainer.textContent = text;
-
-                    const resultContainer = document.createElement('div');
-                    resultContainer.style.minWidth = '40%'; 
-                    resultContainer.style.textAlign = 'right'; 
-                    resultContainer.style.color = 'lightgray';
-                    if(text == "Highest Sell"){
-                        let highestTokenSell;
-                        try {
-                            let recentSellsFromContract = await contract.methods.getRecentSells().call();
-                            highestTokenSell = 0;
-                            for (const nft of recentSellsFromContract) {
-                                if (nft.id == searchedTokenID) {
-                                    if (parseInt(nft.price) > highestTokenSell) {
-                                        highestTokenSell = parseInt(nft.price);
-                                    }
-                                }
-                            }
-                            if (highestTokenSell === 0) {
-                                console.log('No sells found for this token.');
-                            }
-                            let highestTokenSellInETH = (highestTokenSell / (10 ** 18)).toFixed(2); 
-                            console.log('Highest sell in ETH:', highestTokenSellInETH);
-                            resultContainer.textContent = `${highestTokenSellInETH} ${coin}`;
-
-                        } catch (error) {
-                            console.log('Error calling the function getRecentSells() on the contract', error);
-                            highestTokenSell = 0;
-                            resultContainer.textContent = '0 ETH'; // Default in case of error
-                        }
-                        let highesTokenConverted = (highestTokenSell)/(10**18).toFixed(2);
-                        resultContainer.textContent = `${highesTokenConverted}`+ `${coin}`;
-                    }else if(text == "Current Owner"){
-                        let currentOwner;
-                        try{
-                            let data = await contract.methods.getTokenData(searchedTokenID).call();
-                            currentOwner = data.owner.substring(0,8)+ "~~~";
-                        }catch(error){
-                            console.log('Error calling the function getTokenData() on the contract and setting the current');
-                            currentOwner = RoysWallet.substring(0,8)+ "~~~";
-                            
-                        }
-                        resultContainer.textContent = currentOwner;
-                    }else if(text == "Date of Last Sell"){
-                        let dateOfLastSell;
-                        try{
-                            let data = await contract.methods.getTokenData(searchedTokenID).call();
-                            const dateSold = new Date(data.lastSellData * 1000); 
-                            const dateSpan = document.createElement('div');
-                            dateSpan.textContent = `${dateSold.toLocaleDateString("en-US", { 
-                                year: '2-digit', 
-                                month: '2-digit', 
-                                day: '2-digit' 
-                            })} at ${datePurchased.toLocaleTimeString("en-US", { 
-                                hour: '2-digit', 
-                                minute: '2-digit', 
-                                hour12: false 
-                            })}`;
-                            dateOfLastSell = dateSpan.textContent;
-                        }catch(error){
-                            console.log('Error calling the function getTokenData() on the contract and setting the current');
-                            dateOfLastSell = 'No sell yet';
-                            
-                        }
-                        resultContainer.textContent = dateOfLastSell;
-                    }else if(text == "Previous Owner"){
-                        let previousOwner;
-                        try{
-                            let data = await contract.methods.getTokenData(searchedTokenID).call();
-                            previousOwner = data.lastOwner.substring(0,8) + "~~~";
-                        }catch(error){
-                            console.log('Error calling the function getTokenData() on the contract and setting the current');
-                            previousOwner = RoysWallet.substring(0,8) + "~~~";
-                            
-                        }
-                        resultContainer.textContent = previousOwner;
-                    }else{
-                        console.log('an unexpected error occured on the result container');
-                    }
-                    
-                    div.appendChild(textContainer);
-                    div.appendChild(resultContainer);
-                    divContainer.appendChild(div);
-                });
-
-                searchContainer.appendChild(divContainer);
-                document.body.appendChild(searchContainer);
-
-                const promptMessage = document.createElement('p');
-                promptMessage.textContent = 'Please enter a token ID to retrieve its information';
-                promptMessage.style.color = 'white'; 
-                promptMessage.style.fontSize = '14px';  
-                promptMessage.style.textAlign = 'center';  
-                promptMessage.style.margin = '10px 0'; 
-
-                searchContainer.appendChild(searchBar);
-                searchContainer.appendChild(promptMessage); 
-                searchContainer.appendChild(searchButton);
-
-                function revealContent() {
-                    let tokenExist = false;
-                    let searchedTokenID = searchBar.value;
-                    if (searchedTokenID === '' || isNaN(searchedTokenID)) {
-                        alert('Please enter a valid number in the search bar');
-                    } else {
-                        searchedTokenID = parseInt(searchedTokenID);
-                        let imageUrl = null;
-                        for (const nft of currentNFTArray) {
-                            if (nft.tokenID === searchedTokenID) {
-                                tokenExist = true;
-                                imageUrl = nft.image; 
-                                console.log('We found the token with ID:', nft.tokenID);
-                                break;
-                            }
-                        }
-                        if (tokenExist) {
-                            try {
-                                if (imageUrl) {
-                                    imageContainer.style.backgroundImage = `url(${imageUrl})`;
-                                    imageContainer.style.backgroundSize = 'cover'; 
-                                    imageContainer.style.backgroundRepeat = 'no-repeat';
-                                    imageContainer.style.backgroundPosition = 'center'; 
-                                    imageContainer.style.display = 'block';
-                                    console.log('Image set successfully');
-                                } else {
-                                    console.log('Image URL is not found');
-                                }
-                            } catch (error) {
-                                console.log('Error setting image:', error);
-                            }             
-                            searchButton.remove();
-                            searchBar.remove();
-                            promptMessage.remove();
-                            divContainer.style.display = 'flex';
-                        } else {
-                            alert('Please enter a valid token ID');
-                        }
-                    }
-                }
-                searchBar.addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter') {
-                        revealContent();
-                    }
-                });
-
-                searchButton.addEventListener('click', revealContent);
-            }else if(item.textContent == 'Sort'){
-                console.log('make 4 div elements here');
-                const sortContainer = document.createElement('div');
-                sortContainer.style.position = 'absolute';
-                sortContainer.style.right = '1%';
-                sortContainer.style.top = '20vh';
-                sortContainer.style.height = '27%';
-                sortContainer.style.boxSizing = 'border-box';
-                sortContainer.style.width = sideElementsWidth;
-                sortContainer.style.borderRadius = '5px';
-                sortContainer.style.backgroundColor = '#404a5c';
-                sortContainer.style.border = '2px solid black';
-                sortContainer.style.display = 'flex';
-                sortContainer.style.flexDirection = 'column';
-                sortContainer.style.alignItems = 'center';
-                sortContainer.style.justifyContent = 'space-evenly';
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px';
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px';
-                closeIcon.style.color = 'red';
-
-                sortContainer.appendChild(closeIcon);
-
-                closeIcon.addEventListener('click', () => {
-                    document.body.removeChild(sortContainer);
-                });
-
-                document.body.appendChild(sortContainer);
-                const sortingData = ['Listed', 'Not Listed', 'Highest Price', 'Lowest Price'];
-                const miniSortContainer = document.createElement('div');    
-                miniSortContainer.style.position = 'absolute';
-                miniSortContainer.style.width = "100%";
-                miniSortContainer.style.height = '85%';
-                miniSortContainer.style.left = '0%';
-                miniSortContainer.style.bottom = '1%';
-                sortContainer.appendChild(miniSortContainer);
-
-                sortingData.forEach((text) => {
-                    const div = document.createElement('div');
-                    div.style.width = '99%'; 
-                    div.style.left = '0.5%';
-                    div.style.height = '20%';
-                    div.style.display = 'flex';
-                    div.style.alignItems = 'center'; 
-                    div.style.justifyContent = 'center'; 
-                    div.style.textAlign = 'center';
-                    div.style.color = 'white';
-                    div.style.borderRadius = '5px';
-                    div.style.cursor = 'pointer';
-                    div.textContent = text;
-                    div.style.fontSize = '2vh';
-                    div.style.borderBottom = '1px solid white';
-
-                    div.addEventListener('mouseover', () => {
-                        div.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                        div.style.color = 'black';
+            item.addEventListener('click', async function () {
+                if(item.textContent == 'Sweep'){
+                    console.log('trying to perform sweep');
+                    const sweepBox = document.createElement('div');
+                    sweepBox.style.position = 'absolute';
+                    sweepBox.style.right = '1%';
+                    sweepBox.style.top = '20vh';
+                    sweepBox.style.height = '27%';
+                    sweepBox.style.boxSizing = 'border-box';
+                    sweepBox.style.width = sideElementsWidth;
+                    sweepBox.style.backgroundColor = '#404a5c';
+                    sweepBox.style.border = '2px solid black';
+    
+                    const closeIcon = document.createElement('span');
+                    closeIcon.textContent = '×';
+                    closeIcon.className = 'closeIcon';
+                    closeIcon.style.position = 'absolute';
+                    closeIcon.style.top = '10px'; 
+                    closeIcon.style.right = '10px';
+                    closeIcon.style.cursor = 'pointer';
+                    closeIcon.style.fontSize = '20px'; 
+                    closeIcon.style.color = 'red';
+                    sweepBox.appendChild(closeIcon);
+                    closeIcon.addEventListener('click', ()=>{
+                        document.body.removeChild(sweepBox);
                     });
-                    div.addEventListener('mouseout', () => {
-                        div.style.backgroundColor = '#404a5c';
-                        div.style.color = 'white';
-                    });
-                    div.addEventListener('click', async () => {
-                        let listedItems = [];
-                        let itemsNotListed = [];
-                        if(text === "Listed"){
+                    document.body.appendChild(sweepBox);
+    
+                    createCircularSweeper(sweepBox);
+    
+                    const searchButton = document.createElement('button');
+                    searchButton.style.position = 'absolute';
+                    searchButton.textContent = 'Sweep';
+                    searchButton.style.marginTop = '2px';
+                    searchButton.style.backgroundColor = 'dimgray';
+                    searchButton.style.width = '38%';
+                    searchButton.style.radius = '1px';
+                    searchButton.style.bottom = '0%';
+                    searchButton.style.left = '29%';
+                    searchButton.style.color = 'white';
+                    searchButton.style.borderRadius = '1px';
+                    sweepBox.appendChild(searchButton);
+    
+                    async function sweepGrid(){
+                        console.log('trying to sweep grid with specified amount in span tag');
+                        try{
+                            const spanText = document.querySelector('.info-span');
+                            const spanTextContent = spanText.textContent.replace(/Sweep|items| /g, '');
+                            const integerValue = parseInt(spanTextContent.trim(), 10);  
+                            
+                            console.log('trying to sweep this many items:', integerValue );
+                            
                             let oldGrid = document.querySelector(".NewGrid");
                             let gridItems = Array.from(oldGrid.children);  
-                            try{
-                                for(var i =0; i<gridItems.length; i++){
-                                    let tokenData;
-                                    let gridItemIDString = gridItems[i].id; 
-                                    let gridIDINT = parseInt(gridItemIDString.trim());
-
-                                    console.log('calling contract using tokenID:', gridIDINT);
-                                    try {
-                                        tokenData = await contract.methods.getTokenData(gridIDINT).call();
-                                        if(tokenData.forSale === true){
-                                            listedItems.push(gridIDINT);
-                                        }else{
-                                            itemsNotListed.push(gridIDINT);
-                                        }
-                                    } catch (error) {
-                                        console.error(`Error fetching toking Data ${tokenData}`);
-                                    }
-
+                            const children = Array.from(sweepBox.children);
+                            for (let i = children.length - 1; i >= 0; i--) {
+                                const child = children[i];
+                                if (!child.classList.contains('closeIcon')) {
+                                    child.remove();
                                 }
-                                gridItems = sortByID(gridItems, [...listedItems, ...itemsNotListed]);
-                                let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
-                                let oldGrid = document.querySelector(".NewGrid");
-                                currentNFTArray.sort((a, b) => {
-                                    let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                    let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                    return indexA - indexB;
-                                });
-                                if (oldGrid) {
-                                    oldGrid.innerHTML = '';
-                                    console.log('items Cleared from dome');
-                                }
-                                makeNewNFTGrid(currentNFTArray, oldGrid);
-                            }catch(error){
-                                console.log('Error making new nft grid to call', error);
                             }
-                        }if(text === "Not Listed"){
-                            let oldGrid = document.querySelector(".NewGrid");
-                            let gridItems = Array.from(oldGrid.children);  
-                            try{
-                                for(var i = 0; i < gridItems.length; i++){
-                                    let tokenData;
-                                    let gridItemIDString = gridItems[i].id; 
-                                    let gridIDINT = parseInt(gridItemIDString.trim());
-
-                                    console.log('calling contract using tokenID:', gridIDINT);
-                                    try {
-                                        tokenData = await contract.methods.getTokenData(gridIDINT).call();
-                                        if(tokenData.forSale === true){
-                                            itemsNotListed.push(gridIDINT); 
+                            const messageLoadingSpan = document.createElement('span');
+                            messageLoadingSpan.style.fontSize = '1.5vh';
+                            messageLoadingSpan.style.color = 'white';
+                            messageLoadingSpan.style.width = '100%';
+                            messageLoadingSpan.style.height = '10%';
+                            messageLoadingSpan.style.position = 'absolute'; 
+                            messageLoadingSpan.style.textAlign = 'center';
+                            messageLoadingSpan.style.top = '30%';
+                            messageLoadingSpan.textContent = 'Loading . . . ';
+                            sweepBox.appendChild(messageLoadingSpan);
+    
+                            try{    
+                                // sweep value should always be less than or equal to the integerValue by construction
+                                // we can check to make sure no errors occur in case we increase the length later in time
+                                let availabeTokens = [];
+                                let unavailableTokens = [];
+                                for(var k = 0; k< integerValue; k++){
+                                   let tokenID =  parseINT(gridItems[k].id);
+                                   let tokenData;
+                                    try{
+                                        tokenData = await contract.methods.getTokenData(tokenID).call();
+                                        if(tokenData.forSale){
+                                            availabeTokens.push(tokenID);
                                         }else{
-                                            listedItems.push(gridIDINT);  
+                                            unavailableTokens.push(tokenID);
                                         }
-                                    } catch (error) {
-                                        console.error(`Error fetching token Data ${tokenData}`);
+                                    }catch(error){
+                                        console.log('Error calling getTokenData() on contract', error);
                                     }
                                 }
-
-                                gridItems = sortByID(gridItems, [...itemsNotListed, ...listedItems]);
-                                let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
-
-                                let oldGrid = document.querySelector(".NewGrid");
-                                currentNFTArray.sort((a, b) => {
-                                    let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                    let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                    return indexA - indexB;
-                                });
-
-                                if (oldGrid) {
-                                    oldGrid.innerHTML = '';
-                                    console.log('items Cleared from DOM');
-                                }
-                                makeNewNFTGrid(currentNFTArray, oldGrid); 
-                            }catch(error){
-                                console.log('Error making new NFT grid to call', error);
-                            }
-                        }else if(text === "Highest Price"){
-                            console.log('Trying to filter by highest price');
-                            let oldGrid = document.querySelector(".NewGrid");
-                            let gridItems = Array.from(oldGrid.children); 
-                            let savedItems = gridItems; 
-                            let LoopNotBroken = false;
-                            try {
-                                let organizedByHighestIDarray = []; 
-                                console.log('trying to initiate while loop');
-                                while (gridItems.length > 0) {
-                                    let highestCount = BigInt(0);
-                                    let highestTokenID = null;
-                                    let counterJ = 0;
-
-                                    for (let j = 0; j < gridItems.length; j++) {
-                                        let gridItemIDString2 = gridItems[j].id; 
-                                        let gridIDINT2 = parseInt(gridItemIDString2.trim());
-                                        
-                                        try {
-                                            let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
-                                            let tokenPrice = BigInt(tokenDataCounter.price);
-
-                                            if (highestCount <= tokenPrice) {
-                                                highestCount = tokenPrice;
-                                                highestTokenID = tokenDataCounter.id;
-                                                counterJ = j;
+    
+                                if(unavailableTokens.length == 0 && availabeTokens.length != 0){
+                                    console.log('trying to sweep the floor');
+                                    try{
+                                        let currentAddressGasSender;
+                                        if (isConnected) {
+                                            let thisAccount = window.ethereum.selectedAddress;
+                                            currentAddressGasSender = thisAccount;
+                                        } else {
+                                            if (typeof window.ethereum === 'undefined') { 
+                                                alert('You must install MetaMask or another Ethereum provider to purchase tokens');
+                                            } else {
+                                                if (window.ethereum.isMetaMask) { // If MetaMask is detected
+                                                    try {
+                                                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                                                        let thisAccount = accounts[0];
+                                                        currentAddressGasSender = thisAccount;
+                                                    } catch (error) {
+                                                        if (error.code === -32002) { 
+                                                            alert('Please open the MetaMask extension manually, sign in, and reload the page.');
+                                                        } else {
+                                                            alert(`Error: ${error.message || error}`);
+                                                        }
+                                                    }
+                                                } else { 
+                                                    alert('MetaMask not detected. Please install MetaMask to use this feature.');
+                                                }
                                             }
-                                        } catch (error) {
-                                            console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
                                         }
-                                    }
-                                    console.log('finished first loop with counterJ', counterJ);
-                                    console.log('finished first loop with highestTokenID', highestTokenID);
-                                    console.log('finished first loop with highestCount', highestCount);
-                                    if (highestTokenID !== null) {
-                                        const index = gridItems.indexOf(gridItems[counterJ]);
-                                        if (index > -1) {
-                                            gridItems.splice(index, 1); 
+    
+                                        if(currentAddressGasSender){
+                                            const gasEstimate = await contract.methods.purchaseArrayOfNFT(availabeTokens).estimateGas({ from: currentAddressGasSender });
+                                            const tx = await contract.methods.purchaseArrayOfNFT(availabeTokens).send({
+                                                    from: currentAddressGasSender,
+                                                    gas: gasEstimate
+                                            });
+                                            if (tx && tx.transactionHash) {
+                                                console.log('Transaction sent. Waiting for confirmation...');
+                                                const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+                                                if (receipt && receipt.status === true) {
+                                                    console.log('The user accepted the transaction and it was successful.');
+                                                    console.log('creating success span tag inside contaniner');
+                                                    messageLoadingSpan.textContent = '';
+                                                    messageLoadingSpan.textContent = 'Sweep successful! Thank you come again.';
+                                                } else {
+                                                    console.log('The transaction failed.');
+                                                    messageLoadingSpan.textContent = '';
+                                                    messageLoadingSpan.textContent = 'Sorry an error occured. The transaction failed';
+                                                }
+                                            } else {
+                                                console.log('The transaction could not be sent.');
+                                                messageLoadingSpan.textContent = '';
+                                                messageLoadingSpan.textContent = 'The transaction could not be sent.';
+                                            }
+                                        }else{
+                                            messageLoadingSpan.textContent = '';
+                                            messageLoadingSpan.textContent = 'login to your metamask.';
+                                            alert('Please make sure to login to your metamask before proceeding');
                                         }
-                                        organizedByHighestIDarray.push(highestTokenID); 
-                                    }else{
-                                        LoopNotBroken = true;
-                                        alert('Sorry we could not find the highest token id');
-                                        break;
-                                        
+    
+                                    }catch(error){
+                                        console.log('Error calling purchaseArrayOfNFT on the contract', error);
+                                        messageLoadingSpan.textContent = '';
+                                        messageLoadingSpan.textContent = 'error calling contract.';
                                     }
+                                }else if(unavailableTokens.length == 0 && availabeTokens.length == 0){
+                                    console.log('sorry contract not setup yet');
+                                    messageLoadingSpan.textContent = '';
+                                    messageLoadingSpan.textContent = 'error calling contract not setup yet.';
+                                }else if(unavailableTokens.length != 0 && availabeTokens.length != 0) {
+                                    alert('Sorry some of the tokens you are trying to sweep are not availabe. Try to enter a lower amount. You can check the floor manuelly');
+                                }else{
+                                    alert('An unexpected error occured please try again');
                                 }
-
-                                if (LoopNotBroken === false) {   
-                                    savedItems = sortByID(savedItems, [...organizedByHighestIDarray]);
-                                    let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
-
-                                    currentNFTArray.sort((a, b) => {
-                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                        return indexA - indexB;
-                                    });
-
-                                    if (oldGrid) {
-                                        oldGrid.innerHTML = ''; 
-                                        console.log('Items cleared from DOM');
-                                    }
-                                    makeNewNFTGrid(currentNFTArray, oldGrid);  
-                                }
-                            } catch (error) {
-                                console.error('Error making new NFT grid:', error);
+                            }catch(error){
+                                console.log('Error sweeping items', error);
                             }
-                        }else if(text === "Lowest Price") {
-                            console.log('Trying to filter by lowest price');
-                            let oldGrid = document.querySelector(".NewGrid");
-                            let gridItems = Array.from(oldGrid.children); 
-                            let savedItems = gridItems; 
-                            let LoopNotBroken = false;
-                            
+                        }catch(error){
+                            console.log('error getting item number for sweep', error);
+                        }
+                        
+                    }
+                    searchButton.addEventListener('click', sweepGrid);
+                }else if (item.textContent == 'Search') {
+                    const searchContainer = document.createElement('div');
+                    searchContainer.style.position = 'absolute';
+                    searchContainer.style.right = '1%';
+                    searchContainer.style.top = '20vh';
+                    searchContainer.style.height = '27%';
+                    searchContainer.style.boxSizing = 'border-box';
+                    searchContainer.style.width = sideElementsWidth;
+                    searchContainer.style.borderRadius = '5px';
+                    searchContainer.style.backgroundColor = '#404a5c';
+                    searchContainer.style.border = '2px solid black';
+                    searchContainer.style.display = 'flex';
+                    searchContainer.style.flexDirection = 'column';
+                    searchContainer.style.alignItems = 'center';
+                    searchContainer.style.justifyContent = 'space-evenly';
+                    searchContainer.style.overflowY = 'scroll';
+    
+                    const closeIcon = document.createElement('span');
+                    closeIcon.textContent = '×';
+                    closeIcon.style.position = 'absolute';
+                    closeIcon.style.top = '10px';
+                    closeIcon.style.right = '10px';
+                    closeIcon.style.cursor = 'pointer';
+                    closeIcon.style.fontSize = '20px';
+                    closeIcon.style.color = 'red';
+    
+                    searchContainer.appendChild(closeIcon);
+                    closeIcon.addEventListener('click', () => {
+                        document.body.removeChild(searchContainer);
+                    });
+    
+                    const searchBar = document.createElement('input');
+                    searchBar.setAttribute('placeholder', 'Search By Token ID ...');
+                    searchBar.style.width = '70%';
+                    searchBar.style.height = '6%'; 
+                    searchBar.style.margin = '0'; 
+                    searchBar.style.position = 'relative';
+                    searchBar.style.top  = '1%';
+                    searchBar.style.left = '0%';
+                    searchBar.type = 'number';
+    
+                    searchContainer.appendChild(searchBar);
+                    const searchButton = document.createElement('button');
+                    searchButton.textContent = 'Search';
+                    searchButton.style.marginTop = '10px';
+                    searchButton.style.backgroundColor = 'dimgray';
+                    searchButton.style.width = '38%';
+                    searchButton.style.borderRadius = '1px';
+                    searchContainer.appendChild(searchButton);
+    
+                    const imageContainer = document.createElement('div');
+                    imageContainer.style.width = '45%';
+                    imageContainer.style.height = '32%'; 
+                    imageContainer.style.top = '21%';
+                    imageContainer.style.left = '17%';
+                    imageContainer.style.display = 'none'; 
+                    searchContainer.appendChild(imageContainer);
+    
+                    const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
+                    const divContainer = document.createElement('div');
+                    divContainer.style.width = '100%';
+                    divContainer.style.display = 'flex';
+                    divContainer.style.flexDirection = 'column';
+                    divContainer.style.alignItems = 'center'; 
+                    divContainer.style.height = '35%'; 
+                    divContainer.style.bottom = '0%';
+                    divContainer.style.fontSize = '2vh';
+                    divContainer.style.display = 'none'; 
+                    divData.forEach(async (text) => {
+                        const div = document.createElement('div');
+                        div.style.width = '90%';
+                        div.style.height = '20%'; 
+                        div.style.display = 'flex'; 
+                        div.style.alignItems = 'center'; 
+                        div.style.justifyContent = 'space-between'; 
+                        div.style.cursor = 'pointer';
+                        div.style.boxSizing = 'border-box';
+    
+                        const textContainer = document.createElement('div');
+                        textContainer.style.minWidth = '40%'; 
+                        textContainer.style.textAlign = 'left'; 
+                        textContainer.style.color = 'white';
+                        textContainer.textContent = text;
+    
+                        const resultContainer = document.createElement('div');
+                        resultContainer.style.minWidth = '40%'; 
+                        resultContainer.style.textAlign = 'right'; 
+                        resultContainer.style.color = 'lightgray';
+                        if(text == "Highest Sell"){
+                            let highestTokenSell;
                             try {
-                                let organizedByLowestIDarray = []; 
-                                console.log('trying to initiate while loop');
+                                let recentSellsFromContract = await contract.methods.getRecentSells().call();
+                                highestTokenSell = 0;
+                                for (const nft of recentSellsFromContract) {
+                                    if (nft.id == searchedTokenID) {
+                                        if (parseInt(nft.price) > highestTokenSell) {
+                                            highestTokenSell = parseInt(nft.price);
+                                        }
+                                    }
+                                }
+                                if (highestTokenSell === 0) {
+                                    console.log('No sells found for this token.');
+                                }
+                                let highestTokenSellInETH = (highestTokenSell / (10 ** 18)).toFixed(2); 
+                                console.log('Highest sell in ETH:', highestTokenSellInETH);
+                                resultContainer.textContent = `${highestTokenSellInETH} ${coin}`;
+    
+                            } catch (error) {
+                                console.log('Error calling the function getRecentSells() on the contract', error);
+                                highestTokenSell = 0;
+                                resultContainer.textContent = '0 ETH'; // Default in case of error
+                            }
+                            let highesTokenConverted = (highestTokenSell)/(10**18).toFixed(2);
+                            resultContainer.textContent = `${highesTokenConverted}`+ `${coin}`;
+                        }else if(text == "Current Owner"){
+                            let currentOwner;
+                            try{
+                                let data = await contract.methods.getTokenData(searchedTokenID).call();
+                                currentOwner = data.owner.substring(0,8)+ "~~~";
+                            }catch(error){
+                                console.log('Error calling the function getTokenData() on the contract and setting the current');
+                                currentOwner = RoysWallet.substring(0,8)+ "~~~";
                                 
-                                while (gridItems.length > 0) {
-                                    let lowestCount = BigInt(Number.MAX_SAFE_INTEGER);
-                                    let lowestTokenID = null;
-                                    let counterJ = 0;
-
-                                    for (let j = 0; j < gridItems.length; j++) {
-                                        let gridItemIDString2 = gridItems[j].id; 
-                                        let gridIDINT2 = parseInt(gridItemIDString2.trim());
-
+                            }
+                            resultContainer.textContent = currentOwner;
+                        }else if(text == "Date of Last Sell"){
+                            let dateOfLastSell;
+                            try{
+                                let data = await contract.methods.getTokenData(searchedTokenID).call();
+                                const dateSold = new Date(data.lastSellData * 1000); 
+                                const dateSpan = document.createElement('div');
+                                dateSpan.textContent = `${dateSold.toLocaleDateString("en-US", { 
+                                    year: '2-digit', 
+                                    month: '2-digit', 
+                                    day: '2-digit' 
+                                })} at ${datePurchased.toLocaleTimeString("en-US", { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit', 
+                                    hour12: false 
+                                })}`;
+                                dateOfLastSell = dateSpan.textContent;
+                            }catch(error){
+                                console.log('Error calling the function getTokenData() on the contract and setting the current');
+                                dateOfLastSell = 'No sell yet';
+                                
+                            }
+                            resultContainer.textContent = dateOfLastSell;
+                        }else if(text == "Previous Owner"){
+                            let previousOwner;
+                            try{
+                                let data = await contract.methods.getTokenData(searchedTokenID).call();
+                                previousOwner = data.lastOwner.substring(0,8) + "~~~";
+                            }catch(error){
+                                console.log('Error calling the function getTokenData() on the contract and setting the current');
+                                previousOwner = RoysWallet.substring(0,8) + "~~~";
+                                
+                            }
+                            resultContainer.textContent = previousOwner;
+                        }else{
+                            console.log('an unexpected error occured on the result container');
+                        }
+                        
+                        div.appendChild(textContainer);
+                        div.appendChild(resultContainer);
+                        divContainer.appendChild(div);
+                    });
+    
+                    searchContainer.appendChild(divContainer);
+                    document.body.appendChild(searchContainer);
+    
+                    const promptMessage = document.createElement('p');
+                    promptMessage.textContent = 'Please enter a token ID to retrieve its information';
+                    promptMessage.style.color = 'white'; 
+                    promptMessage.style.fontSize = '14px';  
+                    promptMessage.style.textAlign = 'center';  
+                    promptMessage.style.margin = '10px 0'; 
+    
+                    searchContainer.appendChild(searchBar);
+                    searchContainer.appendChild(promptMessage); 
+                    searchContainer.appendChild(searchButton);
+    
+                    function revealContent() {
+                        let tokenExist = false;
+                        let searchedTokenID = searchBar.value;
+                        if (searchedTokenID === '' || isNaN(searchedTokenID)) {
+                            alert('Please enter a valid number in the search bar');
+                        } else {
+                            searchedTokenID = parseInt(searchedTokenID);
+                            let imageUrl = null;
+                            for (const nft of currentNFTArray) {
+                                if (nft.tokenID === searchedTokenID) {
+                                    tokenExist = true;
+                                    imageUrl = nft.image; 
+                                    console.log('We found the token with ID:', nft.tokenID);
+                                    break;
+                                }
+                            }
+                            if (tokenExist) {
+                                try {
+                                    if (imageUrl) {
+                                        imageContainer.style.backgroundImage = `url(${imageUrl})`;
+                                        imageContainer.style.backgroundSize = 'cover'; 
+                                        imageContainer.style.backgroundRepeat = 'no-repeat';
+                                        imageContainer.style.backgroundPosition = 'center'; 
+                                        imageContainer.style.display = 'block';
+                                        console.log('Image set successfully');
+                                    } else {
+                                        console.log('Image URL is not found');
+                                    }
+                                } catch (error) {
+                                    console.log('Error setting image:', error);
+                                }             
+                                searchButton.remove();
+                                searchBar.remove();
+                                promptMessage.remove();
+                                divContainer.style.display = 'flex';
+                            } else {
+                                alert('Please enter a valid token ID');
+                            }
+                        }
+                    }
+                    searchBar.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            revealContent();
+                        }
+                    });
+    
+                    searchButton.addEventListener('click', revealContent);
+                }else if(item.textContent == 'Sort'){
+                    console.log('make 4 div elements here');
+                    const sortContainer = document.createElement('div');
+                    sortContainer.style.position = 'absolute';
+                    sortContainer.style.right = '1%';
+                    sortContainer.style.top = '20vh';
+                    sortContainer.style.height = '27%';
+                    sortContainer.style.boxSizing = 'border-box';
+                    sortContainer.style.width = sideElementsWidth;
+                    sortContainer.style.borderRadius = '5px';
+                    sortContainer.style.backgroundColor = '#404a5c';
+                    sortContainer.style.border = '2px solid black';
+                    sortContainer.style.display = 'flex';
+                    sortContainer.style.flexDirection = 'column';
+                    sortContainer.style.alignItems = 'center';
+                    sortContainer.style.justifyContent = 'space-evenly';
+    
+                    const closeIcon = document.createElement('span');
+                    closeIcon.textContent = '×';
+                    closeIcon.style.position = 'absolute';
+                    closeIcon.style.top = '10px';
+                    closeIcon.style.right = '10px';
+                    closeIcon.style.cursor = 'pointer';
+                    closeIcon.style.fontSize = '20px';
+                    closeIcon.style.color = 'red';
+    
+                    sortContainer.appendChild(closeIcon);
+    
+                    closeIcon.addEventListener('click', () => {
+                        document.body.removeChild(sortContainer);
+                    });
+    
+                    document.body.appendChild(sortContainer);
+                    const sortingData = ['Listed', 'Not Listed', 'Highest Price', 'Lowest Price'];
+                    const miniSortContainer = document.createElement('div');    
+                    miniSortContainer.style.position = 'absolute';
+                    miniSortContainer.style.width = "100%";
+                    miniSortContainer.style.height = '85%';
+                    miniSortContainer.style.left = '0%';
+                    miniSortContainer.style.bottom = '1%';
+                    sortContainer.appendChild(miniSortContainer);
+    
+                    sortingData.forEach((text) => {
+                        const div = document.createElement('div');
+                        div.style.width = '99%'; 
+                        div.style.left = '0.5%';
+                        div.style.height = '20%';
+                        div.style.display = 'flex';
+                        div.style.alignItems = 'center'; 
+                        div.style.justifyContent = 'center'; 
+                        div.style.textAlign = 'center';
+                        div.style.color = 'white';
+                        div.style.borderRadius = '5px';
+                        div.style.cursor = 'pointer';
+                        div.textContent = text;
+                        div.style.fontSize = '2vh';
+                        div.style.borderBottom = '1px solid white';
+    
+                        div.addEventListener('mouseover', () => {
+                            div.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                            div.style.color = 'black';
+                        });
+                        div.addEventListener('mouseout', () => {
+                            div.style.backgroundColor = '#404a5c';
+                            div.style.color = 'white';
+                        });
+                        div.addEventListener('click', async () => {
+                            let listedItems = [];
+                            let itemsNotListed = [];
+                            if(text === "Listed"){
+                                let oldGrid = document.querySelector(".NewGrid");
+                                let gridItems = Array.from(oldGrid.children);  
+                                try{
+                                    for(var i =0; i<gridItems.length; i++){
+                                        let tokenData;
+                                        let gridItemIDString = gridItems[i].id; 
+                                        let gridIDINT = parseInt(gridItemIDString.trim());
+    
+                                        console.log('calling contract using tokenID:', gridIDINT);
                                         try {
-                                            let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
-                                            let tokenPrice = BigInt(tokenDataCounter.price);
-
-                                            if (lowestCount >= tokenPrice) {
-                                                lowestCount = tokenPrice;
-                                                lowestTokenID = tokenDataCounter.id;
-                                                counterJ = j;
+                                            tokenData = await contract.methods.getTokenData(gridIDINT).call();
+                                            if(tokenData.forSale === true){
+                                                listedItems.push(gridIDINT);
+                                            }else{
+                                                itemsNotListed.push(gridIDINT);
                                             }
                                         } catch (error) {
-                                            console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
+                                            console.error(`Error fetching toking Data ${tokenData}`);
                                         }
+    
                                     }
-
-                                    console.log('Finished loop with counterJ', counterJ);
-                                    console.log('Finished loop with lowestTokenID', lowestTokenID);
-                                    console.log('Finished loop with lowestCount', lowestCount);
-
-                                    if (lowestTokenID !== null) {
-                                        const index = gridItems.indexOf(gridItems[counterJ]);
-                                        if (index > -1) {
-                                            gridItems.splice(index, 1);
-                                        }
-                                        organizedByLowestIDarray.push(lowestTokenID); 
-                                    } else {
-                                        LoopNotBroken = true;
-                                        alert('Sorry we could not find the lowest token id');
-                                        break;
-                                    }
-                                }
-
-                                if (LoopNotBroken === false) {
-                                    savedItems = sortByID(savedItems, [...organizedByLowestIDarray]);
-                                    let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
-
+                                    gridItems = sortByID(gridItems, [...listedItems, ...itemsNotListed]);
+                                    let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
+                                    let oldGrid = document.querySelector(".NewGrid");
                                     currentNFTArray.sort((a, b) => {
                                         let indexA = sortedTokenIDs.indexOf(a.tokenID);
                                         let indexB = sortedTokenIDs.indexOf(b.tokenID);
                                         return indexA - indexB;
                                     });
-
                                     if (oldGrid) {
-                                        oldGrid.innerHTML = ''; 
-                                        console.log('Items cleared from DOM');
+                                        oldGrid.innerHTML = '';
+                                        console.log('items Cleared from dome');
                                     }
-
-                                    makeNewNFTGrid(currentNFTArray, oldGrid); 
+                                    makeNewNFTGrid(currentNFTArray, oldGrid);
+                                }catch(error){
+                                    console.log('Error making new nft grid to call', error);
                                 }
-                            } catch (error) {
-                                console.error('Error making new NFT grid:', error);
+                            }if(text === "Not Listed"){
+                                let oldGrid = document.querySelector(".NewGrid");
+                                let gridItems = Array.from(oldGrid.children);  
+                                try{
+                                    for(var i = 0; i < gridItems.length; i++){
+                                        let tokenData;
+                                        let gridItemIDString = gridItems[i].id; 
+                                        let gridIDINT = parseInt(gridItemIDString.trim());
+    
+                                        console.log('calling contract using tokenID:', gridIDINT);
+                                        try {
+                                            tokenData = await contract.methods.getTokenData(gridIDINT).call();
+                                            if(tokenData.forSale === true){
+                                                itemsNotListed.push(gridIDINT); 
+                                            }else{
+                                                listedItems.push(gridIDINT);  
+                                            }
+                                        } catch (error) {
+                                            console.error(`Error fetching token Data ${tokenData}`);
+                                        }
+                                    }
+    
+                                    gridItems = sortByID(gridItems, [...itemsNotListed, ...listedItems]);
+                                    let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
+    
+                                    let oldGrid = document.querySelector(".NewGrid");
+                                    currentNFTArray.sort((a, b) => {
+                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                        return indexA - indexB;
+                                    });
+    
+                                    if (oldGrid) {
+                                        oldGrid.innerHTML = '';
+                                        console.log('items Cleared from DOM');
+                                    }
+                                    makeNewNFTGrid(currentNFTArray, oldGrid); 
+                                }catch(error){
+                                    console.log('Error making new NFT grid to call', error);
+                                }
+                            }else if(text === "Highest Price"){
+                                console.log('Trying to filter by highest price');
+                                let oldGrid = document.querySelector(".NewGrid");
+                                let gridItems = Array.from(oldGrid.children); 
+                                let savedItems = gridItems; 
+                                let LoopNotBroken = false;
+                                try {
+                                    let organizedByHighestIDarray = []; 
+                                    console.log('trying to initiate while loop');
+                                    while (gridItems.length > 0) {
+                                        let highestCount = BigInt(0);
+                                        let highestTokenID = null;
+                                        let counterJ = 0;
+    
+                                        for (let j = 0; j < gridItems.length; j++) {
+                                            let gridItemIDString2 = gridItems[j].id; 
+                                            let gridIDINT2 = parseInt(gridItemIDString2.trim());
+                                            
+                                            try {
+                                                let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
+                                                let tokenPrice = BigInt(tokenDataCounter.price);
+    
+                                                if (highestCount <= tokenPrice) {
+                                                    highestCount = tokenPrice;
+                                                    highestTokenID = tokenDataCounter.id;
+                                                    counterJ = j;
+                                                }
+                                            } catch (error) {
+                                                console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
+                                            }
+                                        }
+                                        console.log('finished first loop with counterJ', counterJ);
+                                        console.log('finished first loop with highestTokenID', highestTokenID);
+                                        console.log('finished first loop with highestCount', highestCount);
+                                        if (highestTokenID !== null) {
+                                            const index = gridItems.indexOf(gridItems[counterJ]);
+                                            if (index > -1) {
+                                                gridItems.splice(index, 1); 
+                                            }
+                                            organizedByHighestIDarray.push(highestTokenID); 
+                                        }else{
+                                            LoopNotBroken = true;
+                                            alert('Sorry we could not find the highest token id');
+                                            break;
+                                            
+                                        }
+                                    }
+    
+                                    if (LoopNotBroken === false) {   
+                                        savedItems = sortByID(savedItems, [...organizedByHighestIDarray]);
+                                        let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
+    
+                                        currentNFTArray.sort((a, b) => {
+                                            let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                            let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                            return indexA - indexB;
+                                        });
+    
+                                        if (oldGrid) {
+                                            oldGrid.innerHTML = ''; 
+                                            console.log('Items cleared from DOM');
+                                        }
+                                        makeNewNFTGrid(currentNFTArray, oldGrid);  
+                                    }
+                                } catch (error) {
+                                    console.error('Error making new NFT grid:', error);
+                                }
+                            }else if(text === "Lowest Price") {
+                                console.log('Trying to filter by lowest price');
+                                let oldGrid = document.querySelector(".NewGrid");
+                                let gridItems = Array.from(oldGrid.children); 
+                                let savedItems = gridItems; 
+                                let LoopNotBroken = false;
+                                
+                                try {
+                                    let organizedByLowestIDarray = []; 
+                                    console.log('trying to initiate while loop');
+                                    
+                                    while (gridItems.length > 0) {
+                                        let lowestCount = BigInt(Number.MAX_SAFE_INTEGER);
+                                        let lowestTokenID = null;
+                                        let counterJ = 0;
+    
+                                        for (let j = 0; j < gridItems.length; j++) {
+                                            let gridItemIDString2 = gridItems[j].id; 
+                                            let gridIDINT2 = parseInt(gridItemIDString2.trim());
+    
+                                            try {
+                                                let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
+                                                let tokenPrice = BigInt(tokenDataCounter.price);
+    
+                                                if (lowestCount >= tokenPrice) {
+                                                    lowestCount = tokenPrice;
+                                                    lowestTokenID = tokenDataCounter.id;
+                                                    counterJ = j;
+                                                }
+                                            } catch (error) {
+                                                console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
+                                            }
+                                        }
+    
+                                        console.log('Finished loop with counterJ', counterJ);
+                                        console.log('Finished loop with lowestTokenID', lowestTokenID);
+                                        console.log('Finished loop with lowestCount', lowestCount);
+    
+                                        if (lowestTokenID !== null) {
+                                            const index = gridItems.indexOf(gridItems[counterJ]);
+                                            if (index > -1) {
+                                                gridItems.splice(index, 1);
+                                            }
+                                            organizedByLowestIDarray.push(lowestTokenID); 
+                                        } else {
+                                            LoopNotBroken = true;
+                                            alert('Sorry we could not find the lowest token id');
+                                            break;
+                                        }
+                                    }
+    
+                                    if (LoopNotBroken === false) {
+                                        savedItems = sortByID(savedItems, [...organizedByLowestIDarray]);
+                                        let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
+    
+                                        currentNFTArray.sort((a, b) => {
+                                            let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                            let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                            return indexA - indexB;
+                                        });
+    
+                                        if (oldGrid) {
+                                            oldGrid.innerHTML = ''; 
+                                            console.log('Items cleared from DOM');
+                                        }
+    
+                                        makeNewNFTGrid(currentNFTArray, oldGrid); 
+                                    }
+                                } catch (error) {
+                                    console.error('Error making new NFT grid:', error);
+                                }
+                            }
+                        });
+    
+                        miniSortContainer.appendChild(div);
+                    });
+                }else if(item.textContent == 'File a Report'){
+                    console.log('Opening report form');
+                    const reportContainer = document.createElement('div');
+                    reportContainer.style.position = 'absolute';
+                    reportContainer.style.right = '1%';
+                    reportContainer.style.top = '20vh';
+                    reportContainer.style.height = '27%'; 
+                    reportContainer.style.boxSizing = 'border-box';
+                    reportContainer.style.width = sideElementsWidth;
+                    reportContainer.style.borderRadius = '5px';
+                    reportContainer.style.backgroundColor = '#404a5c';
+                    reportContainer.style.border = '2px solid black';
+                    reportContainer.style.display = 'flex';
+                    reportContainer.style.flexDirection = 'column';
+                    reportContainer.style.alignItems = 'center';
+                    reportContainer.style.justifyContent = 'space-evenly';
+                    reportContainer.style.overflowY = 'scroll';
+    
+                    const closeIcon = document.createElement('span');
+                    closeIcon.textContent = '×';
+                    closeIcon.style.position = 'absolute';
+                    closeIcon.style.top = '5px';
+                    closeIcon.style.right = '5px';
+                    closeIcon.style.cursor = 'pointer';
+                    closeIcon.style.fontSize = '16px';
+                    closeIcon.style.color = 'red';
+                    closeIcon.addEventListener('click', () => {
+                        document.body.removeChild(reportContainer);
+                    });
+                    reportContainer.appendChild(closeIcon);
+    
+                    const tokenIdLabel = document.createElement('label');
+                    tokenIdLabel.textContent = 'Token ID';
+                    tokenIdLabel.style.color = 'white';
+                    tokenIdLabel.style.fontSize = '12px';
+                    reportContainer.appendChild(tokenIdLabel);
+    
+                    const tokenIdInput = document.createElement('input');
+                    tokenIdInput.type = 'number';
+                    tokenIdInput.placeholder = 'Enter Token ID';
+                    tokenIdInput.style.width = '80%';
+                    tokenIdInput.style.height = '12%'; 
+                    tokenIdInput.style.fontSize = '12px'; 
+                    tokenIdInput.style.top = '2%';
+                    tokenIdInput.style.position = 'relative';
+                    tokenIdInput.min = '1'; 
+                    tokenIdInput.step = '1';
+                    reportContainer.appendChild(tokenIdInput);
+    
+                    const emailLabel = document.createElement('label');
+                    emailLabel.textContent = 'Email';
+                    emailLabel.style.color = 'white';
+                    emailLabel.style.left = "5%";
+                    emailLabel.style.fontSize = '12px'; 
+                    reportContainer.appendChild(emailLabel);
+    
+                    const emailInput = document.createElement('input');
+                    emailInput.type = 'email';
+                    emailInput.placeholder = 'Enter your email';
+                    emailInput.style.width = '80%';
+                    emailInput.style.left = "5%";
+                    emailInput.style.height = '12%';
+                    emailInput.style.fontSize = '12px'; 
+                    reportContainer.appendChild(emailInput);
+    
+                    const messageLabel = document.createElement('label');
+                    messageLabel.textContent = 'Message';
+                    messageLabel.style.color = 'white';
+                    messageLabel.style.fontSize = '12px'; 
+                    messageLabel.style.marginBottom = '5px';
+                    reportContainer.appendChild(messageLabel);
+    
+                    const messageInput = document.createElement('textarea');
+                    messageInput.placeholder = 'Enter your message';
+                    messageInput.maxLength = 500; 
+                    messageInput.style.width = '80%';
+                    messageInput.style.height = '250px'; 
+                    messageInput.style.fontSize = '10px'; 
+                    messageInput.style.padding = '5px'; 
+                    messageInput.style.left = "5%";
+                    messageInput.style.resize = 'vertical';
+                    reportContainer.appendChild(messageInput);
+    
+                    const fileButton = document.createElement('button');
+                    fileButton.textContent = 'Submit';
+                    fileButton.style.width = '40%';
+                    fileButton.style.padding = '5px'; 
+                    fileButton.style.backgroundColor = 'dimgray';
+                    fileButton.style.color = 'white';
+                    fileButton.style.border = 'none';
+                    fileButton.style.borderRadius = '5px';
+                    fileButton.style.cursor = 'pointer';
+                    fileButton.style.fontSize = '12px';
+    
+                    fileButton.addEventListener('click', async () => { 
+                        const tokenID = tokenIdInput.value;
+                        const email = emailInput.value;
+                        const message = messageInput.value;
+    
+                        console.log(`Token ID: ${tokenID}, Email: ${email}, Message: ${message}`);
+                        const fields = [tokenID, email, message];
+                        const fieldNames = ['Token ID', 'Email', 'Message'];
+                        for (let i = 0; i < fields.length; i++) {
+                            if (!fields[i]) {
+                                alert(`Please make sure to properly fill out all fields`);
+                                return; 
+                            }
+                        }
+    
+                        let walletSender;
+                        if(isConnected === false){
+                            alert('Please make sure to login to your main wallet before filing a report');
+                        }else{
+                            if(window.ethereum.selectedAddress != null && window.ethereum.isMetaMask){ 
+                                walletSender = window.ethereum.selectedAddress;
+                                let reportData = {
+                                    clientWallet: walletSender,
+                                    contractName: userSelectedContract.contractName,
+                                    ERCStandard: userSelectedContract.ERCStandard,
+                                    tokenID: tokenID.toString(),   
+                                    email: email, 
+                                    message: message
+                                };
+    
+                                try {
+                                    const reportResponse = await fetch('/file-a-report', {
+                                        method: "POST", 
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(reportData)
+                                    });
+    
+                                    if (reportResponse.ok) {
+                                        const responseJson = await reportResponse.json();
+                                        if (responseJson.success === false) {
+                                            console.log('Did not get back expected response');
+                                            if(responseJson.code == 10002444222202 ){
+                                                alert('Make sure to entere a valid email address invalid email');
+                                            }else if(responseJson.code == 3433444 ){
+                                                alert('Error with try and catch on server');
+                                            }else if(responseJson.code == 1000202 ){
+                                                alert('Sorry we already dedicated that you filed a report. We will contact you as soon as possible');
+                                            }else if(responseJson.code == 34444411 ){
+                                                alert('error with response from server');
+                                            }else{
+                                                alert('unexpected code error');
+                                            }
+                                        }else {
+                                            try{
+                                                tokenIdLabel.remove();
+                                                tokenIdInput.remove();
+                                                emailLabel.remove();
+                                                emailInput.remove();
+                                                messageLabel.remove();
+                                                messageInput.remove();
+                                                fileButton.remove();
+    
+                                                const successSpan = document.createElement('span');
+                                                successSpan.textContent = "Thank you for filing a report. We will get back to it as soon as possible and pause the token if we find an issue!";
+                                                successSpan.style.display = 'block';
+                                                successSpan.style.textAlign = 'center';
+                                                successSpan.style.marginTop = '20px';
+                                                successSpan.style.fontSize = '10px';
+                                                successSpan.style.color = 'white';
+                                                reportContainer.appendChild(successSpan);
+                                            }catch(error){
+                                                console.log('Error', error);
+                                            }
+                                        }
+                                    } else {
+                                        console.error('Failed to fetch: Response was not okay', reportResponse.statusText);
+                                        alert('An error occurred while sending the report please try again at a later time');
+                                    }
+                                } catch (error) {
+                                    console.error('Failed to fetch: An error occurred', error);
+                                    alert('An error occurred while sending the report');
+                                }
+                            }else{
+                                alert('Please make sure to sign into a wallet before sending a report');
                             }
                         }
                     });
-
-                    miniSortContainer.appendChild(div);
-                });
-            }else if(item.textContent == 'File a Report'){
-                console.log('Opening report form');
-                const reportContainer = document.createElement('div');
-                reportContainer.style.position = 'absolute';
-                reportContainer.style.right = '1%';
-                reportContainer.style.top = '20vh';
-                reportContainer.style.height = '27%'; 
-                reportContainer.style.boxSizing = 'border-box';
-                reportContainer.style.width = sideElementsWidth;
-                reportContainer.style.borderRadius = '5px';
-                reportContainer.style.backgroundColor = '#404a5c';
-                reportContainer.style.border = '2px solid black';
-                reportContainer.style.display = 'flex';
-                reportContainer.style.flexDirection = 'column';
-                reportContainer.style.alignItems = 'center';
-                reportContainer.style.justifyContent = 'space-evenly';
-                reportContainer.style.overflowY = 'scroll';
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '5px';
-                closeIcon.style.right = '5px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '16px';
-                closeIcon.style.color = 'red';
-                closeIcon.addEventListener('click', () => {
-                    document.body.removeChild(reportContainer);
-                });
-                reportContainer.appendChild(closeIcon);
-
-                const tokenIdLabel = document.createElement('label');
-                tokenIdLabel.textContent = 'Token ID';
-                tokenIdLabel.style.color = 'white';
-                tokenIdLabel.style.fontSize = '12px';
-                reportContainer.appendChild(tokenIdLabel);
-
-                const tokenIdInput = document.createElement('input');
-                tokenIdInput.type = 'number';
-                tokenIdInput.placeholder = 'Enter Token ID';
-                tokenIdInput.style.width = '80%';
-                tokenIdInput.style.height = '12%'; 
-                tokenIdInput.style.fontSize = '12px'; 
-                tokenIdInput.style.top = '2%';
-                tokenIdInput.style.position = 'relative';
-                tokenIdInput.min = '1'; 
-                tokenIdInput.step = '1';
-                reportContainer.appendChild(tokenIdInput);
-
-                const emailLabel = document.createElement('label');
-                emailLabel.textContent = 'Email';
-                emailLabel.style.color = 'white';
-                emailLabel.style.left = "5%";
-                emailLabel.style.fontSize = '12px'; 
-                reportContainer.appendChild(emailLabel);
-
-                const emailInput = document.createElement('input');
-                emailInput.type = 'email';
-                emailInput.placeholder = 'Enter your email';
-                emailInput.style.width = '80%';
-                emailInput.style.left = "5%";
-                emailInput.style.height = '12%';
-                emailInput.style.fontSize = '12px'; 
-                reportContainer.appendChild(emailInput);
-
-                const messageLabel = document.createElement('label');
-                messageLabel.textContent = 'Message';
-                messageLabel.style.color = 'white';
-                messageLabel.style.fontSize = '12px'; 
-                messageLabel.style.marginBottom = '5px';
-                reportContainer.appendChild(messageLabel);
-
-                const messageInput = document.createElement('textarea');
-                messageInput.placeholder = 'Enter your message';
-                messageInput.maxLength = 500; 
-                messageInput.style.width = '80%';
-                messageInput.style.height = '250px'; 
-                messageInput.style.fontSize = '10px'; 
-                messageInput.style.padding = '5px'; 
-                messageInput.style.left = "5%";
-                messageInput.style.resize = 'vertical';
-                reportContainer.appendChild(messageInput);
-
-                const fileButton = document.createElement('button');
-                fileButton.textContent = 'Submit';
-                fileButton.style.width = '40%';
-                fileButton.style.padding = '5px'; 
-                fileButton.style.backgroundColor = 'dimgray';
-                fileButton.style.color = 'white';
-                fileButton.style.border = 'none';
-                fileButton.style.borderRadius = '5px';
-                fileButton.style.cursor = 'pointer';
-                fileButton.style.fontSize = '12px';
-
-                fileButton.addEventListener('click', async () => { 
-                    const tokenID = tokenIdInput.value;
-                    const email = emailInput.value;
-                    const message = messageInput.value;
-
-                    console.log(`Token ID: ${tokenID}, Email: ${email}, Message: ${message}`);
-                    const fields = [tokenID, email, message];
-                    const fieldNames = ['Token ID', 'Email', 'Message'];
-                    for (let i = 0; i < fields.length; i++) {
-                        if (!fields[i]) {
-                            alert(`Please make sure to properly fill out all fields`);
-                            return; 
-                        }
-                    }
-
-                    let walletSender;
-                    if(isConnected === false){
-                        alert('Please make sure to login to your main wallet before filing a report');
-                    }else{
-                        if(window.ethereum.selectedAddress != null && window.ethereum.isMetaMask){ 
-                            walletSender = window.ethereum.selectedAddress;
-                            let reportData = {
-                                clientWallet: walletSender,
-                                contractName: userSelectedContract.contractName,
-                                ERCStandard: userSelectedContract.ERCStandard,
-                                tokenID: tokenID.toString(),   
-                                email: email, 
-                                message: message
-                            };
-
-                            try {
-                                const reportResponse = await fetch('/file-a-report', {
-                                    method: "POST", 
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify(reportData)
-                                });
-
-                                if (reportResponse.ok) {
-                                    const responseJson = await reportResponse.json();
-                                    if (responseJson.success === false) {
-                                        console.log('Did not get back expected response');
-                                        if(responseJson.code == 10002444222202 ){
-                                            alert('Make sure to entere a valid email address invalid email');
-                                        }else if(responseJson.code == 3433444 ){
-                                            alert('Error with try and catch on server');
-                                        }else if(responseJson.code == 1000202 ){
-                                            alert('Sorry we already dedicated that you filed a report. We will contact you as soon as possible');
-                                        }else if(responseJson.code == 34444411 ){
-                                            alert('error with response from server');
-                                        }else{
-                                            alert('unexpected code error');
-                                        }
-                                    }else {
-                                        try{
-                                            tokenIdLabel.remove();
-                                            tokenIdInput.remove();
-                                            emailLabel.remove();
-                                            emailInput.remove();
-                                            messageLabel.remove();
-                                            messageInput.remove();
-                                            fileButton.remove();
-
-                                            const successSpan = document.createElement('span');
-                                            successSpan.textContent = "Thank you for filing a report. We will get back to it as soon as possible and pause the token if we find an issue!";
-                                            successSpan.style.display = 'block';
-                                            successSpan.style.textAlign = 'center';
-                                            successSpan.style.marginTop = '20px';
-                                            successSpan.style.fontSize = '10px';
-                                            successSpan.style.color = 'white';
-                                            reportContainer.appendChild(successSpan);
-                                        }catch(error){
-                                            console.log('Error', error);
-                                        }
-                                    }
-                                } else {
-                                    console.error('Failed to fetch: Response was not okay', reportResponse.statusText);
-                                    alert('An error occurred while sending the report please try again at a later time');
-                                }
-                            } catch (error) {
-                                console.error('Failed to fetch: An error occurred', error);
-                                alert('An error occurred while sending the report');
-                            }
-                        }else{
-                            alert('Please make sure to sign into a wallet before sending a report');
-                        }
-                    }
-                });
-
-                reportContainer.appendChild(fileButton);
-                document.body.appendChild(reportContainer);
-            }else{
-                console.log('Unepexected click');
-            }
-        });
-        item.addEventListener('mouseenter', function () {
-            this.style.backgroundColor = '#5a647d';
-            this.style.color = '#f0f0f0'; 
-        });
-
-        item.addEventListener('mouseleave', function () {
-            this.style.backgroundColor = ''; 
-            this.style.color = ''; 
-        });
+    
+                    reportContainer.appendChild(fileButton);
+                    document.body.appendChild(reportContainer);
+                }else{
+                    console.log('Unepexected click');
+                }
+            });
+            item.addEventListener('mouseenter', function () {
+                this.style.backgroundColor = '#5a647d';
+                this.style.color = '#f0f0f0'; 
+            });
+    
+            item.addEventListener('mouseleave', function () {
+                this.style.backgroundColor = ''; 
+                this.style.color = ''; 
+            });
     });
 }
 function isValidPhoneNumber(phoneNumber) {
