@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 09-13-24
+// Date last modified: 09-17-24
 // purpose: Make web3 art website to coincide with research related life
 
 // local variables to server
@@ -44,7 +44,7 @@ const purchasesCollectionString = 'Purchase';
 const commissionCollectionString = 'Commission';
 const bursonSkullzModelString = 'Burson Skullz';
 const contractCollectionString = 'NFT Contracts';
-
+const reportString = 'Reports Filed';
 
 // security strings 
 const paintingUploadCode = 'Painting-code-here!';
@@ -123,12 +123,22 @@ const collectionSchema = new mongoose.Schema({
     collectionBackgroundImage: String
 }); 
 
+const reportSchema = new mongoose.Schema({
+    clientWallet: String,
+    ipAddress: String,
+    contractName: String,
+    ERCStandard: String,
+    tokenID: String,
+    email: String,
+    message: String
+}); 
+
 // Create models 
 const paintingModel = mongoose.model(paintCollectionString, paintingSchema); 
 const purchaseModel = mongoose.model(purchasesCollectionString, purchaseSchema); 
 const commissionModel = mongoose.model(commissionCollectionString, commissionSchema); 
 const collectionModel = mongoose.model(contractCollectionString, collectionSchema); 
-
+const reportModel = mongoose.model(reportString, reportSchema); 
 
 const basicDefinitions = ['to', 'from', 'why', 'his', 'her', 'this','dad', 'mom',
   'and', 'the', 'a', 'an', 'in', 'on', 'at', 'with', 'he', 'she',
@@ -3228,6 +3238,59 @@ const handleHttpRequest = async (req, res, io) => {
             console.log('Error with fetch request /UpdateInProgressAttribute');
         }   
 
+    }else if (req.method === 'POST' && req.url === '/file-a-report') {
+        try {
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+
+            req.on('end', async () => {
+                const data = JSON.parse(body);
+                const clientIP = req.connection.remoteAddress;
+
+                if(checkEmailString(data.email)){
+                    console.log('Trying to save data to report database', data);
+                    console.log('Client IP', clientIP);
+
+                    try {
+                        // Check if the IP address already exists in the database
+                        const existingReport = await reportModel.findOne({ ipAddress: clientIP });
+
+                        if (existingReport) {
+                            // IP address already exists, send back response with code 1000202
+                            res.setHeader('Content-Type', 'application/json');
+                            res.end(JSON.stringify({ success: false, code: 1000202 }));
+                        } else {
+                            // IP address does not exist, save the report data
+                            const newReport = new reportModel({
+                                ipAddress: clientIP,
+                                ...data
+                            });
+
+                            await newReport.save();
+
+                            // Respond with success
+                            res.setHeader('Content-Type', 'application/json');
+                            res.end(JSON.stringify({ success: true, code: -22131 }));
+                        }
+                    } catch (error) {
+                        console.error('Error with database operation', error);
+                        res.setHeader('Content-Type', 'application/json');
+                        res.end(JSON.stringify({ success: false, code: 3433444 }));
+                    }
+                }else{
+                    // invalid email response
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({ success: false, code: 10002444222202 }));
+                }
+
+            });
+        } catch (error) {
+            console.error('Error handling the request', error);
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ success: false, code: 34444411 }));
+        }
     }else if(req.method == 'POST' && req.url == '/AI-event'){
         try{
             let body = '';
