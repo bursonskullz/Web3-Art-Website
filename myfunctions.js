@@ -3192,7 +3192,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     parentElement.appendChild(tools);
 
 
-    addToolsFunctionality(sideElementsWidth);
+    addToolsFunctionality(sideElementsWidth, contract, coin, parentElement, numColumns);
     parentElement.style.paddingLeft = `${sideElementsWidth}px`;
     var footer = document.createElement('div');
     const footContainer = document.createElement('div');
@@ -5145,7 +5145,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     parentElement.appendChild(footer);
     parentElement.appendChild(footerLEGAL);
 }
-function addToolsFunctionality(sideElementsWidth){
+function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement, numColumns){
         document.querySelectorAll('.option-item-2').forEach((item) => {
         item.addEventListener('click', function () {
             if(item.textContent == 'Sweep'){
@@ -5178,17 +5178,37 @@ function addToolsFunctionality(sideElementsWidth){
 
                 const searchButton = document.createElement('button');
                 searchButton.style.position = 'absolute';
-                searchButton.textContent = 'Search';
+                searchButton.textContent = 'Sweep';
                 searchButton.style.marginTop = '2px';
                 searchButton.style.backgroundColor = 'dimgray';
                 searchButton.style.width = '38%';
                 searchButton.style.radius = '1px';
                 searchButton.style.bottom = '0%';
-                searchButton.style.left = '31%';
+                searchButton.style.left = '29%';
+                searchButton.style.color = 'white';
+                searchButton.style.borderRadius = '1px';
                 sweepBox.appendChild(searchButton);
 
                 function sweepGrid(){
                     console.log('trying to sweep grid with specified amount in span tag');
+                    try{
+                        const spanText = document.querySelector('.info-span');
+                        const spanTextContent = spanText.textContent.replace(/Sweep|items| /g, '');
+                        const integerValue = parseInt(spanTextContent.trim(), 10);  
+                        /*
+                        if (isNaN(integerValue)) {
+                            console.error('The resulting value is not a valid integer.');
+                        } else {
+                            console.log('Parsed integer:', integerValue);
+                        }*/
+                        console.log('trying to sweep this many items:', integerValue );
+                        // loop through grid and try to get id from classname 
+                        // use each classname to sweep and call contract purchaseArray() for each one listed 
+                        // only up to max they selected
+                    }catch(error){
+                        console.log('error getting item number for sweep', error);
+                    }
+                    
                 }
                 searchButton.addEventListener('click', sweepGrid);
                 // add a sweep button at button of the container 
@@ -5228,14 +5248,14 @@ function addToolsFunctionality(sideElementsWidth){
                 });
 
                 const searchBar = document.createElement('input');
-                searchBar.setAttribute('type', 'text');
-                searchBar.setAttribute('placeholder', 'Search...');
+                searchBar.setAttribute('placeholder', 'Search By Token ID ...');
                 searchBar.style.width = '70%';
                 searchBar.style.height = '6%'; 
                 searchBar.style.margin = '0'; 
                 searchBar.style.position = 'relative';
                 searchBar.style.top  = '1%';
                 searchBar.style.left = '0%';
+                searchBar.type = 'number';
 
                 searchContainer.appendChild(searchBar);
                 const searchButton = document.createElement('button');
@@ -5243,7 +5263,7 @@ function addToolsFunctionality(sideElementsWidth){
                 searchButton.style.marginTop = '10px';
                 searchButton.style.backgroundColor = 'dimgray';
                 searchButton.style.width = '38%';
-                searchButton.style.radius = '1px';
+                searchButton.style.borderRadius = '1px';
                 searchContainer.appendChild(searchButton);
 
                 const imageContainer = document.createElement('div');
@@ -5251,9 +5271,7 @@ function addToolsFunctionality(sideElementsWidth){
                 imageContainer.style.height = '32%'; 
                 imageContainer.style.top = '21%';
                 imageContainer.style.left = '17%';
-                imageContainer.style.backgroundColor = 'white';
                 imageContainer.style.display = 'none'; 
-                imageContainer.textContent = "Tokens Image";
                 searchContainer.appendChild(imageContainer);
 
                 const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
@@ -5265,9 +5283,8 @@ function addToolsFunctionality(sideElementsWidth){
                 divContainer.style.height = '35%'; 
                 divContainer.style.bottom = '0%';
                 divContainer.style.fontSize = '2vh';
-                divContainer.style.display = 'none';  
-
-                divData.forEach((text) => {
+                divContainer.style.display = 'none'; 
+                divData.forEach(async (text) => {
                     const div = document.createElement('div');
                     div.style.width = '90%';
                     div.style.height = '20%'; 
@@ -5287,7 +5304,80 @@ function addToolsFunctionality(sideElementsWidth){
                     resultContainer.style.minWidth = '40%'; 
                     resultContainer.style.textAlign = 'right'; 
                     resultContainer.style.color = 'lightgray';
-                    resultContainer.textContent = 'Result';
+                    if(text == "Highest Sell"){
+                        let highestTokenSell;
+                        try {
+                            let recentSellsFromContract = await contract.methods.getRecentSells().call();
+                            highestTokenSell = 0;
+                            for (const nft of recentSellsFromContract) {
+                                if (nft.id == searchedTokenID) {
+                                    if (parseInt(nft.price) > highestTokenSell) {
+                                        highestTokenSell = parseInt(nft.price);
+                                    }
+                                }
+                            }
+                            if (highestTokenSell === 0) {
+                                console.log('No sells found for this token.');
+                            }
+                            let highestTokenSellInETH = (highestTokenSell / (10 ** 18)).toFixed(2); 
+                            console.log('Highest sell in ETH:', highestTokenSellInETH);
+                            resultContainer.textContent = `${highestTokenSellInETH} ${coin}`;
+
+                        } catch (error) {
+                            console.log('Error calling the function getRecentSells() on the contract', error);
+                            highestTokenSell = 0;
+                            resultContainer.textContent = '0 ETH'; // Default in case of error
+                        }
+                        let highesTokenConverted = (highestTokenSell)/(10**18).toFixed(2);
+                        resultContainer.textContent = `${highesTokenConverted}`+ `${coin}`;
+                    }else if(text == "Current Owner"){
+                        let currentOwner;
+                        try{
+                            let data = await contract.methods.getTokenData(searchedTokenID).call();
+                            currentOwner = data.owner.substring(0,8)+ "~~~";
+                        }catch(error){
+                            console.log('Error calling the function getTokenData() on the contract and setting the current');
+                            currentOwner = RoysWallet.substring(0,8)+ "~~~";
+                            
+                        }
+                        resultContainer.textContent = currentOwner;
+                    }else if(text == "Date of Last Sell"){
+                        let dateOfLastSell;
+                        try{
+                            let data = await contract.methods.getTokenData(searchedTokenID).call();
+                            const dateSold = new Date(data.lastSellData * 1000); 
+                            const dateSpan = document.createElement('div');
+                            dateSpan.textContent = `${dateSold.toLocaleDateString("en-US", { 
+                                year: '2-digit', 
+                                month: '2-digit', 
+                                day: '2-digit' 
+                            })} at ${datePurchased.toLocaleTimeString("en-US", { 
+                                hour: '2-digit', 
+                                minute: '2-digit', 
+                                hour12: false 
+                            })}`;
+                            dateOfLastSell = dateSpan.textContent;
+                        }catch(error){
+                            console.log('Error calling the function getTokenData() on the contract and setting the current');
+                            dateOfLastSell = 'No sell yet';
+                            
+                        }
+                        resultContainer.textContent = dateOfLastSell;
+                    }else if(text == "Previous Owner"){
+                        let previousOwner;
+                        try{
+                            let data = await contract.methods.getTokenData(searchedTokenID).call();
+                            previousOwner = data.lastOwner.substring(0,8) + "~~~";
+                        }catch(error){
+                            console.log('Error calling the function getTokenData() on the contract and setting the current');
+                            previousOwner = RoysWallet.substring(0,8) + "~~~";
+                            
+                        }
+                        resultContainer.textContent = previousOwner;
+                    }else{
+                        console.log('an unexpected error occured on the result container');
+                    }
+                    
                     div.appendChild(textContainer);
                     div.appendChild(resultContainer);
                     divContainer.appendChild(div);
@@ -5308,21 +5398,45 @@ function addToolsFunctionality(sideElementsWidth){
                 searchContainer.appendChild(searchButton);
 
                 function revealContent() {
-                    const tokenValue = searchBar.value.trim(); 
-                    
-                    if (isNaN(tokenValue) || tokenValue === '') {
-                        alert('Please enter a valid token ID (a number).');
-                        return; 
+                    let tokenExist = false;
+                    let searchedTokenID = searchBar.value;
+                    if (searchedTokenID === '' || isNaN(searchedTokenID)) {
+                        alert('Please enter a valid number in the search bar');
+                    } else {
+                        searchedTokenID = parseInt(searchedTokenID);
+                        let imageUrl = null;
+                        for (const nft of currentNFTArray) {
+                            if (nft.tokenID === searchedTokenID) {
+                                tokenExist = true;
+                                imageUrl = nft.image; 
+                                console.log('We found the token with ID:', nft.tokenID);
+                                break;
+                            }
+                        }
+                        if (tokenExist) {
+                            try {
+                                if (imageUrl) {
+                                    imageContainer.style.backgroundImage = `url(${imageUrl})`;
+                                    imageContainer.style.backgroundSize = 'cover'; 
+                                    imageContainer.style.backgroundRepeat = 'no-repeat';
+                                    imageContainer.style.backgroundPosition = 'center'; 
+                                    imageContainer.style.display = 'block';
+                                    console.log('Image set successfully');
+                                } else {
+                                    console.log('Image URL is not found');
+                                }
+                            } catch (error) {
+                                console.log('Error setting image:', error);
+                            }             
+                            searchButton.remove();
+                            searchBar.remove();
+                            promptMessage.remove();
+                            divContainer.style.display = 'flex';
+                        } else {
+                            alert('Please enter a valid token ID');
+                        }
                     }
-                    
-                    searchButton.remove();
-                    searchBar.remove();
-                    promptMessage.remove();
-                    
-                    imageContainer.style.display = 'block';
-                    divContainer.style.display = 'flex';
                 }
-
                 searchBar.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter') {
                         revealContent();
@@ -5396,16 +5510,230 @@ function addToolsFunctionality(sideElementsWidth){
                         div.style.backgroundColor = '#404a5c';
                         div.style.color = 'white';
                     });
-                    div.addEventListener('click', () => {
-                        // depending on the text sort differently here 
-                        // and then makeNEwNFT grid with the new current array 
-                        console.log('Hello World from', text);
+                    div.addEventListener('click', async () => {
+                        let listedItems = [];
+                        let itemsNotListed = [];
+                        if(text === "Listed"){
+                            let oldGrid = document.querySelector(".NewGrid");
+                            let gridItems = Array.from(oldGrid.children);  
+                            try{
+                                for(var i =0; i<gridItems.length; i++){
+                                    let tokenData;
+                                    let gridItemIDString = gridItems[i].id; 
+                                    let gridIDINT = parseInt(gridItemIDString.trim());
+
+                                    console.log('calling contract using tokenID:', gridIDINT);
+                                    try {
+                                        tokenData = await contract.methods.getTokenData(gridIDINT).call();
+                                        if(tokenData.forSale === true){
+                                            listedItems.push(gridIDINT);
+                                        }else{
+                                            itemsNotListed.push(gridIDINT);
+                                        }
+                                    } catch (error) {
+                                        console.error(`Error fetching toking Data ${tokenData}`);
+                                    }
+
+                                }
+                                gridItems = sortByID(gridItems, [...listedItems, ...itemsNotListed]);
+                                let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
+                                let oldGrid = document.querySelector(".NewGrid");
+                                currentNFTArray.sort((a, b) => {
+                                    let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                    let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                    return indexA - indexB;
+                                });
+                                if (oldGrid) {
+                                    oldGrid.innerHTML = '';
+                                    console.log('items Cleared from dome');
+                                }
+                                makeNewNFTGrid(currentNFTArray, oldGrid);
+                            }catch(error){
+                                console.log('Error making new nft grid to call', error);
+                            }
+                        }if(text === "Not Listed"){
+                            let oldGrid = document.querySelector(".NewGrid");
+                            let gridItems = Array.from(oldGrid.children);  
+                            try{
+                                for(var i = 0; i < gridItems.length; i++){
+                                    let tokenData;
+                                    let gridItemIDString = gridItems[i].id; 
+                                    let gridIDINT = parseInt(gridItemIDString.trim());
+
+                                    console.log('calling contract using tokenID:', gridIDINT);
+                                    try {
+                                        tokenData = await contract.methods.getTokenData(gridIDINT).call();
+                                        if(tokenData.forSale === true){
+                                            itemsNotListed.push(gridIDINT); 
+                                        }else{
+                                            listedItems.push(gridIDINT);  
+                                        }
+                                    } catch (error) {
+                                        console.error(`Error fetching token Data ${tokenData}`);
+                                    }
+                                }
+
+                                gridItems = sortByID(gridItems, [...itemsNotListed, ...listedItems]);
+                                let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
+
+                                let oldGrid = document.querySelector(".NewGrid");
+                                currentNFTArray.sort((a, b) => {
+                                    let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                    let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                    return indexA - indexB;
+                                });
+
+                                if (oldGrid) {
+                                    oldGrid.innerHTML = '';
+                                    console.log('items Cleared from DOM');
+                                }
+                                makeNewNFTGrid(currentNFTArray, oldGrid); 
+                            }catch(error){
+                                console.log('Error making new NFT grid to call', error);
+                            }
+                        }else if(text === "Highest Price"){
+                            console.log('Trying to filter by highest price');
+                            let oldGrid = document.querySelector(".NewGrid");
+                            let gridItems = Array.from(oldGrid.children); 
+                            let savedItems = gridItems; 
+                            let LoopNotBroken = false;
+                            try {
+                                let organizedByHighestIDarray = []; 
+                                console.log('trying to initiate while loop');
+                                while (gridItems.length > 0) {
+                                    let highestCount = BigInt(0);
+                                    let highestTokenID = null;
+                                    let counterJ = 0;
+
+                                    for (let j = 0; j < gridItems.length; j++) {
+                                        let gridItemIDString2 = gridItems[j].id; 
+                                        let gridIDINT2 = parseInt(gridItemIDString2.trim());
+                                        
+                                        try {
+                                            let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
+                                            let tokenPrice = BigInt(tokenDataCounter.price);
+
+                                            if (highestCount <= tokenPrice) {
+                                                highestCount = tokenPrice;
+                                                highestTokenID = tokenDataCounter.id;
+                                                counterJ = j;
+                                            }
+                                        } catch (error) {
+                                            console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
+                                        }
+                                    }
+                                    console.log('finished first loop with counterJ', counterJ);
+                                    console.log('finished first loop with highestTokenID', highestTokenID);
+                                    console.log('finished first loop with highestCount', highestCount);
+                                    if (highestTokenID !== null) {
+                                        const index = gridItems.indexOf(gridItems[counterJ]);
+                                        if (index > -1) {
+                                            gridItems.splice(index, 1); 
+                                        }
+                                        organizedByHighestIDarray.push(highestTokenID); 
+                                    }else{
+                                        LoopNotBroken = true;
+                                        alert('Sorry we could not find the highest token id');
+                                        break;
+                                        
+                                    }
+                                }
+
+                                if (LoopNotBroken === false) {   
+                                    savedItems = sortByID(savedItems, [...organizedByHighestIDarray]);
+                                    let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
+
+                                    currentNFTArray.sort((a, b) => {
+                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                        return indexA - indexB;
+                                    });
+
+                                    if (oldGrid) {
+                                        oldGrid.innerHTML = ''; 
+                                        console.log('Items cleared from DOM');
+                                    }
+                                    makeNewNFTGrid(currentNFTArray, oldGrid);  
+                                }
+                            } catch (error) {
+                                console.error('Error making new NFT grid:', error);
+                            }
+                        }else if(text === "Lowest Price") {
+                            console.log('Trying to filter by lowest price');
+                            let oldGrid = document.querySelector(".NewGrid");
+                            let gridItems = Array.from(oldGrid.children); 
+                            let savedItems = gridItems; 
+                            let LoopNotBroken = false;
+                            
+                            try {
+                                let organizedByLowestIDarray = []; 
+                                console.log('trying to initiate while loop');
+                                
+                                while (gridItems.length > 0) {
+                                    let lowestCount = BigInt(Number.MAX_SAFE_INTEGER);
+                                    let lowestTokenID = null;
+                                    let counterJ = 0;
+
+                                    for (let j = 0; j < gridItems.length; j++) {
+                                        let gridItemIDString2 = gridItems[j].id; 
+                                        let gridIDINT2 = parseInt(gridItemIDString2.trim());
+
+                                        try {
+                                            let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
+                                            let tokenPrice = BigInt(tokenDataCounter.price);
+
+                                            if (lowestCount >= tokenPrice) {
+                                                lowestCount = tokenPrice;
+                                                lowestTokenID = tokenDataCounter.id;
+                                                counterJ = j;
+                                            }
+                                        } catch (error) {
+                                            console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
+                                        }
+                                    }
+
+                                    console.log('Finished loop with counterJ', counterJ);
+                                    console.log('Finished loop with lowestTokenID', lowestTokenID);
+                                    console.log('Finished loop with lowestCount', lowestCount);
+
+                                    if (lowestTokenID !== null) {
+                                        const index = gridItems.indexOf(gridItems[counterJ]);
+                                        if (index > -1) {
+                                            gridItems.splice(index, 1);
+                                        }
+                                        organizedByLowestIDarray.push(lowestTokenID); 
+                                    } else {
+                                        LoopNotBroken = true;
+                                        alert('Sorry we could not find the lowest token id');
+                                        break;
+                                    }
+                                }
+
+                                if (LoopNotBroken === false) {
+                                    savedItems = sortByID(savedItems, [...organizedByLowestIDarray]);
+                                    let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
+
+                                    currentNFTArray.sort((a, b) => {
+                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                        return indexA - indexB;
+                                    });
+
+                                    if (oldGrid) {
+                                        oldGrid.innerHTML = ''; 
+                                        console.log('Items cleared from DOM');
+                                    }
+
+                                    makeNewNFTGrid(currentNFTArray, oldGrid); 
+                                }
+                            } catch (error) {
+                                console.error('Error making new NFT grid:', error);
+                            }
+                        }
                     });
 
                     miniSortContainer.appendChild(div);
                 });
-
-                const sortingata = ['Listed', 'Not listed', 'Highest Price', 'LowestPrice'];
             }else if(item.textContent == 'File a Report'){
                 console.log('Opening report form');
                 const reportContainer = document.createElement('div');
@@ -5543,13 +5871,13 @@ function addToolsFunctionality(sideElementsWidth){
                                     const responseJson = await reportResponse.json();
                                     if (responseJson.success === false) {
                                         console.log('Did not get back expected response');
-                                        if(responseJson.code === 10002444222202 ){
+                                        if(responseJson.code == 10002444222202 ){
                                             alert('Make sure to entere a valid email address invalid email');
-                                        }else if(responseJson.code === 3433444 ){
+                                        }else if(responseJson.code == 3433444 ){
                                             alert('Error with try and catch on server');
-                                        }else if(responseJson.code === 1000202 ){
+                                        }else if(responseJson.code == 1000202 ){
                                             alert('Sorry we already dedicated that you filed a report. We will contact you as soon as possible');
-                                        }else if(responseJson.code === 34444411 ){
+                                        }else if(responseJson.code == 34444411 ){
                                             alert('error with response from server');
                                         }else{
                                             alert('unexpected code error');
@@ -5569,6 +5897,8 @@ function addToolsFunctionality(sideElementsWidth){
                                             successSpan.style.display = 'block';
                                             successSpan.style.textAlign = 'center';
                                             successSpan.style.marginTop = '20px';
+                                            successSpan.style.fontSize = '10px';
+                                            successSpan.style.color = 'white';
                                             reportContainer.appendChild(successSpan);
                                         }catch(error){
                                             console.log('Error', error);
@@ -5817,6 +6147,28 @@ export async function checkifConnected(){
         }
     }
     
+}
+
+// Function to sort array of grid items based on provided ids
+function sortByID(currentArray, sortByArray) {
+    // Ensure currentArray is an array
+    if (!Array.isArray(currentArray)) {
+        console.error('currentArray is not an array:', currentArray);
+        return [];
+    }
+
+    // Create a map to store the order of the IDs for sorting
+    const orderMap = sortByArray.reduce((map, id, index) => {
+        map[id] = index;
+        return map;
+    }, {});
+
+    // Sort currentArray based on the order defined in sortByArray
+    return currentArray.sort((a, b) => {
+        let idA = parseInt(a.className.replace("grid-item", "").trim());
+        let idB = parseInt(b.className.replace("grid-item", "").trim());
+        return (orderMap[idA] || Infinity) - (orderMap[idB] || Infinity);
+    });
 }
 
 async function createChangeUsernamePopup() {
