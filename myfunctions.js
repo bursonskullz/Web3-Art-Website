@@ -1177,84 +1177,62 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
         overlay.style.justifyContent = 'flex-end'; 
         overlay.style.opacity = '.6';
 
+        let hoverTimeout;
         gridItem.addEventListener('mouseenter', async function() {
-            console.log('we are hovering on the mouse');
+            clearTimeout(hoverTimeout); 
             gridItem.style.transform = 'translateY(-5px)';
             overlay.style.display = 'flex';
-            var checkIfInStock = false; 
+            const buyButton = document.querySelector('.buy-button' + gridItem.id);
+            if(buyButton){
+                buyButton.remove();
+            }         
             var descriptionP = document.createElement('p');
             descriptionP.className = 'descriptionNFTPTAG';
-            descriptionP.style.width = '100%';
-            descriptionP.style.height = '80%';
-            descriptionP.style.top = '0%';
-            descriptionP.style.position = 'absolute';
-            descriptionP.style.overflowY = 'scroll';
-            descriptionP.style.fontSize = '1.8vh';
-            descriptionP.style.color = 'white';
+            descriptionP.style.cssText = 'width: 100%; height: 80%; top: 0%; position: absolute; overflow-y: scroll; font-size: 1.8vh; color: white;';
 
-            let tokenData; let value; let NFTOwner; let description; let thisAccount;
+            let tokenData, value, NFTOwner, description, thisAccount;
             if(isConnected){
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 thisAccount = accounts[0];
-                try{
+                try {
                     tokenData = await contract.methods.getTokenData(item.tokenID).call();
-                    if(tokenData){
-                        value = (tokenData.price)/(10**18);
+                    if(tokenData) {
+                        value = (tokenData.price) / (10**18);
                         NFTOwner = tokenData.owner;
-                        if (tokenData.flagged) {
-                            description = 'flagged';
-                        } else if (tokenData.forSale) {
-                            description = 'for sale';
-                        } else if (NFTOwner === thisAccount) {
-                            description = 'You Own This Token';
-                        } else {
-                            description = 'not for sale';
-                        }
+                        description = tokenData.flagged ? 'flagged' : 
+                                     tokenData.forSale ? 'for sale' : 
+                                     NFTOwner === thisAccount ? 'You Own This Token' : 'not for sale';
                     }
-                }catch(error){
-                    tokenData = null;
-                    value = "Error";
-                    NFTOwner = "Error";
-                    description = 'Error';
-                    console.log('Error getting token data on contract to display');
+                } catch(error) {
+                    console.error('Error getting token data on contract to display', error);
+                    value = "Error"; NFTOwner = "Error"; description = 'Error';
                 }
-            }else{
+            } else {
                 description = 'please connect wallet';
             }
-            if(value === 'Error' || value === undefined || value === null ){
-                descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID  + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
-            }else{
-                descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID + '<br>'  + 'Last Listed Price:' + "    " + value.toString() + " " + `${coin}` + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
-            }
-            
+
+            descriptionP.innerHTML = value === 'Error' || value === undefined || value === null ?
+                `Name: ${item.contractName} ${item.tokenID}<br>Owner: ${NFTOwner}<br><br>` :
+                `Name: ${item.contractName} ${item.tokenID}<br>Last Listed Price: ${value.toString()} ${coin}<br>Owner: ${NFTOwner}<br><br>`;
+
             overlay.appendChild(descriptionP);
             gridItem.appendChild(overlay);
             addNFTBuyButton(gridItem, description, gridItem.id, value, thisAccount, contract, item.image, coin);
         });
+
         gridItem.addEventListener('mouseleave', function() {
-            gridItem.style.transform = 'translateY(0)';
-            overlay.remove(); 
-            setTimeout(()=> {
-                const buyButton = document.querySelector('.buy-button' + gridItem.id.toString());
+            hoverTimeout = setTimeout(() => {
+                gridItem.style.transform = 'translateY(0)';
+                const buyButton = document.querySelector('.buy-button' + gridItem.id);
                 const descriptionP = document.querySelector('.descriptionNFTPTAG');
 
-                if (buyButton != 'undefined' || buyButton != null) {
-                    buyButton.remove();
-                } else {
-                    console.error('Buy button not found');
-                }
-                if(descriptionP){
-                   descriptionP.remove(); 
-                }else{
-                    console.log('Description not found');
-                }
-            }, 1);
+                if (buyButton) buyButton.remove();
+                if (descriptionP) descriptionP.remove();
+                overlay.remove(); 
+            }, 100); 
         });
-
         gridContainer.appendChild(gridItem);
     });
-
-    
     parentElement.appendChild(gridContainer);
 
 }
@@ -1300,78 +1278,59 @@ export function makeNewNFTGrid(array, grid,coin, contract) {
         overlay.style.opacity = '.6';
         grid.appendChild(gridItem);
 
+        let hoverTimeout;
         gridItem.addEventListener('mouseenter', async function() {
-            console.log('we are hovering on the mouse');
+            clearTimeout(hoverTimeout); // Clear the timeout if mouse leaves before it's set
             gridItem.style.transform = 'translateY(-5px)';
             overlay.style.display = 'flex';
-            var checkIfInStock = false; 
+            const buyButton = document.querySelector('.buy-button' + gridItem.id);
+            if(buyButton){
+                buyButton.remove();
+            }
             var descriptionP = document.createElement('p');
             descriptionP.className = 'descriptionNFTPTAG';
-            descriptionP.style.width = '100%';
-            descriptionP.style.height = '80%';
-            descriptionP.style.top = '0%';
-            descriptionP.style.position = 'absolute';
-            descriptionP.style.overflowY = 'scroll';
-            descriptionP.style.fontSize = '1.8vh';
-            descriptionP.style.color = 'white';
+            descriptionP.style.cssText = 'width: 100%; height: 80%; top: 0%; position: absolute; overflow-y: scroll; font-size: 1.8vh; color: white;';
 
-            let tokenData; let value; let NFTOwner; let description; let thisAccount;
+            let tokenData, value, NFTOwner, description, thisAccount;
             if(isConnected){
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 thisAccount = accounts[0];
-                try{
+                try {
                     tokenData = await contract.methods.getTokenData(item.tokenID).call();
-                    if(tokenData){
-                        value = (tokenData.price)/(10**18);
+                    if(tokenData) {
+                        value = (tokenData.price) / (10**18);
                         NFTOwner = tokenData.owner;
-                        if (tokenData.flagged) {
-                            description = 'flagged';
-                        } else if (tokenData.forSale) {
-                            description = 'for sale';
-                        } else if (NFTOwner === thisAccount) {
-                            description = 'You Own This Token';
-                        } else {
-                            description = 'not for sale';
-                        }
+                        description = tokenData.flagged ? 'flagged' : 
+                                     tokenData.forSale ? 'for sale' : 
+                                     NFTOwner === thisAccount ? 'You Own This Token' : 'not for sale';
                     }
-                }catch(error){
-                    tokenData = null;
-                    value = "Error";
-                    NFTOwner = "Error";
-                    description = 'Error';
-                    console.log('Error getting token data on contract to display');
+                } catch(error) {
+                    console.error('Error getting token data on contract to display', error);
+                    value = "Error"; NFTOwner = "Error"; description = 'Error';
                 }
-            }else{
+            } else {
                 description = 'please connect wallet';
             }
-            if(value === 'Error' || value === undefined || value === null ){
-                descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID  + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
-            }else{
-                descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID + '<br>'  + 'Last Listed Price:' + "    " + value.toString() + " " + `${coin}` + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
-            }
-            
+
+            descriptionP.innerHTML = value === 'Error' || value === undefined || value === null ?
+                `Name: ${item.contractName} ${item.tokenID}<br>Owner: ${NFTOwner}<br><br>` :
+                `Name: ${item.contractName} ${item.tokenID}<br>Last Listed Price: ${value.toString()} ${coin}<br>Owner: ${NFTOwner}<br><br>`;
+
             overlay.appendChild(descriptionP);
             gridItem.appendChild(overlay);
             addNFTBuyButton(gridItem, description, gridItem.id, value, thisAccount, contract, item.image, coin);
         });
+
         gridItem.addEventListener('mouseleave', function() {
-            gridItem.style.transform = 'translateY(0)';
-            overlay.remove(); 
-            setTimeout(()=> {
-                const buyButton = document.querySelector('.buy-button' + gridItem.id.toString());
+            hoverTimeout = setTimeout(() => {
+                gridItem.style.transform = 'translateY(0)';
+                const buyButton = document.querySelector('.buy-button' + gridItem.id);
                 const descriptionP = document.querySelector('.descriptionNFTPTAG');
 
-                if (buyButton != 'undefined' || buyButton != null) {
-                    buyButton.remove();
-                } else {
-                    console.error('Buy button not found');
-                }
-                if(descriptionP){
-                   descriptionP.remove(); 
-                }else{
-                    console.log('Description not found');
-                }
-            }, 1);
+                if (buyButton) buyButton.remove();
+                if (descriptionP) descriptionP.remove();
+                overlay.remove();
+            }, 100); // Slight delay to avoid flickering
         });
     });
 }
