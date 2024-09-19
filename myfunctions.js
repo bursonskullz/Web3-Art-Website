@@ -234,21 +234,19 @@ export async function addDigitalElementListener(digitalElement){
                         contractDiv.style.position = 'relative';
                         contractDiv.style.transition = 'background-color 0.3s, transform 0.2s';
                         contractDiv.style.width = '100%';
-                        contractDiv.style.padding = '10px'; // Adds padding for better spacing
-                        contractDiv.style.backgroundColor = 'dimgray'; // Light neutral color for background
-                        //contractDiv.style.borderBottom = '2px solid black'; // Light border at the bottom
-
+                        contractDiv.style.padding = '10px'; 
+                        contractDiv.style.backgroundColor = 'dimgray'; 
                         contractDiv.addEventListener('mouseenter', () => {
-                            contractDiv.style.backgroundImage = 'linear-gradient(180deg, #2F2F2F, #4A4A4A)'; // Adds gradient from dark to lighter gray
-                            contractDiv.style.transform = 'translateY(-2px)'; // Adds a slight lift on hover
+                            contractDiv.style.backgroundImage = 'linear-gradient(180deg, #2F2F2F, #4A4A4A)'; 
+                            contractDiv.style.transform = 'translateY(-2px)'; 
                         });
-
+                        
                         contractDiv.addEventListener('mouseleave', () => {
                             contractDiv.style.backgroundImage = '';
                             contractDiv.style.backgroundColor = 'dimgray';
-                            contractDiv.style.transform = 'translateY(0)'; // Resets position on leave
+                            contractDiv.style.transform = 'translateY(0)';
                         });
-
+                        
                         const imageContainer = document.createElement('div');
                         imageContainer.style.marginRight = '10px';
                         imageContainer.style.width = '50px'; 
