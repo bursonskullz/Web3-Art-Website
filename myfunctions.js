@@ -236,17 +236,18 @@ export async function addDigitalElementListener(digitalElement){
                         contractDiv.style.width = '100%';
                         contractDiv.style.padding = '10px'; 
                         contractDiv.style.backgroundColor = 'dimgray'; 
+
                         contractDiv.addEventListener('mouseenter', () => {
                             contractDiv.style.backgroundImage = 'linear-gradient(180deg, #2F2F2F, #4A4A4A)'; 
-                            contractDiv.style.transform = 'translateY(-2px)'; 
+                            contractDiv.style.transform = 'translateY(-2px)';
                         });
-                        
+
                         contractDiv.addEventListener('mouseleave', () => {
                             contractDiv.style.backgroundImage = '';
                             contractDiv.style.backgroundColor = 'dimgray';
                             contractDiv.style.transform = 'translateY(0)';
                         });
-                        
+
                         const imageContainer = document.createElement('div');
                         imageContainer.style.marginRight = '10px';
                         imageContainer.style.width = '50px'; 
@@ -1111,7 +1112,7 @@ export function shiftOffScreen(element) {
     var interval = setInterval(shift, 38); 
 }
 
-export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
+export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coin, contract) {
     var numRows = Math.ceil(array.length / columns);
     var oldGrid = document.querySelector('.Grid_container');
     var gridContainer = document.createElement('div');
@@ -1120,7 +1121,6 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
         console.log('removed old grid');
         oldGrid.parentNode.removeChild(oldGrid); 
     }
-    
     gridContainer.style.position = 'relative';
     gridContainer.style.left = `17%`;
     gridContainer.style.height = '100%'; 
@@ -1191,30 +1191,64 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
             descriptionP.style.overflowY = 'scroll';
             descriptionP.style.fontSize = '1.8vh';
             descriptionP.style.color = 'white';
-            let maticValue = '50000'; 
-            let NFTOwner = '0x37277211111'; 
-            descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID + '<br>'  + 'Approximate Price:' + "    " + maticValue + " Matic " + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
+
+            let tokenData; let value; let NFTOwner; let description; let thisAccount;
+            if(isConnected){
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                thisAccount = accounts[0];
+                try{
+                    tokenData = await contract.methods.getTokenData(item.tokenID).call();
+                    if(tokenData){
+                        value = (tokenData.price)/(10**18);
+                        NFTOwner = tokenData.owner;
+                        if (tokenData.flagged) {
+                            description = 'flagged';
+                        } else if (tokenData.forSale) {
+                            description = 'for sale';
+                        } else if (NFTOwner === thisAccount) {
+                            description = 'You Own This Token';
+                        } else {
+                            description = 'not for sale';
+                        }
+                    }
+                }catch(error){
+                    tokenData = null;
+                    value = "Error";
+                    NFTOwner = "Error";
+                    description = 'Error';
+                    console.log('Error getting token data on contract to display');
+                }
+            }else{
+                description = 'please connect wallet';
+            }
+            if(value === 'Error' || value === undefined || value === null ){
+                descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID  + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
+            }else{
+                descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID + '<br>'  + 'Last Listed Price:' + "    " + value.toString() + " " + `${coin}` + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
+            }
+            
             overlay.appendChild(descriptionP);
             gridItem.appendChild(overlay);
-            addNFTBuyButton(gridItem, checkIfInStock, gridItem.id);
+            addNFTBuyButton(gridItem, description, gridItem.id, value, thisAccount, contract, item.image, coin);
         });
         gridItem.addEventListener('mouseleave', function() {
             gridItem.style.transform = 'translateY(0)';
-            overlay.style.display = 'none'; 
+            overlay.remove(); 
+            setTimeout(()=> {
+                const buyButton = document.querySelector('.buy-button' + gridItem.id.toString());
+                const descriptionP = document.querySelector('.descriptionNFTPTAG');
 
-            const buyButton = document.querySelector('.buy-button' + gridItem.id.toString());
-            const descriptionP = document.querySelector('.descriptionNFTPTAG');
-
-            if (buyButton != 'undefined' || buyButton != null) {
-                buyButton.remove();
-            } else {
-                console.error('Buy button not found');
-            }
-            if(descriptionP){
-               descriptionP.remove(); 
-            }else{
-                console.log('Description not found');
-            }
+                if (buyButton != 'undefined' || buyButton != null) {
+                    buyButton.remove();
+                } else {
+                    console.error('Buy button not found');
+                }
+                if(descriptionP){
+                   descriptionP.remove(); 
+                }else{
+                    console.log('Description not found');
+                }
+            }, 1);
         });
 
         gridContainer.appendChild(gridItem);
@@ -1224,9 +1258,7 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent) {
     parentElement.appendChild(gridContainer);
 
 }
-
-
-export function makeNewNFTGrid(array, grid) {
+export function makeNewNFTGrid(array, grid,coin, contract) {
     console.log('trying to make new grid');
     array.forEach(item => {
         console.log('trying to make items to append to grid');
@@ -1267,10 +1299,82 @@ export function makeNewNFTGrid(array, grid) {
         overlay.style.justifyContent = 'flex-end'; 
         overlay.style.opacity = '.6';
         grid.appendChild(gridItem);
-        console.log('we made a new grid'); 
+
+        gridItem.addEventListener('mouseenter', async function() {
+            console.log('we are hovering on the mouse');
+            gridItem.style.transform = 'translateY(-5px)';
+            overlay.style.display = 'flex';
+            var checkIfInStock = false; 
+            var descriptionP = document.createElement('p');
+            descriptionP.className = 'descriptionNFTPTAG';
+            descriptionP.style.width = '100%';
+            descriptionP.style.height = '80%';
+            descriptionP.style.top = '0%';
+            descriptionP.style.position = 'absolute';
+            descriptionP.style.overflowY = 'scroll';
+            descriptionP.style.fontSize = '1.8vh';
+            descriptionP.style.color = 'white';
+
+            let tokenData; let value; let NFTOwner; let description; let thisAccount;
+            if(isConnected){
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                thisAccount = accounts[0];
+                try{
+                    tokenData = await contract.methods.getTokenData(item.tokenID).call();
+                    if(tokenData){
+                        value = (tokenData.price)/(10**18);
+                        NFTOwner = tokenData.owner;
+                        if (tokenData.flagged) {
+                            description = 'flagged';
+                        } else if (tokenData.forSale) {
+                            description = 'for sale';
+                        } else if (NFTOwner === thisAccount) {
+                            description = 'You Own This Token';
+                        } else {
+                            description = 'not for sale';
+                        }
+                    }
+                }catch(error){
+                    tokenData = null;
+                    value = "Error";
+                    NFTOwner = "Error";
+                    description = 'Error';
+                    console.log('Error getting token data on contract to display');
+                }
+            }else{
+                description = 'please connect wallet';
+            }
+            if(value === 'Error' || value === undefined || value === null ){
+                descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID  + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
+            }else{
+                descriptionP.innerHTML =  'Name:' + "    " + item.contractName + ' ' + item.tokenID + '<br>'  + 'Last Listed Price:' + "    " + value.toString() + " " + `${coin}` + '<br>'+ " Owner: "+  NFTOwner +  '<br> <br>';
+            }
+            
+            overlay.appendChild(descriptionP);
+            gridItem.appendChild(overlay);
+            addNFTBuyButton(gridItem, description, gridItem.id, value, thisAccount, contract, item.image, coin);
+        });
+        gridItem.addEventListener('mouseleave', function() {
+            gridItem.style.transform = 'translateY(0)';
+            overlay.remove(); 
+            setTimeout(()=> {
+                const buyButton = document.querySelector('.buy-button' + gridItem.id.toString());
+                const descriptionP = document.querySelector('.descriptionNFTPTAG');
+
+                if (buyButton != 'undefined' || buyButton != null) {
+                    buyButton.remove();
+                } else {
+                    console.error('Buy button not found');
+                }
+                if(descriptionP){
+                   descriptionP.remove(); 
+                }else{
+                    console.log('Description not found');
+                }
+            }, 1);
+        });
     });
 }
-
 export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
     var numRows = Math.ceil(array.length / columns);
     var oldGrid = document.querySelector('.Grid_container');
@@ -2906,7 +3010,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     collectionBackgroundImageContainer.style.left = '20%';
     collectionBackgroundImageContainer.style.height = '15%';
 
-    collectionBackgroundImageContainer.style.backgroundImage = 'url("/images/BursonSKullText.png")'; 
+    collectionBackgroundImageContainer.style.backgroundImage = `url('${userSelectedContract.collectionBackgroundImage}')`; 
     collectionBackgroundImageContainer.style.backgroundSize = 'cover';
     collectionBackgroundImageContainer.style.backgroundRepeat = 'no-repeat';
     collectionBackgroundImageContainer.style.backgroundPosition = 'center'; 
@@ -3220,7 +3324,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
             emojiOptionsContainer.className =' emojiOptionsContainer';
 
             emojiMenu.appendChild(emojiOptionsContainer);
-
             const emojis = ['😊', '🖕🏻',  '😁', '😎', '😍', '👍', '❤️', '🎉', '🌟', '🍕', '🎈', '🎨', '🚀', '💡', '🔥', '🌈', '🙌', '👏', '🤩', '💯', '🙏',
                    '🎶', '💪', '💥', '💖', '🌺', '🌸', '🌼', '🍦', '🍭', '🍩', '🍬', '🍔', '🍟', '🥇', '🏆', '🏅', '🎖️', '🏵️', '🎯', '🚗',
                    '🚲', '🚄', '🚢', '✈️', '🚀', '🛸', '🚁', '🎠', '🎡', '🏰', '🏯', '🏟️', '⛲', '🌆', '🌉', '🏞️', '🏝️', '🏖️', '⛱️',
@@ -3240,7 +3343,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
             });
             unknownDiv.appendChild(emojiMenu);
         }
-        
     });
 
     const messageInput = document.createElement('input');
@@ -3391,7 +3493,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
 
     });
 
-    makeNFTGrid(array, parentElement, numColumns, gridWidthPercent);
+    makeNFTGrid(array, parentElement, numColumns, gridWidthPercent, coin, contract);
 
     const logo = document.createElement('div');
     footer.style.position = 'relative';
@@ -3444,7 +3546,8 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     footerLargeTextContainer.style.backgroundSize = 'cover';
     footerLargeTextContainer.style.backgroundRepeat = 'no-repeat';
     footerLargeTextContainer.style.backgroundPosition = 'center';
-    
+
+
     logo.style.position = 'relative'; 
     logo.style.height = '100%'
     logo.style.width = '15%'; 
@@ -4976,12 +5079,9 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                         const spanTextContent = spanText.textContent.replace(/Sweep|items| /g, '');
                         const integerValue = parseInt(spanTextContent.trim(), 10);  
                         console.log('trying to sweep this many items:', integerValue );
-
                         let oldGrid = document.querySelector(".NewGrid");
                         let gridItems = Array.from(oldGrid.children);  
                         const children = Array.from(sweepBox.children);
-
-                        // Iterate backward to avoid issues with index shifting
                         for (let i = children.length - 1; i >= 0; i--) {
                             const child = children[i];
                             if (!child.classList.contains('closeIcon')) {
@@ -5001,97 +5101,114 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                         try{    
                             let availabeTokens = [];
                             let unavailableTokens = [];
-                            for(var k = 0; k< integerValue; k++){
-                               let tokenID =  parseInt(gridItems[k].id);
-                               let tokenData;
-                                try{
-                                    tokenData = await contract.methods.getTokenData(tokenID).call();
-                                    if(tokenData.forSale){
-                                        availabeTokens.push(tokenID);
-                                    }else{
-                                        unavailableTokens.push(tokenID);
-                                    }
-                                }catch(error){
-                                    console.log('Error calling getTokenData() on contract', error);
-                                }
-                            }
-                            if(unavailableTokens.length == 0 && availabeTokens.length != 0){
-                                console.log('trying to sweep the floor');
-                                try{
-                                    let currentAddressGasSender;
-                                    if (isConnected) {
-                                        let thisAccount = window.ethereum.selectedAddress;
-                                        currentAddressGasSender = thisAccount;
-                                    } else {
-                                        if (typeof window.ethereum === 'undefined') { 
-                                            alert('You must install MetaMask or another Ethereum provider to purchase tokens');
-                                        } else {
-                                            if (window.ethereum.isMetaMask) { 
-                                                try {
-                                                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                                                    let thisAccount = accounts[0];
-                                                    currentAddressGasSender = thisAccount;
-                                                } catch (error) {
-                                                    if (error.code === -32002) { 
-                                                        alert('Please open the MetaMask extension manually, sign in, and reload the page.');
-                                                    } else {
-                                                        alert(`Error: ${error.message || error}`);
-                                                    }
-                                                }
-                                            } else { 
-                                                alert('MetaMask not detected. Please install MetaMask to use this feature.');
-                                            }
+                            console.log('trying to sweep this many items:', integerValue);
+                            console.log('trying to compare to length of grid:', gridItems.length);
+
+                            if(integerValue <= gridItems.length && integerValue != 0){
+                                for(var k = 0; k< integerValue; k++){
+                                    console.log("grid item swep", gridItems[k].id);
+                                    console.log('trying to get id and parse to integer');
+                                   let tokenID =  parseInt(gridItems[k].id);
+                                   console.log('tokenID is', tokenID);
+                                   let tokenData;
+                                    try{
+                                        tokenData = await contract.methods.getTokenData(tokenID).call();
+                                        if(tokenData.forSale){
+                                            availabeTokens.push(tokenID);
+                                        }else{
+                                            unavailableTokens.push(tokenID);
                                         }
+                                    }catch(error){
+                                        // for testing purposes 
+                                        //unavailableTokens.push(tokenID);
+                                        //availabeTokens.push(tokenID);
+                                        console.log('Error calling getTokenData() on contract', error);
                                     }
-                                    if(currentAddressGasSender){
-                                        const gasEstimate = await contract.methods.purchaseArrayOfNFT(availabeTokens).estimateGas({ from: currentAddressGasSender });
-                                        const tx = await contract.methods.purchaseArrayOfNFT(availabeTokens).send({
-                                                from: currentAddressGasSender,
-                                                gas: gasEstimate
-                                        });
-                                        if (tx && tx.transactionHash) {
-                                            console.log('Transaction sent. Waiting for confirmation...');
-                                            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-                                            if (receipt && receipt.status === true) {
-                                                console.log('The user accepted the transaction and it was successful.');
-                                                console.log('creating success span tag inside contaniner');
-                                                messageLoadingSpan.textContent = '';
-                                                messageLoadingSpan.textContent = 'Sweep successful! Thank you come again.';
+                                }
+                                if(unavailableTokens.length == 0 && availabeTokens.length != 0){
+                                    console.log('trying to sweep the floor');
+                                    try{
+                                        let currentAddressGasSender;
+                                        if (isConnected) {
+                                            let thisAccount = window.ethereum.selectedAddress;
+                                            currentAddressGasSender = thisAccount;
+                                        } else {
+                                            if (typeof window.ethereum === 'undefined') { 
+                                                alert('You must install MetaMask or another Ethereum provider to purchase tokens');
                                             } else {
-                                                console.log('The transaction failed.');
-                                                messageLoadingSpan.textContent = '';
-                                                messageLoadingSpan.textContent = 'Sorry an error occured. The transaction failed';
+                                                if (window.ethereum.isMetaMask) { 
+                                                    try {
+                                                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                                                        let thisAccount = accounts[0];
+                                                        currentAddressGasSender = thisAccount;
+                                                    } catch (error) {
+                                                        if (error.code === -32002) { 
+                                                            alert('Please open the MetaMask extension manually, sign in, and reload the page.');
+                                                        } else {
+                                                            alert(`Error: ${error.message || error}`);
+                                                        }
+                                                    }
+                                                } else { 
+                                                    alert('MetaMask not detected. Please install MetaMask to use this feature.');
+                                                }
                                             }
-                                        } else {
-                                            console.log('The transaction could not be sent.');
-                                            messageLoadingSpan.textContent = '';
-                                            messageLoadingSpan.textContent = 'The transaction could not be sent.';
                                         }
-                                    }else{
+                                        if(currentAddressGasSender){
+                                            const gasEstimate = await contract.methods.purchaseArrayOfNFT(availabeTokens).estimateGas({ from: currentAddressGasSender });
+                                            const tx = await contract.methods.purchaseArrayOfNFT(availabeTokens).send({
+                                                    from: currentAddressGasSender,
+                                                    gas: gasEstimate
+                                            });
+                                            if (tx && tx.transactionHash) {
+                                                console.log('Transaction sent. Waiting for confirmation...');
+                                                const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+                                                if (receipt && receipt.status === true) {
+                                                    console.log('The user accepted the transaction and it was successful.');
+                                                    console.log('creating success span tag inside contaniner');
+                                                    messageLoadingSpan.textContent = '';
+                                                    messageLoadingSpan.textContent = 'Sweep successful! Thank you come again.';
+                                                } else {
+                                                    console.log('The transaction failed.');
+                                                    messageLoadingSpan.textContent = '';
+                                                    messageLoadingSpan.textContent = 'Sorry an error occured. The transaction failed';
+                                                }
+                                            } else {
+                                                console.log('The transaction could not be sent.');
+                                                messageLoadingSpan.textContent = '';
+                                                messageLoadingSpan.textContent = 'The transaction could not be sent.';
+                                            }
+                                        }else{
+                                            messageLoadingSpan.textContent = '';
+                                            messageLoadingSpan.textContent = 'Login to your metamask before proceeding.';
+                                        }
+                                    }catch(error){
+                                        console.log('Error calling purchaseArrayOfNFT on the contract', error);
                                         messageLoadingSpan.textContent = '';
-                                        messageLoadingSpan.textContent = 'login to your metamask.';
-                                        alert('Please make sure to login to your metamask before proceeding');
+                                        messageLoadingSpan.textContent = 'error calling contract function may not be set up yet.';
                                     }
-                                }catch(error){
-                                    console.log('Error calling purchaseArrayOfNFT on the contract', error);
+                                }else if(unavailableTokens.length == 0 && availabeTokens.length == 0) {
                                     messageLoadingSpan.textContent = '';
-                                    messageLoadingSpan.textContent = 'error calling contract.';
+                                    messageLoadingSpan.textContent = 'Sorry the contract is not setup yet.';
+                                }else if(unavailableTokens.length != 0 && availabeTokens.length != 0) {
+                                    messageLoadingSpan.textContent = '';
+                                    messageLoadingSpan.textContent = 'Sorry some of the tokens you are trying to sweep are unavailable. Please enter a smaller amount and try again. You can check which tokens are availabe by hovering over them';
+                                }else{
+                                    messageLoadingSpan.textContent = '';
+                                    messageLoadingSpan.textContent = 'Sorry an unexpected error occured.';
                                 }
-                            }else if(unavailableTokens.length == 0 && availabeTokens.length == 0){
-                                console.log('sorry contract not setup yet');
-                                messageLoadingSpan.textContent = '';
-                                messageLoadingSpan.textContent = 'error calling contract not setup yet.';
-                            }else if(unavailableTokens.length != 0 && availabeTokens.length != 0) {
-                                alert('Sorry some of the tokens you are trying to sweep are not availabe. Try to enter a lower amount. You can check the floor manuelly');
                             }else{
-                                alert('An unexpected error occured please try again');
+                                messageLoadingSpan.textContent = '';
+                                messageLoadingSpan.textContent = `Please enter an appropriate integer to sweep the grid only has ${gridItems.length} tokens available`;
                             }
                         }catch(error){
                             console.log('Error sweeping items', error);
+                            messageLoadingSpan.textContent = '';
+                            messageLoadingSpan.textContent = `Please contact support if you keep experiencing issues`;
                         }
                     }catch(error){
                         console.log('error getting item number for sweep', error);
                     }
+                    
                 }
                 searchButton.addEventListener('click', sweepGrid);
             }else if (item.textContent == 'Search') {
@@ -5423,7 +5540,7 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                     oldGrid.innerHTML = '';
                                     console.log('items Cleared from dome');
                                 }
-                                makeNewNFTGrid(currentNFTArray, oldGrid);
+                                makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract);
                             }catch(error){
                                 console.log('Error making new nft grid to call', error);
                             }
@@ -5461,7 +5578,7 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                     oldGrid.innerHTML = '';
                                     console.log('items Cleared from DOM');
                                 }
-                                makeNewNFTGrid(currentNFTArray, oldGrid); 
+                                makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract); 
                             }catch(error){
                                 console.log('Error making new NFT grid to call', error);
                             }
@@ -5525,7 +5642,7 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                         oldGrid.innerHTML = ''; 
                                         console.log('Items cleared from DOM');
                                     }
-                                    makeNewNFTGrid(currentNFTArray, oldGrid);  
+                                    makeNewNFTGrid(currentNFTArray, oldGrid,coin, contract);  
                                 }
                             } catch (error) {
                                 console.error('Error making new NFT grid:', error);
@@ -5594,7 +5711,7 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                         console.log('Items cleared from DOM');
                                     }
 
-                                    makeNewNFTGrid(currentNFTArray, oldGrid); 
+                                    makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract); 
                                 }
                             } catch (error) {
                                 console.error('Error making new NFT grid:', error);
@@ -6843,13 +6960,11 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                 closeIcon.style.cursor = 'pointer';
                 closeIcon.style.fontSize = '20px';
                 closeIcon.style.color = '#000';
-
                 closeIcon.addEventListener('click', () => {
                     parentContainer.remove();
                 });
                 if (failedTokens.length > 0) {
                     if (successFullTokens.length > 0) {
-                        // display successful tokens with others
                         const successContainer = document.createElement('div');
                         successContainer.classList.add('success-tokens-container');
                         const successList = document.createElement('ul');
@@ -6867,11 +6982,9 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         noSuccessMessage.textContent = 'Sorry unable to transfer tokens';
                         parentContainer.appendChild(noSuccessMessage);
                     }
-
                     const failedContainer = document.createElement('div');
                     failedContainer.classList.add('failed-tokens-container'); 
                     const failedList = document.createElement('ul');
-                    
                     failedTokens.forEach(tokenId => {
                         const listItem = document.createElement('li');
                         listItem.textContent = `Failed to Tranfer Token: ${tokenId}`;
@@ -6898,7 +7011,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
         }else{
             console.log('unexpected error occured with transfer text');
         }
-
     }else{
         console.log('unexpected data for listOrDelistOption variable');
     }
@@ -6911,7 +7023,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
         }catch(error){
             console.log('Error calling the function getUsersTokens() on the contract');
             UsersNFTsIds = [];
-            
         }
         // comment to stop testing
         UsersNFTsIds = [1,2,3,4,5, 6,7,8];
@@ -7612,6 +7723,7 @@ function createContract(data) {
         function listNFT(uint256 tokenId, uint256 userListPrice) external payable {
             // remember to send 15 matic to Roy for listing fee
             require(owners[tokenId] == msg.sender, "Only the owner can list the NFT");
+            require(nfts[tokenId].flagged == false, "Only tokens that are not flagged can be listed ");
             require(userListPrice >= minimalListingPrice, "Price below minimum listing price");
             payable(walletToReceiveFunds).transfer(minimalTransferFee); // send Roy minimal transfer fee
             nfts[tokenId].forSale = true;
@@ -9311,7 +9423,7 @@ async function checkNetwork(network_name) {
         return false;
     }
 }
-function addNFTBuyButton(parentDiv, availabe, buttonClassName){
+function addNFTBuyButton(parentDiv, description, buttonClassName, value, address, contract, tokenImage, coin){
     var buyButton = document.createElement("div");
     buyButton.className =  'buy-button' + buttonClassName;
     buyButton.style.position = "fixed";
@@ -9328,29 +9440,122 @@ function addNFTBuyButton(parentDiv, availabe, buttonClassName){
     buyButton.style.borderTopRightRadius = '0.4vh';
     buyButton.style.fontSize = '1.8vh';
 
-    if(availabe){
+    if(description == 'for sell'){
         var buttonText = document.createTextNode("Purchase");
+    }else if(description == 'flagged'){
+        var buttonText = document.createTextNode("flagged");
+        buttonText.style.color = 'red';
+    }else if(description == 'please connect wallet'){
+        var buttonText = document.createTextNode("Connect your wallet");
     }else{
         var buttonText = document.createTextNode("Unavailable");
     }
     buyButton.appendChild(buttonText);
     parentDiv.appendChild(buyButton);
-    let currentname; 
-    for(const NFT of currentNFTArray){
-        if(NFT.id == parentDiv.id){
-            currentname = NFT.name + " " + NFT.id;
-        }
-    }
-    if(buttonText.textContent == "Purchase"){
+
+    if (buttonText.textContent == "Purchase") {
         buyButton.addEventListener("click", async function() {
-            if(isConnected){
-                console.log('trying to call solidity function on blockchain');
-            }else{
-                alert('you must connect you wallet to make a purchase');
+            if (isConnected) {
+                const web3 = new Web3(window.ethereum);
+                try {
+                    const tokenData = await contract.methods.getTokenData(parseInt(parentDiv.id)).call();// should fail until contract is setup
+                    const purchaseAmount = tokenData.price;
+                    const gasEstimate = await contract.methods.purchaseSingleNFT(parseInt(parentDiv.id), purchaseAmount).estimateGas({ from: address });
+                    const tx = await contract.methods.purchaseSingleNFT(parseInt(parentDiv.id), purchaseAmount).send({
+                        from: address,
+                        gas: gasEstimate
+                    });
+                    if (tx && tx.transactionHash) {
+                        console.log('Transaction sent. Waiting for confirmation...');
+                        const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+                        if (receipt && receipt.status === true) {
+                            alert('Your Transaction was a success.');
+                            tokenPurchaseForm(parentDid.id, purchaseAmount, gasEstimate, tx.transactionHash, reciept, tokenImage, coin);
+                        } else {
+                            alert('The transaction failed.');
+                        }
+                    } else {
+                        alert('The transaction could not be sent.');
+                    }
+                } catch (error) {
+                    console.error('Error calling function on the blockchain:', error);
+                }
+            } else {
+                alert('You must connect your wallet to make a purchase');
             }
         });
     }
     parentDiv.appendChild(buyButton);
+}
+function tokenPurchaseForm(tokenID, purchaseAmount, gasEstimate, transactionHash, receipt, tokenImage,coin) {
+    const formContainer = document.createElement('div');
+    formContainer.style.position = 'absolute';
+    formContainer.style.top = '50%';
+    formContainer.style.left = '50%';
+    formContainer.style.transform = 'translate(-50%, -50%)';
+    formContainer.style.width = '30%';
+    formContainer.style.height = '55%';
+    formContainer.style.padding = '20px';
+    formContainer.style.backgroundColor = '#404a5c';
+    formContainer.style.borderRadius = '10px';
+    formContainer.style.color = 'white';
+    formContainer.style.fontSize = '2vh';
+    formContainer.style.zIndex = '1000';
+    formContainer.style.textAlign = 'center';
+    formContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+    formContainer.style.overflowY = 'scroll';
+    formContainer.style.border = '2px solid black';
+    formContainer.style.borderRadius = '5px';
+    const closeButton = document.createElement('span');
+    closeButton.textContent = 'X';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '15px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.color = 'red';
+    closeButton.style.fontSize = '1.5vh';
+    closeButton.onclick = function() {
+        document.body.removeChild(formContainer);
+    };
+    formContainer.appendChild(closeButton);
+    const tokenIDContainer = document.createElement('span');
+    tokenIDContainer.textContent = `Token ID: ${tokenID}`;
+    tokenIDContainer.style.color = 'black';
+    tokenIDContainer.style.display = 'block';
+    tokenIDContainer.style.marginBottom = '10px';
+    formContainer.appendChild(tokenIDContainer);
+    const imageContainer = document.createElement('div');
+    const img = document.createElement('img');
+    imageContainer.style.position = 'relative';
+    imageContainer.style.width = '58%';
+    imageContainer.style.left = '20%';
+    imageContainer.style.height = '45%';
+    imageContainer.style.border = '1px solid black';
+    img.src = tokenImage;
+    img.style.position = 'relative';
+    img.style.height = '100%';
+    img.style.width = '100%';
+    imageContainer.appendChild(img);
+    formContainer.appendChild(imageContainer);
+    const infoContainer = document.createElement('div');
+    infoContainer.style.marginTop = '15px';
+    const purchaseAmountText = document.createElement('p');
+    purchaseAmount = purchaseAmount/(10**18);// reset before displaying
+    purchaseAmountText.textContent = `Purchase Amount: ${purchaseAmount.toFixed(3).toString()} ${coin}`;
+    infoContainer.appendChild(purchaseAmountText);
+    const gasEstimateText = document.createElement('p');
+    const gasEstimateInETH = BigInt(gasEstimate)/BigInt(10**18);
+    gasEstimateText.textContent = `Gas Estimate: ${gasEstimateInETH} ${coin}`;
+    infoContainer.appendChild(gasEstimateText);
+    const transactionHashText = document.createElement('p');
+    transactionHashText.textContent = `Transaction Hash: ${transactionHash}`;
+    infoContainer.appendChild(transactionHashText);
+    const receiptStatus = document.createElement('p');
+    receiptStatus.textContent = `Transaction Status: ${receipt.status ? 'Success' : 'Failed'}`;
+    infoContainer.appendChild(receiptStatus);
+    formContainer.appendChild(infoContainer);
+    document.body.appendChild(formContainer);
+    makeElementDraggable(formContainer);
 }
 function addBuyButton(parentDiv, availabe, buttonClassName) {
     var buyButton = document.createElement("div");
@@ -9700,10 +9905,10 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                                 console.error('Failed to update server values response was not okay');
                                                             }
 
-                                                            }catch(error){
-                                                                console.log('there was an error sending update fecth ',error);
-                                                            }
+                                                        }catch(error){
+                                                            console.log('there was an error sending update fecth ',error);
                                                         }
+                                                    }
                                                 }
                                                 console.log('User wallet:', userWallet);
                                                 console.log('User trying to send', amountToSendFloat)
@@ -10299,11 +10504,8 @@ function makeNewGrid(array, grid){
 }
 async function organizePaintingArrayByMostRecent(array) {
     array.sort((a, b) =>  {
-
         const dateA = new Date(a.dateCreated);
         const dateB = new Date(b.dateCreated);
-
-        // Compare dates
         if (dateA < dateB) return 1;
         if (dateA > dateB) return -1;
         return 0;
