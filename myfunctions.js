@@ -3444,8 +3444,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     footerLargeTextContainer.style.backgroundSize = 'cover';
     footerLargeTextContainer.style.backgroundRepeat = 'no-repeat';
     footerLargeTextContainer.style.backgroundPosition = 'center';
-
-
+    
     logo.style.position = 'relative'; 
     logo.style.height = '100%'
     logo.style.width = '15%'; 
@@ -4999,14 +4998,11 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                         messageLoadingSpan.style.top = '30%';
                         messageLoadingSpan.textContent = 'Loading . . . ';
                         sweepBox.appendChild(messageLoadingSpan);
-
                         try{    
-                            // sweep value should always be less than or equal to the integerValue by construction
-                            // we can check to make sure no errors occur in case we increase the length later in time
                             let availabeTokens = [];
                             let unavailableTokens = [];
                             for(var k = 0; k< integerValue; k++){
-                               let tokenID =  parseINT(gridItems[k].id);
+                               let tokenID =  parseInt(gridItems[k].id);
                                let tokenData;
                                 try{
                                     tokenData = await contract.methods.getTokenData(tokenID).call();
@@ -5019,7 +5015,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                     console.log('Error calling getTokenData() on contract', error);
                                 }
                             }
-
                             if(unavailableTokens.length == 0 && availabeTokens.length != 0){
                                 console.log('trying to sweep the floor');
                                 try{
@@ -5048,7 +5043,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                             }
                                         }
                                     }
-
                                     if(currentAddressGasSender){
                                         const gasEstimate = await contract.methods.purchaseArrayOfNFT(availabeTokens).estimateGas({ from: currentAddressGasSender });
                                         const tx = await contract.methods.purchaseArrayOfNFT(availabeTokens).send({
@@ -5078,7 +5072,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                         messageLoadingSpan.textContent = 'login to your metamask.';
                                         alert('Please make sure to login to your metamask before proceeding');
                                     }
-
                                 }catch(error){
                                     console.log('Error calling purchaseArrayOfNFT on the contract', error);
                                     messageLoadingSpan.textContent = '';
@@ -5099,7 +5092,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                     }catch(error){
                         console.log('error getting item number for sweep', error);
                     }
-                    
                 }
                 searchButton.addEventListener('click', sweepGrid);
             }else if (item.textContent == 'Search') {
