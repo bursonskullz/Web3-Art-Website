@@ -48,7 +48,6 @@ export async function painting_section_click(parentElement) {
         loadingAnimation.style.left = '0';
         loadingAnimation.className = "loadingPopUp";
         document.body.appendChild(loadingAnimation);
-
         try {
             const response = await fetch('/getALL-paintings', {
                 method: 'GET',
@@ -258,7 +257,7 @@ export async function addDigitalElementListener(digitalElement){
                         imageContainer.style.display = 'flex';
                         imageContainer.style.alignItems = 'center';
                         imageContainer.style.justifyContent = 'center';
-                        imageContainer.style.borderRadius = '8px'; // Adds rounded corners to images
+                        imageContainer.style.borderRadius = '8px';
 
                         const image = document.createElement('img');
                         image.src = item.collectionBackgroundImage;
@@ -272,8 +271,8 @@ export async function addDigitalElementListener(digitalElement){
                         contractNameSpan.textContent = item.contractName;
                         contractNameSpan.style.flex = '1';
                         contractNameSpan.style.textAlign = 'center';
-                        contractNameSpan.style.fontSize = '16px'; // Adjusts font size for better readability
-                        contractNameSpan.style.color = 'white'; // Darker text for better contrast
+                        contractNameSpan.style.fontSize = '16px';
+                        contractNameSpan.style.color = 'white'; 
 
                         contractDiv.appendChild(imageContainer);
                         contractDiv.appendChild(contractNameSpan);
@@ -326,7 +325,6 @@ export async function addDigitalElementListener(digitalElement){
                                     currentNFTArray = nfts;
                                     setTimeout(async () => { 
                                         contractsForm.remove();
-                                        // remove loading icon on top right
                                         console.log('trying to make dummy page with array', currentNFTArray);
                                         sideElementsWidthPercent = '15%'; 
                                         GridWidth = '65%';
@@ -379,10 +377,8 @@ export async function addDigitalElementListener(digitalElement){
                                             contractOptions.remove();
                                             chatBox.remove();
                                         }else if(window.innerWidth <= 499 && window.innerWidth >= 350 ){
-                                            //sideElementsWidthPercent = '5%'; 
                                             GridWidth = '80%';
                                             gridItemWidth = '100%';
-                                            //rowWidth = '50%';
                                             if(currentNFTArray.length >= 24){
                                                 makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 2, GridWidth, gridItemWidth);
                                             }else{
@@ -392,10 +388,8 @@ export async function addDigitalElementListener(digitalElement){
                                             const contractTools = document.querySelector('.contractTools');
                                             const contractOptions = document.querySelector('.contractOptions');
                                             const chatBox = document.querySelector('.crypto-chat-room');
-
                                             const gridContainer = document.querySelector('.NewGrid');
                                             gridContainer.style.left = '10%';
-
                                             contractInfoContainer.remove();
                                             contractTools.remove();
                                             contractOptions.remove();
@@ -403,13 +397,11 @@ export async function addDigitalElementListener(digitalElement){
                                         }else if(window.innerWidth <= 350) {
                                             window.location.href = 'unsupported.html'; 
                                         }
-
                                     }, 101)
                                 }else{
                                     console.log('There are no NFTs on the contract yet');
                                     msgSpanTag.textContent = "There are currently no NFT's on this contract. Wait until mint is annocuned or select another contract";
                                     msgSpanTag.style.color = '#8b0000';
-
                                 }
                                 tryingToAccessData = false;
                             }else{
@@ -419,9 +411,6 @@ export async function addDigitalElementListener(digitalElement){
                         const container = document.querySelector('.contentContainerNFTs');
                         container.appendChild(contractDiv);
                     });
-
-
-
                 }).catch(error =>{
                     console.log(error);
                 });
@@ -462,9 +451,7 @@ export async function addPaintingElementListener(paintingElement) {
                                 makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }else{
                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 4, sideElementsWidthPercent, GridWidth, gridItemWidth);
-                            }
-
-                            
+                            } 
                             var paintingGrid = document.querySelector('.NewGrid');
                             const addToDBButton = document.querySelector('.add-to-DB');
                             const deleteToDBButton = document.querySelector('.minus-to-DB');
@@ -474,22 +461,18 @@ export async function addPaintingElementListener(paintingElement) {
                             const gridFowardContainer = document.querySelector('.gridFowardContainer');
                             const gridBackContainer = document.querySelector('.gridBackContainer');
                             const headerTextContainer = document.querySelector('.headerTextContainer');
-
-
                             const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
 
                             ptagDescriptions.forEach(itemDescription => {
                                 itemDescription.style.fontSize = '1.6vh';
                             });
 
-                            
                             const purchasesInfoContainer = document.querySelector('.infoContainer');
 
                             if(purchasesInfoContainer){
                                 purchasesInfoContainer.style.fontSize = '1.5vh';
                                 purchasesInfoContainer.style.marginTop = '0vh';   
                             }
-
 
                             const dateNodes = document.querySelectorAll('.dateNode');
                             dateNodes.forEach(dateNode => {
@@ -506,8 +489,6 @@ export async function addPaintingElementListener(paintingElement) {
                             dppurchasesPriceDivs.forEach(dppurchasesPriceDiv => {
                                 dppurchasesPriceDiv.style.fontSize = '1.3vh'; 
                             });
-
-                            
 
                             if(addToDBButton && deleteToDBButton){
                                 addToDBButton.remove();
@@ -540,7 +521,6 @@ export async function addPaintingElementListener(paintingElement) {
                               searchBar.remove();  
                             }
                             
-
                         }else if(window.innerWidth <= 998 && window.innerWidth >= 610 ){
                             GridWidth = '52%';
                             gridItemWidth = '95%';
@@ -599,6 +579,7 @@ export async function addPaintingElementListener(paintingElement) {
                             if(purchasesInfoContainer){
                                 purchasesInfoContainer.style.marginTop = '1.1vh';
                             }
+
                             headerTextContainer.style.width = '38%';
                             backButtonContainer.style.left = '44.5%';
                             backButtonContainer.style.width = '6vh';
@@ -615,6 +596,7 @@ export async function addPaintingElementListener(paintingElement) {
                                 addToDBButton.remove();
                                 deleteToDBButton.remove();  
                             }
+
                             searchBar.remove();
 
                             var listItems = document.getElementsByTagName('li');
@@ -644,7 +626,6 @@ export async function addPaintingElementListener(paintingElement) {
                             const searchBar = document.querySelector('.search-container');
                             const addToDBButton = document.querySelector('.add-to-DB');
                             const deleteToDBButton = document.querySelector('.minus-to-DB');
-
                             const backButtonContainer = document.querySelector('.backButtonContainer');
                             const commissionContainer = document.querySelector('.commissionContainer');
                             const AIbuttonContainer = document.querySelector('.AIbuttonContainer');
@@ -680,56 +661,43 @@ export async function addPaintingElementListener(paintingElement) {
                             }
                             
                             headerTextContainer.style.width = '38%';
-
                             backButtonContainer.style.left = '40.5%';
                             backButtonContainer.style.width  = '5.5vh';
-
                             commissionContainer.style.left = '46.8%';
                             commissionContainer.style.width  = '5.5vh';
-
                             AIbuttonContainer.style.left = '52.8%';
                             AIbuttonContainer.style.width  = '5.5vh';
-
                             gridFowardContainer.style.left = '33%';
                             gridFowardContainer.style.width  = '5.5vh';
-
                             gridBackContainer.style.left = '26%';
                             gridBackContainer.style.width  = '5.5vh';
 
                             
                             searchBar.remove(); 
-                            
-
                             if(addToDBButton && deleteToDBButton){
                                 addToDBButton.remove();
                                 deleteToDBButton.remove();  
                             }
-
                             var listItems = document.getElementsByTagName('li');
                             var listH3Items = document.getElementsByTagName('li');
 
                             for (var i = 0; i < listItems.length; i++) {
                                listItems[i].style.fontSize = '2.2vh'; 
                             }
-
                             for (var i = 0; i < listH3Items.length; i++) {
                                 listItems[i].style.fontSize = '2.2vh'; 
                             }
-
                             paintingGrid.style.left = '27.5%';
-
                         }else if(window.innerWidth <= 499 && window.innerWidth >= 350 ){
                             sideElementsWidthPercent = '27%'; 
                             GridWidth = '80%';
                             gridItemWidth = '100%';
                             rowWidth = '50%';
-
                             if(currentPaintingArray.length >= 24){
                                 makePaintingPage(currentPaintingArray.slice(0,24), currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }else{
                                 makePaintingPage(currentPaintingArray, currentPurchaseArray,  document.body, 2, sideElementsWidthPercent, GridWidth, gridItemWidth);
                             }
-
                             var paintingGrid = document.querySelector('.NewGrid');
                             paintingGrid.style.left = '10%';
                             paintingGrid.style.height = '60%';
@@ -743,25 +711,21 @@ export async function addPaintingElementListener(paintingElement) {
                             const searchBar = document.querySelector('.search-container');
                             const addToDBButton = document.querySelector('.add-to-DB');
                             const deleteToDBButton = document.querySelector('.minus-to-DB');
-
                             const backButtonContainer = document.querySelector('.backButtonContainer');
                             const commissionContainer = document.querySelector('.commissionContainer');
                             const AIbuttonContainer = document.querySelector('.AIbuttonContainer');
                             const gridFowardContainer = document.querySelector('.gridFowardContainer');
                             const gridBackContainer = document.querySelector('.gridBackContainer');
-
                             const ptagDescriptions = document.querySelectorAll('.descriptionPaintingPTAG');
 
                             ptagDescriptions.forEach(itemDescription => {
                                 itemDescription.style.fontSize = '1.3vh';
                             });
 
-
                             const dateNodes = document.querySelectorAll('.dateNode');
                             dateNodes.forEach(dateNode => {
                                 dateNode.style.fontSize = '.9vh'; 
                             });
-
 
                             const dpurchasesfirstNameDivs = document.querySelectorAll('.purchasesfirstNameDiv');
                             dpurchasesfirstNameDivs.forEach(dpurchasesfirstNameDiv => {
@@ -803,28 +767,23 @@ export async function addPaintingElementListener(paintingElement) {
                             chatRoom.style.left = '11.5%';
                             chatRoom.style.top = '0%';
                             chatRoom.style.zIndex = '99999';
-
                             var listItems = document.getElementsByTagName('li');
                             var listH3Items = document.getElementsByTagName('h3');
                             for (var i = 0; i < listItems.length; i++) {
                                listItems[i].style.fontSize = '1.5vh'; 
                             }
-
                             for (var i = 0; i < listH3Items.length; i++) {
                                 listH3Items[i].style.fontSize = '1.5vh'; 
                             }
                         }else if(window.innerWidth <= 350) {
                             window.location.href = 'unsupported.html'; 
                         }
-
                         gridNavigator.style.display = 'none';
-
                         let msgHisotry = await getMessageHistory();
 
                         for(const element of msgHisotry){
                             addMessage(element.msg, element.username, element.time, 'dimgray');
                         }
-
                     }, 101); 
                   })
                   .catch((error) => {
@@ -836,29 +795,24 @@ export async function addPaintingElementListener(paintingElement) {
             }
         }); 
 }
-
 export function math_section_click(parentElement){
     comingSoonScreen(parentElement);
 }
-
 function makeElementDraggable(element) {
     let offsetX, offsetY;
     let isDragging = false;
-
     element.addEventListener("mousedown", function (event) {
         isDragging = true;
         offsetX = event.clientX - parseFloat(window.getComputedStyle(element).left);
         offsetY = event.clientY - parseFloat(window.getComputedStyle(element).top);
         element.style.cursor = "grabbing";
     });
-
     document.addEventListener("mousemove", function (event) {
         if (isDragging) {
             element.style.left = (event.clientX - offsetX) + "px";
             element.style.top = (event.clientY - offsetY) + "px";
         }
     });
-
     document.addEventListener("mouseup", function () {
         isDragging = false;
         element.style.cursor = "grab";
@@ -966,9 +920,7 @@ async function createContractSelectionForm(array) {
             image.style.width = '100%';
             image.style.height = 'auto';
             image.style.objectFit = 'cover';
-
             imageContainer.appendChild(image);
-
             const contractNameSpan = document.createElement('span');
             contractNameSpan.textContent = item.contractName;
             contractNameSpan.style.flex = '1';
@@ -990,8 +942,6 @@ async function createContractSelectionForm(array) {
 }
 export async function nft_section_click(parentElement) {
     const functionNameString = 'getAllNFTS';
-
-
     let listofCollections ;
     try {
          const response = await fetch('/getALLDeployedCollections', {
@@ -1000,14 +950,12 @@ export async function nft_section_click(parentElement) {
                 'Content-Type': 'application/json'
             }
         });
-
         if (response.ok) {
             listofCollections = await response.json();
             if(listofCollections.success == false){
                 console.log('no databases active');
             }else{
                 console.log('Received collections', listofCollections);
-
             }
         } else {
             console.error("Failed to get response from server");
@@ -1018,12 +966,10 @@ export async function nft_section_click(parentElement) {
     }
     return listofCollections;
 }
-
 export function upcoming_section_click(parentElement){
      console.log("NFT section clicked!"); 
      comingSoonScreen(parentElement);
 }
-
 export function makeConnection() {
     let popup = document.querySelector('.popup');
     if (!popup) {
@@ -1046,9 +992,7 @@ export function makeConnection() {
         imageContainer.style.marginTop = '1%'; 
         imageContainer.style.marginBottom = '7%'; 
         imageContainer.style.borderRadius = '5px';
-        //imageContainer.style.backgroundColor = 'blue';
         imageContainer.style.backgroundImage = 'url("images/BursonSkull2.png")';
-        //imageContainer.style.backgroundSize = 'cover'; 
         imageContainer.style.backgroundSize = 'contain'; 
         imageContainer.style.backgroundRepeat = 'no-repeat';
         imageContainer.style.backgroundPosition = 'center'; 
@@ -1087,13 +1031,10 @@ export function makeConnection() {
                 providerDiv.style.backgroundRepeat = 'no-repeat';
                 providerDiv.style.backgroundPosition = 'center'; 
             }
-            
             popup.appendChild(providerDiv);
         });
-
         const cancelButton = document.createElement("div");
         const ptag = document.createElement('p');
-
         ptag.style.position = 'relative'
         ptag.style.height = '50%';
         ptag.style.width = '80%';
@@ -1101,46 +1042,33 @@ export function makeConnection() {
         ptag.style.top = '25%';
         ptag.textContent = "Cancel";
         ptag.style.fontSize = '15px';
-
         cancelButton.classList.add("cancel-button");
         cancelButton.style.alignItems;
         cancelButton.style.fontSize = '1vw';
         cancelButton.style.boxShadow = '0px 0px 15px rgba(0, 0, 0, 0.5)';
         cancelButton.style.fontFamily = "Times New Roman";
-
         cancelButton.addEventListener("click", function () {
             popup.remove();
         });
-
         cancelButton.appendChild(ptag);
         popup.appendChild(cancelButton);
-
         document.body.appendChild(popup);
-
         makeElementDraggable(popup);
     }
 }
-
-
 export function comingSoonScreen(divElement) {
     divElement.style.position = 'relative';
-
     const overlay = document.createElement('div');
     const overlayText = document.createElement('p');
-
     overlay.classList.add('coming-soon-overlay');
     overlayText.classList.add('coming-soon-text');
-
     overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
     overlay.style.borderRadius = '10px';
-
     overlay.style.position = 'absolute';
     overlay.style.width = '100%';
     overlay.style.height = '0'; 
     overlay.style.left = '0';
     overlay.style.bottom = '0';
-
-
     overlayText.style.color = 'white';
     overlayText.style.position = 'absolute'; 
     overlayText.style.textAlign = 'center'; 
@@ -1148,12 +1076,10 @@ export function comingSoonScreen(divElement) {
     overlayText.style.margin = '0'; 
     overlayText.style.top = '50%'; 
     overlayText.style.transform = 'translateY(-50%)'; 
-
     overlayText.textContent = 'Coming Soon';
     overlayText.style.zIndex = 1000000;
     overlay.appendChild(overlayText);
     divElement.appendChild(overlay);
-
     function updateOverlayHeight() {
         const elapsedTime = performance.now() - startTime; 
         const percentageComplete = elapsedTime / animationDuration; 
@@ -1164,10 +1090,8 @@ export function comingSoonScreen(divElement) {
             requestAnimationFrame(updateOverlayHeight);
         }
     }
-
     const animationDuration = 1000; 
     const startTime = performance.now(); 
-
     requestAnimationFrame(updateOverlayHeight);
     setTimeout(function () {
         divElement.removeChild(overlay);
@@ -1176,7 +1100,6 @@ export function comingSoonScreen(divElement) {
         updatesOverlay = false;
     }, 3000); 
 }
-
 
 export function shiftOffScreen(element) {
     var shiftAmount = 2; 
@@ -2096,6 +2019,7 @@ function createCircularSweeper(container) {
         const percent = (angle + Math.PI / 2) / (2 * Math.PI) * 100; 
         const items = Math.round((percent / 100) * maxItems); 
         infoSpan.textContent = `Sweep ${items} items`;
+        infoSpan.style.color = 'white';
         sweeperCircle.style.background = `conic-gradient(#4caf50 ${percent}%, transparent ${percent}%)`;
     }
 
@@ -2611,15 +2535,11 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     closeIcon.style.cursor = 'pointer'; 
     closeIcon.style.fontSize = '15px';
     closeIcon.style.color = 'red'; 
-
     smallHeader.appendChild(closeIcon);
-
     closeIcon.addEventListener('click', ()=>{
         document.body.removeChild(tokenContainer);
     });
-
     document.body.appendChild(tokenContainer);
-
     const smallContainer = document.createElement('div');
     smallContainer.className = 'token-inside-Container';
     smallContainer.style.width = "100%"; 
@@ -2628,7 +2548,6 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     smallContainer.style.position = 'relative'; 
     smallContainer.style.height = '60%'; 
     smallContainer.style.padding = '0px';
-    //smallContainer.style.bottom = '0';
     smallContainer.style.boxSizing = 'border-box';
     smallContainer.style.backgroundColor = 'none';
     smallContainer.style.overflowY = 'scroll';
@@ -2641,14 +2560,11 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     footer.style.height = '17%';
     footer.style.bottom = '0';
     footer.style.backgroundColor = '#404a5c'; 
-    //footer.style.position = 'absolute';
-    footer.style.position = 'sticky';  // Change to sticky
+    footer.style.position = 'sticky';  
     footer.style.color = 'white';
     footer.style.display = 'flex';
     footer.style.justifyContent = 'center';
     footer.style.alignItems = 'center';
-
-
     tokenContainer.appendChild(footer);
 
     addBTDListeners(transferText, bulkListText, delistText);
@@ -2662,7 +2578,7 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
             if (typeof window.ethereum === 'undefined') { 
                 alert('You must install MetaMask or another Ethereum provider to see your tokens or purchase tokens.');
             } else {
-                if (window.ethereum.isMetaMask) { // If MetaMask is detected
+                if (window.ethereum.isMetaMask) { 
                     try {
                         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                         let thisAccount = accounts[0];
@@ -2699,7 +2615,6 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     recentSellsPopUpBox.style.padding = '0px';
     recentSellsPopUpBox.style.boxSizing = 'border-box';
     recentSellsPopUpBox.style.backgroundColor = '#404a5c';
-    //recentSellsPopUpBox.style.backgroundColor = 'rgba(64, 74, 92, 0.7)';
     recentSellsPopUpBox.style.border = '1px solid black'; 
     recentSellsPopUpBox.style.borderWidth = '2px';
     recentSellsPopUpBox.style.display = 'flex';
@@ -2853,14 +2768,12 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 soldItem.classList.add('sold-item'); 
                 soldItem.style.height = '140px';
                 soldItem.style.width = '90%';
-                //soldItem.style.left = '5%;'
                 soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
                 soldItem.style.borderRadius = '5px'; 
                 soldItem.style.marginBottom = '20px';
                 soldItem.style.border = '1px solid white';
 
                 const imageContainer = document.createElement('div');
-                //imageContainer.style.position = 'relative';
                 imageContainer.style.height = '80%';
                 imageContainer.style.width = '35%';
                 imageContainer.style.left = '2.5%';
@@ -2890,7 +2803,6 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 currentBuyer.textContent = `Buyer: ${token.owner.substring(0, 12)}`;
                 currentBuyer.style.right = '0%';
                 currentBuyer.style.color = 'white'; 
-                //currentBuyer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
                 currentBuyer.style.borderRadius = '3px'; 
                 currentBuyer.style.margin = '0';
                 currentBuyer.style.textAlign = 'right'; 
@@ -2899,13 +2811,12 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 const seller = document.createElement('p');
                 seller.textContent = `Seller: ${token.lastOwner.substring(0,12)}`;
                 seller.style.color = 'white'; 
-                //seller.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
                 seller.style.borderRadius = '3px'; 
                 seller.style.margin = "0";
                 seller.style.textAlign = 'right'; 
                 infoContainer.appendChild(seller);
 
-                let convertedPrice = ((token.price)/(10*15**18)).toFixed(4);
+                let convertedPrice = ((token.price)/(10**18)).toFixed(4);
                 const price = document.createElement('p');
                 price.textContent = `${convertedPrice}` + ` ${coin}`;
                 price.style.color = 'white'; 
@@ -2916,8 +2827,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
 
                 const currentTokenID = document.createElement('p');
                 currentTokenID.textContent = `Token ID: ${token.tokenID}`;
-                currentTokenID.style.color = 'white';
-                //currentTokenID.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
+                currentTokenID.style.color = 'white'; 
                 currentTokenID.style.margin = '0';
                 currentTokenID.style.borderRadius = '3px'; 
                 currentTokenID.style.textAlign = 'right'; 
@@ -2937,7 +2847,6 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 })}`;
 
                 date.style.color = 'white';
-                // date.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
                 date.style.margin = "0";
                 date.style.borderRadius = '3px'; 
                 date.style.textAlign = 'right'; 
@@ -3031,7 +2940,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     let coin;
 
     if(userSelectedContract.ERCStandard === "ERC1155"){
-        // should be able to edit hyperlinks here
         coin = "POL";
     }else if(userSelectedContract.ERCStandard === "ERC721"){
          coin = "ETH";
@@ -3040,32 +2948,26 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     }else{
          coin = "??";
     }
-
-
     const web3 = new Web3(window.ethereum);
     const contract = new web3.eth.Contract(JSON.parse(userSelectedContract.contractABI), userSelectedContract.contractAddress);
-
     try{
         numberOfTokens = await contract.methods.getNumberOfTokens().call();
     }catch(error){
         console.log('Error calling function on contract to get maximum sell');
         numberOfTokens = "Error";
     }
-
     try{
         maxSell = await contract.methods.getMaxSell().call();
     }catch(error){
         console.log('Error calling function on contract to get maximum sell');
         maxSell = "Error";
     }
-
     try{
         numberOfSells = await contract.methods.getNumberOfsells().call();
     }catch(error){
         console.log('Error calling function on contract to get number of sells');
         numberOfSells = "Error";
     }
-
     let scanURL = "";
     if (coin === "ETH") {
         scanURL = `https://etherscan.io/address/${userSelectedContract.contractAddress}`;
@@ -3076,10 +2978,8 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     }else {
         scanURL = "#"; 
     }
-
     console.log('access to contract granted trying to get number of token, Max Sell, and number of sells', contract);
     console.log('Contract methods:', contract.methods);
-
     contractInfoDiv.innerHTML = `
         <h2 style="margin: 0; text-align: center;">Contract Information</h2>
 
@@ -3099,10 +2999,8 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     contractInfoDiv.style.alignItems = 'center';
     contractInfoDiv.style.justifyContent = 'center'; 
     contractInfoDiv.style.textAlign = 'center'; 
-
     parentElement.appendChild(contractInfoDiv);
     parentElement.style.paddingLeft = `${sideElementsWidth}px`;
-
     const options = document.createElement('div');
     options.className = 'contractOptions';
     options.style.fontSize = '1.5vh';
@@ -3119,7 +3017,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     options.style.borderColor = 'black';
     options.style.borderWidth = '2px';
     options.style.borderRadius = '5px';
-
     options.innerHTML = `
         <h2 style="margin: 0; text-align: center;">Options</h2>
         <p class="option-item" data-title="Recent Sells" style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Recent Sells</p>
@@ -3176,7 +3073,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     tools.style.display = 'flex';
     tools.style.flexDirection = 'column';
     tools.style.justifyContent = 'space-between'; 
-
     tools.innerHTML = `
         <h2 style="margin: 0; text-align: center;">Tools</h2>
         <p class="option-item-2" style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Sweep</p>
@@ -3190,8 +3086,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     tools.style.justifyContent = 'center'; 
     tools.style.textAlign = 'center'; 
     parentElement.appendChild(tools);
-
-
     addToolsFunctionality(sideElementsWidth, contract, coin, parentElement, numColumns);
     parentElement.style.paddingLeft = `${sideElementsWidth}px`;
     var footer = document.createElement('div');
@@ -3203,13 +3097,10 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     const unknownDiv = document.createElement('div');
     var community =  ["X", "Instagram", "Threads"];
     var commnityList = document.createElement("ul");
-    
     var links = ["Opensea", "Github", "researchGate", 'Linkedin', 'MathOverflow'];
     var linkList = document.createElement("ul");
-    
     var resources = ["Help", "Privacy Policy", "Terms of Service", "Contracts"];
     var resourcesList = document.createElement("ul");
-
     unknownDiv.id = 'crypto-chat-room';
     unknownDiv.className = 'crypto-chat-room';
     unknownDiv.style.width = sideElementsWidth;
@@ -3221,12 +3112,9 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     unknownDiv.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)';
     unknownDiv.style.borderRadius = '2vh';
     document.body.appendChild(unknownDiv); 
-
-
     const chatBox = document.createElement('div');
     chatBox.classList.add('chatBox');
     chatBox.className = 'chatBox';
-
     chatBox.style.height = '85%';
     chatBox.style.left = '0%';
     chatBox.style.width = '100%';
@@ -3238,9 +3126,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     chatBox.style.borderTopRightRadius = '1vh';
     chatBox.style.borderBottomLeftRadius = '0'; 
     chatBox.style.borderBottomRightRadius = '0'; 
-
     unknownDiv.appendChild(chatBox);
-
     const emojiButton = document.createElement('div');
     emojiButton.classList.add('emoji-button');
     emojiButton.textContent = '➕'; 
@@ -3253,7 +3139,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     emojiButton.style.border = 'none';
     emojiButton.style.cursor = 'pointer';
     emojiButton.style.fontSize = '10px';
-
     const changeUserName = document.createElement('div');
     changeUserName.classList.add('emoji-button');
     changeUserName.textContent = '🖊️'; 
@@ -3369,7 +3254,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     messageInput.style.right = '4%';
     messageInput.style.bottom = '5%';
     messageInput.style.position = 'absolute';
-    //messageInput.style.display = 'block';
     messageInput.style.backgroundColor = 'lightgray';
     messageInput.style.color = 'black';
     messageInput.style.border = '1px solid black'; 
@@ -3509,7 +3393,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
 
     });
 
-    makeNFTGrid(array, parentElement, numColumns, gridWidthPercent, gridItemWidth);
+    makeNFTGrid(array, parentElement, numColumns, gridWidthPercent);
 
     const logo = document.createElement('div');
     footer.style.position = 'relative';
@@ -3581,7 +3465,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         var heading = document.createElement("h3");
         heading.style.fontSize = '3vh';
         heading.style.color = 'white';
-
         if(i == 1){
             heading.textContent = "Links"; 
         }else if(i == 2){
@@ -3591,9 +3474,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         }else if(i == 3){
             heading.textContent = "Resources";
         }
-
         column.appendChild(heading);
-
         if(i==1){
             column.appendChild(linkList);
         }else if(i ==2){
@@ -3601,13 +3482,10 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         }else if(i ==3){
             column.appendChild(resourcesList);
         }
-
         row.appendChild(column);
     }
-
     footContainer.appendChild(row);
     parentElement.appendChild(unknownDiv);
-
     logoContainer.appendChild(logo);
     logoContainer.appendChild(footerLargeTextContainer); 
     footer.appendChild(logoContainer);
@@ -3621,55 +3499,44 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
 
 export function makePaintingPage(array, purchaseArray, parentElement, numColumns, sideElementsWidth, gridWidthPercent, griditem) {
     var footer = document.createElement('div');
-
     var backButtonContainer = document.createElement('div');
     var backButton = document.createElement('div');
     var commissionContainer = document.createElement('div');
     var commission  = document.createElement('div');
-
     var header = document.querySelector('.Header');
     const footContainer = document.createElement('div');
     const logoContainer = document.createElement('div');
     const footerLargeTextContainer = document.createElement('div');
     var footerLEGAL = document.createElement('div');
     var footerLine = document.createElement('hr');
-
     const logo = document.createElement('div');
-
     const headerLogo = document.createElement('div');
     const tree = document.createElement('div');
     const recentSells = document.createElement('div');
     const acceptableCoins = document.createElement('div');
     const unknownDiv = document.createElement('div');
-
     var welcomeDiv = document.createElement("div");
     var welcomeDivPTAG = document.createElement('p');
     var AIbutton = document.createElement('div');
     var AIbuttonContainer = document.createElement('div');
     var headerTextContainer = document.createElement('div');
     var headertext = document.createElement('div');
-
     var gridFowardContainer = document.createElement('div');
     var gridBackContainer = document.createElement('div');
     var gridFoward = document.createElement('div');
     var gridBack = document.createElement('div');
-
     var community =  ["X", "Instagram", "Threads"];
     var commnityList = document.createElement("ul");
-    
     var links = ["Opensea", "Github", "researchGate", 'Linkedin', 'MathOverflow'];
     var linkList = document.createElement("ul");
-    
     var resources = ["Help", "Privacy Policy", "Terms of Service", "Contracts"];
     var resourcesList = document.createElement("ul");
-
     links.forEach(function(itemText) {
         var li = document.createElement("li");
         const atag = document.createElement('a');
         li.style.marginBottom = '1vh';
         li.style.fontSize = '3.2vh';
         atag.textContent = itemText;
-
         if(atag.textContent == 'Opensea'){
             atag.href = 'https://opensea.io/collection/bursonskullz/';
         }else if(atag.textContent == 'Github'){
@@ -3681,7 +3548,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else if(atag.textContent == 'MathOverflow'){
               atag.href = 'https://mathoverflow.net/users/528543/the-potato-eater';
         }
-       
         li.appendChild(atag);
         linkList.appendChild(li);
     });
@@ -3706,7 +3572,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         commnityList.appendChild(li); 
     });
 
-
     resources.forEach(function(itemText) {
         var li = document.createElement("li");
         const atag = document.createElement('a');
@@ -3723,7 +3588,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else if(atag.textContent == 'Contracts'){
             atag.href = 'contracts.html';
         }
-
         li.appendChild(atag);
         resourcesList.appendChild(li);
     });
@@ -3758,15 +3622,11 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     commnityList.style.width = '100%';
     commnityList.style.left = '0%';
     commnityList.style.padding = '0%';
-
-
     resourcesList.style.listStyleType = "none";
     resourcesList.style.position = 'relative';
     resourcesList.style.width = '100%';
     resourcesList.style.left = '0%';
     resourcesList.style.padding = '0%';
-
-
     acceptableCoins.style.width =  sideElementsWidth; 
     acceptableCoins.style.height = '35%';
     acceptableCoins.style.position = 'absolute';
@@ -3968,16 +3828,12 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     }else{
         isSocketPresent = true;
         socket.on('updateCurrentPaintings', data => {
-            //console.log('Received data from server:', data);
             for(const myObj of currentPaintingArray){
                 if(myObj._id == data.Id && myObj.inStock == true){
                     myObj.inStock = false;
-                    //console.log('we updated the array item', myObj);
                     setTimeout( ()=> {
                         try{
                             const purchaseForm = document.querySelector('.purchase-form-container');
-
-                            // maybe wait a few seconds before removing
                             if(purchaseForm && purchaseForm.id == myObj._id){
                                 purchaseForm.remove();
                                 console.log('we removed the form');
@@ -3989,27 +3845,21 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                             console.log(error);
                         }
                     }, 15000); 
-
-
                 }else{
                     console.log('cannot find painting to update');
                 }
-        }
+            }
 
         });
 
         socket.on('message', (myobject) => {   
             console.log('trying to add message from server');
-
             if(myobject.coolDown <= 10){
                 addMessage(myobject.msg, myobject.username, myobject.time, 'dimgray'); 
             }else{
                 alert('you cannot send anymore messages for 24 hours');
-            }
-            
+            } 
         });
-
-
         socket.on('updatePaintingChunk', (data) => {
             paintingChunks[data.index] = data.chunk;
             totalChunks = data.total;
@@ -4020,7 +3870,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 currentPaintingArray.push(newPainting);
             }
         });
-
         socket.on('updatePaintingComplete', () => {
             console.log('All chunks have been received.');
             alert('A new painting has been added. Please refresh the page');
@@ -4028,7 +3877,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             totalChunks = 0;
         });
     }
-
     messageInput.addEventListener('keypress', (event) => {
         if(event.key === 'Enter') {
             const message = messageInput.value.trim();
@@ -4037,9 +3885,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 messageInput.value = ''; 
             }
         }
-
         const emojiMenu = document.querySelector('.emoji-menu');
-
         if(emojiMenu){
             emojiMenu.remove();
         }
@@ -4054,13 +3900,10 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     tree.style.backgroundColor = 'dimgrey';
     tree.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)';
     tree.style.borderRadius = '2vh';
-    //tree.style.opacity = '.6';
     tree.setAttribute("id", "tree");
     tree.className = 'tree';
     tree.appendChild(welcomeDiv);  
-
     addTreeList(tree, currentPaintingArray, parentElement, numColumns, gridWidthPercent); 
-
     const timeFrame = 15; 
     const movementPercentages = [1, 1.5, 0.5, 0.8, 1.2]; 
     moveLeftAndRight(tree, timeFrame, movementPercentages);
@@ -4095,7 +3938,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     recentSells.style.borderRadius = '2vh';
     recentSells.className = 'recentSells';
 
-
     if(purchaseArray.length == 0){
         var textDiv = document.createElement("div");
         textDiv.textContent = "Recent Sells";
@@ -4106,24 +3948,18 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         textDiv.style.color = "white"; 
         textDiv.style.fontSize = "2.5vh"; 
         textDiv.style.fontWeight = "bold"; 
-
         recentSells.appendChild(textDiv);
         recentSells.style.backgroundImage = 'url("/Gifs/HourGlass/loading2.gif")';
         recentSells.style.backgroundSize = 'cover';
         recentSells.style.backgroundRepeat = 'no-repeat';
         recentSells.style.backgroundPosition = 'center';
         recentSells.style.backgroundColor = 'dimgray'; 
-
-
     }else{
         recentSells.style.overflowY = 'auto'; 
         recentSells.style.display = "flex"; 
         recentSells.style.flexDirection = "column"; 
         recentSells.style.overflowY = 'auto';
-
         var purchaseIndex = 0;
-
-
         purchaseArray.forEach(purchase => {
             const purchaseDiv = document.createElement("div");
             purchaseDiv.style.borderBottomStyle = 'solid';
@@ -4154,9 +3990,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             infoContainer.style.overflowY = 'scroll';
             infoContainer.style.alignItems = "center"; 
             infoContainer.style.display = "flex";
-            infoContainer.style.flexDirection = "column"; 
+            infoContainer.style.flexDirection = "column";   
 
-                                          
             const dateNode =  document.createElement("div");
             dateNode.textContent = `Date Purchased: ${purchase.datePurchased}`;
 
@@ -4193,7 +4028,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             purchaseDiv.appendChild(image);
             purchaseDiv.appendChild(infoContainer);
             recentSells.appendChild(purchaseDiv);
-
 
             if(purchaseIndex == 0){
                 purchaseIndex  = purchaseIndex +1; 
@@ -4329,8 +4163,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             console.log('cannot find digitalElement div');
         }
 
-
-
         if(mathElement){
             mathElement.addEventListener('click', function() {
                 if(!mathOverlay){
@@ -4354,8 +4186,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else{
             console.log('cannot find events div');
         }
-
-
     });
 
     commissionContainer.style.height = '90%';
@@ -4378,7 +4208,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     commission.style.backgroundRepeat = 'no-repeat';
     commission.style.backgroundPosition = 'center'; 
 
-
     commission.addEventListener('click', async function() {
         const containerChecker = document.querySelector('.commissionUserInputForm');
         if(containerChecker == null){
@@ -4398,9 +4227,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             containerInput.className = 'commissionUserInputForm';
             makeElementDraggable(containerInput);
             document.body.appendChild(containerInput);
-
             const mediaQuery = window.matchMedia('(max-width: 768px)');
-
             const handleMediaQuery = (mq) => {
                 if (mq.matches) {
                     const screenWidth = window.innerWidth;
@@ -4432,13 +4259,10 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                     containerInput.style.left = leftPosition + 'px';
                 }
             };
-
             handleMediaQuery(mediaQuery);
-
             mediaQuery.addEventListener('change', (event) => {
                 handleMediaQuery(event.target);
             });
-
             let container = document.createElement('div');
             container.classList.add('container');
             container.style.width = '85%';
@@ -4446,15 +4270,12 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             container.style.left = '7.5%';
             container.style.top = '10%';
             container.style.position = 'absolute';
-            //container.style.padding = '20px';
             container.style.backgroundColor = 'none';
             container.style.overflowY = 'scroll';
             container.style.justifyContent = 'center'; 
             container.style.textAlign = 'center';
-
             container.style.flexDirection = 'column';
             container.style.alignItems = 'center'; 
-
             let exitDiv = document.createElement('div');
             exitDiv.classList.add('exit-div');
             exitDiv.textContent = '✖'; 
@@ -4467,18 +4288,13 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             exitDiv.style.fontSize = '20px'; 
             exitDiv.style.color = 'black'; 
             container.appendChild(exitDiv);
-                
             exitDiv.addEventListener('click', function() {
                 document.body.removeChild(containerInput);
             });
-
-
             let title = document.createElement('h2');
             title.textContent = 'Commission Form';
             title.style.textAlign = 'center';
             title.style.marginBottom = '20px';
-
-
             const formDescription = `
             Hello,
 
@@ -4486,7 +4302,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
             Once you've filled out the form, I'll review your request and get back to you as soon as possible. Your input is valuable, and I'm excited to bring your vision to life!
             `;
-            
             let para = document.createElement('p');
             para.textContent = formDescription;
             para.style.marginBottom = '10px';
@@ -4561,8 +4376,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 formGroup.appendChild(input);
                 container.appendChild(formGroup);
             });
-
-                // Create submit button
                 let submitButton = document.createElement('button');
                 submitButton.textContent = 'Submit';
                 submitButton.classList.add('form-submit');
@@ -4710,8 +4523,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else{
             console.log('commission form is already active');
         }
-
-
     });
 
     AIbuttonContainer.style.height = '90%';
@@ -4781,8 +4592,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             overlay.style.left = '0';
             overlay.style.backgroundColor = 'black';
             overlay.style.opacity = '0.73';
-            //overlay.style.overflowY = 'scroll';
-
             responseDiv.appendChild(overlay);
 
             const overlayMain = document.createElement('div');
@@ -4799,13 +4608,10 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             overlayMain.style.justifyContent = 'flex-start'; 
             overlayMain.style.alignItems = 'center'; 
             overlayMain.style.overflowY = 'scroll';
-
             // Hide scrollbar for Chrome, Safari, and Opera
             //overlayMain.style.webkitOverflowScrolling = 'auto';
             //overlayMain.style.webkitScrollbar = 'auto';
-
             overlay.appendChild(overlayMain);
-
             overlayMain.style.fontSize = '2vh';
            
             const inputParent = document.createElement('div');
@@ -4849,7 +4655,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                                         }, 48 * 60 * 60 * 1000);
                                     }else{
                                         console.log(response);
-
                                         if(response.serverAIResponse.length>0){
                                              console.log(response.serverAIResponse);
                                             for(const serverRSPDS of response.serverAIResponse){
@@ -4860,9 +4665,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                                         }else{
                                             console.log('unexpected error we did not get back an array', response.serverAIResponse);
                                         }
-
                                     }
-
                                 }else{
                                     writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10, 1);
                                 }
@@ -4878,8 +4681,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                             writeToParentDivWithDelay("there was an unexpected error", overlayMain, 10,1);
                         }  
                     }
-
-                    
                 }
             });
             const exitButton = document.createElement('div');
@@ -4898,8 +4699,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 botContainer.remove();
             });
             botContainer.appendChild(exitButton);
-
-
             inputContainer.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
                     console.log('User typed:', inputContainer.value);
@@ -4956,7 +4755,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     gridBackContainer.style.backgroundColor = 'none'; 
     gridBackContainer.className = 'gridBackContainer';
 
-
     gridBackContainer.addEventListener('click', function() {
         if(gridPageNumber >1){
             gridPageNumber -= 1;
@@ -4971,7 +4769,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }
 
     });
-
 
     gridBack.style.position = 'absolute'; 
     gridBack.style.width = '70%';
@@ -4988,7 +4785,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     header.style.backgroundColor = '#9b9999';
     header.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; 
 
-
     headerLogo.style.position = 'absolute'; 
     headerLogo.style.height = '8.5vh'
     headerLogo.style.width = '10%'; 
@@ -5001,7 +4797,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     headerLogo.style.backgroundRepeat = 'no-repeat';
     headerLogo.style.backgroundPosition = 'center';
 
-
     header.appendChild(headerLogo);
     headerTextContainer.appendChild(headertext);
     header.appendChild(headerTextContainer);
@@ -5009,7 +4804,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     header.appendChild(gridFowardContainer);
     gridBackContainer.appendChild(gridBack);
     header.appendChild(gridBackContainer);
-
 
     makePaintGrid(array, parentElement, numColumns, gridWidthPercent);
 
@@ -5064,7 +4858,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     footerLargeTextContainer.style.backgroundRepeat = 'no-repeat';
     footerLargeTextContainer.style.backgroundPosition = 'center';
 
-
     logo.style.position = 'relative'; 
     logo.style.height = '100%'
     logo.style.width = '15%'; 
@@ -5106,10 +4899,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else if(i ==3){
             column.appendChild(resourcesList);
         }
-
         row.appendChild(column);
     }
-
     footContainer.appendChild(row);
     createSearchBar(header);
     if(isConnected == true && window.ethereum.selectedAddress == RoysWallet){
@@ -5117,927 +4908,911 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     }else{
         // do nothing
     }
-    
-
     parentElement.appendChild(tree);
-
     parentElement.appendChild(acceptableCoins);
     parentElement.appendChild(recentSells);
     parentElement.appendChild(unknownDiv);
-
-
     backButtonContainer.appendChild(backButton);
     header.appendChild(backButtonContainer);
-
     commissionContainer.appendChild(commission);
-
     header.appendChild(commissionContainer);
-
     AIbuttonContainer.appendChild(AIbutton);
     header.appendChild(AIbuttonContainer);
-
     logoContainer.appendChild(logo);
     logoContainer.appendChild(footerLargeTextContainer); 
     footer.appendChild(logoContainer);
     footer.appendChild(footContainer);
     footerLEGAL.appendChild(footerLine);
-    
     parentElement.appendChild(footer);
     parentElement.appendChild(footerLEGAL);
 }
+
 function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement, numColumns){
-        document.querySelectorAll('.option-item-2').forEach((item) => {
-            item.addEventListener('click', async function () {
-                if(item.textContent == 'Sweep'){
-                    console.log('trying to perform sweep');
-                    const sweepBox = document.createElement('div');
-                    sweepBox.style.position = 'absolute';
-                    sweepBox.style.right = '1%';
-                    sweepBox.style.top = '20vh';
-                    sweepBox.style.height = '27%';
-                    sweepBox.style.boxSizing = 'border-box';
-                    sweepBox.style.width = sideElementsWidth;
-                    sweepBox.style.backgroundColor = '#404a5c';
-                    sweepBox.style.border = '2px solid black';
-    
-                    const closeIcon = document.createElement('span');
-                    closeIcon.textContent = '×';
-                    closeIcon.className = 'closeIcon';
-                    closeIcon.style.position = 'absolute';
-                    closeIcon.style.top = '10px'; 
-                    closeIcon.style.right = '10px';
-                    closeIcon.style.cursor = 'pointer';
-                    closeIcon.style.fontSize = '20px'; 
-                    closeIcon.style.color = 'red';
-                    sweepBox.appendChild(closeIcon);
-                    closeIcon.addEventListener('click', ()=>{
-                        document.body.removeChild(sweepBox);
-                    });
-                    document.body.appendChild(sweepBox);
-    
-                    createCircularSweeper(sweepBox);
-    
-                    const searchButton = document.createElement('button');
-                    searchButton.style.position = 'absolute';
-                    searchButton.textContent = 'Sweep';
-                    searchButton.style.marginTop = '2px';
-                    searchButton.style.backgroundColor = 'dimgray';
-                    searchButton.style.width = '38%';
-                    searchButton.style.radius = '1px';
-                    searchButton.style.bottom = '0%';
-                    searchButton.style.left = '29%';
-                    searchButton.style.color = 'white';
-                    searchButton.style.borderRadius = '1px';
-                    sweepBox.appendChild(searchButton);
-    
-                    async function sweepGrid(){
-                        console.log('trying to sweep grid with specified amount in span tag');
-                        try{
-                            const spanText = document.querySelector('.info-span');
-                            const spanTextContent = spanText.textContent.replace(/Sweep|items| /g, '');
-                            const integerValue = parseInt(spanTextContent.trim(), 10);  
-                            
-                            console.log('trying to sweep this many items:', integerValue );
-                            
-                            let oldGrid = document.querySelector(".NewGrid");
-                            let gridItems = Array.from(oldGrid.children);  
-                            const children = Array.from(sweepBox.children);
-                            for (let i = children.length - 1; i >= 0; i--) {
-                                const child = children[i];
-                                if (!child.classList.contains('closeIcon')) {
-                                    child.remove();
+    document.querySelectorAll('.option-item-2').forEach((item) => {
+        item.addEventListener('click', async function () {
+            if(item.textContent == 'Sweep'){
+                console.log('trying to perform sweep');
+                const sweepBox = document.createElement('div');
+                sweepBox.style.position = 'absolute';
+                sweepBox.style.right = '1%';
+                sweepBox.style.top = '20vh';
+                sweepBox.style.height = '27%';
+                sweepBox.style.boxSizing = 'border-box';
+                sweepBox.style.width = sideElementsWidth;
+                sweepBox.style.backgroundColor = '#404a5c';
+                sweepBox.style.border = '2px solid black';
+
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.className = 'closeIcon';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '10px'; 
+                closeIcon.style.right = '10px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px'; 
+                closeIcon.style.color = 'red';
+                sweepBox.appendChild(closeIcon);
+                closeIcon.addEventListener('click', ()=>{
+                    document.body.removeChild(sweepBox);
+                });
+                document.body.appendChild(sweepBox);
+
+                createCircularSweeper(sweepBox);
+
+                const searchButton = document.createElement('button');
+                searchButton.style.position = 'absolute';
+                searchButton.textContent = 'Sweep';
+                searchButton.style.marginTop = '2px';
+                searchButton.style.backgroundColor = 'dimgray';
+                searchButton.style.width = '38%';
+                searchButton.style.radius = '1px';
+                searchButton.style.bottom = '0%';
+                searchButton.style.left = '29%';
+                searchButton.style.color = 'white';
+                searchButton.style.borderRadius = '1px';
+                sweepBox.appendChild(searchButton);
+
+                async function sweepGrid(){
+                    console.log('trying to sweep grid with specified amount in span tag');
+                    try{
+                        const spanText = document.querySelector('.info-span');
+                        const spanTextContent = spanText.textContent.replace(/Sweep|items| /g, '');
+                        const integerValue = parseInt(spanTextContent.trim(), 10);  
+                        console.log('trying to sweep this many items:', integerValue );
+
+                        let oldGrid = document.querySelector(".NewGrid");
+                        let gridItems = Array.from(oldGrid.children);  
+                        const children = Array.from(sweepBox.children);
+
+                        // Iterate backward to avoid issues with index shifting
+                        for (let i = children.length - 1; i >= 0; i--) {
+                            const child = children[i];
+                            if (!child.classList.contains('closeIcon')) {
+                                child.remove();
+                            }
+                        }
+                        const messageLoadingSpan = document.createElement('span');
+                        messageLoadingSpan.style.fontSize = '1.5vh';
+                        messageLoadingSpan.style.color = 'white';
+                        messageLoadingSpan.style.width = '100%';
+                        messageLoadingSpan.style.height = '10%';
+                        messageLoadingSpan.style.position = 'absolute'; 
+                        messageLoadingSpan.style.textAlign = 'center';
+                        messageLoadingSpan.style.top = '30%';
+                        messageLoadingSpan.textContent = 'Loading . . . ';
+                        sweepBox.appendChild(messageLoadingSpan);
+
+                        try{    
+                            // sweep value should always be less than or equal to the integerValue by construction
+                            // we can check to make sure no errors occur in case we increase the length later in time
+                            let availabeTokens = [];
+                            let unavailableTokens = [];
+                            for(var k = 0; k< integerValue; k++){
+                               let tokenID =  parseINT(gridItems[k].id);
+                               let tokenData;
+                                try{
+                                    tokenData = await contract.methods.getTokenData(tokenID).call();
+                                    if(tokenData.forSale){
+                                        availabeTokens.push(tokenID);
+                                    }else{
+                                        unavailableTokens.push(tokenID);
+                                    }
+                                }catch(error){
+                                    console.log('Error calling getTokenData() on contract', error);
                                 }
                             }
-                            const messageLoadingSpan = document.createElement('span');
-                            messageLoadingSpan.style.fontSize = '1.5vh';
-                            messageLoadingSpan.style.color = 'white';
-                            messageLoadingSpan.style.width = '100%';
-                            messageLoadingSpan.style.height = '10%';
-                            messageLoadingSpan.style.position = 'absolute'; 
-                            messageLoadingSpan.style.textAlign = 'center';
-                            messageLoadingSpan.style.top = '30%';
-                            messageLoadingSpan.textContent = 'Loading . . . ';
-                            sweepBox.appendChild(messageLoadingSpan);
-    
-                            try{    
-                                // sweep value should always be less than or equal to the integerValue by construction
-                                // we can check to make sure no errors occur in case we increase the length later in time
-                                let availabeTokens = [];
-                                let unavailableTokens = [];
-                                for(var k = 0; k< integerValue; k++){
-                                   let tokenID =  parseINT(gridItems[k].id);
-                                   let tokenData;
-                                    try{
-                                        tokenData = await contract.methods.getTokenData(tokenID).call();
-                                        if(tokenData.forSale){
-                                            availabeTokens.push(tokenID);
-                                        }else{
-                                            unavailableTokens.push(tokenID);
-                                        }
-                                    }catch(error){
-                                        console.log('Error calling getTokenData() on contract', error);
-                                    }
-                                }
-    
-                                if(unavailableTokens.length == 0 && availabeTokens.length != 0){
-                                    console.log('trying to sweep the floor');
-                                    try{
-                                        let currentAddressGasSender;
-                                        if (isConnected) {
-                                            let thisAccount = window.ethereum.selectedAddress;
-                                            currentAddressGasSender = thisAccount;
+
+                            if(unavailableTokens.length == 0 && availabeTokens.length != 0){
+                                console.log('trying to sweep the floor');
+                                try{
+                                    let currentAddressGasSender;
+                                    if (isConnected) {
+                                        let thisAccount = window.ethereum.selectedAddress;
+                                        currentAddressGasSender = thisAccount;
+                                    } else {
+                                        if (typeof window.ethereum === 'undefined') { 
+                                            alert('You must install MetaMask or another Ethereum provider to purchase tokens');
                                         } else {
-                                            if (typeof window.ethereum === 'undefined') { 
-                                                alert('You must install MetaMask or another Ethereum provider to purchase tokens');
-                                            } else {
-                                                if (window.ethereum.isMetaMask) { // If MetaMask is detected
-                                                    try {
-                                                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                                                        let thisAccount = accounts[0];
-                                                        currentAddressGasSender = thisAccount;
-                                                    } catch (error) {
-                                                        if (error.code === -32002) { 
-                                                            alert('Please open the MetaMask extension manually, sign in, and reload the page.');
-                                                        } else {
-                                                            alert(`Error: ${error.message || error}`);
-                                                        }
+                                            if (window.ethereum.isMetaMask) { 
+                                                try {
+                                                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                                                    let thisAccount = accounts[0];
+                                                    currentAddressGasSender = thisAccount;
+                                                } catch (error) {
+                                                    if (error.code === -32002) { 
+                                                        alert('Please open the MetaMask extension manually, sign in, and reload the page.');
+                                                    } else {
+                                                        alert(`Error: ${error.message || error}`);
                                                     }
-                                                } else { 
-                                                    alert('MetaMask not detected. Please install MetaMask to use this feature.');
                                                 }
+                                            } else { 
+                                                alert('MetaMask not detected. Please install MetaMask to use this feature.');
                                             }
                                         }
-    
-                                        if(currentAddressGasSender){
-                                            const gasEstimate = await contract.methods.purchaseArrayOfNFT(availabeTokens).estimateGas({ from: currentAddressGasSender });
-                                            const tx = await contract.methods.purchaseArrayOfNFT(availabeTokens).send({
-                                                    from: currentAddressGasSender,
-                                                    gas: gasEstimate
-                                            });
-                                            if (tx && tx.transactionHash) {
-                                                console.log('Transaction sent. Waiting for confirmation...');
-                                                const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-                                                if (receipt && receipt.status === true) {
-                                                    console.log('The user accepted the transaction and it was successful.');
-                                                    console.log('creating success span tag inside contaniner');
-                                                    messageLoadingSpan.textContent = '';
-                                                    messageLoadingSpan.textContent = 'Sweep successful! Thank you come again.';
-                                                } else {
-                                                    console.log('The transaction failed.');
-                                                    messageLoadingSpan.textContent = '';
-                                                    messageLoadingSpan.textContent = 'Sorry an error occured. The transaction failed';
-                                                }
-                                            } else {
-                                                console.log('The transaction could not be sent.');
-                                                messageLoadingSpan.textContent = '';
-                                                messageLoadingSpan.textContent = 'The transaction could not be sent.';
-                                            }
-                                        }else{
-                                            messageLoadingSpan.textContent = '';
-                                            messageLoadingSpan.textContent = 'login to your metamask.';
-                                            alert('Please make sure to login to your metamask before proceeding');
-                                        }
-    
-                                    }catch(error){
-                                        console.log('Error calling purchaseArrayOfNFT on the contract', error);
-                                        messageLoadingSpan.textContent = '';
-                                        messageLoadingSpan.textContent = 'error calling contract.';
                                     }
-                                }else if(unavailableTokens.length == 0 && availabeTokens.length == 0){
-                                    console.log('sorry contract not setup yet');
+
+                                    if(currentAddressGasSender){
+                                        const gasEstimate = await contract.methods.purchaseArrayOfNFT(availabeTokens).estimateGas({ from: currentAddressGasSender });
+                                        const tx = await contract.methods.purchaseArrayOfNFT(availabeTokens).send({
+                                                from: currentAddressGasSender,
+                                                gas: gasEstimate
+                                        });
+                                        if (tx && tx.transactionHash) {
+                                            console.log('Transaction sent. Waiting for confirmation...');
+                                            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+                                            if (receipt && receipt.status === true) {
+                                                console.log('The user accepted the transaction and it was successful.');
+                                                console.log('creating success span tag inside contaniner');
+                                                messageLoadingSpan.textContent = '';
+                                                messageLoadingSpan.textContent = 'Sweep successful! Thank you come again.';
+                                            } else {
+                                                console.log('The transaction failed.');
+                                                messageLoadingSpan.textContent = '';
+                                                messageLoadingSpan.textContent = 'Sorry an error occured. The transaction failed';
+                                            }
+                                        } else {
+                                            console.log('The transaction could not be sent.');
+                                            messageLoadingSpan.textContent = '';
+                                            messageLoadingSpan.textContent = 'The transaction could not be sent.';
+                                        }
+                                    }else{
+                                        messageLoadingSpan.textContent = '';
+                                        messageLoadingSpan.textContent = 'login to your metamask.';
+                                        alert('Please make sure to login to your metamask before proceeding');
+                                    }
+
+                                }catch(error){
+                                    console.log('Error calling purchaseArrayOfNFT on the contract', error);
                                     messageLoadingSpan.textContent = '';
-                                    messageLoadingSpan.textContent = 'error calling contract not setup yet.';
-                                }else if(unavailableTokens.length != 0 && availabeTokens.length != 0) {
-                                    alert('Sorry some of the tokens you are trying to sweep are not availabe. Try to enter a lower amount. You can check the floor manuelly');
-                                }else{
-                                    alert('An unexpected error occured please try again');
+                                    messageLoadingSpan.textContent = 'error calling contract.';
                                 }
-                            }catch(error){
-                                console.log('Error sweeping items', error);
+                            }else if(unavailableTokens.length == 0 && availabeTokens.length == 0){
+                                console.log('sorry contract not setup yet');
+                                messageLoadingSpan.textContent = '';
+                                messageLoadingSpan.textContent = 'error calling contract not setup yet.';
+                            }else if(unavailableTokens.length != 0 && availabeTokens.length != 0) {
+                                alert('Sorry some of the tokens you are trying to sweep are not availabe. Try to enter a lower amount. You can check the floor manuelly');
+                            }else{
+                                alert('An unexpected error occured please try again');
                             }
                         }catch(error){
-                            console.log('error getting item number for sweep', error);
+                            console.log('Error sweeping items', error);
                         }
-                        
+                    }catch(error){
+                        console.log('error getting item number for sweep', error);
                     }
-                    searchButton.addEventListener('click', sweepGrid);
-                }else if (item.textContent == 'Search') {
-                    const searchContainer = document.createElement('div');
-                    searchContainer.style.position = 'absolute';
-                    searchContainer.style.right = '1%';
-                    searchContainer.style.top = '20vh';
-                    searchContainer.style.height = '27%';
-                    searchContainer.style.boxSizing = 'border-box';
-                    searchContainer.style.width = sideElementsWidth;
-                    searchContainer.style.borderRadius = '5px';
-                    searchContainer.style.backgroundColor = '#404a5c';
-                    searchContainer.style.border = '2px solid black';
-                    searchContainer.style.display = 'flex';
-                    searchContainer.style.flexDirection = 'column';
-                    searchContainer.style.alignItems = 'center';
-                    searchContainer.style.justifyContent = 'space-evenly';
-                    searchContainer.style.overflowY = 'scroll';
-    
-                    const closeIcon = document.createElement('span');
-                    closeIcon.textContent = '×';
-                    closeIcon.style.position = 'absolute';
-                    closeIcon.style.top = '10px';
-                    closeIcon.style.right = '10px';
-                    closeIcon.style.cursor = 'pointer';
-                    closeIcon.style.fontSize = '20px';
-                    closeIcon.style.color = 'red';
-    
-                    searchContainer.appendChild(closeIcon);
-                    closeIcon.addEventListener('click', () => {
-                        document.body.removeChild(searchContainer);
-                    });
-    
-                    const searchBar = document.createElement('input');
-                    searchBar.setAttribute('placeholder', 'Search By Token ID ...');
-                    searchBar.style.width = '70%';
-                    searchBar.style.height = '6%'; 
-                    searchBar.style.margin = '0'; 
-                    searchBar.style.position = 'relative';
-                    searchBar.style.top  = '1%';
-                    searchBar.style.left = '0%';
-                    searchBar.type = 'number';
-    
-                    searchContainer.appendChild(searchBar);
-                    const searchButton = document.createElement('button');
-                    searchButton.textContent = 'Search';
-                    searchButton.style.marginTop = '10px';
-                    searchButton.style.backgroundColor = 'dimgray';
-                    searchButton.style.width = '38%';
-                    searchButton.style.borderRadius = '1px';
-                    searchContainer.appendChild(searchButton);
-    
-                    const imageContainer = document.createElement('div');
-                    imageContainer.style.width = '45%';
-                    imageContainer.style.height = '32%'; 
-                    imageContainer.style.top = '21%';
-                    imageContainer.style.left = '17%';
-                    imageContainer.style.display = 'none'; 
-                    searchContainer.appendChild(imageContainer);
-    
-                    const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
-                    const divContainer = document.createElement('div');
-                    divContainer.style.width = '100%';
-                    divContainer.style.display = 'flex';
-                    divContainer.style.flexDirection = 'column';
-                    divContainer.style.alignItems = 'center'; 
-                    divContainer.style.height = '35%'; 
-                    divContainer.style.bottom = '0%';
-                    divContainer.style.fontSize = '2vh';
-                    divContainer.style.display = 'none'; 
-                    divData.forEach(async (text) => {
-                        const div = document.createElement('div');
-                        div.style.width = '90%';
-                        div.style.height = '20%'; 
-                        div.style.display = 'flex'; 
-                        div.style.alignItems = 'center'; 
-                        div.style.justifyContent = 'space-between'; 
-                        div.style.cursor = 'pointer';
-                        div.style.boxSizing = 'border-box';
-    
-                        const textContainer = document.createElement('div');
-                        textContainer.style.minWidth = '40%'; 
-                        textContainer.style.textAlign = 'left'; 
-                        textContainer.style.color = 'white';
-                        textContainer.textContent = text;
-    
-                        const resultContainer = document.createElement('div');
-                        resultContainer.style.minWidth = '40%'; 
-                        resultContainer.style.textAlign = 'right'; 
-                        resultContainer.style.color = 'lightgray';
-                        if(text == "Highest Sell"){
-                            let highestTokenSell;
-                            try {
-                                let recentSellsFromContract = await contract.methods.getRecentSells().call();
-                                highestTokenSell = 0;
-                                for (const nft of recentSellsFromContract) {
-                                    if (nft.id == searchedTokenID) {
-                                        if (parseInt(nft.price) > highestTokenSell) {
-                                            highestTokenSell = parseInt(nft.price);
-                                        }
-                                    }
-                                }
-                                if (highestTokenSell === 0) {
-                                    console.log('No sells found for this token.');
-                                }
-                                let highestTokenSellInETH = (highestTokenSell / (10 ** 18)).toFixed(2); 
-                                console.log('Highest sell in ETH:', highestTokenSellInETH);
-                                resultContainer.textContent = `${highestTokenSellInETH} ${coin}`;
-    
-                            } catch (error) {
-                                console.log('Error calling the function getRecentSells() on the contract', error);
-                                highestTokenSell = 0;
-                                resultContainer.textContent = '0 ETH'; // Default in case of error
-                            }
-                            let highesTokenConverted = (highestTokenSell)/(10**18).toFixed(2);
-                            resultContainer.textContent = `${highesTokenConverted}`+ `${coin}`;
-                        }else if(text == "Current Owner"){
-                            let currentOwner;
-                            try{
-                                let data = await contract.methods.getTokenData(searchedTokenID).call();
-                                currentOwner = data.owner.substring(0,8)+ "~~~";
-                            }catch(error){
-                                console.log('Error calling the function getTokenData() on the contract and setting the current');
-                                currentOwner = RoysWallet.substring(0,8)+ "~~~";
-                                
-                            }
-                            resultContainer.textContent = currentOwner;
-                        }else if(text == "Date of Last Sell"){
-                            let dateOfLastSell;
-                            try{
-                                let data = await contract.methods.getTokenData(searchedTokenID).call();
-                                const dateSold = new Date(data.lastSellData * 1000); 
-                                const dateSpan = document.createElement('div');
-                                dateSpan.textContent = `${dateSold.toLocaleDateString("en-US", { 
-                                    year: '2-digit', 
-                                    month: '2-digit', 
-                                    day: '2-digit' 
-                                })} at ${datePurchased.toLocaleTimeString("en-US", { 
-                                    hour: '2-digit', 
-                                    minute: '2-digit', 
-                                    hour12: false 
-                                })}`;
-                                dateOfLastSell = dateSpan.textContent;
-                            }catch(error){
-                                console.log('Error calling the function getTokenData() on the contract and setting the current');
-                                dateOfLastSell = 'No sell yet';
-                                
-                            }
-                            resultContainer.textContent = dateOfLastSell;
-                        }else if(text == "Previous Owner"){
-                            let previousOwner;
-                            try{
-                                let data = await contract.methods.getTokenData(searchedTokenID).call();
-                                previousOwner = data.lastOwner.substring(0,8) + "~~~";
-                            }catch(error){
-                                console.log('Error calling the function getTokenData() on the contract and setting the current');
-                                previousOwner = RoysWallet.substring(0,8) + "~~~";
-                                
-                            }
-                            resultContainer.textContent = previousOwner;
-                        }else{
-                            console.log('an unexpected error occured on the result container');
-                        }
-                        
-                        div.appendChild(textContainer);
-                        div.appendChild(resultContainer);
-                        divContainer.appendChild(div);
-                    });
-    
-                    searchContainer.appendChild(divContainer);
-                    document.body.appendChild(searchContainer);
-    
-                    const promptMessage = document.createElement('p');
-                    promptMessage.textContent = 'Please enter a token ID to retrieve its information';
-                    promptMessage.style.color = 'white'; 
-                    promptMessage.style.fontSize = '14px';  
-                    promptMessage.style.textAlign = 'center';  
-                    promptMessage.style.margin = '10px 0'; 
-    
-                    searchContainer.appendChild(searchBar);
-                    searchContainer.appendChild(promptMessage); 
-                    searchContainer.appendChild(searchButton);
-    
-                    function revealContent() {
-                        let tokenExist = false;
-                        let searchedTokenID = searchBar.value;
-                        if (searchedTokenID === '' || isNaN(searchedTokenID)) {
-                            alert('Please enter a valid number in the search bar');
-                        } else {
-                            searchedTokenID = parseInt(searchedTokenID);
-                            let imageUrl = null;
-                            for (const nft of currentNFTArray) {
-                                if (nft.tokenID === searchedTokenID) {
-                                    tokenExist = true;
-                                    imageUrl = nft.image; 
-                                    console.log('We found the token with ID:', nft.tokenID);
-                                    break;
-                                }
-                            }
-                            if (tokenExist) {
-                                try {
-                                    if (imageUrl) {
-                                        imageContainer.style.backgroundImage = `url(${imageUrl})`;
-                                        imageContainer.style.backgroundSize = 'cover'; 
-                                        imageContainer.style.backgroundRepeat = 'no-repeat';
-                                        imageContainer.style.backgroundPosition = 'center'; 
-                                        imageContainer.style.display = 'block';
-                                        console.log('Image set successfully');
-                                    } else {
-                                        console.log('Image URL is not found');
-                                    }
-                                } catch (error) {
-                                    console.log('Error setting image:', error);
-                                }             
-                                searchButton.remove();
-                                searchBar.remove();
-                                promptMessage.remove();
-                                divContainer.style.display = 'flex';
-                            } else {
-                                alert('Please enter a valid token ID');
-                            }
-                        }
-                    }
-                    searchBar.addEventListener('keydown', (event) => {
-                        if (event.key === 'Enter') {
-                            revealContent();
-                        }
-                    });
-    
-                    searchButton.addEventListener('click', revealContent);
-                }else if(item.textContent == 'Sort'){
-                    console.log('make 4 div elements here');
-                    const sortContainer = document.createElement('div');
-                    sortContainer.style.position = 'absolute';
-                    sortContainer.style.right = '1%';
-                    sortContainer.style.top = '20vh';
-                    sortContainer.style.height = '27%';
-                    sortContainer.style.boxSizing = 'border-box';
-                    sortContainer.style.width = sideElementsWidth;
-                    sortContainer.style.borderRadius = '5px';
-                    sortContainer.style.backgroundColor = '#404a5c';
-                    sortContainer.style.border = '2px solid black';
-                    sortContainer.style.display = 'flex';
-                    sortContainer.style.flexDirection = 'column';
-                    sortContainer.style.alignItems = 'center';
-                    sortContainer.style.justifyContent = 'space-evenly';
-    
-                    const closeIcon = document.createElement('span');
-                    closeIcon.textContent = '×';
-                    closeIcon.style.position = 'absolute';
-                    closeIcon.style.top = '10px';
-                    closeIcon.style.right = '10px';
-                    closeIcon.style.cursor = 'pointer';
-                    closeIcon.style.fontSize = '20px';
-                    closeIcon.style.color = 'red';
-    
-                    sortContainer.appendChild(closeIcon);
-    
-                    closeIcon.addEventListener('click', () => {
-                        document.body.removeChild(sortContainer);
-                    });
-    
-                    document.body.appendChild(sortContainer);
-                    const sortingData = ['Listed', 'Not Listed', 'Highest Price', 'Lowest Price'];
-                    const miniSortContainer = document.createElement('div');    
-                    miniSortContainer.style.position = 'absolute';
-                    miniSortContainer.style.width = "100%";
-                    miniSortContainer.style.height = '85%';
-                    miniSortContainer.style.left = '0%';
-                    miniSortContainer.style.bottom = '1%';
-                    sortContainer.appendChild(miniSortContainer);
-    
-                    sortingData.forEach((text) => {
-                        const div = document.createElement('div');
-                        div.style.width = '99%'; 
-                        div.style.left = '0.5%';
-                        div.style.height = '20%';
-                        div.style.display = 'flex';
-                        div.style.alignItems = 'center'; 
-                        div.style.justifyContent = 'center'; 
-                        div.style.textAlign = 'center';
-                        div.style.color = 'white';
-                        div.style.borderRadius = '5px';
-                        div.style.cursor = 'pointer';
-                        div.textContent = text;
-                        div.style.fontSize = '2vh';
-                        div.style.borderBottom = '1px solid white';
-    
-                        div.addEventListener('mouseover', () => {
-                            div.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                            div.style.color = 'black';
-                        });
-                        div.addEventListener('mouseout', () => {
-                            div.style.backgroundColor = '#404a5c';
-                            div.style.color = 'white';
-                        });
-                        div.addEventListener('click', async () => {
-                            let listedItems = [];
-                            let itemsNotListed = [];
-                            if(text === "Listed"){
-                                let oldGrid = document.querySelector(".NewGrid");
-                                let gridItems = Array.from(oldGrid.children);  
-                                try{
-                                    for(var i =0; i<gridItems.length; i++){
-                                        let tokenData;
-                                        let gridItemIDString = gridItems[i].id; 
-                                        let gridIDINT = parseInt(gridItemIDString.trim());
-    
-                                        console.log('calling contract using tokenID:', gridIDINT);
-                                        try {
-                                            tokenData = await contract.methods.getTokenData(gridIDINT).call();
-                                            if(tokenData.forSale === true){
-                                                listedItems.push(gridIDINT);
-                                            }else{
-                                                itemsNotListed.push(gridIDINT);
-                                            }
-                                        } catch (error) {
-                                            console.error(`Error fetching toking Data ${tokenData}`);
-                                        }
-    
-                                    }
-                                    gridItems = sortByID(gridItems, [...listedItems, ...itemsNotListed]);
-                                    let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
-                                    let oldGrid = document.querySelector(".NewGrid");
-                                    currentNFTArray.sort((a, b) => {
-                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                        return indexA - indexB;
-                                    });
-                                    if (oldGrid) {
-                                        oldGrid.innerHTML = '';
-                                        console.log('items Cleared from dome');
-                                    }
-                                    makeNewNFTGrid(currentNFTArray, oldGrid);
-                                }catch(error){
-                                    console.log('Error making new nft grid to call', error);
-                                }
-                            }if(text === "Not Listed"){
-                                let oldGrid = document.querySelector(".NewGrid");
-                                let gridItems = Array.from(oldGrid.children);  
-                                try{
-                                    for(var i = 0; i < gridItems.length; i++){
-                                        let tokenData;
-                                        let gridItemIDString = gridItems[i].id; 
-                                        let gridIDINT = parseInt(gridItemIDString.trim());
-    
-                                        console.log('calling contract using tokenID:', gridIDINT);
-                                        try {
-                                            tokenData = await contract.methods.getTokenData(gridIDINT).call();
-                                            if(tokenData.forSale === true){
-                                                itemsNotListed.push(gridIDINT); 
-                                            }else{
-                                                listedItems.push(gridIDINT);  
-                                            }
-                                        } catch (error) {
-                                            console.error(`Error fetching token Data ${tokenData}`);
-                                        }
-                                    }
-    
-                                    gridItems = sortByID(gridItems, [...itemsNotListed, ...listedItems]);
-                                    let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
-    
-                                    let oldGrid = document.querySelector(".NewGrid");
-                                    currentNFTArray.sort((a, b) => {
-                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                        return indexA - indexB;
-                                    });
-    
-                                    if (oldGrid) {
-                                        oldGrid.innerHTML = '';
-                                        console.log('items Cleared from DOM');
-                                    }
-                                    makeNewNFTGrid(currentNFTArray, oldGrid); 
-                                }catch(error){
-                                    console.log('Error making new NFT grid to call', error);
-                                }
-                            }else if(text === "Highest Price"){
-                                console.log('Trying to filter by highest price');
-                                let oldGrid = document.querySelector(".NewGrid");
-                                let gridItems = Array.from(oldGrid.children); 
-                                let savedItems = gridItems; 
-                                let LoopNotBroken = false;
-                                try {
-                                    let organizedByHighestIDarray = []; 
-                                    console.log('trying to initiate while loop');
-                                    while (gridItems.length > 0) {
-                                        let highestCount = BigInt(0);
-                                        let highestTokenID = null;
-                                        let counterJ = 0;
-    
-                                        for (let j = 0; j < gridItems.length; j++) {
-                                            let gridItemIDString2 = gridItems[j].id; 
-                                            let gridIDINT2 = parseInt(gridItemIDString2.trim());
-                                            
-                                            try {
-                                                let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
-                                                let tokenPrice = BigInt(tokenDataCounter.price);
-    
-                                                if (highestCount <= tokenPrice) {
-                                                    highestCount = tokenPrice;
-                                                    highestTokenID = tokenDataCounter.id;
-                                                    counterJ = j;
-                                                }
-                                            } catch (error) {
-                                                console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
-                                            }
-                                        }
-                                        console.log('finished first loop with counterJ', counterJ);
-                                        console.log('finished first loop with highestTokenID', highestTokenID);
-                                        console.log('finished first loop with highestCount', highestCount);
-                                        if (highestTokenID !== null) {
-                                            const index = gridItems.indexOf(gridItems[counterJ]);
-                                            if (index > -1) {
-                                                gridItems.splice(index, 1); 
-                                            }
-                                            organizedByHighestIDarray.push(highestTokenID); 
-                                        }else{
-                                            LoopNotBroken = true;
-                                            alert('Sorry we could not find the highest token id');
-                                            break;
-                                            
-                                        }
-                                    }
-    
-                                    if (LoopNotBroken === false) {   
-                                        savedItems = sortByID(savedItems, [...organizedByHighestIDarray]);
-                                        let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
-    
-                                        currentNFTArray.sort((a, b) => {
-                                            let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                            let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                            return indexA - indexB;
-                                        });
-    
-                                        if (oldGrid) {
-                                            oldGrid.innerHTML = ''; 
-                                            console.log('Items cleared from DOM');
-                                        }
-                                        makeNewNFTGrid(currentNFTArray, oldGrid);  
-                                    }
-                                } catch (error) {
-                                    console.error('Error making new NFT grid:', error);
-                                }
-                            }else if(text === "Lowest Price") {
-                                console.log('Trying to filter by lowest price');
-                                let oldGrid = document.querySelector(".NewGrid");
-                                let gridItems = Array.from(oldGrid.children); 
-                                let savedItems = gridItems; 
-                                let LoopNotBroken = false;
-                                
-                                try {
-                                    let organizedByLowestIDarray = []; 
-                                    console.log('trying to initiate while loop');
-                                    
-                                    while (gridItems.length > 0) {
-                                        let lowestCount = BigInt(Number.MAX_SAFE_INTEGER);
-                                        let lowestTokenID = null;
-                                        let counterJ = 0;
-    
-                                        for (let j = 0; j < gridItems.length; j++) {
-                                            let gridItemIDString2 = gridItems[j].id; 
-                                            let gridIDINT2 = parseInt(gridItemIDString2.trim());
-    
-                                            try {
-                                                let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
-                                                let tokenPrice = BigInt(tokenDataCounter.price);
-    
-                                                if (lowestCount >= tokenPrice) {
-                                                    lowestCount = tokenPrice;
-                                                    lowestTokenID = tokenDataCounter.id;
-                                                    counterJ = j;
-                                                }
-                                            } catch (error) {
-                                                console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
-                                            }
-                                        }
-    
-                                        console.log('Finished loop with counterJ', counterJ);
-                                        console.log('Finished loop with lowestTokenID', lowestTokenID);
-                                        console.log('Finished loop with lowestCount', lowestCount);
-    
-                                        if (lowestTokenID !== null) {
-                                            const index = gridItems.indexOf(gridItems[counterJ]);
-                                            if (index > -1) {
-                                                gridItems.splice(index, 1);
-                                            }
-                                            organizedByLowestIDarray.push(lowestTokenID); 
-                                        } else {
-                                            LoopNotBroken = true;
-                                            alert('Sorry we could not find the lowest token id');
-                                            break;
-                                        }
-                                    }
-    
-                                    if (LoopNotBroken === false) {
-                                        savedItems = sortByID(savedItems, [...organizedByLowestIDarray]);
-                                        let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
-    
-                                        currentNFTArray.sort((a, b) => {
-                                            let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                            let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                            return indexA - indexB;
-                                        });
-    
-                                        if (oldGrid) {
-                                            oldGrid.innerHTML = ''; 
-                                            console.log('Items cleared from DOM');
-                                        }
-    
-                                        makeNewNFTGrid(currentNFTArray, oldGrid); 
-                                    }
-                                } catch (error) {
-                                    console.error('Error making new NFT grid:', error);
-                                }
-                            }
-                        });
-    
-                        miniSortContainer.appendChild(div);
-                    });
-                }else if(item.textContent == 'File a Report'){
-                    console.log('Opening report form');
-                    const reportContainer = document.createElement('div');
-                    reportContainer.style.position = 'absolute';
-                    reportContainer.style.right = '1%';
-                    reportContainer.style.top = '20vh';
-                    reportContainer.style.height = '27%'; 
-                    reportContainer.style.boxSizing = 'border-box';
-                    reportContainer.style.width = sideElementsWidth;
-                    reportContainer.style.borderRadius = '5px';
-                    reportContainer.style.backgroundColor = '#404a5c';
-                    reportContainer.style.border = '2px solid black';
-                    reportContainer.style.display = 'flex';
-                    reportContainer.style.flexDirection = 'column';
-                    reportContainer.style.alignItems = 'center';
-                    reportContainer.style.justifyContent = 'space-evenly';
-                    reportContainer.style.overflowY = 'scroll';
-    
-                    const closeIcon = document.createElement('span');
-                    closeIcon.textContent = '×';
-                    closeIcon.style.position = 'absolute';
-                    closeIcon.style.top = '5px';
-                    closeIcon.style.right = '5px';
-                    closeIcon.style.cursor = 'pointer';
-                    closeIcon.style.fontSize = '16px';
-                    closeIcon.style.color = 'red';
-                    closeIcon.addEventListener('click', () => {
-                        document.body.removeChild(reportContainer);
-                    });
-                    reportContainer.appendChild(closeIcon);
-    
-                    const tokenIdLabel = document.createElement('label');
-                    tokenIdLabel.textContent = 'Token ID';
-                    tokenIdLabel.style.color = 'white';
-                    tokenIdLabel.style.fontSize = '12px';
-                    reportContainer.appendChild(tokenIdLabel);
-    
-                    const tokenIdInput = document.createElement('input');
-                    tokenIdInput.type = 'number';
-                    tokenIdInput.placeholder = 'Enter Token ID';
-                    tokenIdInput.style.width = '80%';
-                    tokenIdInput.style.height = '12%'; 
-                    tokenIdInput.style.fontSize = '12px'; 
-                    tokenIdInput.style.top = '2%';
-                    tokenIdInput.style.position = 'relative';
-                    tokenIdInput.min = '1'; 
-                    tokenIdInput.step = '1';
-                    reportContainer.appendChild(tokenIdInput);
-    
-                    const emailLabel = document.createElement('label');
-                    emailLabel.textContent = 'Email';
-                    emailLabel.style.color = 'white';
-                    emailLabel.style.left = "5%";
-                    emailLabel.style.fontSize = '12px'; 
-                    reportContainer.appendChild(emailLabel);
-    
-                    const emailInput = document.createElement('input');
-                    emailInput.type = 'email';
-                    emailInput.placeholder = 'Enter your email';
-                    emailInput.style.width = '80%';
-                    emailInput.style.left = "5%";
-                    emailInput.style.height = '12%';
-                    emailInput.style.fontSize = '12px'; 
-                    reportContainer.appendChild(emailInput);
-    
-                    const messageLabel = document.createElement('label');
-                    messageLabel.textContent = 'Message';
-                    messageLabel.style.color = 'white';
-                    messageLabel.style.fontSize = '12px'; 
-                    messageLabel.style.marginBottom = '5px';
-                    reportContainer.appendChild(messageLabel);
-    
-                    const messageInput = document.createElement('textarea');
-                    messageInput.placeholder = 'Enter your message';
-                    messageInput.maxLength = 500; 
-                    messageInput.style.width = '80%';
-                    messageInput.style.height = '250px'; 
-                    messageInput.style.fontSize = '10px'; 
-                    messageInput.style.padding = '5px'; 
-                    messageInput.style.left = "5%";
-                    messageInput.style.resize = 'vertical';
-                    reportContainer.appendChild(messageInput);
-    
-                    const fileButton = document.createElement('button');
-                    fileButton.textContent = 'Submit';
-                    fileButton.style.width = '40%';
-                    fileButton.style.padding = '5px'; 
-                    fileButton.style.backgroundColor = 'dimgray';
-                    fileButton.style.color = 'white';
-                    fileButton.style.border = 'none';
-                    fileButton.style.borderRadius = '5px';
-                    fileButton.style.cursor = 'pointer';
-                    fileButton.style.fontSize = '12px';
-    
-                    fileButton.addEventListener('click', async () => { 
-                        const tokenID = tokenIdInput.value;
-                        const email = emailInput.value;
-                        const message = messageInput.value;
-    
-                        console.log(`Token ID: ${tokenID}, Email: ${email}, Message: ${message}`);
-                        const fields = [tokenID, email, message];
-                        const fieldNames = ['Token ID', 'Email', 'Message'];
-                        for (let i = 0; i < fields.length; i++) {
-                            if (!fields[i]) {
-                                alert(`Please make sure to properly fill out all fields`);
-                                return; 
-                            }
-                        }
-    
-                        let walletSender;
-                        if(isConnected === false){
-                            alert('Please make sure to login to your main wallet before filing a report');
-                        }else{
-                            if(window.ethereum.selectedAddress != null && window.ethereum.isMetaMask){ 
-                                walletSender = window.ethereum.selectedAddress;
-                                let reportData = {
-                                    clientWallet: walletSender,
-                                    contractName: userSelectedContract.contractName,
-                                    ERCStandard: userSelectedContract.ERCStandard,
-                                    tokenID: tokenID.toString(),   
-                                    email: email, 
-                                    message: message
-                                };
-    
-                                try {
-                                    const reportResponse = await fetch('/file-a-report', {
-                                        method: "POST", 
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify(reportData)
-                                    });
-    
-                                    if (reportResponse.ok) {
-                                        const responseJson = await reportResponse.json();
-                                        if (responseJson.success === false) {
-                                            console.log('Did not get back expected response');
-                                            if(responseJson.code == 10002444222202 ){
-                                                alert('Make sure to entere a valid email address invalid email');
-                                            }else if(responseJson.code == 3433444 ){
-                                                alert('Error with try and catch on server');
-                                            }else if(responseJson.code == 1000202 ){
-                                                alert('Sorry we already dedicated that you filed a report. We will contact you as soon as possible');
-                                            }else if(responseJson.code == 34444411 ){
-                                                alert('error with response from server');
-                                            }else{
-                                                alert('unexpected code error');
-                                            }
-                                        }else {
-                                            try{
-                                                tokenIdLabel.remove();
-                                                tokenIdInput.remove();
-                                                emailLabel.remove();
-                                                emailInput.remove();
-                                                messageLabel.remove();
-                                                messageInput.remove();
-                                                fileButton.remove();
-    
-                                                const successSpan = document.createElement('span');
-                                                successSpan.textContent = "Thank you for filing a report. We will get back to it as soon as possible and pause the token if we find an issue!";
-                                                successSpan.style.display = 'block';
-                                                successSpan.style.textAlign = 'center';
-                                                successSpan.style.marginTop = '20px';
-                                                successSpan.style.fontSize = '10px';
-                                                successSpan.style.color = 'white';
-                                                reportContainer.appendChild(successSpan);
-                                            }catch(error){
-                                                console.log('Error', error);
-                                            }
-                                        }
-                                    } else {
-                                        console.error('Failed to fetch: Response was not okay', reportResponse.statusText);
-                                        alert('An error occurred while sending the report please try again at a later time');
-                                    }
-                                } catch (error) {
-                                    console.error('Failed to fetch: An error occurred', error);
-                                    alert('An error occurred while sending the report');
-                                }
-                            }else{
-                                alert('Please make sure to sign into a wallet before sending a report');
-                            }
-                        }
-                    });
-    
-                    reportContainer.appendChild(fileButton);
-                    document.body.appendChild(reportContainer);
-                }else{
-                    console.log('Unepexected click');
+                    
                 }
-            });
-            item.addEventListener('mouseenter', function () {
-                this.style.backgroundColor = '#5a647d';
-                this.style.color = '#f0f0f0'; 
-            });
-    
-            item.addEventListener('mouseleave', function () {
-                this.style.backgroundColor = ''; 
-                this.style.color = ''; 
-            });
+                searchButton.addEventListener('click', sweepGrid);
+            }else if (item.textContent == 'Search') {
+                const searchContainer = document.createElement('div');
+                searchContainer.style.position = 'absolute';
+                searchContainer.style.right = '1%';
+                searchContainer.style.top = '20vh';
+                searchContainer.style.height = '27%';
+                searchContainer.style.boxSizing = 'border-box';
+                searchContainer.style.width = sideElementsWidth;
+                searchContainer.style.borderRadius = '5px';
+                searchContainer.style.backgroundColor = '#404a5c';
+                searchContainer.style.border = '2px solid black';
+                searchContainer.style.display = 'flex';
+                searchContainer.style.flexDirection = 'column';
+                searchContainer.style.alignItems = 'center';
+                searchContainer.style.justifyContent = 'space-evenly';
+                searchContainer.style.overflowY = 'scroll';
+
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '10px';
+                closeIcon.style.right = '10px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px';
+                closeIcon.style.color = 'red';
+
+                searchContainer.appendChild(closeIcon);
+                closeIcon.addEventListener('click', () => {
+                    document.body.removeChild(searchContainer);
+                });
+
+                const searchBar = document.createElement('input');
+                searchBar.setAttribute('placeholder', 'Search By Token ID ...');
+                searchBar.style.width = '70%';
+                searchBar.style.height = '6%'; 
+                searchBar.style.margin = '0'; 
+                searchBar.style.position = 'relative';
+                searchBar.style.top  = '1%';
+                searchBar.style.left = '0%';
+                searchBar.type = 'number';
+
+                searchContainer.appendChild(searchBar);
+                const searchButton = document.createElement('button');
+                searchButton.textContent = 'Search';
+                searchButton.style.marginTop = '10px';
+                searchButton.style.backgroundColor = 'dimgray';
+                searchButton.style.width = '38%';
+                searchButton.style.borderRadius = '1px';
+                searchContainer.appendChild(searchButton);
+
+                const imageContainer = document.createElement('div');
+                imageContainer.style.width = '45%';
+                imageContainer.style.height = '32%'; 
+                imageContainer.style.top = '21%';
+                imageContainer.style.left = '17%';
+                imageContainer.style.display = 'none'; 
+                searchContainer.appendChild(imageContainer);
+
+                const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
+                const divContainer = document.createElement('div');
+                divContainer.style.width = '100%';
+                divContainer.style.display = 'flex';
+                divContainer.style.flexDirection = 'column';
+                divContainer.style.alignItems = 'center'; 
+                divContainer.style.height = '35%'; 
+                divContainer.style.bottom = '0%';
+                divContainer.style.fontSize = '2vh';
+                divContainer.style.display = 'none'; 
+                divData.forEach(async (text) => {
+                    const div = document.createElement('div');
+                    div.style.width = '90%';
+                    div.style.height = '20%'; 
+                    div.style.display = 'flex'; 
+                    div.style.alignItems = 'center'; 
+                    div.style.justifyContent = 'space-between'; 
+                    div.style.cursor = 'pointer';
+                    div.style.boxSizing = 'border-box';
+
+                    const textContainer = document.createElement('div');
+                    textContainer.style.minWidth = '40%'; 
+                    textContainer.style.textAlign = 'left'; 
+                    textContainer.style.color = 'white';
+                    textContainer.textContent = text;
+
+                    const resultContainer = document.createElement('div');
+                    resultContainer.style.minWidth = '40%'; 
+                    resultContainer.style.textAlign = 'right'; 
+                    resultContainer.style.color = 'lightgray';
+                    if(text == "Highest Sell"){
+                        let highestTokenSell;
+                        try {
+                            let recentSellsFromContract = await contract.methods.getRecentSells().call();
+                            highestTokenSell = 0;
+                            for (const nft of recentSellsFromContract) {
+                                if (nft.id == searchedTokenID) {
+                                    if (parseInt(nft.price) > highestTokenSell) {
+                                        highestTokenSell = parseInt(nft.price);
+                                    }
+                                }
+                            }
+                            if (highestTokenSell === 0) {
+                                console.log('No sells found for this token.');
+                            }
+                            let highestTokenSellInETH = (highestTokenSell / (10 ** 18)).toFixed(2); 
+                            console.log('Highest sell in ETH:', highestTokenSellInETH);
+                            resultContainer.textContent = `${highestTokenSellInETH} ${coin}`;
+
+                        } catch (error) {
+                            console.log('Error calling the function getRecentSells() on the contract', error);
+                            highestTokenSell = 0;
+                            resultContainer.textContent = '0 ETH'; 
+                        }
+                        let highesTokenConverted = (highestTokenSell)/(10**18).toFixed(2);
+                        resultContainer.textContent = `${highesTokenConverted}`+ `${coin}`;
+                    }else if(text == "Current Owner"){
+                        let currentOwner;
+                        try{
+                            let data = await contract.methods.getTokenData(searchedTokenID).call();
+                            currentOwner = data.owner.substring(0,8)+ "~~~";
+                        }catch(error){
+                            console.log('Error calling the function getTokenData() on the contract and setting the current');
+                            currentOwner = RoysWallet.substring(0,8)+ "~~~";
+                            
+                        }
+                        resultContainer.textContent = currentOwner;
+                    }else if(text == "Date of Last Sell"){
+                        let dateOfLastSell;
+                        try{
+                            let data = await contract.methods.getTokenData(searchedTokenID).call();
+                            const dateSold = new Date(data.lastSellData * 1000); 
+                            const dateSpan = document.createElement('div');
+                            dateSpan.textContent = `${dateSold.toLocaleDateString("en-US", { 
+                                year: '2-digit', 
+                                month: '2-digit', 
+                                day: '2-digit' 
+                            })} at ${datePurchased.toLocaleTimeString("en-US", { 
+                                hour: '2-digit', 
+                                minute: '2-digit', 
+                                hour12: false 
+                            })}`;
+                            dateOfLastSell = dateSpan.textContent;
+                        }catch(error){
+                            console.log('Error calling the function getTokenData() on the contract and setting the current');
+                            dateOfLastSell = 'No sell yet';
+                            
+                        }
+                        resultContainer.textContent = dateOfLastSell;
+                    }else if(text == "Previous Owner"){
+                        let previousOwner;
+                        try{
+                            let data = await contract.methods.getTokenData(searchedTokenID).call();
+                            previousOwner = data.lastOwner.substring(0,8) + "~~~";
+                        }catch(error){
+                            console.log('Error calling the function getTokenData() on the contract and setting the current');
+                            previousOwner = RoysWallet.substring(0,8) + "~~~";
+                            
+                        }
+                        resultContainer.textContent = previousOwner;
+                    }else{
+                        console.log('an unexpected error occured on the result container');
+                    }
+                    
+                    div.appendChild(textContainer);
+                    div.appendChild(resultContainer);
+                    divContainer.appendChild(div);
+                });
+
+                searchContainer.appendChild(divContainer);
+                document.body.appendChild(searchContainer);
+
+                const promptMessage = document.createElement('p');
+                promptMessage.textContent = 'Please enter a token ID to retrieve its information';
+                promptMessage.style.color = 'white'; 
+                promptMessage.style.fontSize = '14px';  
+                promptMessage.style.textAlign = 'center';  
+                promptMessage.style.margin = '10px 0'; 
+
+                searchContainer.appendChild(searchBar);
+                searchContainer.appendChild(promptMessage); 
+                searchContainer.appendChild(searchButton);
+
+                function revealContent() {
+                    let tokenExist = false;
+                    let searchedTokenID = searchBar.value;
+                    if (searchedTokenID === '' || isNaN(searchedTokenID)) {
+                        alert('Please enter a valid number in the search bar');
+                    } else {
+                        searchedTokenID = parseInt(searchedTokenID);
+                        let imageUrl = null;
+                        for (const nft of currentNFTArray) {
+                            if (nft.tokenID === searchedTokenID) {
+                                tokenExist = true;
+                                imageUrl = nft.image; 
+                                console.log('We found the token with ID:', nft.tokenID);
+                                break;
+                            }
+                        }
+                        if (tokenExist) {
+                            try {
+                                if (imageUrl) {
+                                    imageContainer.style.backgroundImage = `url(${imageUrl})`;
+                                    imageContainer.style.backgroundSize = 'cover'; 
+                                    imageContainer.style.backgroundRepeat = 'no-repeat';
+                                    imageContainer.style.backgroundPosition = 'center'; 
+                                    imageContainer.style.display = 'block';
+                                    console.log('Image set successfully');
+                                } else {
+                                    console.log('Image URL is not found');
+                                }
+                            } catch (error) {
+                                console.log('Error setting image:', error);
+                            }             
+                            searchButton.remove();
+                            searchBar.remove();
+                            promptMessage.remove();
+                            divContainer.style.display = 'flex';
+                        } else {
+                            alert('Please enter a valid token ID');
+                        }
+                    }
+                }
+                searchBar.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        revealContent();
+                    }
+                });
+                searchButton.addEventListener('click', revealContent);
+            }else if(item.textContent == 'Sort'){
+                console.log('make 4 div elements here');
+                const sortContainer = document.createElement('div');
+                sortContainer.style.position = 'absolute';
+                sortContainer.style.right = '1%';
+                sortContainer.style.top = '20vh';
+                sortContainer.style.height = '27%';
+                sortContainer.style.boxSizing = 'border-box';
+                sortContainer.style.width = sideElementsWidth;
+                sortContainer.style.borderRadius = '5px';
+                sortContainer.style.backgroundColor = '#404a5c';
+                sortContainer.style.border = '2px solid black';
+                sortContainer.style.display = 'flex';
+                sortContainer.style.flexDirection = 'column';
+                sortContainer.style.alignItems = 'center';
+                sortContainer.style.justifyContent = 'space-evenly';
+
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '10px';
+                closeIcon.style.right = '10px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '20px';
+                closeIcon.style.color = 'red';
+
+                sortContainer.appendChild(closeIcon);
+
+                closeIcon.addEventListener('click', () => {
+                    document.body.removeChild(sortContainer);
+                });
+
+                document.body.appendChild(sortContainer);
+                const sortingData = ['Listed', 'Not Listed', 'Highest Price', 'Lowest Price'];
+                const miniSortContainer = document.createElement('div');    
+                miniSortContainer.style.position = 'absolute';
+                miniSortContainer.style.width = "100%";
+                miniSortContainer.style.height = '85%';
+                miniSortContainer.style.left = '0%';
+                miniSortContainer.style.bottom = '1%';
+                sortContainer.appendChild(miniSortContainer);
+
+                sortingData.forEach((text) => {
+                    const div = document.createElement('div');
+                    div.style.width = '99%'; 
+                    div.style.left = '0.5%';
+                    div.style.height = '20%';
+                    div.style.display = 'flex';
+                    div.style.alignItems = 'center'; 
+                    div.style.justifyContent = 'center'; 
+                    div.style.textAlign = 'center';
+                    div.style.color = 'white';
+                    div.style.borderRadius = '5px';
+                    div.style.cursor = 'pointer';
+                    div.textContent = text;
+                    div.style.fontSize = '2vh';
+                    div.style.borderBottom = '1px solid white';
+
+                    div.addEventListener('mouseover', () => {
+                        div.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                        div.style.color = 'black';
+                    });
+                    div.addEventListener('mouseout', () => {
+                        div.style.backgroundColor = '#404a5c';
+                        div.style.color = 'white';
+                    });
+                    div.addEventListener('click', async () => {
+                        let listedItems = [];
+                        let itemsNotListed = [];
+                        if(text === "Listed"){
+                            let oldGrid = document.querySelector(".NewGrid");
+                            let gridItems = Array.from(oldGrid.children);  
+                            try{
+                                for(var i =0; i<gridItems.length; i++){
+                                    let tokenData;
+                                    let gridItemIDString = gridItems[i].id; 
+                                    let gridIDINT = parseInt(gridItemIDString.trim());
+
+                                    console.log('calling contract using tokenID:', gridIDINT);
+                                    try {
+                                        tokenData = await contract.methods.getTokenData(gridIDINT).call();
+                                        if(tokenData.forSale === true){
+                                            listedItems.push(gridIDINT);
+                                        }else{
+                                            itemsNotListed.push(gridIDINT);
+                                        }
+                                    } catch (error) {
+                                        console.error(`Error fetching toking Data ${tokenData}`);
+                                    }
+                                }
+                                gridItems = sortByID(gridItems, [...listedItems, ...itemsNotListed]);
+                                let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
+                                let oldGrid = document.querySelector(".NewGrid");
+                                currentNFTArray.sort((a, b) => {
+                                    let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                    let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                    return indexA - indexB;
+                                });
+                                if (oldGrid) {
+                                    oldGrid.innerHTML = '';
+                                    console.log('items Cleared from dome');
+                                }
+                                makeNewNFTGrid(currentNFTArray, oldGrid);
+                            }catch(error){
+                                console.log('Error making new nft grid to call', error);
+                            }
+                        }if(text === "Not Listed"){
+                            let oldGrid = document.querySelector(".NewGrid");
+                            let gridItems = Array.from(oldGrid.children);  
+                            try{
+                                for(var i = 0; i < gridItems.length; i++){
+                                    let tokenData;
+                                    let gridItemIDString = gridItems[i].id; 
+                                    let gridIDINT = parseInt(gridItemIDString.trim());
+
+                                    console.log('calling contract using tokenID:', gridIDINT);
+                                    try {
+                                        tokenData = await contract.methods.getTokenData(gridIDINT).call();
+                                        if(tokenData.forSale === true){
+                                            itemsNotListed.push(gridIDINT); 
+                                        }else{
+                                            listedItems.push(gridIDINT);  
+                                        }
+                                    } catch (error) {
+                                        console.error(`Error fetching token Data ${tokenData}`);
+                                    }
+                                }
+                                gridItems = sortByID(gridItems, [...itemsNotListed, ...listedItems]);
+                                let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
+
+                                let oldGrid = document.querySelector(".NewGrid");
+                                currentNFTArray.sort((a, b) => {
+                                    let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                    let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                    return indexA - indexB;
+                                });
+                                if (oldGrid) {
+                                    oldGrid.innerHTML = '';
+                                    console.log('items Cleared from DOM');
+                                }
+                                makeNewNFTGrid(currentNFTArray, oldGrid); 
+                            }catch(error){
+                                console.log('Error making new NFT grid to call', error);
+                            }
+                        }else if(text === "Highest Price"){
+                            console.log('Trying to filter by highest price');
+                            let oldGrid = document.querySelector(".NewGrid");
+                            let gridItems = Array.from(oldGrid.children); 
+                            let savedItems = gridItems; 
+                            let LoopNotBroken = false;
+                            try {
+                                let organizedByHighestIDarray = []; 
+                                console.log('trying to initiate while loop');
+                                while (gridItems.length > 0) {
+                                    let highestCount = BigInt(0);
+                                    let highestTokenID = null;
+                                    let counterJ = 0;
+
+                                    for (let j = 0; j < gridItems.length; j++) {
+                                        let gridItemIDString2 = gridItems[j].id; 
+                                        let gridIDINT2 = parseInt(gridItemIDString2.trim());
+                                        
+                                        try {
+                                            let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
+                                            let tokenPrice = BigInt(tokenDataCounter.price);
+
+                                            if (highestCount <= tokenPrice) {
+                                                highestCount = tokenPrice;
+                                                highestTokenID = tokenDataCounter.id;
+                                                counterJ = j;
+                                            }
+                                        } catch (error) {
+                                            console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
+                                        }
+                                    }
+                                    console.log('finished first loop with counterJ', counterJ);
+                                    console.log('finished first loop with highestTokenID', highestTokenID);
+                                    console.log('finished first loop with highestCount', highestCount);
+                                    if (highestTokenID !== null) {
+                                        const index = gridItems.indexOf(gridItems[counterJ]);
+                                        if (index > -1) {
+                                            gridItems.splice(index, 1); 
+                                        }
+                                        organizedByHighestIDarray.push(highestTokenID); 
+                                    }else{
+                                        LoopNotBroken = true;
+                                        alert('Sorry we could not find the highest token id');
+                                        break;
+                                    }
+                                }
+                                if (LoopNotBroken === false) {   
+                                    savedItems = sortByID(savedItems, [...organizedByHighestIDarray]);
+                                    let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
+
+                                    currentNFTArray.sort((a, b) => {
+                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                        return indexA - indexB;
+                                    });
+
+                                    if (oldGrid) {
+                                        oldGrid.innerHTML = ''; 
+                                        console.log('Items cleared from DOM');
+                                    }
+                                    makeNewNFTGrid(currentNFTArray, oldGrid);  
+                                }
+                            } catch (error) {
+                                console.error('Error making new NFT grid:', error);
+                            }
+                        }else if(text === "Lowest Price") {
+                            console.log('Trying to filter by lowest price');
+                            let oldGrid = document.querySelector(".NewGrid");
+                            let gridItems = Array.from(oldGrid.children); 
+                            let savedItems = gridItems; 
+                            let LoopNotBroken = false;
+                            try {
+                                let organizedByLowestIDarray = []; 
+                                console.log('trying to initiate while loop');
+                                
+                                while (gridItems.length > 0) {
+                                    let lowestCount = BigInt(Number.MAX_SAFE_INTEGER);
+                                    let lowestTokenID = null;
+                                    let counterJ = 0;
+
+                                    for (let j = 0; j < gridItems.length; j++) {
+                                        let gridItemIDString2 = gridItems[j].id; 
+                                        let gridIDINT2 = parseInt(gridItemIDString2.trim());
+
+                                        try {
+                                            let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
+                                            let tokenPrice = BigInt(tokenDataCounter.price);
+
+                                            if (lowestCount >= tokenPrice) {
+                                                lowestCount = tokenPrice;
+                                                lowestTokenID = tokenDataCounter.id;
+                                                counterJ = j;
+                                            }
+                                        } catch (error) {
+                                            console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
+                                        }
+                                    }
+                                    console.log('Finished loop with counterJ', counterJ);
+                                    console.log('Finished loop with lowestTokenID', lowestTokenID);
+                                    console.log('Finished loop with lowestCount', lowestCount);
+
+                                    if (lowestTokenID !== null) {
+                                        const index = gridItems.indexOf(gridItems[counterJ]);
+                                        if (index > -1) {
+                                            gridItems.splice(index, 1);
+                                        }
+                                        organizedByLowestIDarray.push(lowestTokenID); 
+                                    } else {
+                                        LoopNotBroken = true;
+                                        alert('Sorry we could not find the lowest token id');
+                                        break;
+                                    }
+                                }
+
+                                if (LoopNotBroken === false) {
+                                    savedItems = sortByID(savedItems, [...organizedByLowestIDarray]);
+                                    let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
+
+                                    currentNFTArray.sort((a, b) => {
+                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                        return indexA - indexB;
+                                    });
+
+                                    if (oldGrid) {
+                                        oldGrid.innerHTML = ''; 
+                                        console.log('Items cleared from DOM');
+                                    }
+
+                                    makeNewNFTGrid(currentNFTArray, oldGrid); 
+                                }
+                            } catch (error) {
+                                console.error('Error making new NFT grid:', error);
+                            }
+                        }
+                    });
+
+                    miniSortContainer.appendChild(div);
+                });
+            }else if(item.textContent == 'File a Report'){
+                console.log('Opening report form');
+                const reportContainer = document.createElement('div');
+                reportContainer.style.position = 'absolute';
+                reportContainer.style.right = '1%';
+                reportContainer.style.top = '20vh';
+                reportContainer.style.height = '27%'; 
+                reportContainer.style.boxSizing = 'border-box';
+                reportContainer.style.width = sideElementsWidth;
+                reportContainer.style.borderRadius = '5px';
+                reportContainer.style.backgroundColor = '#404a5c';
+                reportContainer.style.border = '2px solid black';
+                reportContainer.style.display = 'flex';
+                reportContainer.style.flexDirection = 'column';
+                reportContainer.style.alignItems = 'center';
+                reportContainer.style.justifyContent = 'space-evenly';
+                reportContainer.style.overflowY = 'scroll';
+
+                const closeIcon = document.createElement('span');
+                closeIcon.textContent = '×';
+                closeIcon.style.position = 'absolute';
+                closeIcon.style.top = '5px';
+                closeIcon.style.right = '5px';
+                closeIcon.style.cursor = 'pointer';
+                closeIcon.style.fontSize = '16px';
+                closeIcon.style.color = 'red';
+                closeIcon.addEventListener('click', () => {
+                    document.body.removeChild(reportContainer);
+                });
+                reportContainer.appendChild(closeIcon);
+
+                const tokenIdLabel = document.createElement('label');
+                tokenIdLabel.textContent = 'Token ID';
+                tokenIdLabel.style.color = 'white';
+                tokenIdLabel.style.fontSize = '12px';
+                reportContainer.appendChild(tokenIdLabel);
+
+                const tokenIdInput = document.createElement('input');
+                tokenIdInput.type = 'number';
+                tokenIdInput.placeholder = 'Enter Token ID';
+                tokenIdInput.style.width = '80%';
+                tokenIdInput.style.height = '12%'; 
+                tokenIdInput.style.fontSize = '12px'; 
+                tokenIdInput.style.top = '2%';
+                tokenIdInput.style.position = 'relative';
+                tokenIdInput.min = '1'; 
+                tokenIdInput.step = '1';
+                reportContainer.appendChild(tokenIdInput);
+
+                const emailLabel = document.createElement('label');
+                emailLabel.textContent = 'Email';
+                emailLabel.style.color = 'white';
+                emailLabel.style.left = "5%";
+                emailLabel.style.fontSize = '12px'; 
+                reportContainer.appendChild(emailLabel);
+
+                const emailInput = document.createElement('input');
+                emailInput.type = 'email';
+                emailInput.placeholder = 'Enter your email';
+                emailInput.style.width = '80%';
+                emailInput.style.left = "5%";
+                emailInput.style.height = '12%';
+                emailInput.style.fontSize = '12px'; 
+                reportContainer.appendChild(emailInput);
+
+                const messageLabel = document.createElement('label');
+                messageLabel.textContent = 'Message';
+                messageLabel.style.color = 'white';
+                messageLabel.style.fontSize = '12px'; 
+                messageLabel.style.marginBottom = '5px';
+                reportContainer.appendChild(messageLabel);
+
+                const messageInput = document.createElement('textarea');
+                messageInput.placeholder = 'Enter your message';
+                messageInput.maxLength = 500; 
+                messageInput.style.width = '80%';
+                messageInput.style.height = '250px'; 
+                messageInput.style.fontSize = '10px'; 
+                messageInput.style.padding = '5px'; 
+                messageInput.style.left = "5%";
+                messageInput.style.resize = 'vertical';
+                reportContainer.appendChild(messageInput);
+
+                const fileButton = document.createElement('button');
+                fileButton.textContent = 'Submit';
+                fileButton.style.width = '40%';
+                fileButton.style.padding = '5px'; 
+                fileButton.style.backgroundColor = 'dimgray';
+                fileButton.style.color = 'white';
+                fileButton.style.border = 'none';
+                fileButton.style.borderRadius = '5px';
+                fileButton.style.cursor = 'pointer';
+                fileButton.style.fontSize = '12px';
+
+                fileButton.addEventListener('click', async () => { 
+                    const tokenID = tokenIdInput.value;
+                    const email = emailInput.value;
+                    const message = messageInput.value;
+
+                    console.log(`Token ID: ${tokenID}, Email: ${email}, Message: ${message}`);
+                    const fields = [tokenID, email, message];
+                    const fieldNames = ['Token ID', 'Email', 'Message'];
+                    for (let i = 0; i < fields.length; i++) {
+                        if (!fields[i]) {
+                            alert(`Please make sure to properly fill out all fields`);
+                            return; 
+                        }
+                    }
+
+                    let walletSender;
+                    if(isConnected === false){
+                        alert('Please make sure to login to your main wallet before filing a report');
+                    }else{
+                        if(window.ethereum.selectedAddress != null && window.ethereum.isMetaMask){ 
+                            walletSender = window.ethereum.selectedAddress;
+                            let reportData = {
+                                clientWallet: walletSender,
+                                contractName: userSelectedContract.contractName,
+                                ERCStandard: userSelectedContract.ERCStandard,
+                                tokenID: tokenID.toString(),   
+                                email: email, 
+                                message: message
+                            };
+
+                            try {
+                                const reportResponse = await fetch('/file-a-report', {
+                                    method: "POST", 
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(reportData)
+                                });
+
+                                if (reportResponse.ok) {
+                                    const responseJson = await reportResponse.json();
+                                    if (responseJson.success === false) {
+                                        console.log('Did not get back expected response');
+                                        if(responseJson.code == 10002444222202 ){
+                                            alert('Make sure to entere a valid email address invalid email');
+                                        }else if(responseJson.code == 3433444 ){
+                                            alert('Error with try and catch on server');
+                                        }else if(responseJson.code == 1000202 ){
+                                            alert('Sorry we already dedicated that you filed a report. We will contact you as soon as possible');
+                                        }else if(responseJson.code == 34444411 ){
+                                            alert('error with response from server');
+                                        }else{
+                                            alert('unexpected code error');
+                                        }
+                                    }else {
+                                        try{
+                                            tokenIdLabel.remove();
+                                            tokenIdInput.remove();
+                                            emailLabel.remove();
+                                            emailInput.remove();
+                                            messageLabel.remove();
+                                            messageInput.remove();
+                                            fileButton.remove();
+
+                                            const successSpan = document.createElement('span');
+                                            successSpan.textContent = "Thank you for filing a report. We will get back to it as soon as possible and pause the token if we find an issue!";
+                                            successSpan.style.display = 'block';
+                                            successSpan.style.textAlign = 'center';
+                                            successSpan.style.marginTop = '20px';
+                                            successSpan.style.fontSize = '10px';
+                                            successSpan.style.color = 'white';
+                                            reportContainer.appendChild(successSpan);
+                                        }catch(error){
+                                            console.log('Error', error);
+                                        }
+                                    }
+                                } else {
+                                    console.error('Failed to fetch: Response was not okay', reportResponse.statusText);
+                                    alert('An error occurred while sending the report please try again at a later time');
+                                }
+                            } catch (error) {
+                                console.error('Failed to fetch: An error occurred', error);
+                                alert('An error occurred while sending the report');
+                            }
+                        }else{
+                            alert('Please make sure to sign into a wallet before sending a report');
+                        }
+                    }
+                });
+
+                reportContainer.appendChild(fileButton);
+                document.body.appendChild(reportContainer);
+            }else{
+                console.log('Unepexected click');
+            }
+        });
+        item.addEventListener('mouseenter', function () {
+            this.style.backgroundColor = '#5a647d';
+            this.style.color = '#f0f0f0'; 
+        });
+
+        item.addEventListener('mouseleave', function () {
+            this.style.backgroundColor = ''; 
+            this.style.color = ''; 
+        });
     });
 }
 function isValidPhoneNumber(phoneNumber) {
@@ -6144,9 +5919,6 @@ export function addMessage(message, username, timestamp, color) {
     p.appendChild(timestampDiv);
         
 }
-
-
-
 export async function checkifConnected(){
     let connectButtton = document.createElement("div"); 
     let loggedInButton = document.createElement("div"); 
@@ -6167,12 +5939,10 @@ export async function checkifConnected(){
         const buttonPTAG = document.createElement('p');
         buttonPTAG.innerHTML = 'Connect';
         buttonPTAG.classList.add('centered-text');
-
         buttonPTAG.style.position = 'relative';
         buttonPTAG.style.width = '100%';
         buttonPTAG.style.height = '100%';
         buttonPTAG.style.top = '0%';
-            //buttonPTAG.style.left = '0%';
         buttonPTAG.style.margin = '0%';
         buttonPTAG.style.fontSize = '1.5vh';
 
@@ -6185,13 +5955,9 @@ export async function checkifConnected(){
             isConnected = true; 
             buttonContainer.appendChild(greenLight);
             buttonContainer.appendChild(loggedInButton);
-
-
             const connectButtonPTAG = document.createElement('p');
-
             connectButtonPTAG.innerHTML = window.ethereum.selectedAddress.substring(0, 8) + '~~~';
             connectButtonPTAG.classList.add('centered-text'); 
-
             connectButtonPTAG.style.position = 'relative';
             connectButtonPTAG.style.width = '70%';
             connectButtonPTAG.style.height = '100%';
@@ -6226,21 +5992,16 @@ export async function checkifConnected(){
                     console.log('MetaMask is installed but not connected.');
                     isConnected = false; 
                     buttonContainer.appendChild(connectButtton);
-
                     connectButtton.style.boxShadow = '0px 0px 15px rgba(0, 0, 0, 0.5)'; 
-
                     const buttonPTAG = document.createElement('p');
                     buttonPTAG.innerHTML = 'Connect';
                     buttonPTAG.classList.add('centered-text');
-
                     buttonPTAG.style.position = 'relative';
                     buttonPTAG.style.width = '100%';
                     buttonPTAG.style.height = '100%';
                     buttonPTAG.style.top = '0%';
-                    //buttonPTAG.style.left = '0%';
                     buttonPTAG.style.margin = '0%';
                     buttonPTAG.style.fontSize = '1.5vh';
-
                     buttonPTAG.style.display = 'flex';
                     buttonPTAG.style.justifyContent = 'center';
                     buttonPTAG.style.alignItems = 'center';
@@ -6253,22 +6014,15 @@ export async function checkifConnected(){
     }
     
 }
-
-// Function to sort array of grid items based on provided ids
 function sortByID(currentArray, sortByArray) {
-    // Ensure currentArray is an array
     if (!Array.isArray(currentArray)) {
         console.error('currentArray is not an array:', currentArray);
         return [];
     }
-
-    // Create a map to store the order of the IDs for sorting
     const orderMap = sortByArray.reduce((map, id, index) => {
         map[id] = index;
         return map;
     }, {});
-
-    // Sort currentArray based on the order defined in sortByArray
     return currentArray.sort((a, b) => {
         let idA = parseInt(a.className.replace("grid-item", "").trim());
         let idB = parseInt(b.className.replace("grid-item", "").trim());
@@ -6277,12 +6031,10 @@ function sortByID(currentArray, sortByArray) {
 }
 
 async function createChangeUsernamePopup() {
-
     if(changeUserNamePopUpExist){
         console.log('popup already exist');
     }else{
         changeUserNamePopUpExist = true;
-
         const popupContainer = document.createElement('div');
         popupContainer.classList.add('popup-container');
         popupContainer.style.position = 'absolute';
@@ -6324,8 +6076,6 @@ async function createChangeUsernamePopup() {
             document.body.removeChild(popupContainer);
             changeUserNamePopUpExist = false;
         });
-
-
         submitButton.addEventListener('click', async () => {
             const newUsername = usernameInput.value;
             if (newUsername.length > 30 && newUsername.length <=3 ) {
@@ -6405,7 +6155,6 @@ function toggleGreenLight() {
         }, 600); 
 }
 
-
 function removeString(parentElement, searchString) {
     searchString = searchString.toLowerCase();
     function searchAndRemove(element) {
@@ -6423,12 +6172,8 @@ function removeString(parentElement, searchString) {
     searchAndRemove(parentElement);
 }
 
-
-
 export function addMetaMaskListener() {
-    
     const metamaskConnectButton = document.querySelector('.Metamask'); 
-
     metamaskConnectButton.addEventListener('click', async function(){ 
         if(typeof window.ethereum == 'undefined'){
             alert('Metamask is not installed or the browser cannot detect it');
@@ -6452,9 +6197,6 @@ export function addMetaMaskListener() {
     });
 }
 
-
-
-
 if(typeof window.ethereum !== 'undefined'){
     window.ethereum.on('accountsChanged', function (accounts) { 
         if (accounts.length === 0) {
@@ -6471,34 +6213,17 @@ if(typeof window.ethereum !== 'undefined'){
 }else{
     alert('metamask or other ethereum wallet provider is not present in the browser extensions or is not detected');
 }
-
-
-function showScrollUpArrow() {
-  console.log('We are scrolling');
-}
-
-function ScrollDownArrow() {
-   console.log('make Down arrow');
-}
-
-
-
-
 function createDatabaseUtility(parentElement){
     var dbIconContainer = document.createElement("div");
-
     dbIconContainer.classList.add("dbIcon-container");
-
     var addButton = document.createElement("div");
     var deleteButton = document.createElement("div");
-
     dbIconContainer.style.position = 'absolute';
     dbIconContainer.style.height = '54%';
     dbIconContainer.style.right = '10%';
     dbIconContainer.style.top = '30%';
     dbIconContainer.style.width = '4.6%';
     dbIconContainer.style.backgroundColor = 'none';
-
     addButton.style.position = 'absolute';
     addButton.innerHTML = '<span style="margin-left: 5px;">➕</span>';
     addButton.style.height = '100%';
@@ -6509,7 +6234,6 @@ function createDatabaseUtility(parentElement){
     addButton.style.alignItems = 'center';
     addButton.style.justifyContent = 'center';
     addButton.className = 'add-to-DB';
-
     deleteButton.style.position = 'absolute';
     deleteButton.innerHTML = '<span style="margin-left: 5px;">➖</span>';
     deleteButton.style.height = '100%';
@@ -6520,19 +6244,14 @@ function createDatabaseUtility(parentElement){
     deleteButton.style.alignItems = 'center';
     deleteButton.style.justifyContent = 'center';
     deleteButton.className = 'minus-to-DB';
-
     dbIconContainer.appendChild(addButton);
     dbIconContainer.appendChild(deleteButton);
-
-
-
     addButton.addEventListener('mouseenter', function() {
         addButton.style.transform = 'translateY(-2px)';
     });
     addButton.addEventListener('mouseleave', function() {
         addButton.style.transform = 'translateY(0)';
     });
-
     addButton.addEventListener('click', function(){
         const isSecretMenuActive = document.querySelector(".secret-menu");
         if(isSecretMenuActive){
@@ -6542,31 +6261,22 @@ function createDatabaseUtility(parentElement){
     });
     parentElement.appendChild(dbIconContainer);
 }
-
-
-
 function createSearchBar(parentElement) {
-    // Create search container
     var searchContainer = document.createElement("div");
     searchContainer.classList.add("search-container");
-
     var searchInput = document.createElement("input");
     searchInput.classList.add("search-input");
     searchInput.setAttribute("type", "text");
     searchInput.setAttribute("placeholder", "Search...");
-
     var popupDiv = document.createElement("div");
     popupDiv.classList.add("search-popup");
     popupDiv.style.display = "none";
-
     searchContainer.appendChild(searchInput);
-
     searchContainer.style.position = 'absolute';
     searchContainer.style.height = '54%';
     searchContainer.style.right = '15%';
     searchContainer.style.top = '10%';
     searchContainer.style.width = '33%';
-
     searchInput.style.position = 'absolute';
     searchInput.style.height = '60%';
     searchInput.style.right = '0%';
@@ -6574,9 +6284,7 @@ function createSearchBar(parentElement) {
     searchInput.style.width = '70%';
     searchInput.style.borderRadius = '5vh';
     searchInput.style.border = '1px solid #ccc';
-
     parentElement.appendChild(searchContainer);
-
     function handleSearch(event) {
         if (event.key === 'Enter') {
             var query = searchInput.value.trim().toLowerCase();
@@ -6586,13 +6294,10 @@ function createSearchBar(parentElement) {
                 if(popupContainerExist){
                     console.log('pop up already exist');
                 }else {
-
                     var additionalPixels = 152; 
                     var popupContainer = document.createElement('div');
                     popupContainer.classList.add('popup-container');
-
                     popupContainer.style.position = 'absolute';
-
                     var popupTop = searchContainer.offsetTop + searchContainer.offsetHeight + 10;
                     popupContainer.style.top = '10%';
                     popupContainer.style.width = '100%';
@@ -6605,10 +6310,8 @@ function createSearchBar(parentElement) {
                     popupContainer.style.borderRadius = "5px";
                     popupContainer.style.border = "0.1vh solid black"; 
                     var popupLeft = searchContainer.offsetLeft + additionalPixels;
-
                     popupContainer.style.left = '60%';
                     popupContainer.style.width = searchContainer.offsetWidth * .70 + 'px'; 
-
                     var exitButton = document.createElement('button');
                     exitButton.textContent = 'X';
                     exitButton.classList.add('exit-button'); 
@@ -6620,16 +6323,12 @@ function createSearchBar(parentElement) {
                     exitButton.style.color = 'white'; 
                     exitButton.style.fontSize = '10px';
                     exitButton.style.cursor = 'pointer';
-
                     exitButton.addEventListener('click', function() {
                         popupContainer.remove();
                         searchInput.value = '';
                     });
                     popupContainer.appendChild(exitButton);
-
                     document.body.appendChild(popupContainer);
-
-                    
                     for(const foundObj of foundPaintings){
                         var horizontalContainer = document.createElement('div');
                         horizontalContainer.style.width = '90%';
@@ -6642,7 +6341,6 @@ function createSearchBar(parentElement) {
                         horizontalContainer.style.color = 'white';
                         horizontalContainer.className = foundObj.name;
                         horizontalContainer.setAttribute('id', 'horizontalContainer');
-
                         var imageElement = document.createElement('img');
                         imageElement.style.height = '99%';
                         imageElement.style.position = 'absolute';
@@ -6650,20 +6348,15 @@ function createSearchBar(parentElement) {
                         imageElement.style.left = '10%'; 
                         imageElement.style.width = '12.5%';
                         imageElement.setAttribute('src', foundObj.image);
-
                         var spanElement = document.createElement('span');
                         spanElement.textContent = foundObj.name; 
                         spanElement.style.position = 'absolute';
                         spanElement.style.top = '50%'; 
                         spanElement.style.left = '50%';
                         spanElement.style.transform = 'translate(-50%, -50%)'; 
-
                         horizontalContainer.appendChild(imageElement);
                         horizontalContainer.appendChild(spanElement);
                         popupContainer.appendChild(horizontalContainer);
-
-
-
                         horizontalContainer.addEventListener('click', function(){
                             const index = currentPaintingArray.findIndex(painting => painting.name === foundObj.name);
                             if (index) {
@@ -6684,7 +6377,7 @@ function createSearchBar(parentElement) {
                         });
                     }
                     popupContainer.style.display = 'block';
-            }
+                }
 
             } else {
                 console.log('we found nothing');
@@ -6699,13 +6392,11 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
     let minimalListingPriceChecker = true;
     let dictatedTokenPlaceHolder;
     if(listOrDelistOption === "listing"){
-        console.log('trying to bulk list ');
         const failedTokens = [];
         if (nextButton.textContent === 'Next') {
             const selectedTokens = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             const soldItems = document.querySelectorAll('.sold-item');
-            
             const smallHeaderText = document.querySelector(".smallHeader");
             if (smallHeaderText) {
                 smallHeaderText.firstChild.textContent = 'List Tokens';
@@ -6719,7 +6410,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             }else{
                 dictatedTokenPlaceHolder = 'Price';
             }
-            
             soldItems.forEach(soldItem => {
                 const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
                 if (!checkbox || !checkbox.checked) {
@@ -6728,7 +6418,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     const parentClass = soldItem.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
                     const tokenCount = parentClass ? parentClass.split('-')[2] : null; 
                     const textContainer = soldItem.querySelector(`.textContainer\\:${tokenCount}`); 
-
                     if (textContainer) {
                         const purchasePriceDiv = Array.from(textContainer.children).find(child => 
                             child.textContent.includes('Purchase Price:')
@@ -6753,7 +6442,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         priceInput.style.border = '1px solid #ccc';  
                         priceInput.classList.add('price-input'); 
                         textContainer.appendChild(priceInput);
-
                         if (tokenCount) {
                             const inputValue = priceInput.value || ''; 
                             selectedTokens.push({ tokenId: tokenCount, inputValue });
@@ -6761,7 +6449,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     }
                 }
             });
-            console.log('Selected Tokens with Input Values:', selectedTokens);
             nextButton.textContent = 'Submit';
         } else if (nextButton.textContent === 'Submit') {
             const selectedTokens = [];
@@ -6791,16 +6478,13 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                                     }else{
                                         minimalListingPriceChecker = false;
                                     }
-                                    
                                 } catch (error) {
                                     minimalListingPriceChecker = false;
                                     minimalListingPriceInETH = 0.00;
                                     console.error('Error fetching minimalListingPrice:', error);
                                 }
-
                             } else {
                                 tokenPricesInputsFilled = false;
-
                             }
                         } else {
                             tokenPricesInputsFilled = false;
@@ -6851,17 +6535,24 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         from: clientBlockChainAddress,
                         gas: gasEstimate
                     });
-                    
-                    console.log('Transaction successful:', tx);
-                    successFullTokens.push(tokenIds);
-                    
+                    if (tx && tx.transactionHash) {
+                            console.log('Transaction sent. Waiting for confirmation...');
+                            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+                            if (receipt && receipt.status === true) {
+                                console.log('The user accepted the transaction and it was successful.');
+                                successFullTokens.push(tokenIds);
+                            } else {
+                                console.log('The transaction failed.');
+                                failedTokens.push(tokenIds);
+                            }
+                    } else {
+                        console.log('The transaction could not be sent.');
+                    }
                 } catch (error) {
                     failedTokens.push(tokenIds);
                     console.error('Error calling listArrayOfNFTs:', error);
                 }
-
                 loadingContainer.remove();
-
                 while (parentContainer.firstChild) {
                     parentContainer.removeChild(parentContainer.firstChild);
                 }
@@ -6917,6 +6608,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                 }else{
                      alert('An unexpected error has occured.');
                 }
+               
             }
         }
     }else if(listOrDelistOption === "delisting"){
@@ -6931,15 +6623,12 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             if (smallHeaderText) {
                 smallHeaderText.firstChild.textContent = 'Delist Tokens';
             }
-        
             soldItems.forEach(soldItem => {
                 const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
                 if (!checkbox || !checkbox.checked) {
                     soldItem.remove(); 
                 } 
             });
-
-            console.log('Selected Tokens with Input Values:', selectedTokens);
             nextButton.textContent = 'Delist';
         } else if (nextButton.textContent === 'Delist') {
             let successFullTokens = [];
@@ -6956,20 +6645,28 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             });
 
             if (selectedTokens.length > 0) {
-                console.log('trying to delist array of tokens:', selectedTokens);
-
                 const web3 = new Web3(window.ethereum);
                 const tokenIds = selectedTokens.map(token => parseInt(token.tokenId));
-                console.log("converted tokens to integer mapping");
                 try {
                     const gasEstimate = await contract.methods.delistNFTArray(tokenIds).estimateGas({ from: clientBlockChainAddress });
                     const tx = await contract.methods.delistNFTArray(tokenIds).send({
                         from: clientBlockChainAddress,
                         gas: gasEstimate
                     });
+                    if (tx && tx.transactionHash) {
+                        console.log('Transaction sent. Waiting for confirmation...');
+                        const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
 
-                    
-                    console.log('Transaction successful:', tx);
+                        if (receipt && receipt.status === true) {
+                            console.log('The user accepted the transaction to delist tokens and it was successful.');
+                            successFullTokens.push(tokenIds);
+                        } else {
+                            console.log('The transaction to delist failed.');
+                            failedTokens.push(tokenIds);
+                        }
+                    } else {
+                        console.log('The transaction could not be sent.');
+                    }
                    for(i =0; i< tokenIds.length; i++){
                         successFullTokens.push(tokenIds[i]);
                    }
@@ -6981,7 +6678,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     failedTokens.push(tokenIds);
                     console.error('Error calling delistNFTArray:', error);
                 }
-
 
                 while (parentContainer.firstChild) {
                     parentContainer.removeChild(parentContainer.firstChild);
@@ -7005,11 +6701,9 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         noSuccessMessage.textContent = 'No tokens were successfully Transfered.';
                         parentContainer.appendChild(noSuccessMessage);
                     }
-
                     const failedContainer = document.createElement('div');
                     failedContainer.classList.add('failed-tokens-container'); 
                     const failedList = document.createElement('ul');
-                    
                     failedTokens.forEach(tokenId => {
                         const listItem = document.createElement('li');
                         listItem.textContent = `Failed to Transfer Token: ${tokenId}`;
@@ -7030,13 +6724,11 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         parentContainer.appendChild(successDiv);
                     }
                 }
-
             } else {
                 alert('No tokens have been selected to delist.');
             }
         }
     }else if(listOrDelistOption === "transfering"){
-        console.log('trying to perform transfer token logic');
         const failedTokens = [];
         if (nextButton.textContent === 'Next') {
             const selectedTokens = [];
@@ -7047,18 +6739,13 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             if (smallHeaderText) {
                 smallHeaderText.firstChild.textContent = 'Transfer Tokens';
             }
-        
             soldItems.forEach(soldItem => {
                 const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
                 if (!checkbox || !checkbox.checked) {
                     soldItem.remove(); 
                 } 
             });
-
-            console.log('Selected Tokens with Input Values:', selectedTokens);
             nextButton.textContent = 'Transfer';
-            console.log('trying to make single input container to send all NFTs');
-
             const inputAddress = document.createElement('input');
             const inputContainer = document.querySelector('.smallHeader');
             const delistTool = document.querySelector(".delistTool");
@@ -7086,7 +6773,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             inputWrapper.style.width = '100%'; 
             inputWrapper.style.height = '60%'; 
             inputWrapper.style.marginTop = '10px';
-            // Set up the input styles
             inputAddress.className = 'inputTrasnferAddress';
             inputAddress.style.width = '90%'; 
             inputAddress.style.height = '80%';
@@ -7096,10 +6782,8 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             inputAddress.type = 'text';
             inputAddress.id = 'TransferInput';
             inputAddress.placeholder = 'Transfer Address';
-
             inputWrapper.appendChild(inputAddress);
             inputContainer.appendChild(inputWrapper);
-
         }else if (nextButton.textContent === 'Transfer') {
             console.log('trying to transfer tokens and call the contract');
             const inputChecker = document.querySelector('.inputTrasnferAddress');
@@ -7127,18 +6811,26 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         }
                     });
                 });
-                console.log('trying to tansfer array of NFTS using ID data', transferTokenIds);
-
                 try {
                     const gasEstimate = await contract.methods.transferArrayOfNFTS(address, transferTokenIds).estimateGas({ from: clientBlockChainAddress });
                     const tx = await contract.methods.transferArrayOfNFTS(address, transferTokenIds).send({
                         from: clientBlockChainAddress,
                         gas: gasEstimate
                     });
-                    
-                    console.log('Transaction successful:', tx);
-                    successFullTokens.push(transferTokenIds);
-                    
+                    if (tx && tx.transactionHash) {
+                            console.log('Transaction sent. Waiting for confirmation...');
+                            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+                            if (receipt && receipt.status === true) {
+                                console.log('The user accepted the transaction and it was successful.');
+                                successFullTokens.push(transferTokenIds);
+                            } else {
+                                console.log('The transaction failed.');
+                                failedTokens.push(transferTokenIds);
+                            }
+                    } else {
+                        console.log('The transaction could not be sent.');
+                        failedTokens.push(transferTokenIds);
+                    }
                 } catch (error) {
                     failedTokens.push(transferTokenIds);
                     console.error('Error calling delistNFTArray:', error);
@@ -7210,7 +6902,6 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         parentContainer.appendChild(successDiv);
                     }
                 }
-
             } else {
                 alert('Please enter a valid crypto address to transfer your tokens');
             }
@@ -7292,12 +6983,9 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     }
                 }
             }
-            console.log('data has been extracted we are trying to loop through and set data using data:', userNFTARRay);
             let count = 0; 
             userNFTARRay.forEach(token => {
                 count+=1;
-                console.log('Trying to display token data inside pop up tokenContainer');
-
                 const soldItem = document.createElement('div');
                 soldItem.classList.add('sold-item', `sold-item-${count}`); 
                 soldItem.style.height = '100px';
@@ -7308,13 +6996,11 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 soldItem.style.display = 'flex'; 
                 soldItem.style.alignItems = 'center'; 
                 soldItem.style.padding = '10px'; 
-
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.style.display = 'none'; 
                 checkbox.style.marginRight = '10px'; 
                 soldItem.appendChild(checkbox);
-
                 const imageContainer = document.createElement('div');
                 imageContainer.style.position = 'relative'; 
                 imageContainer.style.height = '80%';
@@ -7323,7 +7009,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 imageContainer.style.flexShrink = '0'; 
                 imageContainer.style.backgroundColor = '#ddd'; 
                 soldItem.appendChild(imageContainer);
-
                 const img = document.createElement('img');
                 img.src = token.image;
                 img.alt = `Token ID ${token.tokenID}`;
@@ -7332,7 +7017,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 img.style.borderRadius = '5px'; 
                 img.style.objectFit = 'cover'; 
                 imageContainer.appendChild(img);
-
                 const textContainer = document.createElement('div');
                 textContainer.className = `textContainer:${count}`;
                 textContainer.style.flex = '1'; 
@@ -7341,41 +7025,31 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 textContainer.style.justifyContent = 'center';
                 textContainer.style.marginLeft = '10px'; 
                 soldItem.appendChild(textContainer);
-
                 const listedSpan = document.createElement('div');
                 listedSpan.className = 'listedSpan';
-
                 const listedText = document.createElement('span');
                 listedText.textContent = 'Listed: ';
-
                 const statusSpan = document.createElement('span');
                 statusSpan.textContent = token.listed;
-
                 if (token.listed === "active") {
                     statusSpan.style.color = 'green'; 
                 } else {
                     statusSpan.style.color = 'red';
                 }
-
                 listedSpan.appendChild(listedText);
                 listedSpan.appendChild(statusSpan);
-
                 listedSpan.style.marginBottom = '5px'; 
                 textContainer.appendChild(listedSpan);
-
                 const nameSpan = document.createElement('div');
                 nameSpan.textContent = `Token ID: ${token.tokenID}`; 
                 nameSpan.style.color = 'white'; 
                 textContainer.appendChild(nameSpan);
-
                 const priceSpan = document.createElement('div');
-                let convertedPrice = ((token.purchasePrice)/(10*15**18)).toFixed(3);
-
+                let convertedPrice = ((token.purchasePrice)/(10**18)).toFixed(3);
                 priceSpan.textContent = `Purchase Price: `+ `${convertedPrice}` + ` ${coin}`; 
                 priceSpan.style.marginBottom = '5px'; 
                 priceSpan.style.color = 'white'; 
                 textContainer.appendChild(priceSpan);
-
                 const datePurchased = new Date(token.purchaseDate * 1000); 
                 const dateSpan = document.createElement('div');
                 dateSpan.textContent = `${datePurchased.toLocaleDateString("en-US", { 
@@ -7389,7 +7063,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 })}`;
                 dateSpan.style.color = 'white';
                 textContainer.appendChild(dateSpan);
-
                 parentContainer.appendChild(soldItem);
             });
             if (!document.querySelector('.nextButton')) {
@@ -7399,19 +7072,15 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 nextButton.style.position = 'relative';
                 nextButton.style.bottom = '0%';
                 nextButton.style.width = '30%';
-                //nextButton.style.left = '35%';
                 nextButton.style.backgroundColor = 'grey';
                 nextButton.style.color = 'white';
                 nextButton.style.border = 'none';
                 nextButton.style.cursor = 'pointer';
                 nextButton.style.zIndex = '10';
-
                 footer.appendChild(nextButton);
-
                 nextButton.addEventListener('click', async () => {
                     const isListingToolActive = document.querySelector(".bulkListTool");
                     const isDelistToolActive =document.querySelector(".delistTool");
-
                     if(listingOrDelisting === undefined){
                         alert("please select bulk list or delist before clicking next");
                     }else if(listingOrDelisting === "listing"){
@@ -7423,7 +7092,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     }else{
                        alert("an unexpected eror has occured");
                     }
-
                 });
             }
         }else{
@@ -7442,12 +7110,10 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
             spanContainer.style.justifyContent = 'center';
             spanContainer.style.textAlign = 'center';
             spanContainer.style.boxSizing = 'border-box';
-
             const spanTextContent = document.createElement('span');
             spanTextContent.textContent = 'No Tokens Yet';
             spanTextContent.style.color = 'white';
             spanTextContent.style.fontSize = '12px';
-
             spanContainer.appendChild(spanTextContent);
             parentElement.appendChild(spanContainer);
         }
@@ -7463,9 +7129,7 @@ function printInfo(div, strings) {
     div.style.textAlign = 'center'; 
     div.style.fontSize = '2.2vh';
     div.style.color = 'white';
-
     function printString(index) {
-
         var stringToPrint = strings[index];
         if (!stringToPrint) return; 
         for (var i = 0; i < stringToPrint.length; i++) {
@@ -7475,7 +7139,6 @@ function printInfo(div, strings) {
                 };
             }(stringToPrint[i]), i * 200);
         }
-         
         setTimeout(function() {
             div.textContent = '';
             printString(index + 1);
@@ -7486,7 +7149,6 @@ function printInfo(div, strings) {
             }
         }, stringToPrint.length * 250); 
     }
-
     printString(0);
     currentlyPrinted = true;
 }
@@ -7495,7 +7157,6 @@ export async function getVeChainPrice(element) {
     let retryCount = 0; 
     const maxRetries = 2; 
     const retryInterval = 180000; 
-
     function fetchVETPrice() {
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=vechain&vs_currencies=usd')
             .then(response => {
@@ -7538,7 +7199,6 @@ export async function getVeChainPrice(element) {
     fetchVETPrice();
     setInterval(fetchVETPrice, retryInterval);
 }
-
 function addSecretMenu() {
     const menuItems = ['upload painting', 'remove painting', 'send tracking number', 'Deploy a Contract', 'Mint a Collection'];
     const secretMenu = document.createElement('div');
@@ -7553,10 +7213,7 @@ function addSecretMenu() {
     secretMenu.style.zIndex = '9999999';
     secretMenu.style.borderRadius = '2vh';
     secretMenu.style.border = '1px solid black';
-
     makeElementDraggable(secretMenu);
-
-
     const closeButtonContainer = document.createElement('div');
     closeButtonContainer.style.position = 'absolute';
     closeButtonContainer.style.top = '10px';
@@ -7569,17 +7226,10 @@ function addSecretMenu() {
     closeButton.addEventListener('click', function() {
         document.body.removeChild(secretMenu);
     });
-
-
     closeButtonContainer.appendChild(closeButton);
-
-
     secretMenu.appendChild(closeButtonContainer);
-
-
     const itemList = document.createElement('div');
     itemList.style.marginTop = '50px';
-
     menuItems.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.textContent = item;
@@ -7590,11 +7240,9 @@ function addSecretMenu() {
         itemDiv.style.backgroundColor = 'none';
         itemDiv.style.borderRadius = '4px';
         itemDiv.style.borderBottom = '0.2vh solid lightgrey';
-
         itemDiv.addEventListener('mouseenter', function() {
             itemDiv.style.backgroundColor = '#585858';
         });
-
         itemDiv.addEventListener('mouseleave', function() {
             itemDiv.style.backgroundColor = 'dimgray';
         });
@@ -7636,7 +7284,6 @@ function addSecretMenu() {
                             exitButton.style.display = 'inline-block';
                         }
                     });
-
                     const previewContainer = document.createElement('div');
                     previewContainer.style.position = 'relative';
                     const preview = document.createElement('img');
@@ -7664,27 +7311,19 @@ function addSecretMenu() {
                         exitButton.style.display = 'none';
                     });
                     previewContainer.appendChild(exitButton);
-
-
                     const dateInput = document.createElement('input');
                     dateInput.type = 'date';
                     dateInput.id = 'dateInput';
-
-
                     const dateCreatedLabel = document.createElement('span');
                     dateCreatedLabel.textContent = 'Date created';
                     dateCreatedLabel.style.marginLeft = '10px';
-
-
                     const booleanInput = document.createElement('input');
                     booleanInput.type = 'checkbox';
                     booleanInput.id = 'booleanInput';
-
                     const availabilityLabel = document.createElement('label');
                     availabilityLabel.textContent = 'Available';
                     availabilityLabel.htmlFor = 'booleanInput';
                     availabilityLabel.style.marginLeft = '10px';
-
                     const stringInputs = [];
                     const placeholders = ['Artist', 'Description', 'LegalContract'];
                     for (let i = 0; i < placeholders.length; i++) {
@@ -7694,22 +7333,18 @@ function addSecretMenu() {
                         stringInput.placeholder = placeholders[i];
                         stringInputs.push(stringInput);
                     }
-
                     const uploadName = document.createElement('input');
                     uploadName.type = 'text';
                     uploadName.id = 'priceInput';
                     uploadName.placeholder = 'Painting Name';
-
                     const priceInput = document.createElement('input');
                     priceInput.type = 'text';
                     priceInput.id = 'priceInput';
                     priceInput.placeholder = 'Price in ETH';
-
                     const uploadPassword = document.createElement('input');
                     uploadPassword.type = 'text';
                     uploadPassword.id = 'priceInput';
                     uploadPassword.placeholder = 'passcode';
-
                     const uploadButton = document.createElement('button');
                     uploadButton.type = 'button';
                     uploadButton.id = 'uploadButton';
@@ -7721,7 +7356,6 @@ function addSecretMenu() {
                     uploadButton.style.border = 'none';
                     uploadButton.style.borderRadius = '5px';
                     uploadButton.style.cursor = 'pointer';
-
                     const cancelButton = document.createElement('button');
                     cancelButton.type = 'button';
                     cancelButton.id = 'uploadButton';
@@ -7733,7 +7367,6 @@ function addSecretMenu() {
                     cancelButton.style.border = 'none';
                     cancelButton.style.borderRadius = '5px';
                     cancelButton.style.cursor = 'pointer';
-
                     form.append(
                         imageInput, document.createElement('br'),
                         previewContainer, document.createElement('br'),
@@ -7747,15 +7380,11 @@ function addSecretMenu() {
                     popupForm.appendChild(form);
                     document.body.appendChild(popupForm);
                     popupForm.style.display = 'block';
-
                     uploadButton.addEventListener('click', async () =>  {
-
                         const price = parseFloat(priceInput.value);
-
                         if (isNaN(price)) {
                             alert('Price must be a valid integer.');
                         }
-
                         const currentDate = new Date();
                         const thisObj = {
                             image: preview.src,
@@ -7778,7 +7407,6 @@ function addSecretMenu() {
                                 },
                                 body: JSON.stringify(thisObj)
                             });
-
                             if (response.ok) {
                                 const serverMessage = await response.json();
                                 if(serverMessage.success == true){
@@ -7794,14 +7422,11 @@ function addSecretMenu() {
                         } catch (error) {
                             console.error('Error adding painting:', error);
                         }
-                    
                     });
-
                     cancelButton.addEventListener('click', function() {
                         popupForm.style.display = 'none';
                     });
                 } 
-                
             }else if(item == 'send tracking number'){
                 const isConfirmationFormActive = document.querySelector('.confirmation-form');
 
@@ -7822,18 +7447,8 @@ function addSecretMenu() {
                 
             }else if(item == "Deploy a Contract"){
                 console.log('making a deployer form');
-
-                // 1) check if form is already in the document before calling again 
-                // 2) deploy simple contract to test it 
-                // 3) use remix to write better contract and test using crazy donkeys
-                // 4) save adress and ABI to database 
-                // 5) pull all contracts and display them on the mint form before minting 
-                // 6) use data to create a new model and database and save all data to it
-                // 7) do not create data if database already exist
                 const deployerFormIsActive = document.querySelector('.Deployer-form');
-
                 console.log(deployerFormIsActive);
-
                 if(deployerFormIsActive){
                     console.log(' form is active no need to call');
                 }else{
@@ -7844,32 +7459,24 @@ function addSecretMenu() {
                 console.log('button not found');
             } 
         });
-
         itemList.appendChild(itemDiv);
-
         itemDiv.addEventListener('click', function() {
             console.log(`${item} clicked`);
         });
-
         itemList.appendChild(itemDiv);
     });
-
     secretMenu.appendChild(itemList);
     document.body.appendChild(secretMenu);
 }
-
 function createContract(data) {
-    const minimumPolygonListingPrice = 100*(15*10**18); // 100 Matic minimum listing price 
-    const minimumEtheruemListingPrice = 0.5*(15*10**18); // 0.5 ETH minimum listing price 
-    const minimumETCCLassicListingPrice = 3*(15*10**18); // 0.5 ETH minimum listing price 
-
-    const minimumPolygonTransferPrice = 10*(15*10**18); 
-    const minimumEtheruemTransferPrice = 0.1*(15*10**18); 
-    const minimumETCCLassicTransferPrice = 0.5*(15*10**18); 
-
+    const minimumPolygonListingPrice = 100*(10**18); // 100 Matic minimum listing price 
+    const minimumEtheruemListingPrice = 0.5*(10**18); // 0.5 ETH minimum listing price 
+    const minimumETCCLassicListingPrice = 3*(10**18); // 0.5 ETH minimum listing price 
+    const minimumPolygonTransferPrice = 10*(10**18); 
+    const minimumEtheruemTransferPrice = 0.1*(10**18); 
+    const minimumETCCLassicTransferPrice = 0.5*(10**18); 
     var minimalListingPrice;
     var minimalTransferFEE;
-
     if(data.token == 'ERC1155'){// Matic
         minimalListingPrice = minimumPolygonListingPrice;
         minimalTransferFEE = minimumPolygonTransferPrice;
@@ -7881,7 +7488,7 @@ function createContract(data) {
         minimalTransferFEE = 0.5 * (15 * 10 ** 18);
     }   
 
-    const version = '^0.8.19'; // may need to ^0.8.19 depending on coin
+    const version = '^0.8.19'; // may need to implment ^0.8.19 depending on coin
     const contractString = `
     // SPDX-License-Identifier: MIT
 
@@ -8092,7 +7699,7 @@ function createContract(data) {
             recentSells.push(nft);
 
             // Keep the length of recentSells to a maximum of 1000 items
-            if (recentSells.length > 1000) {
+            if (recentSells.length > 10000) {
                 // Remove the first element by shifting all other elements left
                 for (uint i = 0; i < recentSells.length - 1; i++) {
                     recentSells[i] = recentSells[i + 1];
@@ -8177,7 +7784,6 @@ function createContract(data) {
             }
             return sells;
         }
-
         function getUsersTokens(address user) public view returns (uint256[] memory) {
             uint256[] memory tempTokens = new uint256[](tokenCount); // Temporary array to store token IDs
             uint256 count = 0; // Counter to keep track of the number of tokens owned by the user
@@ -8225,7 +7831,6 @@ function createContract(data) {
     return contractString;
 }
 function makeDeployerForm() {
-    // make sure name does not exist before deploying
     const formContainer = document.createElement('div');
     formContainer.className = 'Deployer-form';
     formContainer.style.width = '300px';
@@ -8242,18 +7847,15 @@ function makeDeployerForm() {
     formContainer.style.display = 'flex';
     formContainer.style.flexDirection = 'column';
     formContainer.style.alignItems = 'center';
-    formContainer.style.maxHeight = '500px'; // Optional: Add max height to avoid overflow issues
-    formContainer.style.overflowY = 'scroll'; // Optional: Add scroll if content exceeds max height
+    formContainer.style.maxHeight = '500px';
+    formContainer.style.overflowY = 'scroll'; 
     document.body.appendChild(formContainer);
-
     makeElementDraggable(formContainer);
-
     const titleSpan = document.createElement('span');
     titleSpan.textContent = 'Deploy a Contract';
     titleSpan.style.fontSize = '18px';
     titleSpan.style.marginBottom = '10px';
     formContainer.appendChild(titleSpan);
-
     const closeButton = document.createElement('div');
     closeButton.textContent = '❌';
     closeButton.style.fontSize = '10px';
@@ -8262,15 +7864,10 @@ function makeDeployerForm() {
     closeButton.style.right = '10px';
     closeButton.style.cursor = 'pointer';
     closeButton.style.color = '#333';
-
     closeButton.addEventListener('click', function() {
         document.body.removeChild(formContainer);
     });
-
     formContainer.appendChild(closeButton);
-
-
-    // Create the image upload section
     const imageUploadSection = document.createElement('div');
     imageUploadSection.className = 'image-upload-section';
     imageUploadSection.style.width = '100%';
@@ -8285,30 +7882,22 @@ function makeDeployerForm() {
     imageUploadSection.style.marginBottom = '20px';
     imageUploadSection.style.backgroundSize = 'cover';
     imageUploadSection.style.backgroundPosition = 'center';
-    
-    // Hover effect
     imageUploadSection.addEventListener('mouseover', () => {
         imageUploadSection.style.backgroundColor = '#555';
     });
     imageUploadSection.addEventListener('mouseout', () => {
         imageUploadSection.style.backgroundColor = '#444';
     });
-
-    // Label for the image upload section
     const imageLabel = document.createElement('p');
     imageLabel.textContent = 'Collection Background Image';
     imageLabel.style.color = '#fff';
     imageLabel.style.textAlign = 'center';
     imageUploadSection.appendChild(imageLabel);
-
-    // Hidden file input
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
     fileInput.style.display = 'none';
     imageUploadSection.appendChild(fileInput);
-
-    // Handle image upload
     imageUploadSection.addEventListener('click', () => {
         fileInput.click();
     });
@@ -8325,29 +7914,21 @@ function makeDeployerForm() {
             reader.readAsDataURL(file);
         }
     });
-
     formContainer.appendChild(imageUploadSection);
-
-    // Add the selection dropdown for contract type
     const contractSelect = document.createElement('select');
     contractSelect.style.marginTop = '20px';
     contractSelect.style.padding = '5px';
     contractSelect.style.borderRadius = '4px';
     contractSelect.style.border = '1px solid #333';
     contractSelect.style.width = '85%';
-
     const options = ['Select Token', 'MATIC', 'ETH', 'ETC'];
-
     options.forEach(optionText => {
         const option = document.createElement('option');
         option.value = optionText.toLowerCase();
         option.textContent = optionText;
         contractSelect.appendChild(option);
     });
-
     formContainer.appendChild(contractSelect);
-
-    // Add input for contract name
     const contractNameInput = document.createElement('input');
     contractNameInput.placeholder = 'Contract Name';
     contractNameInput.style.marginTop = '20px';
@@ -8357,7 +7938,6 @@ function makeDeployerForm() {
     contractNameInput.style.width = '80%';
     formContainer.appendChild(contractNameInput);
 
-    // Add input for creator earning percentage
     const creatorEarningInput = document.createElement('input');
     creatorEarningInput.placeholder = 'Creator Earning (%)';
     creatorEarningInput.type = 'number';
@@ -8371,7 +7951,6 @@ function makeDeployerForm() {
     creatorEarningInput.style.width = '80%';
     formContainer.appendChild(creatorEarningInput);
 
-    // Add input for number of tokens to mint
     const tokenCountInput = document.createElement('input');
     tokenCountInput.placeholder = 'Number of Tokens';
     tokenCountInput.type = 'number';
@@ -8383,7 +7962,6 @@ function makeDeployerForm() {
     tokenCountInput.style.width = '80%';
     formContainer.appendChild(tokenCountInput);
 
-        // Add input for number of tokens to mint
     const deployContractPasscode = document.createElement('input');
     deployContractPasscode.placeholder = 'Passcode';
     deployContractPasscode.style.marginTop = '20px';
@@ -8392,7 +7970,6 @@ function makeDeployerForm() {
     deployContractPasscode.style.border = '1px solid #333';
     deployContractPasscode.style.width = '80%';
     formContainer.appendChild(deployContractPasscode);
-
 
     const booleanOptions = [
         { label: 'Add a manager', value: 'addManager', placeholder: "Manager address" },
@@ -8433,8 +8010,6 @@ function makeDeployerForm() {
         optionContainer.appendChild(labelRow);
         formContainer.appendChild(optionContainer);
     });
-
-    // Add submit button
     const submitButton = document.createElement('button');
     submitButton.textContent = 'Deploy Contract';
     submitButton.style.marginTop = '30px';
@@ -8444,19 +8019,13 @@ function makeDeployerForm() {
     submitButton.style.backgroundColor = '#444';
     submitButton.style.color = 'white';
     submitButton.style.cursor = 'pointer';
-
     formContainer.appendChild(submitButton);
-
-    // Add event listener for submit button
     submitButton.addEventListener('click', async function() {
-
-        await new Promise(resolve => setTimeout(resolve, 0));// wait briefly for icon to render
-
+        await new Promise(resolve => setTimeout(resolve, 0));
         if(collectionBackgroundBase64Image == null){
             alert('Make sure to upload a background image pelase for your collection');
             throw new Error("Error no background image inserted");
         }
-
         const loadingContainer = document.createElement("div");
         loadingContainer.className = "loading-container";
         loadingContainer.style.position = "absolute";
@@ -8484,7 +8053,6 @@ function makeDeployerForm() {
         const creatorEarning = creatorEarningInput.value;
         const tokenCount = tokenCountInput.value;
         const attemptedClientPasscode = deployContractPasscode.value;
-
         const selectedOptions = booleanOptions.map(option => {
             const checkbox = formContainer.querySelector(`input[value="${option.value}"]`);
             const input = checkbox.parentElement.parentElement.querySelector('input[type="text"]');
@@ -8494,10 +8062,8 @@ function makeDeployerForm() {
                 return {option: option.value, active: false};
             }
         });
-
         let ERCStandard = '';
         console.log('select coin type', contractSelect.value);
-
         if(contractSelect.value == 'matic'){
             ERCStandard = 'ERC1155';
         }else if(contractSelect.value == 'eth'){
@@ -8507,7 +8073,6 @@ function makeDeployerForm() {
         }else{
             ERCStandard = null;
         }
-
         let contractData = {
                 token: ERCStandard,
                 address: null, //initially null
@@ -8521,30 +8086,22 @@ function makeDeployerForm() {
                 lastChunk: null
 
         };
-
-        const contractString = createContract(contractData); // return the actual contract in a string 
-        contractData.solidityContract = contractString; // resets null attribute
+        const contractString = createContract(contractData);  
+        contractData.solidityContract = contractString;
         console.log('trying to chunk and send data to sever', contractData);
-
         deployContractUsingServer(contractData).then(result =>{
             if(result.success == false){
                 console.log('result from function deployContractUsingServer() returns', result);
-                //alert('failed to compile bytecode please try again');
-                //loadingContainer.remove();
             }else{
                 console.log('contract deployed successfully please check database to mint');
             }
-            
         }).catch(error=>{
             console.log('Error', error);
             alert('unexpected error occured');
             loadingContainer.remove();
         });
-
-
     });
 
-    // Add custom styles for toggle switches
     const style = document.createElement('style');
     style.textContent = `
         .switch {
@@ -8612,8 +8169,6 @@ async function deployContractUsingServer(data){
     try {
         const maxChunkSize = 700;
         const numberOfChunks = Math.ceil(data.backgroundImage.length/maxChunkSize);
-        console.log('total number of chunks:', numberOfChunks);
-
         for (let i = 0; i < numberOfChunks; i++) {
             let start = i * maxChunkSize;
             let end = Math.min(start + maxChunkSize, data.backgroundImage.length);
@@ -8636,7 +8191,6 @@ async function deployContractUsingServer(data){
                 passcode: data.passcode,
                 lastChunk: isLastChunk
             };
-            //console.log(`trying to send fetch to server using chunk i = ${i}`);
             const response = await fetch('/deploy-a-contract', {
                     method: 'POST',
                     headers: {
@@ -8646,19 +8200,12 @@ async function deployContractUsingServer(data){
             });
             if (response.ok) {
                 const serverMessage = await response.json();
-                //console.log(`Received response`, serverMessage);
-
                 if(serverMessage.success == true  && serverMessage.contractABI != null){
                     console.log('all chunks have been sent over');
                     console.log('trying to deploy contract');
-
                     deployedContractABI = serverMessage.contractABI;
-
                     console.log('deployedContractABI', deployedContractABI);
-
-                    // Determine the intended network based on the token
                     let expectedNetwork;
-
                     if (data.token === 'ERC1155') {
                         expectedNetwork = 'matic'; // Polygon network
                     } else if (data.token === 'ERC721') {
@@ -8667,55 +8214,35 @@ async function deployContractUsingServer(data){
                         alert('Please select from availabe tokens to deploy contract');
                         throw new Error(`Unsupported token: ${data.token}`);
                     }
-
-                    // Check the current network connection
                     const web3 = new Web3(window.ethereum);
                     const currentNetwork = await web3.eth.net.getId();
-
                     console.log('web3 window object', await web3.eth.net);
                     console.log(`Connected to ${currentNetwork} network`);
-
-                    // Check if the current network matches the expected network
                     if ((data.token === 'ERC115' && currentNetwork !== 137) || (data.token === 'ERC721' && currentNetwork !== 1)) {
                         alert('Please make sure you are on the correct network. Change networks in the metamask app.');
                         throw new Error(`Mismatch between selected network (${currentNetwork}) and expected network (${expectedNetwork})`);
                         // create span tag to prompt user inside the form
                     }
-
-                    
                     console.log('Prepare to deploy the contract and approve the transaction');
                     // change span tag to say this inside the form
-
                     const Contract = new web3.eth.Contract(serverMessage.contractABI);
                     const deployOptions = {
                         data: serverMessage.bytecode,
                         arguments: [], // Add any constructor arguments if required
                     };
-
-                    // Estimate gas for deployment
                     const connectedAccounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     let deployerAddress;
                     deployerAddress = connectedAccounts[0];
-
-                    console.log('deployerAddress = ', deployerAddress);
-
                     const gasEstimate = await web3.eth.estimateGas({
                         from: deployerAddress,
                         data: serverMessage.bytecode,
                     });
-
-
-                    console.log('estimated gas fee to deploy solidity contract', gasEstimate);
-                    console.log('need to make sure there is enough funds');
-
                     try {
-                        // Deploy the contract and capture the transaction hash
                         const deployedContract = Contract.deploy(deployOptions)
                         .send({
                             from: deployerAddress,
                             gas: gasEstimate,
-                            // Optional: Set a higher gas price for faster transactions
-                            gasPrice: web3.utils.toWei('100', 'gwei'), // Adjust the value as needed
+                            gasPrice: web3.utils.toWei('100', 'gwei'), 
                         })
                         .on('transactionHash', (hash) => {
                             console.log('Transaction sent, waiting to be mined...', hash);
@@ -8723,12 +8250,9 @@ async function deployContractUsingServer(data){
                         .on('receipt', async (receipt) => {
                             console.log('Transaction mined!', receipt);
                             contractDeploymentSuccess = true;
-
                             const contractInstance = receipt.contractAddress ? receipt : await deployedContract;
                             console.log('User accepted the transaction', contractInstance);
                             console.log('Address of the contract:', contractInstance.contractAddress);
-
-                            // Capture the contract information once deployment is confirmed
                             let contractInformation = {
                                 contractName: data.name,
                                 ERCStandard: data.token,
@@ -8736,7 +8260,6 @@ async function deployContractUsingServer(data){
                                 contractABI: serverMessage.contractABI,
                                 collectionBackground: data.backgroundImage
                             };
-
                             try {
                                 const response = await fetch('/saveNFTCollection', {
                                     method: 'POST',
@@ -8745,10 +8268,8 @@ async function deployContractUsingServer(data){
                                     },
                                     body: JSON.stringify(contractInformation)
                                 });
-
                                 if (response.ok) {
                                     let serverMessage = await response.json();
-
                                     if (serverMessage.success === true) {
                                         console.log('Data saved successfully. Make a pop-up form containing information (ABI and Address with hyperlinks).');
                                         alert('data successfully saved to database');
@@ -8767,7 +8288,6 @@ async function deployContractUsingServer(data){
                             } catch (error) {
                                 console.error('Error with server:', error);
                             }
-
                             const loadingContainer = document.querySelector('.loading-gif');
                             if(loadingContainer){
                                 loadingContainer.remove();
@@ -8786,7 +8306,6 @@ async function deployContractUsingServer(data){
                             }else{
                                 console.log('unexpected error occured', error);
                             }
-                            // if not mined within 50 blocks retry or increase gas estimat
                         });
 
                     } catch (error) {
@@ -8798,13 +8317,11 @@ async function deployContractUsingServer(data){
                         deployerAddress = null;
                         contractDeploymentSuccess = false;
                     }
-
                 }else if(serverMessage.success == false && serverMessage.error == 10983838122){
                     console.log(`passcode is incorrect stopping loop`);
                     contractDeploymentSuccess = false;
                     break;
                 }else if(serverMessage.success == false && serverMessage.error == 10200299222222){
-                    // sending next chunk dont print anything
                 }else{
                     console.log('unexpected error', serverMessage);
                 }
@@ -8820,8 +8337,6 @@ async function deployContractUsingServer(data){
         contractDeploymentSuccess = false;
         deployedContractABI = null;
     }
-    // server message needs to return the actual fucking ABI and adress
-
     return {
         success: contractDeploymentSuccess,
         abi: deployedContractABI,
@@ -8960,18 +8475,11 @@ async function makeMintingForm() {
         contractSelector.appendChild(option);
         formContainer.appendChild(contractSelector);
     }
-
-    // may need to instead search for contracts that are already minted or saved in DB 
-    // so we dont have to manuelly add next time if we make another one
-
     let selectedContract = contractSelector.value; 
-
     contractSelector.addEventListener('change', function() {
         selectedContract = contractSelector.value;
         console.log(`Selected contract: ${selectedContract}`);
     });
-
-    // Add input for passcode to
     const mintPasscode = document.createElement('input');
     mintPasscode.placeholder = 'Passcode';
     mintPasscode.style.marginTop = '20px';
@@ -8992,13 +8500,11 @@ async function makeMintingForm() {
     submitButton.style.cursor = 'pointer';
 
     let filesArray = [];
-
     submitButton.addEventListener('click', async function() {
         if (!selectedContract) {
             alert('Please select a contract.');
             return;
         }
-
         console.log('sending data ....');
         const loadingContainer = document.createElement("div");
         loadingContainer.className = "loading-container";
@@ -9087,20 +8593,7 @@ async function makeMintingForm() {
             console.log('Network ID:', networkId);
             const result = await contract.methods.greet().call();
             console.log('Function call result:', result);
-            
-
-            //                 -- send seperate fetch and check if models exist before proceeding if you want to limit 
-            //                 -- the amount of mints per contract
-            //                 -- and might want to pull ii from DB if it already exist so we dont mint the same tokenID to DB 
-            //                 -- server code below
-            //                 -- send this back to client 
-            console.log('trying to save files to database');// show on the form 
-
-            //1) make next for statement this a function that returns the serverMessageArray to stay organized
-            //2) may need to chunk image and send to seperate fetch or compress if you want to work inside droplet (remember adding painting failed because it was to much data)
-            //3) check everything is working (may want to remove buttons so you cant click twice) and resend data
-            //4) make a span tag to print info similiar to the select contract form inside the NFT sections
-            // if successfull call mintCollectionSuccessPopUpForm(selectedContract, filesArray[0].image);
+        
 
             if(filesArray.length == 0){
                 alert('Please Insert files to be processed');
@@ -9109,41 +8602,31 @@ async function makeMintingForm() {
                 console.log('addTokensToDataBase() retuns',tryToAddDocument);
                 const successChecker = await checkDocumentsSuccess(tryToAddDocument);
                 console.log('checkDocumentsSuccess() returns', successChecker);
-                // if this returns true at least one document was added to the database
                 if(successChecker){
                     let mintableArray = [];
                     let numberOfNFTs = filesArray.length;
                     let feePerNFTInMATIC = 0.01; // Example fee in MATIC
                     let totalFee = feePerNFTInMATIC * numberOfNFTs;
-
                     for(const k = 1; k<= filesArray.length; k++){ 
                             let maticMintPrice = 20;
-
                             let myNFTobjType = {
                                 id: k,
                                 price: maticMintPrice* 15*10**18, 
                                 owner: RoysWallet,
-                                mintDate: Math.floor(Date.now() / 1000), // Current timestamp
+                                mintDate: Math.floor(Date.now() / 1000), 
                                 tokenName: selectedContract.contractName,
                                 forSale: true, 
                                 flagged: false    
                             };
-
                             mintableArray.push(myNFTobjType);
                     }
-                    console.log('trying to mint array of nfts');
-
                     try {
-                        // Send the transaction to mint NFTs
                         const totalFeeInWei = web3.utils.toWei(totalFee.toString(), 'ether'); // Adjust for MATIC if necessary
-
                         const mintResult = await contract.methods.mintArrayOfNFTs(mintableArray).send({
-                            from: userAddress, // Ensure you provide the sender's address
-                            value: totalFeeInWei // Only if needed
+                            from: userAddress,
+                            value: totalFeeInWei 
                         });
-
-                        // Check the result
-                        if (mintResult.status) { // Assumes mintResult contains a status field for success
+                        if (mintResult.status) { 
                             console.log('Mint was a success, lets check');
                         } else {
                             console.log('Error minting array, contract returned false');
@@ -9152,27 +8635,19 @@ async function makeMintingForm() {
                         console.error('Error calling contract mintArrayOfNFTs:', error);
                     }
                     mintCollectionSuccessPopUpForm(selectedContract, filesArray[0].image);
-                    // use codes to check which documents where
-                    // make this pop up form show them the tokens that did not save 
-                    // promt them if you want to try again on the failed documents 
-                    // dont worry about organization will organize on client side 
-                    // just make sure to not save the same tokenID over again in DB
                 }else{
                     alert('at least one document failed to upload to database');
                     console.log('trying to resend fetch with token ID and image info');
                 } 
             }  
-           
         }catch(error){
             console.log('Error accessing the contract', error);
         }
         loadingContainer.remove();
         formContainer.remove();
     });
-
     formContainer.appendChild(submitButton);
     document.body.appendChild(formContainer);
-
     const progressBarContainer = document.createElement('div');
     progressBarContainer.className = 'progressBar1Container';
     progressBarContainer.style.width = '100%';
@@ -9213,7 +8688,6 @@ async function makeMintingForm() {
                 reader.readAsDataURL(file);
             });
         }
-        
         const readFilePromises = [];
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
@@ -9247,7 +8721,7 @@ async function makeMintingForm() {
             })
             .catch(error => {
                 console.error('Error processing files:', error);
-            });
+        });
     }
 }
 
@@ -9256,7 +8730,6 @@ async function checkDocumentsSuccess(array) {
     // code 222102999221121: success document added
     // code: 21202021122344: error with .save() threw catch error possibly internet 
     // code: 83939111110001: passcode incorrect
-    //
     let success = false;
     for(const indicator of array){
         if(indicator.code == 10900){
@@ -9277,9 +8750,6 @@ async function checkDocumentsSuccess(array) {
 async function addTokensToDataBase(array, passcode, contract, address) {
     let serverMessageArray = [];
     for (let ii = 1; ii <= array.length; ii++) {
-        // can loop through image length and send chunks with json objects {startOfNewString: true} and {startOfNewString: false} if not new image chunks
-        // or try to compress using Zip like in node should be similiar funtion Zip()
-
         const folderData = {
             passcode: passcode,
             contractName: contract,
@@ -9287,25 +8757,20 @@ async function addTokensToDataBase(array, passcode, contract, address) {
             tokenID: ii,
             tokenURI: array[ii-1].image 
         };
-        // Convert the object to a JSON string
         const compressedFolder = pako.gzip(JSON.stringify(folderData));
-
-        // before the fetch we need to call the mint function on burson skullz contract!
         try {
             const response = await fetch('/add-token-to-collection', {
-                // need to check IP on server side to add additional security
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(folderData)// change to compress and print on server to see if we have access to data
+                body: JSON.stringify(folderData)
             });
 
             if (response.ok) {
                 const serverMessage = await response.json();
                 console.log(`Received response from server for chunk ${ii}`, serverMessage);
                 serverMessageArray.push(serverMessage);
-
                 if(serverMessage.code == 83939111110001){
                     alert('passcode incorrect');
                    break;
@@ -9319,7 +8784,6 @@ async function addTokensToDataBase(array, passcode, contract, address) {
                     const submitedProgressPercentage = ((ii / (array.length)))*100;
                     const submitedProgressBar = document.querySelector(".submitedProgressBar");
                     const submitedProgressText = document.querySelector(".submitedProgressText");
-
                     if(submitedProgressBar && submitedProgressText){
                         submitedProgressBar.style.width = submitedProgressPercentage.toFixed(2) + '%';                    
                         submitedProgressText.textContent = `${ii} items saved to database`;
@@ -9354,9 +8818,7 @@ function makeConfirmationForm() {
     formContainer.style.display = 'flex';
     formContainer.style.flexDirection = 'column';
     formContainer.style.alignItems = 'center';
-
     makeElementDraggable(formContainer);
-
     const titleSpan = document.createElement('span');
     titleSpan.textContent = 'Tracking Number Form';
     titleSpan.style.fontSize = '18px';
@@ -9384,7 +8846,6 @@ function makeConfirmationForm() {
     });
 
     formContainer.appendChild(closeButton);
-
     const form = document.createElement('form');
     form.id = 'confirmationForm';
     form.style.display = 'flex';
@@ -9470,7 +8931,6 @@ function makeConfirmationForm() {
                 passcode: passcodeInput.value
             };
             console.log('tracking input is = ', formData.tracking);
-
             const loadingContainer = document.createElement("div");
             loadingContainer.className = "loading-container";
             loadingContainer.style.position = "absolute";
@@ -9519,7 +8979,6 @@ function makeConfirmationForm() {
                 loadingContainer.remove(); 
                 console.error('Error getting response from server:', error);
             }); 
-
         } 
         reader.readAsDataURL(imageInput.files[0]);
     });
@@ -9528,7 +8987,6 @@ export async function getEthereumPrice(element) {
     let retryCount = 0;
     const maxRetries = 2; 
     const retryInterval = 180000; 
-
     function fetchETHPrice() {
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
             .then(response => {
@@ -9563,20 +9021,17 @@ export async function getEthereumPrice(element) {
                         .catch(error => {
                             console.error('Error fetching Polygon price from CoinCap:', error);
                             element.textContent = 'error'; 
-                        });
+                    });
                 }
             });
     }
     fetchETHPrice();
-    
     setInterval(fetchETHPrice, 90000);  
 }
-
 export async function getBitcoinPrice(element) {
     let retryCount = 0; 
     const maxRetries = 2; 
     const retryInterval = 180000;
-
     function fetchBTCPrice() {
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
             .then(response => {
@@ -9612,7 +9067,7 @@ export async function getBitcoinPrice(element) {
                         .catch(error => {
                             console.error('Error fetching Polygon price from CoinCap:', error);
                             element.textContent = 'error'; 
-                        });      
+                    });      
                 }
 
             });
@@ -9620,12 +9075,10 @@ export async function getBitcoinPrice(element) {
     fetchBTCPrice();
     setInterval(fetchBTCPrice, retryInterval);
 }
-
 export async function getShibaInuPrice(element) {
     let retryCount = 0; 
     const maxRetries = 2;
     const retryInterval = 180000; 
-
     function fetchShibaInuPrice() {
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd')
             .then(response => {
@@ -9656,7 +9109,6 @@ export async function getDogecoinPrice(element) {
     let retryCount = 0; 
     const maxRetries = 2; 
     const retryInterval = 180000;
-
     function fetchDogecoinPrice() {
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=dogecoin&vs_currencies=usd')
             .then(response => {
@@ -9696,7 +9148,6 @@ export async function getDogecoinPrice(element) {
                  }
             });
     }
-
     fetchDogecoinPrice();
     setInterval(fetchDogecoinPrice, retryInterval);
 }
@@ -9704,7 +9155,6 @@ export async function getEthereumClassicPrice(element) {
     let retryCount = 0;
     const maxRetries = 2; 
     const retryInterval = 180000; 
-
     function fetchETCPrice() {
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum-classic&vs_currencies=usd')
             .then(response => {
@@ -9752,11 +9202,9 @@ export async function getEthereumClassicPrice(element) {
                 }
             });
     }
-
     fetchETCPrice();
     setInterval(fetchETCPrice, retryInterval);
 }
-
 export async function getPolygonPrice(element) {
     let retryCount = 0; 
     const maxRetries = 3; 
@@ -9802,11 +9250,9 @@ export async function getPolygonPrice(element) {
                 }
             });
     }
-
     fetchPolygonPrice();
     setInterval(fetchPolygonPrice, retryInterval); 
 }
-
 export function handleResize() {
     if (window.innerWidth < 921 && window.innerWidth >= 675) {
         console.log("Window width = ", window.innerWidth);
@@ -9823,7 +9269,6 @@ export function handleResize() {
         } else {
             console.log("No div element found with grid-template-columns property.");
         }
-
     }else if(window.innerWidth < 675 && window.innerWidth >= 300){
         console.log("remove the grid elements and refire with 2 items");
         console.log("Window width = ", window.innerWidth);
@@ -9862,7 +9307,6 @@ async function fetchEthereumPrice() {
         return null;
     }
 }
-
 async function checkNetwork(network_name) {
     if (network_name.toLowerCase() === "ethereum") {
         const networkId = await web3.eth.net.getId();
@@ -9899,26 +9343,18 @@ function addNFTBuyButton(parentDiv, availabe, buttonClassName){
     }else{
         var buttonText = document.createTextNode("Unavailable");
     }
-   
     buyButton.appendChild(buttonText);
-
     parentDiv.appendChild(buyButton);
     let currentname; 
-
     for(const NFT of currentNFTArray){
         if(NFT.id == parentDiv.id){
             currentname = NFT.name + " " + NFT.id;
         }
     }
-
     if(buttonText.textContent == "Purchase"){
         buyButton.addEventListener("click", async function() {
             if(isConnected){
                 console.log('trying to call solidity function on blockchain');
-                // may need to send request to server and check if there is a client trying to get the same token 
-                // because two people can click the purchase button near same time and call soidity function at same time
-                // solidity function changes instock value so it needs to change the value before the next call to function 
-                // 
             }else{
                 alert('you must connect you wallet to make a purchase');
             }
@@ -9942,15 +9378,12 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
     buyButton.style.borderTopLeftRadius = '0.4vh';
     buyButton.style.borderTopRightRadius = '0.4vh';
     buyButton.style.fontSize = '1.8vh';
-
     if(availabe){
         var buttonText = document.createTextNode("Purchase");
     }else{
         var buttonText = document.createTextNode("Unavailable");
     }
-   
     buyButton.appendChild(buttonText);
-
     parentDiv.appendChild(buyButton);
     let currentname; 
     for(const painting of currentPaintingArray){
@@ -9958,7 +9391,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
             currentname = painting.name;
         }
     }
-
     if(buttonText.textContent == "Purchase"){
         buyButton.addEventListener("click", async function() {
             if(isConnected && !currentlyTryingToBuy){
@@ -10067,8 +9499,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                         EmailformData.address =  addressInput.value;
                         EmailformData.firstName =  firstNameInput.value;
                         EmailformData.lastName = lastNameInput.value;
-                        
-                        
                         const data = {
                             transactionHash: '0x89ffec4ef5f4fe434efbd5b94eb620aa6749c22714b6f00a6247f043bf22bd01',
                             objectId: parentDiv.id,
@@ -10130,16 +9560,12 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                     console.error('Error updating database:', error);
                                     // Handle the error, notify user accordingly
                                 }); 
-                        */
-                                                           
+                        */                               
                                 try{
                                     if(transactionInProgress){
-
                                     }else{
                                         const checkMyInfo = await validateUserInfo(data.email, data.address, data.firstName, data.lastName);
-                                        console.log('checkMyInfo() returns', checkMyInfo);
                                         if(checkMyInfo.verified){
-                                                console.log('checking if metamask is installed');   
                                             if (typeof window.ethereum != 'undefined' && isConnected){
                                                 console.log('creating loading icon');
                                                 window.web3 = new Web3(window.ethereum);
@@ -10161,10 +9587,8 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                 loadingIcon.setAttribute("alt", "Loading..."); 
                                                 loadingIcon.style.width = "50%"; 
                                                 loadingIcon.style.height = "50%"; 
-
                                                 loadingContainer.appendChild(loadingIcon);
                                                 formContainer.appendChild(loadingContainer);
-                                                console.log('trying to call try statement line 6997');
                                                 try{
                                                     const amountToSendString = parentDiv.className.replace("grid-item", ""); 
                                                     const amountToSendFloat = parseFloat(amountToSendString);
@@ -10186,7 +9610,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                                 weiParameterStr = weiParameterStr.slice(0, decimalIndex + desiredDecimalPlaces + 1);
                                                               }
                                                             }
-
                                                             const finalWeiParameter = parseFloat(weiParameterStr);
                                                             const amountInWei = web3.utils.toWei(finalWeiParameter.toString(), 'ether');
                                                             const amountInHex = web3.utils.toHex(amountInWei);
@@ -10200,18 +9623,15 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                                             console.log('amount to send float', amountToSendFloat);
                                                             console.log('in WEI', amountInWei);
                                                             console.log('in hex', amountInHex);
-
                                                             const response = await window.ethereum.request({
                                                                 method: 'eth_sendTransaction',
                                                                 params: [transactionObject]
                                                             });
-
                                                             if(response.error){
                                                                 console.log('an error occured', response.error.message);
                                                             }else if(response.result){
                                                                 console.log(response.result);
                                                                 console.log('User accepeted the transaction send the hash over to check on server');
-
                                                                 const data = {
                                                                     transactionHash: response.result,
                                                                     objectId: parentDiv.id
@@ -10300,7 +9720,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                             }else{
                                                 console.log('send user a request to login');
                                             }
-
                                         }else if (!checkMyInfo.verified){
                                             if(checkMyInfo.email){
                                                 if(checkMyInfo.address){
@@ -10325,7 +9744,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                                             console.log('an unepexected error occured');
                                         }
                                     }
-
                                 }catch(error){
                                     console.log(error);
                                     console.log('we could not fire the function checkMyInfo correctly');   
@@ -10353,9 +9771,7 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                         })
                         .catch(error => {
                             console.error('Error getting first check from server', error);
-                        });
-                        
-                                        
+                        });              
                     }                
                     
                 }); 
@@ -10373,23 +9789,18 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                     cancelButton.style.display = "flex"; 
                     cancelButton.style.justifyContent = "center"; 
                     cancelButton.style.alignItems = "center";
-
                     cancelButton.addEventListener("click", function() {
                         document.body.removeChild(formContainer);
                         currentlyTryingToBuy = false;
                     });
-
-
                     form.appendChild(emailInput);
                     form.appendChild(addressInput);
                     form.appendChild(firstNameInput);
                     form.appendChild(lastNameInput);
                     form.appendChild(submitButton);
-
                     formContainer.appendChild(titleDiv);
                     formContainer.appendChild(form);
                     formContainer.appendChild(cancelButton);
-
                     document.body.appendChild(formContainer);
             }else{
                 if(!isConnected){
@@ -10399,7 +9810,6 @@ function addBuyButton(parentDiv, availabe, buttonClassName) {
                 }else{
                     alert('an unexpected error occured');
                 }
-                
             }
 
         });
@@ -10512,7 +9922,6 @@ function warningTransactionPresent() {
 
 }
 
-
 function writeToParentDivWithDelay(text, parentDiv, delay, thisIndex) {
     const repsonseContainer = document.createElement('div');
     repsonseContainer.style.height = '600px';
@@ -10536,11 +9945,9 @@ function writeToParentDivWithDelay(text, parentDiv, delay, thisIndex) {
     }, delay);
 
 }
-
 async function getResponse(question) {
     await new Promise(resolve => setTimeout(resolve, 2000)); 
     const lowercaseQuestion = question.toLowerCase();
-
     try{
         const response = await fetch('/AI-event', {
             method: 'POST',
@@ -10549,7 +9956,6 @@ async function getResponse(question) {
             },
             body: JSON.stringify({ question: lowercaseQuestion })
         });
-
             if (!response.ok) {
                 console.log('response is not okay');
                 return null;
@@ -10558,13 +9964,11 @@ async function getResponse(question) {
                 const data = await response.json();
                 return data;  
             }
-
     }catch(error){
         console.log('error with response from server try and catch failed');
         return null;
     }
 }
-
 async function validateUserInfo(email, address, firstName, lastName) {
     try {
         console.log('trying to get response');
@@ -10580,7 +9984,6 @@ async function validateUserInfo(email, address, firstName, lastName) {
                 lastName: lastName
             })
         });
-
         if(response.ok){
 
             let data = await response.json();
@@ -10588,14 +9991,11 @@ async function validateUserInfo(email, address, firstName, lastName) {
         }else{
             return null;
         }
-
     } catch (error) {
         console.error('Error:', error);
         return null;
     }
 }
-
-
 export async function getMessageHistory() {
     try {
         const response = await fetch('/GetMessageHistory', {
@@ -10616,7 +10016,6 @@ export async function getMessageHistory() {
       
     }
 }
-
 function mintCollectionSuccessPopUpForm(collectionName, collectionImage) {
     const container = document.createElement('div');
     container.className = 'popup-container';
@@ -10638,8 +10037,6 @@ function mintCollectionSuccessPopUpForm(collectionName, collectionImage) {
     container.style.zIndex = '1000000000000';
 
     makeElementDraggable(container);
-
-    // Collection Image
     const imgContainer = document.createElement('div');
     imgContainer.style.width = '150px';
     imgContainer.style.height = '150px';
@@ -10651,8 +10048,6 @@ function mintCollectionSuccessPopUpForm(collectionName, collectionImage) {
     imgContainer.style.backgroundRepeat = 'no-repeat';
     imgContainer.style.backgroundPosition = 'center'; 
     container.appendChild(imgContainer);
-
-    // Congratulatory Message
     const message = document.createElement('span');
     message.textContent = `Congratulations! Your collection "${collectionName}" has been successfully minted!`;
     message.style.fontSize = '16px';
@@ -10660,8 +10055,6 @@ function mintCollectionSuccessPopUpForm(collectionName, collectionImage) {
     message.style.textAlign = 'center';
     message.style.marginBottom = '20px';
     container.appendChild(message);
-
-    // Close Button
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Close';
     closeButton.style.padding = '10px 20px';
@@ -10685,8 +10078,6 @@ function mintCollectionSuccessPopUpForm(collectionName, collectionImage) {
     });
     
     container.appendChild(closeButton);
-
-    // Append to body
     document.body.appendChild(container);
 }
 
@@ -10734,8 +10125,6 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
     exitButtonContainer.style.top = '0%';
     exitButtonContainer.style.marginBottom = '2%';
     exitButtonContainer.style.backgroundColor = 'none';
-
-
     const exitPurchaseButton =  document.createElement('div');
     exitPurchaseButton.className = 'exitPurchaseButton';
     exitPurchaseButton.style.position = 'absolute';
@@ -10749,12 +10138,10 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
     exitPurchaseButton.style.fontSize = '2vh'; 
     exitPurchaseButton.style.border = 'none'; 
     exitPurchaseButton.style.cursor = 'pointer'; 
-
     exitPurchaseButton.addEventListener('click', function() {
         console.log('trying to remove form');
         formContainer.remove();
     });
-
     const centeredDiv = document.createElement('div');
     centeredDiv.style.backgroundImage = `url(${productImageBase64})`;
     centeredDiv.style.backgroundSize = 'cover'; 
@@ -10786,7 +10173,6 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
     message.style.left = '12.5%';
     message.style.height = '60%';
     message.style.overflow = 'scroll';
-
     message.style.cssText += `
         scrollbar-width: thin; /* For Firefox */
         scrollbar-color: transparent transparent; /* For Firefox */
@@ -10811,9 +10197,6 @@ function purchaseSuccessPopUp(formContainer, firstName, lastName, productID, pri
     container.appendChild(message);
     formContainer.appendChild(container);
 }
-
-
-
 function makeNewGrid(array, grid){
     array.forEach(item => {
         var gridItem = document.createElement('div');
@@ -10821,7 +10204,6 @@ function makeNewGrid(array, grid){
         gridItem.setAttribute('id', item._id);
         gridItem.textContent = item; 
         gridItem.style.position = 'relative';
-
         gridItem.style.backgroundColor = '#aaaaaa'; 
         gridItem.style.width = '95%'; 
         gridItem.style.left = '2.5%'; 
@@ -10852,7 +10234,6 @@ function makeNewGrid(array, grid){
         overlay.style.flexDirection = 'column'; 
         overlay.style.justifyContent = 'flex-end'; 
         overlay.style.opacity = '.6';
-
         gridItem.addEventListener('mouseenter', async function() {
             gridItem.style.transform = 'translateY(-5px)';
             overlay.style.display = 'flex';
@@ -10864,9 +10245,7 @@ function makeNewGrid(array, grid){
 
                 }
             }
-
             addBuyButton(gridItem, checkIfInStock, gridItem.id);
-
             var descriptionP = document.createElement('p');
             descriptionP.className = 'descriptionPaintingPTAG';
             descriptionP.style.width = '100%';
@@ -10883,9 +10262,7 @@ function makeNewGrid(array, grid){
                 }
             }
             overlay.appendChild(descriptionP);
-
             const containsPaintingId = currentViewedPaintings.some(item => item.paintingId === gridItem.id);
-
             if (!containsPaintingId) {
               currentViewedPaintings.push({paintingId: gridItem.id});
                 try {
@@ -10896,7 +10273,6 @@ function makeNewGrid(array, grid){
                         },
                         body: JSON.stringify(gridItem.id) 
                     });
-
                     if (response.ok) {
                         const serverMessage = await response.json();
                         if(serverMessage.success == true){
@@ -10931,7 +10307,6 @@ function makeNewGrid(array, grid){
     });
 
 }
-
 async function organizePaintingArrayByMostRecent(array) {
     array.sort((a, b) =>  {
 
@@ -10945,7 +10320,6 @@ async function organizePaintingArrayByMostRecent(array) {
     });
     return array;
 }
-
 async function organizePaintingArrayByOldest(array) {
     array.sort((a, b) => {
         const dateA = new Date(a.dateCreated);
@@ -10956,8 +10330,6 @@ async function organizePaintingArrayByOldest(array) {
     });
     return array;
 }
-
-
 async function organizePaintingArrayByLeastExpensive(array) {
     array.sort((a, b) => a.price.$numberDecimal - b.price.$numberDecimal);
     return array;
@@ -10967,8 +10339,6 @@ async function  organizePaintingArrayByMostExpensive(array) {
      array.sort((a, b) => b.price.$numberDecimal - a.price.$numberDecimal);
     return array;
 }
-
-
 async function organizePaintingArrayByMostViewed(array) {
     array.sort((a, b) => b.views - a.views);
     return array;
