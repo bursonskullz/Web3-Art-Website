@@ -1164,21 +1164,33 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
         gridItem.style.backgroundSize = '100%'; 
         if(columns == 4){
              // above 999 pixels 
-            if(window.innerWidth >= 1275){
+            if(window.innerWidth >= 1500){
+                gridItem.style.height = '205px'; 
+                gridItem.style.width = '205px';    
+                rowHeight = '210px'; 
+            }else if(window.innerWidth >= 1400){
+                gridItem.style.height = '195px'; 
+                gridItem.style.width = '195px';    
+                rowHeight = '200px'; 
+            }else if(window.innerWidth >= 1300){
+                gridItem.style.height = '180px'; 
+                gridItem.style.width = '180px';    
+                rowHeight = '185px'; 
+            }else if (window.innerWidth >= 1200) {
+                gridItem.style.height = '175px'; 
+                gridItem.style.width = '175px';    
+                rowHeight = '180px'; 
+            }else if (window.innerWidth >= 1100) {
                 gridItem.style.height = '165px'; 
                 gridItem.style.width = '165px';    
                 rowHeight = '170px'; 
-            }else if (window.innerWidth >= 1150) {
-                gridItem.style.height = '160px'; 
-                gridItem.style.width = '160px';    
-                rowHeight = '165px'; 
             }else if (window.innerWidth >= 999) {
-                gridItem.style.height = '150px'; 
-                gridItem.style.width = '150px';    
-                rowHeight = '155px'; 
+                gridItem.style.height = '155px'; 
+                gridItem.style.width = '155px';    
+                rowHeight = '160px'; 
             }else{
 
-            }        
+            }     
         }else if(columns == 3){
             // 999 to 500 pixels changisng size of grid
             if(window.innerWidth >= 950){
@@ -3062,6 +3074,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     contractInfoDiv.style.borderWidth = '2px';
 
     let maxSell; let numberOfSells; let myTokens; let numberOfTokens; let allOwners; let coin;
+    let minimalList; let royaltyFeePercent; let transferFee; let minimalListInETH; let transferFeeInETH;
 
     if(userSelectedContract.ERCStandard === "ERC1155"){
         coin = "POL";
@@ -3075,22 +3088,24 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
 
     const web3 = new Web3(window.ethereum);
     const contract = new web3.eth.Contract(JSON.parse(userSelectedContract.contractABI), userSelectedContract.contractAddress);
-    try{
-        numberOfTokens = await contract.methods.getNumberOfTokens().call();
-    }catch(error){
-        console.log('Error calling function on contract to get maximum sell');
-        numberOfTokens = "Error";
-    }
-    try{
+    try {
+        minimalList = await contract.methods.minimalListingPrice().call();
+        minimalListInETH = minimalList / (10**18);
+        transferFee = await contract.methods.minimalTransferFee().call();
+        transferFeeInETH = transferFee / (10**18);
+        royaltyFeePercent = await contract.methods.creatorFee().call();
+        numberOfTokens = await contract.methods.tokenCount().call();
         maxSell = await contract.methods.getMaxSell().call();
-    }catch(error){
-        console.log('Error calling function on contract to get maximum sell');
+        numberOfSells = await contract.methods.numberOfSells().call();
+    } catch (error) {
+        console.log('Error calling functions on contract', error);
+        minimalList = 10000020220202002020;
+        minimalListInETH = minimalList / (10**18);
+        transferFee = 10000020220202002020;
+        transferFeeInETH = transferFee / (10**18);
+        royaltyFeePercent = 10;
+        numberOfTokens = "Error";
         maxSell = "Error";
-    }
-    try{
-        numberOfSells = await contract.methods.getNumberOfsells().call();
-    }catch(error){
-        console.log('Error calling function on contract to get number of sells');
         numberOfSells = "Error";
     }
     let scanURL = "";
@@ -3117,6 +3132,9 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Tokens: ${numberOfTokens}</p>
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Max Sale: ${maxSell} ${coin}</p> 
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Sells: ${numberOfSells}</p> 
+        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Royalty Fee: ${royaltyFeePercent}\%</p> 
+        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Transfer Fee (per token): ${transferFeeInETH.toFixed(2)} ${coin}</p> 
+        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Minimal List price: ${minimalListInETH.toFixed(2)} ${coin}</p> 
     `;
 
     contractInfoDiv.style.display = 'flex';
@@ -4728,9 +4746,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             overlayMain.style.justifyContent = 'flex-start'; 
             overlayMain.style.alignItems = 'center'; 
             overlayMain.style.overflowY = 'scroll';
-            // Hide scrollbar for Chrome, Safari, and Opera
-            //overlayMain.style.webkitOverflowScrolling = 'auto';
-            //overlayMain.style.webkitScrollbar = 'auto';
             overlay.appendChild(overlayMain);
             overlayMain.style.fontSize = '2vh';
            
@@ -5139,9 +5154,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                             unavailableTokens.push(tokenID);
                                         }
                                     }catch(error){
-                                        // for testing purposes 
-                                        //unavailableTokens.push(tokenID);
-                                        //availabeTokens.push(tokenID);
                                         console.log('Error calling getTokenData() on contract', error);
                                     }
                                 }
@@ -5946,7 +5958,6 @@ function isValidPhoneNumber(phoneNumber) {
     let phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
     return phoneRegex.test(phoneNumber);
 }
-
 export async function getNFTS(contractName) {
     let tokensArray = [];
     try {
@@ -5989,7 +6000,6 @@ export async function getNFTS(contractName) {
     }
     return tokensArray;
 }
-
 export function addMessage(message, username, timestamp, color) {
     msgCount +=1 ; 
     const p = document.createElement('p');
@@ -7596,31 +7606,12 @@ function addSecretMenu() {
     document.body.appendChild(secretMenu);
 }
 function createContract(data) {
-    const minimumPolygonListingPrice = 100*(10**18); // 100 Matic minimum listing price 
-    const minimumEtheruemListingPrice = 0.5*(10**18); // 0.5 ETH minimum listing price 
-    const minimumETCCLassicListingPrice = 3*(10**18); // 0.5 ETH minimum listing price 
-    const minimumPolygonTransferPrice = 10*(10**18); 
-    const minimumEtheruemTransferPrice = 0.1*(10**18); 
-    const minimumETCCLassicTransferPrice = 0.5*(10**18); 
-    var minimalListingPrice;
-    var minimalTransferFEE;
-    if(data.token == 'ERC1155'){// Matic
-        minimalListingPrice = minimumPolygonListingPrice;
-        minimalTransferFEE = minimumPolygonTransferPrice;
-    }else if(data.token == 'ERC721'){ //ETC
-        minimalListingPrice = minimumEtheruemListingPrice;
-        minimalTransferFEE = minimumEtheruemTransferPrice;
-    } else if (data.token === 'ERC20') {// etc classic
-        minimalListingPrice = 3 * (15 * 10 ** 18); 
-        minimalTransferFEE = 0.5 * (15 * 10 ** 18);
-    }   
-
-    const version = '^0.8.19'; // may need to implment ^0.8.19 depending on coin
+    let minimalListingPrice = parseInt(parseFloat(data.minListingPrice)*(10**18));
+    let minimalTransferFEE = parseInt(parseFloat(data.minTransferingFEE)*(10**18));
+    const version = "^0.8.19"; 
     const contractString = `
-    // SPDX-License-Identifier: MIT
-
+    //SPDX-License-Identifier: UNLICENSED
     pragma solidity ${version};
-
     contract ${data.name.replace(/ /g, '')}{
         // Struct to declare NFT (Non-Fungible Token) data attributes stored on contract.
         struct NFT {
@@ -7638,6 +7629,7 @@ function createContract(data) {
         // Mappings and arrays
         mapping(uint256 => NFT) public nfts;
         mapping(address => uint256[]) private userTokens; // Mapping from user address to array of token IDs owned by the user
+        mapping(address => bool) private seenOwners; // State variable to track seen owners
         NFT[] private recentSells; // Array to track recent sells as NFT structs
 
         // Events to track NFT minting, listing for sale, and sale
@@ -7649,14 +7641,14 @@ function createContract(data) {
         address public contractCreator;
         string public artist;
         address[] internal owners;
-        uint256 creatorFee;
+        uint256 public creatorFee;
         address public walletToReceiveFunds;
         address public RoysWallet;
         uint256 public minimalTransferFee;
         uint256 public minimalListingPrice;// changes depending on deployment
         uint256 public tokenCount;
         uint256 maximumTokenCount;
-        uint256 numberOfSells;
+        uint256 public numberOfSells;
 
         bool isRoyaltyFeeChangeable;
         bool isManagerInitiated;
@@ -7669,12 +7661,12 @@ function createContract(data) {
             contractCreator = msg.sender; 
             artist = "Roy Burson";
             owners.push(contractCreator);
-            creatorFee = ${Number(data.numberOfTokens)}$;
+            creatorFee = ${Number(data.royaltyFee)};
             RoysWallet = 0x5CdaD7876270364242Ade65e8e84655b53398B76;
             walletToReceiveFunds = RoysWallet;
             minimalListingPrice = ${BigInt(minimalListingPrice)}; 
             minimalTransferFee = ${BigInt(minimalTransferFEE)}; 
-            tokenCount = 0;
+            tokenCount = ${Number(data.numberOfTokens)};
             numberOfSells = 0;
             maximumTokenCount = ${data.royaltyFee};
             isManagerInitiated = ${data.options[0].active};
@@ -7701,9 +7693,9 @@ function createContract(data) {
 
         function getNumberOfOwnedTokens(address _address) public view returns (uint256) {
             uint256 count = 0;
-            for (uint256 i = 0; i < totalTokens; i++) {
-                if(nfts[i].owner== _address){
-                    count +=1;
+            for (uint256 i = 0; i < tokenCount; i++) { // Use tokenCount instead of totalTokens
+                if (nfts[i].owner == _address) {
+                    count++;
                 }
             }
             return count;
@@ -7746,7 +7738,7 @@ function createContract(data) {
             return true;
         }
 
-        function listNFT(uint256 tokenId, uint256 userListPrice) external payable {
+        function listNFT(uint256 tokenId, uint256 userListPrice) public payable {
             // remember to send 15 matic to Roy for listing fee
             require(owners[tokenId] == msg.sender, "Only the owner can list the NFT");
             require(nfts[tokenId].flagged == false, "Only tokens that are not flagged can be listed ");
@@ -7774,13 +7766,13 @@ function createContract(data) {
             }
         }
 
-        function delistNFT(uint256 tokenId) external {
+        function delistNFT(uint256 tokenId) public {
             require(owners[tokenId] == msg.sender, "Only the owner can delist the NFT");
             nfts[tokenId].forSale = false;
         }
 
         function delistNFTArray(uint256[] memory tokenIdArray) external {
-            for (var i = 0; i  < tokenIdArray.length; i++) {
+            for (uint256 i = 0; i  < tokenIdArray.length; i++) {
                 delistNFT(tokenIdArray[i]);
             }
         }
@@ -7804,7 +7796,7 @@ function createContract(data) {
             return tokens;
         }
         
-        function getTokenData(uint256 tokenID) public view returns (NFT[] memory) {
+        function getTokenData(uint256 tokenID) public view returns (NFT memory) {
             return nfts[tokenID];
         }
 
@@ -7839,9 +7831,6 @@ function createContract(data) {
             emit NFTSells(tokenId, msg.value, block.timestamp);
             numberOfSells += 1;
             return true;
-        }
-        function getNumberOfsells() public views returns{
-            return numberOfSells;
         }
         function purchaseArrayOfNFT(uint256[] memory tokenIdArray) external payable returns (bool) {
             // meant for sweep function
@@ -7900,10 +7889,6 @@ function createContract(data) {
             return maxPrice;
         }
 
-        function getNumberOfTokens() public view returns (uint256) {
-            return tokenCount;
-        }
-
         function getRecentSells() public view returns (NFT[] memory) {
             uint256 limit = recentSells.length;
             NFT[] memory sells = new NFT[](limit);
@@ -7923,13 +7908,13 @@ function createContract(data) {
                 }
             }
 
-            // Create a result array of the exact size
-            uint256[] memory userTokens = new uint256[](count);
+            // Rename userTokens to something else, such as userOwnedTokens
+            uint256[] memory userOwnedTokens = new uint256[](count);
             for (uint256 j = 0; j < count; j++) {
-                userTokens[j] = tempTokens[j];
+                userOwnedTokens[j] = tempTokens[j];
             }
 
-            return userTokens; // Return the array of token IDs owned by the user
+            return userOwnedTokens; // Return the array of token IDs owned by the user
         }
 
         function checkIfTokenIsAvailable(uint256 tokenId) public view returns (bool) {
@@ -7937,23 +7922,25 @@ function createContract(data) {
             return !nft.flagged && nft.forSale;
         }
 
-        function getAllUniqueOwners() public view returns (address[] memory) {
-            address[] memory owners = new address[](tokenCount); // Temporary array with maximum possible length
-            uint256 count = 0; // Counter for unique owners
-            mapping(address => bool) ownerExists; // Mapping to track if owner is already added
+        function getAllUniqueOwners() public returns (address[] memory) {
+            address[] memory tempOwners = new address[](owners.length);
+            uint256 count = 0;
 
-            for (uint256 i = 0; i < tokenCount; i++) {
-                address currentOwner = nfts[i].owner; // Get the owner of the current NFT
-                
-                // If the owner is not already added, add them to the owners array
-                if (!ownerExists[currentOwner]) {
-                    owners[count] = currentOwner;
-                    ownerExists[currentOwner] = true; // Mark the owner as added
-                    count++; // Increment the count of unique owners
+            for (uint256 i = 0; i < owners.length; i++) {
+                if (!seenOwners[owners[i]]) {
+                    tempOwners[count] = owners[i];
+                    seenOwners[owners[i]] = true; // Mark this owner as seen
+                    count++;
                 }
             }
 
-            return owners; // Return the array of owners (including possible extra slots)
+            // Resize the array to return only the filled portion
+            address[] memory uniqueOwners = new address[](count);
+            for (uint256 j = 0; j < count; j++) {
+                uniqueOwners[j] = tempOwners[j];
+            }
+
+            return uniqueOwners; // Return the correctly filled array
         }
     }`;
     return contractString;
@@ -8041,6 +8028,7 @@ function makeDeployerForm() {
             };
             reader.readAsDataURL(file);
         }
+        imageLabel.textContent = '';
     });
     formContainer.appendChild(imageUploadSection);
     const contractSelect = document.createElement('select');
@@ -8059,7 +8047,7 @@ function makeDeployerForm() {
     formContainer.appendChild(contractSelect);
     const contractNameInput = document.createElement('input');
     contractNameInput.placeholder = 'Contract Name';
-    contractNameInput.style.marginTop = '20px';
+    contractNameInput.style.marginTop = '10px';
     contractNameInput.style.padding = '5px';
     contractNameInput.style.borderRadius = '4px';
     contractNameInput.style.border = '1px solid #333';
@@ -8072,7 +8060,7 @@ function makeDeployerForm() {
     creatorEarningInput.min = '0';
     creatorEarningInput.max = '100';
     creatorEarningInput.step = '0.01';
-    creatorEarningInput.style.marginTop = '20px';
+    creatorEarningInput.style.marginTop = '10px';
     creatorEarningInput.style.padding = '5px';
     creatorEarningInput.style.borderRadius = '4px';
     creatorEarningInput.style.border = '1px solid #333';
@@ -8083,16 +8071,39 @@ function makeDeployerForm() {
     tokenCountInput.placeholder = 'Number of Tokens';
     tokenCountInput.type = 'number';
     tokenCountInput.min = '1';
-    tokenCountInput.style.marginTop = '20px';
+    tokenCountInput.style.marginTop = '10px';
     tokenCountInput.style.padding = '5px';
     tokenCountInput.style.borderRadius = '4px';
     tokenCountInput.style.border = '1px solid #333';
     tokenCountInput.style.width = '80%';
     formContainer.appendChild(tokenCountInput);
 
+
+    const minimalListingPriceInput = document.createElement('input');
+    minimalListingPriceInput.placeholder = 'Minimal Listing Price';
+    minimalListingPriceInput.type = 'number';
+    minimalListingPriceInput.min = '0';
+    minimalListingPriceInput.style.marginTop = '10px';
+    minimalListingPriceInput.style.padding = '5px';
+    minimalListingPriceInput.style.borderRadius = '4px';
+    minimalListingPriceInput.style.border = '1px solid #333';
+    minimalListingPriceInput.style.width = '80%';
+    formContainer.appendChild(minimalListingPriceInput);
+
+    const transferFeeMin = document.createElement('input');
+    transferFeeMin.placeholder = 'Minimal Transfer Fee';
+    transferFeeMin.type = 'number';
+    transferFeeMin.min = '0';
+    transferFeeMin.style.marginTop = '10px';
+    transferFeeMin.style.padding = '5px';
+    transferFeeMin.style.borderRadius = '4px';
+    transferFeeMin.style.border = '1px solid #333';
+    transferFeeMin.style.width = '80%';
+    formContainer.appendChild(transferFeeMin);
+
     const deployContractPasscode = document.createElement('input');
     deployContractPasscode.placeholder = 'Passcode';
-    deployContractPasscode.style.marginTop = '20px';
+    deployContractPasscode.style.marginTop = '10px';
     deployContractPasscode.style.padding = '5px';
     deployContractPasscode.style.borderRadius = '4px';
     deployContractPasscode.style.border = '1px solid #333';
@@ -8181,6 +8192,8 @@ function makeDeployerForm() {
         const creatorEarning = creatorEarningInput.value;
         const tokenCount = tokenCountInput.value;
         const attemptedClientPasscode = deployContractPasscode.value;
+        const minListPrice  = minimalListingPriceInput.value;
+        const minTransferFEE = transferFeeMin.value;
         const selectedOptions = booleanOptions.map(option => {
             const checkbox = formContainer.querySelector(`input[value="${option.value}"]`);
             const input = checkbox.parentElement.parentElement.querySelector('input[type="text"]');
@@ -8207,6 +8220,8 @@ function makeDeployerForm() {
                 name: contractName,
                 royaltyFee: creatorEarning,
                 numberOfTokens: tokenCount,
+                minListingPrice: minListPrice,
+                minTransferingFEE: minTransferFEE,
                 backgroundImage: collectionBackgroundBase64Image, 
                 solidityContract: null, //initially null  
                 options: selectedOptions,
@@ -8216,7 +8231,6 @@ function makeDeployerForm() {
         };
         const contractString = createContract(contractData);  
         contractData.solidityContract = contractString;
-        console.log('trying to chunk and send data to sever', contractData);
         deployContractUsingServer(contractData).then(result =>{
             if(result.success == false){
                 console.log('result from function deployContractUsingServer() returns', result);
@@ -8447,9 +8461,15 @@ async function deployContractUsingServer(data){
                     }
                 }else if(serverMessage.success == false && serverMessage.error == 10983838122){
                     console.log(`passcode is incorrect stopping loop`);
+                    alert('passcode is incorrect');
                     contractDeploymentSuccess = false;
                     break;
                 }else if(serverMessage.success == false && serverMessage.error == 10200299222222){
+                    console.log('not on last chunk yet');
+                }else if(serverMessage.success == false && serverMessage.error == 1020202022222){
+                    contractDeploymentSuccess = false;
+                    alert('their was an error on the server side');
+                    break;
                 }else{
                     console.log('unexpected error', serverMessage);
                 }
@@ -8710,50 +8730,51 @@ async function makeMintingForm() {
             await window.ethereum.request({ method: 'eth_requestAccounts' });
             const accounts = await web3.eth.getAccounts();
             const account = accounts[0];
-            // Create a contract instance
             console.log(`trying to set contract instance and call functions for: ${mintingAddress}`);
-            //const contract = new web3.eth.Contract(BursonSkullzContractAbi, contractAddress);
             const contract = new web3.eth.Contract(JSON.parse(mintingABI), mintingAddress);
 
             console.log('access to contract granted', contract);
             console.log('Contract methods:', contract.methods);
             const networkId = await web3.eth.net.getId();
             console.log('Network ID:', networkId);
-            const result = await contract.methods.greet().call();
-            console.log('Function call result:', result);
-        
 
             if(filesArray.length == 0){
                 alert('Please Insert files to be processed');
             }else{
                 const tryToAddDocument = await addTokensToDataBase(filesArray, mintPasscode.value, selectedContract,  mintingAddress); // returns serverMessageArray with at last 1 document
                 console.log('addTokensToDataBase() retuns',tryToAddDocument);
-                const successChecker = await checkDocumentsSuccess(tryToAddDocument);
-                console.log('checkDocumentsSuccess() returns', successChecker);
-                if(successChecker){
+                const successCheckerArray = await checkDocumentsSuccess(tryToAddDocument);
+                if (successCheckerArray.length !== 0) {
                     let mintableArray = [];
-                    let numberOfNFTs = filesArray.length;
-                    let feePerNFTInMATIC = 0.01; // Example fee in MATIC
-                    let totalFee = feePerNFTInMATIC * numberOfNFTs;
-                    for(const k = 1; k<= filesArray.length; k++){ 
-                            let maticMintPrice = 20;
-                            let myNFTobjType = {
-                                id: k,
-                                price: maticMintPrice* 15*10**18, 
-                                owner: RoysWallet,
-                                mintDate: Math.floor(Date.now() / 1000), 
-                                tokenName: selectedContract.contractName,
-                                forSale: true, 
-                                flagged: false    
-                            };
-                            mintableArray.push(myNFTobjType);
+                    let numberOfNFTs = successCheckerArray.length;
+
+                    for (const k = 1; k <= successCheckerArray.length; k++) { 
+                        let maticMintPrice = 20;
+                        let myNFTobjType = {
+                            id: successCheckerArray.tokenID,
+                            price: maticMintPrice * (10 ** 18), 
+                            owner: RoysWallet,
+                            mintDate: Math.floor(Date.now() / 1000), 
+                            tokenName: selectedContract.contractName,
+                            forSale: true, 
+                            flagged: false    
+                        };
+                        mintableArray.push(myNFTobjType);
                     }
                     try {
-                        const totalFeeInWei = web3.utils.toWei(totalFee.toString(), 'ether'); // Adjust for MATIC if necessary
+                        // Estimate gas
+                        const gasEstimate = await contract.methods.mintArrayOfNFTs(mintableArray).estimateGas({
+                            from: userAddress
+                        });                        
+                        // Add a buffer (e.g., 10%)
+                        const gasLimit = Math.floor(gasEstimate * 1.1);
+                        const totalFeeInWei = web3.utils.toWei(feePerNFTInMATIC.toString(), 'ether'); // Adjust for MATIC if necessary
                         const mintResult = await contract.methods.mintArrayOfNFTs(mintableArray).send({
                             from: userAddress,
-                            value: totalFeeInWei 
+                            value: totalFeeInWei,
+                            gas: gasLimit // Use the gas limit with buffer
                         });
+
                         if (mintResult.status) { 
                             console.log('Mint was a success, lets check');
                         } else {
@@ -8762,11 +8783,11 @@ async function makeMintingForm() {
                     } catch (error) {
                         console.error('Error calling contract mintArrayOfNFTs:', error);
                     }
+
                     mintCollectionSuccessPopUpForm(selectedContract, filesArray[0].image);
-                }else{
-                    alert('at least one document failed to upload to database');
-                    console.log('trying to resend fetch with token ID and image info');
-                } 
+                } else {
+                    alert('There are no documents to mint');
+                }
             }  
         }catch(error){
             console.log('Error accessing the contract', error);
@@ -8854,6 +8875,7 @@ async function makeMintingForm() {
 }
 
 async function checkDocumentsSuccess(array) {
+    let successArray = [];
     // code 10900: bad server response
     // code 222102999221121: success document added
     // code: 21202021122344: error with .save() threw catch error possibly internet 
@@ -8864,6 +8886,7 @@ async function checkDocumentsSuccess(array) {
             success = false;
         }else if(indicator.code == 222102999221121){
             success = true;
+            successArray.push(indicator)
         }else if (indicator.code == 21202021122344){
             success = false;
         }else if(indicator.code == 83939111110001){
@@ -8872,7 +8895,7 @@ async function checkDocumentsSuccess(array) {
             success = false;
         }
     }
-    return success;
+    return successArray;
 }
 
 async function addTokensToDataBase(array, passcode, contract, address) {
@@ -9571,7 +9594,7 @@ function tokenPurchaseForm(tokenID, purchaseAmount, gasEstimate, transactionHash
     const infoContainer = document.createElement('div');
     infoContainer.style.marginTop = '15px';
     const purchaseAmountText = document.createElement('p');
-    purchaseAmount = purchaseAmount/(10**18);// reset before displaying
+    purchaseAmount = purchaseAmount/(10**18);
     purchaseAmountText.textContent = `Purchase Amount: ${purchaseAmount.toFixed(3).toString()} ${coin}`;
     infoContainer.appendChild(purchaseAmountText);
     const gasEstimateText = document.createElement('p');
