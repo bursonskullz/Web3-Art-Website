@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 09-17-24
+// Date last modified: 09-20-24
 // purpose: Make web3 art website to coincide with research related life
 
 // local variables to server
@@ -3061,68 +3061,47 @@ const handleHttpRequest = async (req, res, io) => {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ success: false, contractABI: null, bytecode: null, error: error })); 
         }
-
-    }else if(req.method == 'POST' && req.url == '/getALL-NFTs'){
-
-        try{
+    }else if (req.method === 'POST' && req.url === '/getALL-NFTs') {
+        try {
             let body = '';
-            // Accumulate incoming data chunks
             req.on('data', (chunk) => {
                 body += chunk.toString();
             });
 
             req.on('end', async () => {
                 const data = JSON.parse(body);
-
-                // Function to fetch NFTs using the model name provided
-
-
-                const getNFTs = async (name, limitLength) => {
-                    let tokens = [];
-                    try{
+                const getNFTs = async (name) => {
+                    try {
                         const allModels = await getAllModels();
-                        const specificModel = allModels[name];
+                        const specificModel = allModels[name] || mongoose.model(name, tokenSchema);
 
                         if (specificModel) {
-                            // Use the model for querying or other operations
-                            console.log(`Successfully accessed model: ${specificModel.modelName}`);
-                                        
-                            // Example operation: Find all documents in the model
-                            const documents = await specificModel.find({}).limit(limitLength);
-                            console.log('Documents:', documents);
-                            tokens = documents;
-
+                            const cursor = specificModel.find({}).cursor(); 
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.write('['); 
+                            let isFirst = true;
+                            for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
+                                if (!isFirst) res.write(',');
+                                res.write(JSON.stringify(doc));
+                                isFirst = false;
+                            }
+                            res.write(']'); 
+                            res.end();
                         } else {
-                           // model was not found we can create it! overwrite
-                           const specificModel = mongoose.model(name, tokenSchema);
-                            const documents = await specificModel.find({}).limit(limitLength);
-                            console.log('Documents:', documents);
-                            tokens = documents;
+                            res.writeHead(400, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: false, error: 'Model not found' }));
                         }
-
-                        return tokens;
-                    }catch(error){
-                        console.log('error finding tokens in databse', error);
-                        return [];
+                    } catch (error) {
+                        console.error('Error finding tokens in the database', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ success: false, error: 'Database error' }));
                     }
                 };
-
-                // Call getNFTs with the contract name from the request data
-                getNFTs(data.contractName, 24).then((result) => {
-                    const compressedData = zlib.gzipSync(JSON.stringify(result)); 
-                    res.setHeader('Content-Encoding', 'gzip');
-                    res.end(compressedData);
-                }).catch((error) => {
-                    console.error(error); 
-                    console.log('There was an error calling the getNFTs() function. If errno: -3008, it indicates an internet connection issue.');
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: false, code: 100 })); 
-                });
+                getNFTs(data.contractName);
             });
-        }catch(error){
-            console.log('Error with fetch request /getALL-NFTs');
+        } catch (error) {
+            console.log('Error with fetch request /getALL-NFTs', error);
         }
-
     }else if(req.method == 'POST' && req.url == '/add-commission'){
         try{
             let body = '';
