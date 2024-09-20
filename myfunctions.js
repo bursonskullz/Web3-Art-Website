@@ -9483,6 +9483,11 @@ function addNFTBuyButton(parentDiv, description, buttonClassName, value, address
         buyButton.addEventListener("click", async function() {
             if (isConnected) {
                 const web3 = new Web3(window.ethereum);
+                const currentNetwork = await web3.eth.net.getId();
+                if ((coin === 'ERC1155' && currentNetwork !== 137) || (coin === 'ERC70' && currentNetwork !== 1)||(coin === 'ERC20' && currentNetwork !== 61)) {
+                    alert('Network mismatch! Please switch to the correct network for this purchase.');
+                    return; 
+                }
                 try {
                     const tokenData = await contract.methods.getTokenData(parseInt(parentDiv.id)).call();// should fail until contract is setup
                     const purchaseAmount = tokenData.price;
