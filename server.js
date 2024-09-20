@@ -16,8 +16,8 @@ var previousQuestion1 = [];
 let stringChunk = '';
 let soliditychunk;
 
-let Series2Holders = ["0x21331", "0x1122222"]; 
-let Series1Holders = []; 
+let Series2Holders = ["0x21331", "0x1122222"]; // Pull From contract add here (these are examples)
+let Series1Holders = []; // pull from contract and add them here!
 
 // packages
 const http = require('http');
@@ -56,9 +56,6 @@ const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
 const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
 const addNFTCollectionDataPasscode = 'your-passcode-to-add-nfts';
 const deployableContractPasscode = 'passcode-to-deploy-contract';
-
-const modelsArray = [];
-const modelsMap = new Map(); // might not need this can comment and check
 
 const myDomain = undefined;
 const openai = new OpenAI({
@@ -123,6 +120,7 @@ const collectionSchema = new mongoose.Schema({
     collectionBackgroundImage: String
 }); 
 
+
 const reportSchema = new mongoose.Schema({
     clientWallet: String,
     ipAddress: String,
@@ -139,6 +137,7 @@ const purchaseModel = mongoose.model(purchasesCollectionString, purchaseSchema);
 const commissionModel = mongoose.model(commissionCollectionString, commissionSchema); 
 const collectionModel = mongoose.model(contractCollectionString, collectionSchema); 
 const reportModel = mongoose.model(reportString, reportSchema); 
+
 
 const basicDefinitions = ['to', 'from', 'why', 'his', 'her', 'this','dad', 'mom',
   'and', 'the', 'a', 'an', 'in', 'on', 'at', 'with', 'he', 'she',
@@ -1950,9 +1949,8 @@ try{
                 }
                 const sender = users.find(u => u.ip == clientIP);
                 if(sender){
-                    //do nothing because we found a user
+
                 }else{
-                    // generate random and push to users
                     let username;
                     do {
                         const randomIndex = Math.floor(Math.random() * randomNames.length);
@@ -1967,8 +1965,6 @@ try{
                     users.push(currentUser);
                 }
                 socket.on('message', (message) => {
-                    // do not want to pass in username because users have ability to change it and socket it called once on creation 
-                    // for each user
                     const ipAddress = socket.handshake.address;
                     const timeSent = new Date().toISOString();
                     let clientIP;
@@ -2031,9 +2027,7 @@ try{
           cluster.fork();
         });
     } else {
-      // Worker processes can handle other tasks if needed
       console.log(`Worker ${process.pid} started`);
-      // Perform other tasks here if needed
     }
     
 }catch(error){
@@ -2042,7 +2036,7 @@ try{
 
 const getPrice = async (chainlinkAbi, address) => {
   try {
-    return price = '100'; // price in USD
+    return price = '100'; 
   } catch (error) {
     console.error(`Error fetching price for address ${address}:`, error);
     return 'Failed'; 
@@ -2070,7 +2064,6 @@ function checkString(input) {
             return false;
         }
     }
-
     for (const pattern of threatPatterns) {
         if (input.includes(pattern)) {
             console.log("Matched threat pattern:", pattern);
@@ -2119,11 +2112,23 @@ function checkEmailString(email) {
     return isValidEmail;
 }
 
+async function checkAddressStringTest(address) {
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+        const data = await response.json();
+        if (data.length > 0) {
+            return true;
+        } else {
+            console.log('Address could not be found. Please review before proceeding.');
+            return false;
+        }
+    } catch (error) {
+        console.log('Error checking address:', error);
+        return false;
+    }
+}
 
 async function checkAddressString(address) {
-    // google maps does not regonize droplet IP address (need new method or configure setting)
-    // works on local host 
-    // 
     try {
         const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=`+googleAPIKEY);
         const data = await response.json();
@@ -2132,22 +2137,18 @@ async function checkAddressString(address) {
         } else {
             return true;
             console.log('The shipping address you entered could not be detected from google maps please make sure to review before proceeding');
-            // should return false dont know why API is restricting me
         }
     } catch (error) {
         console.log('Error checking address:', error);
         console.log('The shipping address you entered could not be detected from google maps please make sure to review before proceeding');
         return false;
-        // should return false dont know why API is restricting me
     }
 }
-
-
 async function checkIfName(string) {
     if (!string.trim()) {
         return false; 
     }
-    const inappropriateRegex = /[^\w\s'-]/; // Allowed characters: letters, digits, spaces, hyphens, and apostrophes
+    const inappropriateRegex = /[^\w\s'-]/;
     if (inappropriateRegex.test(string)) {
         return false; 
     }
@@ -2778,8 +2779,6 @@ async function validateTransaction(transactionHash) {
         return false;
     }
 }
-
-// Function to compile Solidity contracts
 function compileContract(contractSource, contractName) {
     console.log('trying to compile into bytcode');
     try{
@@ -2798,44 +2797,33 @@ function compileContract(contractSource, contractName) {
                 },
             },
         };
-
         const output = JSON.parse(solc.compile(JSON.stringify(input)));
-        const compiledContract = output.contracts;
-        const myobj = compiledContract[Object.keys(compiledContract)[0]];
-        //console.log('compiled contract', compiledContract);
-        //console.log('compiled contract abi', myobj.testContract.abi);
-        //console.log('compiled contract bytecode', myobj.testContract.evm.bytecode);
-
-        if (myobj) {
-            return {
-                abi: myobj.testContract.abi, // does not return a string 
-                bytecode: myobj.testContract.evm.bytecode.object,
-            };
-        } else {
-            throw new Error('Compilation failed: ' + JSON.stringify(output.errors));
+        if (output.errors) {
+            output.errors.forEach(err => {
+                console.error(err.formattedMessage);
+            });
+            return {abi: null, bytecode: null};
+        }else{
+            const contract = output.contracts['Contract.sol'][Object.keys(output.contracts['Contract.sol'])[0]];
+            return {abi: contract.abi, bytecode: contract.evm.bytecode.object};
         }
         console.log('compiled contract successfully');
     }catch(error){
         console.log("Error calling the function compileContract(contractSource, contractName)", error);
     }
 }
-
-// Function to deploy the contract to the specified network
 async function makeDeployableContract(contractData) {
-    console.log('deployableContract called');
+    console.log('Attempting to call use data', contractData);
     
     try {
-        const { solidityContract, name, token } = contractData;
+        const { solidityContract, name, token, options } = contractData;
         const { abi, bytecode } = compileContract(solidityContract, name);
-
         return {
             abi,
             bytecode,
         };
-
     } catch (error) {
         console.error('Error deploying contract:', error);
-
         return {
             abi: null,
             bytecode: null
@@ -2847,7 +2835,6 @@ const handleHttpRequest = async (req, res, io) => {
     if (req.method == 'POST' && req.url == '/add-painting') {
         try{
             let body = '';
-            // Accumulate incoming data chunks
             req.on('data', (chunk) => {
                 body += chunk.toString();
             });
@@ -2870,35 +2857,28 @@ const handleHttpRequest = async (req, res, io) => {
                                 views: 0
 
                             });  
-
                             newPainting.save().then((result)=>{
                                 console.log('trying to call large emit to all clients');
                                 const paintingString = JSON.stringify(newPainting);
                                 const chunkSize = 1024;
                                 let chunks = [];
-
                                 for (let i = 0; i < paintingString.length; i += chunkSize) {
                                     chunks.push(paintingString.substring(i, i + chunkSize));
                                 }
-
                                 chunks.forEach((chunk, index) => {
                                     io.emit('updatePaintingChunk', { chunk, index, total: chunks.length });
                                 });
-
                                 io.emit('updatePaintingComplete');
-
                                 console.log('console went through check on client side');
                                 res.end(JSON.stringify({ success: true }));
                             }).catch((error) =>{
                                 console.log(error);
                                 res.end(JSON.stringify({success: false})); 
                             });
-
                     }else{
                         console.log('could not uplaod because passcode was not correct ');
                         res.end(JSON.stringify({success: false})); 
                     }
-
                 } catch (error) {
                     console.error('Error parsing JSON:', error);
                     res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -2906,14 +2886,11 @@ const handleHttpRequest = async (req, res, io) => {
                 }
             });
         }catch(error){
-        console.log('Error with fetch request /add-painting request');
+            console.log('Error with fetch request /add-painting request');
         }
     } else if (req.method === 'GET' && Series2Holders.includes(req.url.slice(1)) || Series1Holders.includes(req.url.slice(1)) ) {
         try {
-            // logic to setup JS or HTML to send back to client 
-            // make sure utility is not accessible from client side!!!!
             const userHTMLPAGE = '';
-            // send back HTML document from ownerPage.html!
             console.log(`Accessing data for wallet address: ${req.url.slice(1)}`);
         } catch (error) {
             console.log('Error with fetch request:', req.url);
@@ -2935,7 +2912,6 @@ const handleHttpRequest = async (req, res, io) => {
                     res.end(JSON.stringify({success: false})); 
                 }
             }).catch((error) => {
-                // if  errno: -3008,the error is internet connection 
                 console.error(error); 
                 console.log('There was an error calling the paintings() function, if  errno: -3008,the error is internet');
             });
@@ -2953,8 +2929,6 @@ const handleHttpRequest = async (req, res, io) => {
             paintings().then((result) => {
                 if (result.length > 0) {
                     const paintingsData = zlib.gzipSync(JSON.stringify(result)); 
-                    //console.log('paintings before gzip applied:', result)
-                    //console.log(paintingsData);
                     res.setHeader('Content-Encoding', 'gzip');
                     res.end(paintingsData);
                 } else {
@@ -2974,8 +2948,6 @@ const handleHttpRequest = async (req, res, io) => {
     }else if(req.method == 'POST' && req.url == '/saveNFTCollection'){
         try {
             let body = '';
-
-            // Accumulate incoming data chunks
             req.on('data', (chunk) => {
                 body += chunk.toString();
             });
@@ -2989,26 +2961,19 @@ const handleHttpRequest = async (req, res, io) => {
                         contractName: data.contractName,
                         ERCStandard: data.token,
                         contractAddress: data.contractAddress,
-                        contractABI: JSON.stringify(data.contractABI), // check data matches before proceeding
-                        collectionBackgroundImage: data.collectionBackground // Fixed the typo here
+                        contractABI: JSON.stringify(data.contractABI), 
+                        collectionBackgroundImage: data.collectionBackground 
                     });
-
-                    // Save the model instance to the database
                     await collectionModelInstance.save();
                     console.log('Item saved to database');
-
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ success: true, code: 100 }));
                 } catch (error) {
                     console.error("Error saving item to database", error);
-
-                    // Internal server error response
                     res.writeHead(500, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ success: false, code: 102, error: error.message }));
                 }
             });
-
-            // Error handling for request-level issues
             req.on('error', (error) => {
                 console.error('Request error:', error);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -3021,16 +2986,14 @@ const handleHttpRequest = async (req, res, io) => {
         }
 
     }else if(req.method == 'POST' && req.url == '/deploy-a-contract'){
+        console.log('calling to deploy contract');
         try{
             let body = '';
-            // Accumulate incoming data chunks
             req.on('data', (chunk) => {
                 body += chunk.toString();
             });
-
             req.on('end', async () => {
                 const data = JSON.parse(body);
-                //console.log('trying to compile contract using data', data);
                 if(data.passcode === deployableContractPasscode){
                     if(data.lastChunk == true){                  
                         stringChunk += data.backgroundImage;
@@ -3040,12 +3003,11 @@ const handleHttpRequest = async (req, res, io) => {
                         soliditychunk = '';
                         console.log('trying to make contract using data', data);  
                         console.log('trying to call makeDeployableContract() function inside server');
-                        const deployableContract = await makeDeployableContract(data); // returns abi, and bytecode
+                        const deployableContract = await makeDeployableContract(data); 
                         console.log("deployableContract returns", deployableContract);
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ success: true, contractABI: deployableContract.abi, bytecode: deployableContract.bytecode, error: null })); 
                     }else{
-                        //console.log('current string chunk', stringChunk);
                         stringChunk += data.backgroundImage;
                         soliditychunk += data.solidityContract;
                         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -3059,9 +3021,11 @@ const handleHttpRequest = async (req, res, io) => {
         }catch(error){
             console.log('Error with fetch request /deploy-a-contract');
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ success: false, contractABI: null, bytecode: null, error: error })); 
+            res.end(JSON.stringify({ success: false, contractABI: null, bytecode: null, error: 1020202022222 })); 
         }
+
     }else if (req.method === 'POST' && req.url === '/getALL-NFTs') {
+
         try {
             let body = '';
             req.on('data', (chunk) => {
@@ -3102,6 +3066,7 @@ const handleHttpRequest = async (req, res, io) => {
         } catch (error) {
             console.log('Error with fetch request /getALL-NFTs', error);
         }
+
     }else if(req.method == 'POST' && req.url == '/add-commission'){
         try{
             let body = '';
@@ -3115,14 +3080,11 @@ const handleHttpRequest = async (req, res, io) => {
                 const commissionerIPAddress = req.connection.remoteAddress;
 
                 const commissionValidator = await commissionModel.findOne({ipAddress: commissionerIPAddress});
-
                 if(commissionValidator != null){
                     res.setHeader('Content-Type', 'application/json');
                     if(commissionValidator.isActive){
                         res.end(JSON.stringify({ success: false, code: 230 })); 
                     }else{
-
-                        // users commission was a success and he wants more!
                         const newCommissionObject = {
                                 address: data.address,
                                 artworkMedium: data.artworkMedium,
@@ -3149,10 +3111,7 @@ const handleHttpRequest = async (req, res, io) => {
                                 res.end(JSON.stringify({ success: false, code: -3 })); 
                             });
                         }
-
                 }else{
-
-
                     const newCommissionObject = new commissionModel({
                             address: data.address,
                             artworkMedium: data.artworkMedium,
@@ -3193,13 +3152,10 @@ const handleHttpRequest = async (req, res, io) => {
             req.on('data', chunk => {
                 body += chunk.toString();
             });
-
             req.on('end', async ()=> {
                 const data = JSON.parse(body);
                 const clientIP = req.connection.remoteAddress;
                 try {
-
-
                     console.log('trying to reset attempted clients with objectId:', data.objectId);
                     for(const element of attemptedClients){
                         if(element.paintingId == data.objectId && element.ipAddress == clientIP && element.inProgress == true){
@@ -3227,29 +3183,23 @@ const handleHttpRequest = async (req, res, io) => {
             req.on('end', async () => {
                 const data = JSON.parse(body);
                 const clientIP = req.connection.remoteAddress;
-
                 if(checkEmailString(data.email)){
                     console.log('Trying to save data to report database', data);
                     console.log('Client IP', clientIP);
-
                     try {
-                        // Check if the IP address already exists in the database
                         const existingReport = await reportModel.findOne({ ipAddress: clientIP });
-
+                        console.log('exisiting report', existingReport);
                         if (existingReport) {
-                            // IP address already exists, send back response with code 1000202
+                            console.log('Sending back false with code: 1000202');
                             res.setHeader('Content-Type', 'application/json');
                             res.end(JSON.stringify({ success: false, code: 1000202 }));
                         } else {
-                            // IP address does not exist, save the report data
+                            console.log('Sending back true with code: -22131');
                             const newReport = new reportModel({
                                 ipAddress: clientIP,
                                 ...data
                             });
-
                             await newReport.save();
-
-                            // Respond with success
                             res.setHeader('Content-Type', 'application/json');
                             res.end(JSON.stringify({ success: true, code: -22131 }));
                         }
@@ -3259,7 +3209,7 @@ const handleHttpRequest = async (req, res, io) => {
                         res.end(JSON.stringify({ success: false, code: 3433444 }));
                     }
                 }else{
-                    // invalid email response
+                    console.log('Invalid email sending back code: 10002444222202');
                     res.setHeader('Content-Type', 'application/json');
                     res.end(JSON.stringify({ success: false, code: 10002444222202 }));
                 }
@@ -3290,8 +3240,6 @@ const handleHttpRequest = async (req, res, io) => {
 
                 const timeDifference = Math.abs(new Date() - new Date(maxEventsItem.lastEventDate));
                 const hoursDifference = Math.ceil(timeDifference / (1000 * 60 * 60));
-
-                // For testing, set the timeout duration to 1 minute (60000 ms)
                 const testTimeoutDuration = 48 * 60 * 60 * 1000;
 
                 if (hoursDifference <= 48 && maxEventsItem.numberOfEvents > maxNumberOfAIEventsPerClient) {
@@ -3337,13 +3285,7 @@ const handleHttpRequest = async (req, res, io) => {
                     numberOfEvents: maxEventsItem.numberOfEvents + 1
                   };
                   userAIQuestions.push(Aievent);
-
-                  // dont call roul if same question is in the previous question array
-                  // fix roul to send less calls to openAI as last result 
-                  // make your own model and train 
-                  // use OPENAI as last resort
                   const serverAIResponse = await roulsResponse(data.question);
-
                   if (serverAIResponse) {
                     res.end(JSON.stringify({ serverAIResponse, code: 0 }));
                   } else {
@@ -3382,9 +3324,7 @@ const handleHttpRequest = async (req, res, io) => {
             };
 
             purchases().then((result) => {
-
                 const purhcaseData = zlib.gzipSync(JSON.stringify(result)); 
-                // should return zero length if there is none and create gif on client side
                 res.setHeader('Content-Encoding', 'gzip');
                 res.end(purhcaseData);
 
@@ -3437,8 +3377,6 @@ const handleHttpRequest = async (req, res, io) => {
 
     } else if(req.method == 'POST' && req.url == '/checkForAttemptedPurchases'){
         try{
-                // its working but second time around its not working 
-            // so after the reset it doesnt work 
             let body = '';
             req.on('data', chunk =>{
                 body += chunk.toString()
@@ -3451,7 +3389,6 @@ const handleHttpRequest = async (req, res, io) => {
                 const clientIP = req.connection.remoteAddress;
                 const maxPurchaseAttempts = 17;
                 let thisAttemptedClientArray = attemptedClients.filter(obj=> obj.ipAddress == clientIP);
-
                 const attemptedPurchaseClient = {
                         ipAddress: clientIP,
                         inProgress: true,
@@ -3472,36 +3409,26 @@ const handleHttpRequest = async (req, res, io) => {
                     res.setHeader('Content-Type', 'application/json');
                     res.end(JSON.stringify({ canUserAttemptPurchase: true }));
                     attemptedClients.push(attemptedPurchaseClient);
-                    // add 1 to each element with same ip
                     attemptedClients.forEach(client => {
-                        // need to checkIp t
                         if (client.paintingId === attemptedPurchaseClient.paintingId && client.ipAddress == clientIP) {
                             client.numberOfPurchaseAttempts +=1;
                         }
                     });            
                 }else{
                     if(thisAttemptedClientArray.length != 0 && attemptedPurchaseClient.numberOfPurchaseAttempts<= maxPurchaseAttempts){
-
                         let matchingClients = attemptedClients.filter(element => element.paintingId == objectId);
-
                         if(matchingClients.length == 0){
                             console.log('cannot find anyone trying to purchase this painting in local array');
                             console.log('This is Users first time attempt to purchase sending back true');
                             res.setHeader('Content-Type', 'application/json');
                             attemptedClients.push(attemptedPurchaseClient);
                             res.end(JSON.stringify({ canUserAttemptPurchase: true, code: 232121311 }));
-
-                            // add 1 to each element with same ip
                             attemptedClients.forEach(client => {
                                 if (client.paintingId === attemptedPurchaseClient.paintingId) {
                                     client.numberOfPurchaseAttempts +=1;
                                 }
                             });
-
-                            // each time we send true we need to add 1 to every item in attemptedCLients that match the ip 
                          }else{
-                            //const getInstockValue = await paintingModel.find({});
-
                             const getInstockValue = await paintingModel.findOne(
                                 { _id: attemptedPurchaseClient.paintingId }
                             );
@@ -3510,16 +3437,10 @@ const handleHttpRequest = async (req, res, io) => {
                                 if (getInstockValue.inStock) {
                                     console.log('Item is still in stock!');
                                 let allInProgressFalse = attemptedClients.filter(client => client.inProgress == true && client.paintingId == attemptedPurchaseClient.paintingId);
-
-                                // every time resonse goes through add 1 to the attempts (only when server sends back true);
-
                                 if(allInProgressFalse.length != 0){
                                     console.log('Someone is already attempted to buy the same exact painting==>');
                                     res.setHeader('Content-Type', 'application/json');
                                     res.end(JSON.stringify({ canUserAttemptPurchase: false, code : 102111}));
-
-
-                                    // timer resets every object so we can keep local value 
                                     if(timerIsAlreadyCalled){
                                         console.log('no need to set timer because its active');
                                     }else{
@@ -3533,11 +3454,7 @@ const handleHttpRequest = async (req, res, io) => {
                                             });
                                         },randomNumberreset);
                                     }
-
-
                                 }else{
-
-                                    // at least 1 person is trying to buy this same painting
                                     console.log('User is okay to purchase painting (but we need to check number of attempts');
                                     res.setHeader('Content-Type', 'application/json');
                                     attemptedClients.push(attemptedPurchaseClient);
@@ -3546,12 +3463,9 @@ const handleHttpRequest = async (req, res, io) => {
                                         if (client.paintingId === attemptedPurchaseClient.paintingId) {
                                             client.numberOfPurchaseAttempts +=1;
                                         }
-                                     //client.numberOfPurchaseAttempts += 1;
                                     });
                                     res.end(JSON.stringify({ canUserAttemptPurchase: true, code : 10213321}));
-
                                 }                 
-
                                 } else {
                                     console.log('Item is not in stock; sending back first checker is false');
                                     res.setHeader('Content-Type', 'application/json');
@@ -3562,10 +3476,6 @@ const handleHttpRequest = async (req, res, io) => {
                                 res.setHeader('Content-Type', 'application/json');
                                 res.end(JSON.stringify({ canUserAttemptPurchase: false, code :  6477665555}));
                             }
-
-
-
-
                         }
                     }else{
                         if(thisAttemptedClientArray.length == 0){
@@ -3573,8 +3483,6 @@ const handleHttpRequest = async (req, res, io) => {
                             attemptedClients.push(attemptedPurchaseClient);
                             res.setHeader('Content-Type', 'application/json');
                             res.end(JSON.stringify({ canUserAttemptPurchase: true, code: 2322225511 })); 
-
-                            //update each attempt
                         }else if(attemptedPurchaseClient.numberOfPurchaseAttempts > maxPurchaseAttempts){
                             console.log('User has exceeded maximum number of attempts');
                             res.setHeader('Content-Type', 'application/json');
@@ -3583,23 +3491,16 @@ const handleHttpRequest = async (req, res, io) => {
                             let purchaseTimerIsOn = globalPurchaseTimerArray.filter(obj=> obj.ipAddress == attemptedPurchaseClient.ipAddress);
                             console.log('purchaseTimerIsOn', purchaseTimerIsOn);
                             if(purchaseTimerIsOn.length>0){
-                                //timer is already on
                                 console.log('item is already present no need to reset timer or push item in array');
                                 console.log('we found', purchaseTimerIsOn)
                             }else{
                                  console.log('item is not present but we are adding it and adding a timer');
-                                // array is not empty and we cannot find client timer 
                                 const timedOutClient ={
                                     ipAddress: attemptedPurchaseClient.ipAddress,
                                     timer: true
                                 };
                                 globalPurchaseTimerArray.push(timedOutClient);
-
-
-                                // Set timer wait 10 seconds before resetting cleint attributed in attemptedClientsarray 
-                                // we filter through the array named for ip address and objId 
-                                // then if we find them we remove them from the array attemptedClients
-                                let resetUserTimer = 36000000; // 10 hours in milliseconds
+                                let resetUserTimer = 36000000;
                                 console.log('trying to set timer');
                                 setTimeout(function () {
                                     console.log('fireing function after timeoout delay');
@@ -3617,34 +3518,14 @@ const handleHttpRequest = async (req, res, io) => {
                                             globalPurchaseTimerArray.splice(i, 1); // Remove 1 item at index i
                                         }
                                     }
-
-                                    // remove client from timedOutClients
-                                }, resetUserTimer); // 5-second delay
-                            }
-
-                            
-
-                            
-                            // filter through array called attemptedClients by attemptedPurchaseClient.ipAddress and attemptedPurchaseClient.paintingId
-                            // remove all of them from attemptedClients array 
-
-                            // if hanging metamask on client side over 2 minutes cancel it or make pop up                
+                                }, resetUserTimer); 
+                            }                                                               
                         }else{
                             console.log('An unexexpted error occureed');
                             res.setHeader('Content-Type', 'application/json');
                             res.end(JSON.stringify({ canUserAttemptPurchase: false, code: 121225511 })); 
                         }
-
                     }
-
-                   
-                    /*
-                    for(client of attemptedClients){
-                        if(client.paintingId == objectId){
-                            currenTransactionInProgress = true;
-                        }
-                    }*/
-
                 }
             });
         }catch(error){
@@ -3659,11 +3540,8 @@ const handleHttpRequest = async (req, res, io) => {
             });
 
             req.on('end', async ()=> {
-                // Parse the JSON data from the request body
                 const data = JSON.parse(body);
                  try{ 
-
-
                     const { transactionHash, objectId, address, email, firstName, lastName } = data;
                     const clientIP = req.connection.remoteAddress;
 
@@ -3674,9 +3552,6 @@ const handleHttpRequest = async (req, res, io) => {
                         buyerFirstName : firstName,
                         buyerLastName : lastName 
                     };
-
-                    // need to validate hash before updating Db and sending back checker!!
-                    // for security reasons but not setup yet 
                     const result = await paintingModel.updateOne(
                         { _id: objectId }, 
                         { $set: {
@@ -3701,7 +3576,6 @@ const handleHttpRequest = async (req, res, io) => {
                       transactionHash: transactionHash,
                       productIMG: productIMage 
                     });
-
                     if(result.modifiedCount == 1){
                         let thisObj = {
                             updated: true, 
@@ -3717,13 +3591,12 @@ const handleHttpRequest = async (req, res, io) => {
                         res.setHeader('Content-Encoding', 'gzip'); 
                         res.end(zlib.gzipSync(JSON.stringify(thisObj)));
                         io.emit('updateCurrentPaintings',{updated: true, Id: objectId});
-                        // only send email if purchase is saved 
                         newPurchase.save()
                           .then(savedUser => {
                             attemptedClients = [];
                             sendEmail(email, address, firstName, lastName, objectId, updatedPainting.price, updatedPainting.name, updatedPainting.image)
                                 .then(result => {
-                                    // dont do anything with the result maybe log it out
+                                  
                                 })
                                 .catch(error => {
                                      attemptedClients = [];
@@ -3750,14 +3623,12 @@ const handleHttpRequest = async (req, res, io) => {
     }else if(req.method == 'POST' && req.url == '/validate_info'){
         try{
             let body = '';
-
             req.on('data', chunk => {
                 body += chunk.toString();
             });
 
             req.on('end', async () => {
                 try {
-                    // Parse the JSON data from the request body
                     console.log('trying to parse data to json');
                     const data = JSON.parse(body);
                     verifyUserinputData(data.email, data.address, data.firstName, data.lastName)
@@ -3782,13 +3653,8 @@ const handleHttpRequest = async (req, res, io) => {
                         .catch((error) => {
                             console.log('there was an error sending the Newdata array to client or the return of verifyUserinputData() function');
                         });
-
-                    // Send the response with the result
-                    //res.setHeader('Content-Type', 'application/json');
                 } catch (error) {
                     console.error('Error processing request:', error);
-                    // If an error occurs, send an error response
-                    //res.setHeader('Content-Type', 'application/json');
                     res.statusCode = 500;
                     res.end(JSON.stringify({verified: false}));
                 }
@@ -3801,19 +3667,15 @@ const handleHttpRequest = async (req, res, io) => {
     }else if(req.method == 'GET' && req.url == '/GetMessageHistory'){
         try{
             let body = '';
-
             req.on('data', chunk => {
                 body += chunk.toString();
 
             });
-
             req.on('end', async () => {           
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 // may need to send one at a time
                 res.end(JSON.stringify(messageHistory)); 
             });
-
-
         }catch(error){  
             console.log('Error with fetch request /GetMessageHistory');
         }
@@ -3821,17 +3683,14 @@ const handleHttpRequest = async (req, res, io) => {
     } else if(req.method == 'POST' && req.url == '/UpdateUsername'){
         try{
             let body = '';
-
             req.on('data', chunk => {
                 body += chunk.toString();
 
             });
-
             req.on('end', async () =>{
                 const data = JSON.parse(body);
                 const clientIP = req.connection.remoteAddress;
 
-                // check numberOfchangesvalue
                 const userIndex = users.findIndex(user => user.ip === clientIP);
                 if(userIndex!=-1){
                     if (users[userIndex].nameChanges <= 7 && checkString(data.newUsername) && data.newUsername.length >=3) {
@@ -3862,10 +3721,8 @@ const handleHttpRequest = async (req, res, io) => {
                             res.writeHead(200, { 'Content-Type': 'application/json' });
                             res.end(JSON.stringify({success: false, code: 401}));     
                         }
-
                     }
                 }else{
-                    // this should never fire 
                     console.log('this console log should never print');
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({success: false, code: 501}));    
@@ -3890,33 +3747,25 @@ const handleHttpRequest = async (req, res, io) => {
                     const updaterIPAddress = req.connection.remoteAddress;
                     const updator = {ip: updaterIPAddress, data};
                     const isObjectInArray = updatedViewsHistory.some(obj => obj.ip === updator.ip && obj.data === updator.data);
-
                     if(isObjectInArray){
-                        //console.log('user already viewed the painting', updator.data)
                         res.setHeader('Content-Type', 'application/json');
                         res.end(JSON.stringify({ success: false, message: 'you already viewed this painting' }));
                     }else{
                         updatedViewsHistory.push(updator);
-                        const thispainting = await paintingModel.findOne({ _id: data });
-                        
+                        const thispainting = await paintingModel.findOne({ _id: data });  
                         if (thispainting) {
-                            // Update the views count
                             const result = await paintingModel.updateOne(
                                 { _id: data },
                                 { $set: { views: thispainting.views + 1 } }
                             );
-
                             if (result.modifiedCount === 1) {
-                                // Send success response if update was successful
                                 res.writeHead(200, { 'Content-Type': 'application/json' });
                                 res.end(JSON.stringify({ success: true }));
                             } else {
-                                // Send failure response if update was not successful
                                 res.writeHead(200, { 'Content-Type': 'application/json' });
                                 res.end(JSON.stringify({ success: false }));
                             }
                         } else {
-                            // Send failure response if painting with given ID was not found
                             res.writeHead(404, { 'Content-Type': 'application/json' });
                             res.end(JSON.stringify({ success: false, message: 'Painting not found' }));
                         }
@@ -3924,7 +3773,6 @@ const handleHttpRequest = async (req, res, io) => {
 
                 } catch (error) {
                     console.log(error);
-                    // Send error response if there was an error
                     res.writeHead(500, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ success: false, message: 'Internal server error' }));
                 }
@@ -3936,7 +3784,6 @@ const handleHttpRequest = async (req, res, io) => {
         }
         
     }else if(req.method == 'POST' && req.url == '/add-token-to-collection'){
-        // make sure to check IP Adress and adress from wallet to ensure its roy minting
         try{
             let body = '';
             req.on('data', chunk => {
@@ -3945,7 +3792,6 @@ const handleHttpRequest = async (req, res, io) => {
 
             req.on('end', async ()=> {
                 const data = JSON.parse(body);
-                //console.log(' received data from client to save token to data:', data);
                 try {
                     if(data.passcode == addNFTCollectionDataPasscode){
                         let specificModel;
@@ -3982,8 +3828,7 @@ const handleHttpRequest = async (req, res, io) => {
                         res.setHeader('Content-Type', 'application/json');
                         res.end(JSON.stringify({success: false, code: 83939111110001, tokenID: data.tokenID})); 
                     }
-                } catch (error) {
-                    // edit error code for any errors 
+                } catch (error) { 
                     res.setHeader('Content-Type', 'application/json');
                     res.end(JSON.stringify({success: false, code: 29292929100999, tokenID: data.tokenID})); 
                 }
@@ -4001,8 +3846,7 @@ const handleHttpRequest = async (req, res, io) => {
 
             const extname = path.extname(filePath);
             let contentType = 'text/html'; 
-        
-            // Set content type based on file extension
+    
             switch (extname) {
                 case '.js':
                     contentType = 'text/javascript';
@@ -4026,11 +3870,7 @@ const handleHttpRequest = async (req, res, io) => {
                 console.log('content varibale gives', content);
                 if (err) {
                     if (err.code === 'ENOENT') {
-                        // File not found
-                        // Set the status code to 404 (Not Found)
                         res.writeHead(404, { 'Content-Type': 'text/html' });
-
-                        // Send back a custom HTML page
                         res.write(`
                             <!DOCTYPE html>
                             <html>
@@ -4069,16 +3909,12 @@ const handleHttpRequest = async (req, res, io) => {
                             </body>
                             </html>
                         `);
-
-                        // End the response
                         res.end();
                     } else {
-                        // Server error
                         res.writeHead(500);
                         res.end('Internal Server Error: ' + err.code);
                     }
                 } else {
-                    // Serve the file with appropriate content type
                     res.writeHead(200, { 'Content-Type': contentType });
                     res.end(content, 'utf-8');
                 }
