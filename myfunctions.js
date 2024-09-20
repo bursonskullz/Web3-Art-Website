@@ -1165,20 +1165,20 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
         if(columns == 4){
              // above 999 pixels 
             if(window.innerWidth >= 1275){
-                gridItem.style.height = '185px'; 
-                gridItem.style.width = '185px';    
-                rowHeight = '190px'; 
+                gridItem.style.height = '165px'; 
+                gridItem.style.width = '165px';    
+                rowHeight = '170px'; 
             }else if (window.innerWidth >= 1150) {
-                gridItem.style.height = '180px'; 
-                gridItem.style.width = '180px';    
-                rowHeight = '185px'; 
+                gridItem.style.height = '160px'; 
+                gridItem.style.width = '160px';    
+                rowHeight = '165px'; 
             }else if (window.innerWidth >= 999) {
-                gridItem.style.height = '170px'; 
-                gridItem.style.width = '170px';    
-                rowHeight = '175px'; 
+                gridItem.style.height = '150px'; 
+                gridItem.style.width = '150px';    
+                rowHeight = '155px'; 
             }else{
 
-            }     
+            }        
         }else if(columns == 3){
             // 999 to 500 pixels changisng size of grid
             if(window.innerWidth >= 950){
