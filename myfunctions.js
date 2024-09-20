@@ -1135,7 +1135,7 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
     gridContainer.style.zIndex = '0';
 
     gridContainer.style.scrollbarWidth = 'none'; 
-    const rowHeight = '33%'; 
+    window.rowHeight = '33%'; 
     gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`; 
     gridContainer.style.gridTemplateRows = `repeat(${numRows},  ${rowHeight})`; 
     gridContainer.style.gap = '0px'; 
@@ -1162,6 +1162,74 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
         gridItem.style.backgroundRepeat = 'no-repeat';
         gridItem.style.backgroundPosition = 'center'; 
         gridItem.style.backgroundSize = '100%'; 
+        if(columns == 4){
+             // above 999 pixels 
+            if(window.innerWidth >= 1275){
+                gridItem.style.height = '185px'; 
+                gridItem.style.width = '185px';    
+                rowHeight = '190px'; 
+            }else if (window.innerWidth >= 1150) {
+                gridItem.style.height = '180px'; 
+                gridItem.style.width = '180px';    
+                rowHeight = '185px'; 
+            }else if (window.innerWidth >= 999) {
+                gridItem.style.height = '170px'; 
+                gridItem.style.width = '170px';    
+                rowHeight = '175px'; 
+            }else{
+
+            }     
+        }else if(columns == 3){
+            // 999 to 500 pixels changisng size of grid
+            if(window.innerWidth >= 950){
+                gridItem.style.height = '140px'; 
+                gridItem.style.width = '140px';    
+                rowHeight = '150px'; 
+            }else if(window.innerWidth >= 900){
+                gridItem.style.height = '130px'; 
+                gridItem.style.width = '135px';    
+                rowHeight = '135px';  
+            }else if(window.innerWidth >= 850){
+                gridItem.style.height = '125px'; 
+                gridItem.style.width = '125px';    
+                rowHeight = '132px';  
+            }else if(window.innerWidth >= 700){
+                gridItem.style.height = '115px'; 
+                gridItem.style.width = '115px';    
+                rowHeight = '130px';    
+            }else if(window.innerWidth >= 650){
+                gridItem.style.height = '110px';
+                gridItem.style.width = '110px';    
+                rowHeight = '125px';  
+            }else if(window.innerWidth >= 550){
+                gridItem.style.height = '100px'; 
+                gridItem.style.width = '100px';    
+                rowHeight = '120px'; 
+            }else if(window.innerWidth >= 500){
+                gridItem.style.height = '95px'; 
+                gridItem.style.width = '95px';    
+                rowHeight = '115px'; 
+            }else{
+            }     
+        }else if(columns == 2){
+            // 500 pixels to 350 pixels
+            if(window.innerWidth >= 450){
+                gridItem.style.height = '160px'; 
+                gridItem.style.width = '160px';    
+                rowHeight = '165px'; 
+            }else if(window.innerWidth >= 400){
+                gridItem.style.height = '140px';
+                gridItem.style.width = '140px';    
+                rowHeight = '145px'; 
+            }else if(window.innerWidth < 400 && window.innerWidth >= 350){
+                gridItem.style.height = '130px'; // Keep it square
+                gridItem.style.width = '130px';    
+                rowHeight = '135px'; 
+            }  
+        }else{
+        }
+        gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`; 
+        gridContainer.style.gridTemplateRows = `repeat(${numRows}, ${rowHeight})`; 
 
         var overlay = document.createElement('div');
         overlay.classList.add('overlay');
@@ -1234,8 +1302,8 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
         gridContainer.appendChild(gridItem);
     });
     parentElement.appendChild(gridContainer);
-
 }
+
 export function makeNewNFTGrid(array, grid,coin, contract) {
     console.log('trying to make new grid');
     array.forEach(item => {
@@ -1330,7 +1398,7 @@ export function makeNewNFTGrid(array, grid,coin, contract) {
                 if (buyButton) buyButton.remove();
                 if (descriptionP) descriptionP.remove();
                 overlay.remove();
-            }, 100); // Slight delay to avoid flickering
+            }, 100); 
         });
     });
 }
@@ -2993,12 +3061,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     contractInfoDiv.style.borderRadius = '5px';
     contractInfoDiv.style.borderWidth = '2px';
 
-    let maxSell;
-    let numberOfSells;
-    let myTokens; 
-    let numberOfTokens;
-    let allOwners; 
-    let coin;
+    let maxSell; let numberOfSells; let myTokens; let numberOfTokens; let allOwners; let coin;
 
     if(userSelectedContract.ERCStandard === "ERC1155"){
         coin = "POL";
@@ -3009,6 +3072,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     }else{
          coin = "??";
     }
+
     const web3 = new Web3(window.ethereum);
     const contract = new web3.eth.Contract(JSON.parse(userSelectedContract.contractABI), userSelectedContract.contractAddress);
     try{
@@ -3376,7 +3440,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         commnityList.appendChild(li); 
     });
 
-
     resources.forEach(function(itemText) {
         var li = document.createElement("li");
         const atag = document.createElement('a');
@@ -3410,7 +3473,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     commnityList.style.width = '100%';
     commnityList.style.left = '0%';
     commnityList.style.padding = '0%';
-
 
     resourcesList.style.listStyleType = "none";
     resourcesList.style.position = 'relative';
@@ -3506,7 +3568,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     footerLargeTextContainer.style.backgroundRepeat = 'no-repeat';
     footerLargeTextContainer.style.backgroundPosition = 'center';
 
-
     logo.style.position = 'relative'; 
     logo.style.height = '100%'
     logo.style.width = '15%'; 
@@ -3522,7 +3583,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         var column = document.createElement("div");
         column.classList.add("column");
         var heading = document.createElement("h3");
-        heading.style.fontSize = '3vh';
+        heading.style.fontSize = '2vh';
         heading.style.color = 'white';
         if(i == 1){
             heading.textContent = "Links"; 
@@ -9349,9 +9410,9 @@ export function handleResize() {
     window.addEventListener('resize', handleResize);
 }
 function bigNumberToHex(bigNumber) {
-    let hexString = bigNumber.toString(16); // Get hex representation of the number
+    let hexString = bigNumber.toString(16); 
     if (hexString.length % 2 !== 0) {
-        hexString = '0' + hexString; // Ensure even length hex string
+        hexString = '0' + hexString; 
     }
     return '0x' + hexString;
 }
@@ -9372,7 +9433,7 @@ async function checkNetwork(network_name) {
     if (network_name.toLowerCase() === "ethereum") {
         const networkId = await web3.eth.net.getId();
         console.log('current network ID:', networkId);
-        const ethNetworkId =  1; // Ethereum Mainnet ID
+        const ethNetworkId =  1;
         if (networkId === ethNetworkId || '1n') {
             return true;
         } else {
@@ -9437,7 +9498,7 @@ function addNFTBuyButton(parentDiv, description, buttonClassName, value, address
                         alert('The transaction could not be sent.');
                     }
                 } catch (error) {
-                    console.error('Error calling function on the blockchain:', error);
+                    console.error('Transaction rejected or failed:', error);
                 }
             } else {
                 alert('You must connect your wallet to make a purchase');
@@ -10494,5 +10555,3 @@ async function organizePaintingArrayByMostViewed(array) {
     array.sort((a, b) => b.views - a.views);
     return array;
 }
-
-
