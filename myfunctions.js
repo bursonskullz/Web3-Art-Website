@@ -5947,39 +5947,45 @@ function isValidPhoneNumber(phoneNumber) {
     return phoneRegex.test(phoneNumber);
 }
 
-export async function getNFTS(contractName){
+export async function getNFTS(contractName) {
     let tokensArray = [];
-        try {
-           const response = await fetch('/getALL-NFTs', { 
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({contractName: contractName})
-              });
-           if (response.ok) {
-                  const compressedNFTArray = await response.json();            
-                  if (compressedNFTArray.success == false) {
-                      console.log('did not get back array maybe it had hard time sending');
-                  }else{
-                      for (let i = 0; i < compressedNFTArray.length; i++) {
-                          let tokenObject = {
-                               contractName: compressedNFTArray[i].contractName,
-                               contractAddress: compressedNFTArray[i].contractAddress,
-                               tokenID: compressedNFTArray[i].tokenID,
-                               image: compressedNFTArray[i].image
-                       };
+    try {
+        const response = await fetch('/getALL-NFTs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ contractName: contractName })
+        });
 
-                        tokensArray.push(tokenObject);   
-                    }
-                }                                
-            } else {
-              console.error('Failed to fetch NFTS the response was not okay', response.statusText);
-              document.body.removeChild(loadingAnimation);
-          }
-        } catch (error) {
-            console.error('Error fetching paintings:', error);
-            document.body.removeChild(loadingAnimation);
+        if (response.ok) {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let jsonString = '';
+            let done = false;
+
+            while (!done) {
+                const { value, done: readerDone } = await reader.read();
+                done = readerDone;
+                jsonString += decoder.decode(value, { stream: true });
+                if (jsonString.trim().endsWith(']')) {
+                    const tokens = JSON.parse(jsonString);
+                    tokens.forEach(token => {
+                        let tokenObject = {
+                            contractName: token.contractName,
+                            contractAddress: token.contractAddress,
+                            tokenID: token.tokenID,
+                            image: token.image
+                        };
+                        tokensArray.push(tokenObject);
+                    });
+                }
+            }
+        } else {
+            console.error('Failed to fetch NFTs', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error fetching NFTs:', error);
     }
     return tokensArray;
 }
