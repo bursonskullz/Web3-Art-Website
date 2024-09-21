@@ -1173,9 +1173,9 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
                 gridItem.style.width = '195px';    
                 rowHeight = '200px'; 
             }else if(window.innerWidth >= 1300){
-                gridItem.style.height = '180px'; 
-                gridItem.style.width = '180px';    
-                rowHeight = '185px'; 
+                gridItem.style.height = '185px'; 
+                gridItem.style.width = '185px';    
+                rowHeight = '190px'; 
             }else if (window.innerWidth >= 1200) {
                 gridItem.style.height = '175px'; 
                 gridItem.style.width = '175px';    
@@ -1256,6 +1256,8 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
         overlay.style.flexDirection = 'column'; 
         overlay.style.justifyContent = 'flex-end'; 
         overlay.style.opacity = '.6';
+        overlay.style.cursor = 'pointer'; 
+        overlay.addEventListener('contextmenu', event => event.preventDefault());
 
         let hoverTimeout;
         gridItem.addEventListener('mouseenter', async function() {
@@ -2199,7 +2201,7 @@ async function makeUtilityPage(sideElementsWidth) {
     form.style.color = 'white';
     form.style.position = 'absolute';
     form.style.left = '0.5%';
-    form.style.top = '62vh';
+    form.style.top = '67vh';
     form.style.height = '50%';
     form.style.padding = '0px';
     form.style.boxSizing = 'border-box';
@@ -2328,7 +2330,7 @@ async function makeOwnersPage(sideElementsWidth) {
     ownersContainer.style.fontSize = '1.5vh';
     ownersContainer.style.position = 'absolute';
     ownersContainer.style.left = '0.5%';
-    ownersContainer.style.top = '62vh';
+    ownersContainer.style.top = '67vh';
     ownersContainer.style.height = '50%';
     ownersContainer.style.padding = '0px';
     ownersContainer.style.boxSizing = 'border-box';
@@ -2384,8 +2386,8 @@ async function makeOwnersPage(sideElementsWidth) {
         }
 
         // test by uncommmenting next line 
-        allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
-        allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
+        //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
+        //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
 
         if (allOwnersAddressArray.length > 0) {
             let count = 0; 
@@ -2578,7 +2580,7 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     tokenContainer.style.fontSize = '1.5vh';
     tokenContainer.style.position = 'absolute';
     tokenContainer.style.left = '0.5%';
-    tokenContainer.style.top = '62vh';
+    tokenContainer.style.top = '67vh';
     tokenContainer.style.height = '50%';
     tokenContainer.style.padding = '0px';
     tokenContainer.style.boxSizing = 'border-box';
@@ -2587,6 +2589,7 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     tokenContainer.style.borderWidth = '2px';
     tokenContainer.style.overflowY = 'scroll';
     tokenContainer.style.borderRadius = '5px';
+    tokenContainer.style.overflowY = 'hidden';
 
     const smallHeader = document.createElement('div');
     smallHeader.style.top = '0%';
@@ -2641,7 +2644,7 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     transferSPanTagContainer.style.position = 'absolute'; 
     transferSPanTagContainer.className = 'transferTool';
     transferSPanTagContainer.style.bottom = '0%';
-    transferSPanTagContainer.style.right = '37.5%'; 
+    transferSPanTagContainer.style.right = '36%'; 
     transferSPanTagContainer.style.height = '17%';
     transferSPanTagContainer.style.width = '37%';
 
@@ -2687,7 +2690,7 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     smallContainer.style.color = 'white';
     smallContainer.style.fontSize = '1.5vh';
     smallContainer.style.position = 'relative'; 
-    smallContainer.style.height = '60%'; 
+    smallContainer.style.height = '70%'; 
     smallContainer.style.padding = '0px';
     smallContainer.style.boxSizing = 'border-box';
     smallContainer.style.backgroundColor = 'none';
@@ -2698,7 +2701,7 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     const footer = document.createElement('div');
     footer.className = 'footer';
     footer.style.width = '100%'; 
-    footer.style.height = '17%';
+    footer.style.height = '15%';
     footer.style.bottom = '0';
     footer.style.backgroundColor = '#404a5c'; 
     footer.style.position = 'sticky';  
@@ -2751,7 +2754,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     recentSellsPopUpBox.style.fontSize = '1.5vh';
     recentSellsPopUpBox.style.position = 'absolute';
     recentSellsPopUpBox.style.left = '0.5%';
-    recentSellsPopUpBox.style.top = '62vh';
+    recentSellsPopUpBox.style.top = '67vh';
     recentSellsPopUpBox.style.height = '50%';
     recentSellsPopUpBox.style.padding = '0px';
     recentSellsPopUpBox.style.boxSizing = 'border-box';
@@ -2827,6 +2830,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
         recentSells = null;
     }
 
+
     let testObj = {
         image: "/images/BursonSKullText.png", 
         tokenID: 1,
@@ -2839,7 +2843,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     testArray.push(testObj);
     testArray.push(testObj);
 
-    recentSells = testArray; // comment to stop test and remove test data
+    //recentSells = testArray; // comment to stop test and remove test data
     
     if (recentSells != null && recentSells.length != 0) {
         console.log('Trying to get corresponding image to each token contract returns and make div and display data inside');
@@ -3064,7 +3068,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     contractInfoDiv.style.position = 'absolute';
     contractInfoDiv.style.left = '0.5%';
     contractInfoDiv.style.top = '20vh';
-    contractInfoDiv.style.height = '40%';
+    contractInfoDiv.style.height = '45%';
     contractInfoDiv.style.padding = '20px';
     contractInfoDiv.style.boxSizing = 'border-box';
     contractInfoDiv.style.backgroundColor = '#404a5c';
@@ -3151,7 +3155,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     options.style.color = 'white';
     options.style.position = 'absolute';
     options.style.left = '0.5%';
-    options.style.top = '62vh';
+    options.style.top = '67vh';
     options.style.height = '50%';
     options.style.padding = '20px';
     options.style.boxSizing = 'border-box';
@@ -3247,13 +3251,14 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     unknownDiv.id = 'crypto-chat-room';
     unknownDiv.className = 'crypto-chat-room';
     unknownDiv.style.width = sideElementsWidth;
-    unknownDiv.style.height = '55%';
+    unknownDiv.style.height = '68%';
     unknownDiv.style.position = 'absolute';
     unknownDiv.style.right = '1%';
     unknownDiv.style.top = '49%';
     unknownDiv.style.backgroundColor = '#404a5c';
     unknownDiv.style.boxShadow = '0px 0.8px 5px rgba(0, 0, 0.5, 0.5)';
-    unknownDiv.style.borderRadius = '2vh';
+    unknownDiv.style.borderRadius = '5px';
+    unknownDiv.style.border = '2px solid black';
     document.body.appendChild(unknownDiv); 
     const chatBox = document.createElement('div');
     chatBox.classList.add('chatBox');
@@ -3263,12 +3268,13 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     chatBox.style.width = '100%';
     chatBox.style.overflowY = 'scroll';
     chatBox.style.position = 'relative';
-    chatBox.style.borderBottom = '1px solid #ccc';
+    chatBox.style.borderBottom = '1px solid black';
     chatBox.style.backgroundColor = '#404a5c';
-    chatBox.style.borderTopLeftRadius = '1vh'; 
-    chatBox.style.borderTopRightRadius = '1vh';
-    chatBox.style.borderBottomLeftRadius = '0'; 
-    chatBox.style.borderBottomRightRadius = '0'; 
+    chatBox.style.borderRadius = '5px';
+    //chatBox.style.borderTopLeftRadius = '1vh'; 
+    //chatBox.style.borderTopRightRadius = '1vh';
+    //chatBox.style.borderBottomLeftRadius = '0'; 
+    //chatBox.style.borderBottomRightRadius = '0'; 
     unknownDiv.appendChild(chatBox);
     const emojiButton = document.createElement('div');
     emojiButton.classList.add('emoji-button');
@@ -7061,7 +7067,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
             UsersNFTsIds = [];
         }
         // comment to stop testing
-        UsersNFTsIds = [1,2,3,4,5, 6,7,8];
+        // UsersNFTsIds = [1,2,3,4,5, 6,7,8];
         if(UsersNFTsIds.length != 0){
             let userNFTARRay = [];
             console.log('trying to loop through and get images for user tokens');
@@ -7606,6 +7612,7 @@ function addSecretMenu() {
     document.body.appendChild(secretMenu);
 }
 function createContract(data) {
+    // use selected options to add manager and any other neccassary things
     let minimalListingPrice = parseInt(parseFloat(data.minListingPrice)*(10**18));
     let minimalTransferFEE = parseInt(parseFloat(data.minTransferingFEE)*(10**18));
     const version = "^0.8.19"; 
@@ -7799,6 +7806,22 @@ function createContract(data) {
         function getTokenData(uint256 tokenID) public view returns (NFT memory) {
             return nfts[tokenID];
         }
+
+        function flagToken(uint256 tokenID) public {
+            require(msg.sender == owners[0], 'only the owner can flag tokens');
+            nfts[tokenID].flagged = true;
+        }
+
+        function relistflaggedToken(uint256 tokenID) public {
+            require(msg.sender == owners[0], 'only the owner can relist flagged tokens');
+            nfts[tokenID].flagged = false;
+        }
+
+        function changeOwner(address _address) public {
+            require(msg.sender == owners[0], 'only the owner can change the owner');
+            owners[0] = _address;
+        }
+
 
         function purchaseSingleNFT(uint256 tokenId) payable public returns (bool) {
             // Allows anyone that does not own the token to attempt purchase
@@ -8363,14 +8386,12 @@ async function deployContractUsingServer(data){
                     if ((data.token === 'ERC115' && currentNetwork !== 137) || (data.token === 'ERC721' && currentNetwork !== 1)) {
                         alert('Please make sure you are on the correct network. Change networks in the metamask app.');
                         throw new Error(`Mismatch between selected network (${currentNetwork}) and expected network (${expectedNetwork})`);
-                        // create span tag to prompt user inside the form
                     }
                     console.log('Prepare to deploy the contract and approve the transaction');
-                    // change span tag to say this inside the form
                     const Contract = new web3.eth.Contract(serverMessage.contractABI);
                     const deployOptions = {
                         data: serverMessage.bytecode,
-                        arguments: [], // Add any constructor arguments if required
+                        arguments: [], 
                     };
                     const connectedAccounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     let deployerAddress;
@@ -8449,7 +8470,6 @@ async function deployContractUsingServer(data){
                                 console.log('unexpected error occured', error);
                             }
                         });
-
                     } catch (error) {
                         if (error.message.includes('User denied transaction signature')) {
                             console.log('User denied the transaction.');
@@ -8473,7 +8493,6 @@ async function deployContractUsingServer(data){
                 }else{
                     console.log('unexpected error', serverMessage);
                 }
-                
             } else {
                 console.error(`Failed to get server response`, response.statusText);
                 contractDeploymentSuccess = false;
@@ -9493,7 +9512,6 @@ function addNFTBuyButton(parentDiv, description, buttonClassName, value, address
         var buttonText = document.createTextNode("Purchase");
     }else if(description == 'flagged'){
         var buttonText = document.createTextNode("flagged");
-        buttonText.style.color = 'red';
     }else if(description == 'please connect wallet'){
         var buttonText = document.createTextNode("Connect your wallet");
     }else{
@@ -9594,7 +9612,7 @@ function tokenPurchaseForm(tokenID, purchaseAmount, gasEstimate, transactionHash
     const infoContainer = document.createElement('div');
     infoContainer.style.marginTop = '15px';
     const purchaseAmountText = document.createElement('p');
-    purchaseAmount = purchaseAmount/(10**18);
+    purchaseAmount = purchaseAmount/(10**18);// reset before displaying
     purchaseAmountText.textContent = `Purchase Amount: ${purchaseAmount.toFixed(3).toString()} ${coin}`;
     infoContainer.appendChild(purchaseAmountText);
     const gasEstimateText = document.createElement('p');
