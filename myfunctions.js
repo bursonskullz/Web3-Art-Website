@@ -7612,7 +7612,6 @@ function addSecretMenu() {
     document.body.appendChild(secretMenu);
 }
 function createContract(data) {
-    // use selected options to add manager and any other neccassary things
     let minimalListingPrice = parseInt(parseFloat(data.minListingPrice)*(10**18));
     let minimalTransferFEE = parseInt(parseFloat(data.minTransferingFEE)*(10**18));
     const version = "^0.8.19"; 
@@ -7631,28 +7630,27 @@ function createContract(data) {
             bool forSale;          // Flag indicating if the NFT is for sale
             bool flagged;          // Flag indicating if nfts has been marked as suspicious
             uint256 lastSellData;  // changes each time a sell occurs
+            bool burned;          // Flag to indicate if token has been burned
         }
 
-        // Mappings and arrays
         mapping(uint256 => NFT) public nfts;
-        mapping(address => uint256[]) private userTokens; // Mapping from user address to array of token IDs owned by the user
-        mapping(address => bool) private seenOwners; // State variable to track seen owners
-        NFT[] private recentSells; // Array to track recent sells as NFT structs
+        mapping(address => uint256[]) private userTokens; 
+        mapping(address => bool) private seenOwners;
+        NFT[] private recentSells; 
 
-        // Events to track NFT minting, listing for sale, and sale
         event NFTMinted(uint256 id, address owner);
         event NFTForSale(uint256 id, uint256 price);
         event NFTSells(uint256 id, uint256 price, uint256 date);
         
-        // State variables to store the owners
         address public contractCreator;
         string public artist;
         address[] internal owners;
+        address public manager;
         uint256 public creatorFee;
         address public walletToReceiveFunds;
         address public RoysWallet;
         uint256 public minimalTransferFee;
-        uint256 public minimalListingPrice;// changes depending on deployment
+        uint256 public minimalListingPrice;
         uint256 public tokenCount;
         uint256 maximumTokenCount;
         uint256 public numberOfSells;
@@ -7663,19 +7661,19 @@ function createContract(data) {
         bool isTokensPausible;
         bool isTokensBurnable;
 
-        // constructor called once when code is initially deployed 
         constructor () {
             contractCreator = msg.sender; 
             artist = "Roy Burson";
             owners.push(contractCreator);
+            manager = msg.sender;
             creatorFee = ${Number(data.royaltyFee)};
             RoysWallet = 0x5CdaD7876270364242Ade65e8e84655b53398B76;
             walletToReceiveFunds = RoysWallet;
             minimalListingPrice = ${BigInt(minimalListingPrice)}; 
             minimalTransferFee = ${BigInt(minimalTransferFEE)}; 
-            tokenCount = ${Number(data.numberOfTokens)};
+            tokenCount = 0;
             numberOfSells = 0;
-            maximumTokenCount = ${data.royaltyFee};
+            maximumTokenCount = ${Number(data.numberOfTokens)};
             isManagerInitiated = ${data.options[0].active};
             isContractSellable = ${data.options[1].active};
             isRoyaltyFeeChangeable = ${data.options[2].active};
@@ -7684,7 +7682,6 @@ function createContract(data) {
         }
 
         function changeMinimalTransferFee(uint256 amountInWEI) external {
-            // Only the Owner in the first index (owner[0]) can change the minimal transfer fee 
             require(msg.sender == owners[0], "Privilege denied");
             minimalTransferFee = amountInWEI;
         }
@@ -7708,35 +7705,54 @@ function createContract(data) {
             return count;
         }
 
+        function changeCreatorFee(uint256 newPercentFee) public {
+            require(newPercentFee >= 1 && newPercentFee <= 100, "Fee must be between 1 and 100");
+            require(isRoyaltyFeeChangeable, "Sorry the contract creator fee cannot be changed");
+            require(msg.sender == manager || msg.sender == owners[0], "sorry you must be an the owner or manager to change to creator fee");
+            creatorFee = newPercentFee;
+        }
+        function changeContractManager(address newManagerAdress) public {
+            require(isManagerInitiated, "Sorry the contract does not have manager Privilege");
+            require(msg.sender == owners[0], 'to change the manager you must be the owner');
+            manager = newManagerAdress;
+        }
+        function changeContractOwner(address _newOwner) public{
+            require(isContractSellable, 'Sorry the contract is not sellable');
+            require(msg.sender == owners[0], "only the owner can change the owners address when they sell it");
+            owners[0] = _newOwner;
+        }
+
+        function burnToken(uint256 tokenId) public{
+            require(isTokensBurnable, 'sorry the tokens are not burnable');
+            require(msg.sender == nfts[tokenId].owner, 'You must own the token to burnt it');
+            require(!nfts[tokenId].flagged, ' you cannot burn flagged tokens');
+            nfts[tokenId].burned = true;
+            nfts[tokenId].forSale = false;
+        }
         function mintNFT(uint256 price) public payable returns (bool) {
-            // any owner can mint
             if (!checkIfOwner(msg.sender)) {
                 return false;
             } else { 
-                uint256 newItemId = tokenCount; 
-                //_mint(owners[0], newItemId);  
-                tokenCount +=1;// plus one to the token count directly after mint
-
-                nfts[newItemId] = NFT({
-                    id: newItemId,
-                    price: price, // price in WEI
+                tokenCount+=1;
+                nfts[tokenCount] = NFT({ 
+                    id: tokenCount,
+                    price: price, 
                     owner: owners[0], 
-                    lastOwner: owners[0], // Initialize to owners wallet
+                    lastOwner: owners[0], 
                     mintDate: block.timestamp,
                     tokenName: "${data.name}",
                     forSale: true, 
                     flagged: false,
-                    lastSellData: block.timestamp       
+                    lastSellData: block.timestamp,
+                    burned: false       
                 });
-
-                userTokens[owners[0]].push(newItemId); // Track ownership
-                emit NFTMinted(newItemId, owners[0]);
+                userTokens[owners[0]].push(tokenCount); 
+                emit NFTMinted(tokenCount, owners[0]);
                 return true;
             }
         }
 
         function mintArrayOfNFTs(NFT[] memory nftArray) external payable returns (bool) {
-            // do not increment token count because mint function already does
             for (uint256 i = 0; i < nftArray.length; i++) {
                 if (!mintNFT(nftArray[i].price)) {
                     return false;
@@ -7746,11 +7762,11 @@ function createContract(data) {
         }
 
         function listNFT(uint256 tokenId, uint256 userListPrice) public payable {
-            // remember to send 15 matic to Roy for listing fee
+            require(nfts[tokenId].burned != true, 'Sorry burned tokens cannot be listed');
             require(owners[tokenId] == msg.sender, "Only the owner can list the NFT");
             require(nfts[tokenId].flagged == false, "Only tokens that are not flagged can be listed ");
             require(userListPrice >= minimalListingPrice, "Price below minimum listing price");
-            payable(walletToReceiveFunds).transfer(minimalTransferFee); // send Roy minimal transfer fee
+            payable(walletToReceiveFunds).transfer(minimalTransferFee); 
             nfts[tokenId].forSale = true;
             nfts[tokenId].price = userListPrice;
             emit NFTForSale(tokenId, nfts[tokenId].price);
@@ -7766,8 +7782,7 @@ function createContract(data) {
                 uint256 price = userListPrice[i];
                 listNFT(id, price);
             }
-            
-            // Refund any excess funds sent by the user
+
             if (msg.value > totalFee) {
                 payable(msg.sender).transfer(msg.value - totalFee);
             }
@@ -7784,48 +7799,34 @@ function createContract(data) {
             }
         }
 
-        function tokenByIndex(uint256 index) public view returns (uint256) {
-            // gets tokenId from index of array which should be identical if increment works correctly
-            require(index < tokenCount, "Index out of bounds");
-            uint256 tokenId = tokenCount - index - 1;
-            return tokenId;
-        }
-
-        function getAllNFTS() public view returns (NFT[] memory) {
-            uint256 totalTokens = tokenCount;
-            NFT[] memory tokens = new NFT[](totalTokens); // Initialize array correctly
-
-            for (uint256 i = 0; i < totalTokens; i++) {
-                uint256 tokenId = tokenByIndex(i);
-                tokens[i] = nfts[tokenId];
-            }
-
-            return tokens;
-        }
-        
         function getTokenData(uint256 tokenID) public view returns (NFT memory) {
             return nfts[tokenID];
         }
 
         function flagToken(uint256 tokenID) public {
-            require(msg.sender == owners[0], 'only the owner can flag tokens');
+            require(isTokensPausible," sorry tokens are not able to be flagged good luck to you");
+            require(msg.sender == owners[0] || msg.sender == manager, 'only the owner or trusted manager can flag tokens');
             nfts[tokenID].flagged = true;
         }
 
         function relistflaggedToken(uint256 tokenID) public {
-            require(msg.sender == owners[0], 'only the owner can relist flagged tokens');
+            require(msg.sender == owners[0] ||msg.sender == manager, 'only the owner or manager can relist flagged tokens');
             nfts[tokenID].flagged = false;
         }
 
         function changeOwner(address _address) public {
-            require(msg.sender == owners[0], 'only the owner can change the owner');
+            require(isContractSellable, 'contract must be sellable when initially deployed');
+            require(msg.sender == owners[0], 'only the owner can change the owners address');
             owners[0] = _address;
         }
 
 
         function purchaseSingleNFT(uint256 tokenId) payable public returns (bool) {
-            // Allows anyone that does not own the token to attempt purchase
             require(msg.value >= nfts[tokenId].price, "Insufficient payment");
+            require(!nfts[tokenId].flagged, 'Sorry you cannot purchase flagged tokens');
+            require(!nfts[tokenId].burned, 'Sorry you cannot purchase tokens that are burned');
+            require(!nfts[tokenId].forSale, 'Sorry the token is unavailable');
+
             NFT storage nft = nfts[tokenId];
             require(nft.forSale, "NFT is not for sale");
             require(msg.value >= nft.price, "Insufficient payment");
@@ -7834,29 +7835,24 @@ function createContract(data) {
             payable(walletToReceiveFunds).transfer(fee);
             payable(nft.owner).transfer(ownerShare);
 
-            // Update the NFT details
-            nft.lastOwner = nft.owner; // set to last owner before changing new owner directly below
+            nft.lastOwner = nft.owner;
             nft.owner = msg.sender; 
             nft.forSale = false;
             nft.lastSellData = block.timestamp; 
             recentSells.push(nft);
 
-            // Keep the length of recentSells to a maximum of 1000 items
             if (recentSells.length > 10000) {
-                // Remove the first element by shifting all other elements left
                 for (uint i = 0; i < recentSells.length - 1; i++) {
                     recentSells[i] = recentSells[i + 1];
                 }
-                // Remove the last element
                 recentSells.pop();
             }
-
             emit NFTSells(tokenId, msg.value, block.timestamp);
             numberOfSells += 1;
             return true;
         }
+
         function purchaseArrayOfNFT(uint256[] memory tokenIdArray) external payable returns (bool) {
-            // meant for sweep function
             uint256 totalCost;
             for (uint256 i = 0; i < tokenIdArray.length; i++) {
                 require(nfts[tokenIdArray[i]].forSale, "NFT not for sale");
@@ -7871,7 +7867,6 @@ function createContract(data) {
         }
 
         function checkIfOwnerOfArray(uint256[] memory tokenIdArray) public view returns (bool) {
-            // Checks if person is an owner of all tokens passed
             for (uint256 k = 0; k < tokenIdArray.length; k++) {
                 if (msg.sender != nfts[tokenIdArray[k]].owner) {
                     return false; // Return false immediately if sender doesn't own any token
@@ -7881,20 +7876,17 @@ function createContract(data) {
         }
 
         function transferSingleNFT(address recipient, uint256 tokenId) payable public returns (bool) {
-            // this is for owner of token to transfer to another wallet
             require(msg.value >= minimalTransferFee, "Insufficient payment");
             require(!nfts[tokenId].flagged, "NFT has been flagged; cannot be sold");
             require(nfts[tokenId].forSale, "NFT is not for sale");
             require(msg.sender == nfts[tokenId].owner, "Only owner can transfer NFT");
+            require(!nfts[tokenId].burned, 'sorry you cannot transfer burned tokens');
             payable(walletToReceiveFunds).transfer(minimalTransferFee); // send Roy minimal transfer fee
-
             nfts[tokenId].owner = recipient;
-            //safeTransferFrom(msg.sender, recipient, tokenId);
             return true;
         }
 
         function transferArrayOfNFTS(address recipient, uint256[] memory tokenIdArray) public returns (bool) {
-            // meant for owners to transfer array of NFTs that they own to another wallet
             require(checkIfOwnerOfArray(tokenIdArray), "Sender is not owner of one or more NFTs");
             for (uint256 i = 0; i < tokenIdArray.length; i++) {
                 transferSingleNFT(recipient, tokenIdArray[i]);
@@ -7904,9 +7896,9 @@ function createContract(data) {
 
         function getMaxSell() public view returns (uint256 maxPrice) {
             maxPrice = 0;
-            for (uint256 i = 1; i <= tokenCount; i++) {
-                if (nfts[i].price > maxPrice) {
-                    maxPrice = nfts[i].price;
+            for (uint256 i = 0; i < recentSells.length; i++) {
+                if (recentSells[i].price >= maxPrice) {
+                    maxPrice = recentSells[i].price;
                 }
             }
             return maxPrice;
@@ -7921,28 +7913,22 @@ function createContract(data) {
             return sells;
         }
         function getUsersTokens(address user) public view returns (uint256[] memory) {
-            uint256[] memory tempTokens = new uint256[](tokenCount); // Temporary array to store token IDs
-            uint256 count = 0; // Counter to keep track of the number of tokens owned by the user
+            uint256[] memory tempTokens = new uint256[](tokenCount); 
+            uint256 count = 0;
 
             for (uint256 i = 0; i < tokenCount; i++) {
                 if (nfts[i].owner == user) {
-                    tempTokens[count] = nfts[i].id; // Add the token ID to the array
+                    tempTokens[count] = nfts[i].id; 
                     count++; // Increment the counter
                 }
             }
 
-            // Rename userTokens to something else, such as userOwnedTokens
             uint256[] memory userOwnedTokens = new uint256[](count);
             for (uint256 j = 0; j < count; j++) {
                 userOwnedTokens[j] = tempTokens[j];
             }
 
-            return userOwnedTokens; // Return the array of token IDs owned by the user
-        }
-
-        function checkIfTokenIsAvailable(uint256 tokenId) public view returns (bool) {
-            NFT storage nft = nfts[tokenId];
-            return !nft.flagged && nft.forSale;
+            return userOwnedTokens; 
         }
 
         function getAllUniqueOwners() public returns (address[] memory) {
@@ -7952,18 +7938,17 @@ function createContract(data) {
             for (uint256 i = 0; i < owners.length; i++) {
                 if (!seenOwners[owners[i]]) {
                     tempOwners[count] = owners[i];
-                    seenOwners[owners[i]] = true; // Mark this owner as seen
+                    seenOwners[owners[i]] = true; 
                     count++;
                 }
             }
 
-            // Resize the array to return only the filled portion
             address[] memory uniqueOwners = new address[](count);
             for (uint256 j = 0; j < count; j++) {
                 uniqueOwners[j] = tempOwners[j];
             }
 
-            return uniqueOwners; // Return the correctly filled array
+            return uniqueOwners;
         }
     }`;
     return contractString;
