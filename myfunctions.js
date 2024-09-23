@@ -129,6 +129,7 @@ function makeSelectorForm(){
     form.style.padding = '10px';
     form.style.overflow = 'hidden'; 
     form.style.zIndex = '1000'; 
+    form.style.overflowY = 'scroll';
     makeElementDraggable(form);
 
     const header = document.createElement('div');
@@ -284,6 +285,7 @@ export async function addDigitalElementListener(digitalElement){
                                 console.log('setting contract data locally for client side access');
                                 tryingToAccessData = true;
 
+
                                 userSelectedContract = {
                                     contractName: item.contractName, 
                                     ERCStandard: item.ERCStandard,
@@ -291,6 +293,8 @@ export async function addDigitalElementListener(digitalElement){
                                     contractABI: item.contractABI, 
                                     collectionBackgroundImage: item.collectionBackgroundImage
                                 };
+
+                                console.log('setting the contract ERC standard locally', userSelectedContract);
                                 const loadingContainer = document.createElement("div");
                                 loadingContainer.className = "loading-container";
                                 loadingContainer.style.position = "absolute";
@@ -940,7 +944,6 @@ async function createContractSelectionForm(array) {
     });
 }
 export async function nft_section_click(parentElement) {
-    const functionNameString = 'getAllNFTS';
     let listofCollections ;
     try {
          const response = await fetch('/getALLDeployedCollections', {
@@ -2202,7 +2205,7 @@ async function makeUtilityPage(sideElementsWidth) {
     form.style.position = 'absolute';
     form.style.left = '0.5%';
     form.style.top = '67vh';
-    form.style.height = '50%';
+    form.style.height = '55%';
     form.style.padding = '0px';
     form.style.boxSizing = 'border-box';
     form.style.backgroundColor = '#404a5c';
@@ -2321,7 +2324,7 @@ async function makeUtilityPage(sideElementsWidth) {
     document.body.appendChild(form);
 
 }
-async function makeOwnersPage(sideElementsWidth) {
+async function makeOwnersPage(contract,sideElementsWidth) {
     console.log('Trying to get my tokens to display.');
     const ownersContainer = document.createElement('div');
     ownersContainer.className = 'OwnersContainer';
@@ -2331,7 +2334,7 @@ async function makeOwnersPage(sideElementsWidth) {
     ownersContainer.style.position = 'absolute';
     ownersContainer.style.left = '0.5%';
     ownersContainer.style.top = '67vh';
-    ownersContainer.style.height = '50%';
+    ownersContainer.style.height = '55%';
     ownersContainer.style.padding = '0px';
     ownersContainer.style.boxSizing = 'border-box';
     ownersContainer.style.backgroundColor = '#404a5c';
@@ -2375,74 +2378,97 @@ async function makeOwnersPage(sideElementsWidth) {
     });
     document.body.appendChild(ownersContainer);
 
-        let allOwnersAddressArray;
+    let allOwnersAddressArray = [];
+    const loadingContainer = document.createElement("div");
+    loadingContainer.className = "loading-container";
+    loadingContainer.style.position = "absolute";
+    loadingContainer.style.top = "50%";
+    loadingContainer.style.left = "50%";
+    loadingContainer.style.transform = "translate(-50%, -50%)";
+    loadingContainer.style.width = "80%";
+    loadingContainer.style.height = "60%";
+    loadingContainer.style.display = "flex";
+    loadingContainer.style.justifyContent = "center";
+    loadingContainer.style.alignItems = "center";
+    loadingContainer.style.backgroundColor = "none"; 
 
-        try{
-            allOwnersAddressArray = await contract.methods.getAllUniqueOwners().call();
-        }catch(error){
-            console.log('Error calling the function getAllOwners() on the contract');
-            allOwnersAddressArray = [];
+    const loadingIcon = document.createElement("img");
+    loadingIcon.setAttribute("class", "loading-gif");
+    loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+    loadingIcon.setAttribute("alt", "Loading..."); 
+    loadingIcon.style.width = "50%"; 
+    loadingIcon.style.height = "50%";
+    loadingContainer.appendChild(loadingIcon);
+    ownersContainer.appendChild(loadingContainer);
+    try{
+        allOwnersAddressArray = await contract.methods.getAllUniqueOwners().call();
+    }catch(error){
+        console.log('Error calling the function getAllOwners() on the contract', error);
+        allOwnersAddressArray = [];
+    }
+
+    // test by uncommmenting next line 
+    //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
+    //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
+
+    loadingContainer.remove();
+    if (allOwnersAddressArray.length > 0) {
+        let count = 0; 
+        if(allOwnersAddressArray[0]== '0x000000000000000000000000000'){
+
+        }
+        allOwnersAddressArray.forEach(async (owner) => {
+            count += 1;
+            console.log('Trying to display token data inside pop up allOwnersAddressArray');
+
+            const uniqueOwnerContainer = document.createElement('div');
+            uniqueOwnerContainer.classList.add('ownerItem', `-${count}`); 
+            uniqueOwnerContainer.style.height = 'auto';
+            uniqueOwnerContainer.style.position = 'relative'; 
+            uniqueOwnerContainer.style.overflow = 'hidden'; 
+            uniqueOwnerContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; 
+            uniqueOwnerContainer.style.borderRadius = '5px';
+            uniqueOwnerContainer.style.display = 'flex'; 
+            uniqueOwnerContainer.style.alignItems = 'center';
+            uniqueOwnerContainer.style.padding = '10px'; 
+
+            const ownerAddressDiv = document.createElement('div');
+            ownerAddressDiv.style.flex = '1'; 
+            ownerAddressDiv.style.wordWrap = 'break-word'; 
+            ownerAddressDiv.style.overflow = 'hidden'; 
+            ownerAddressDiv.style.whiteSpace = 'normal'; 
+            ownerAddressDiv.style.maxWidth = 'calc(100% - 50px)';
+            ownerAddressDiv.textContent = `Owner: ${owner}`; 
+
+    
+            let numberOfItemsOwned;
+            try{
+                numberOfItemsOwned = await contract.methods.getNumberOfOwnedTokens(owner).call();
+            }catch(error){
+                console.log("Error calling contract function getNumberOfOwnedTokens()", error);
+                console.log("setting owned tokens to zero");
+                numberOfItemsOwned = 0;
+            }
             
-        }
+            const itemCountDiv = document.createElement('div');
+            itemCountDiv.style.fontSize = '12px';
+            itemCountDiv.style.color = '#888'; 
+            itemCountDiv.textContent = `  Total Owned: ${numberOfItemsOwned}`; 
 
-        // test by uncommmenting next line 
-        //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
-        //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
+            uniqueOwnerContainer.appendChild(ownerAddressDiv);
+            uniqueOwnerContainer.appendChild(itemCountDiv);
 
-        if (allOwnersAddressArray.length > 0) {
-            let count = 0; 
-            allOwnersAddressArray.forEach(async (owner) => {
-                count += 1;
-                console.log('Trying to display token data inside pop up allOwnersAddressArray');
-
-                const uniqueOwnerContainer = document.createElement('div');
-                uniqueOwnerContainer.classList.add('ownerItem', `-${count}`); 
-                uniqueOwnerContainer.style.height = 'auto';
-                uniqueOwnerContainer.style.position = 'relative'; 
-                uniqueOwnerContainer.style.overflow = 'hidden'; 
-                uniqueOwnerContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; 
-                uniqueOwnerContainer.style.borderRadius = '5px';
-                uniqueOwnerContainer.style.display = 'flex'; 
-                uniqueOwnerContainer.style.alignItems = 'center';
-                uniqueOwnerContainer.style.padding = '10px'; 
-
-                const ownerAddressDiv = document.createElement('div');
-                ownerAddressDiv.style.flex = '1'; 
-                ownerAddressDiv.style.wordWrap = 'break-word'; 
-                ownerAddressDiv.style.overflow = 'hidden'; 
-                ownerAddressDiv.style.whiteSpace = 'normal'; 
-                ownerAddressDiv.style.maxWidth = 'calc(100% - 50px)';
-                ownerAddressDiv.textContent = `Owner: ${owner}`; 
-
-        
-                let numberOfItemsOwned;
-                try{
-                    numberOfItemsOwned = await contract.methods.getNumberOfOwnedTokens().call();
-                }catch(error){
-                    console.log("Error calling contract function getNumberOfOwnedTokens()", error);
-                    console.log("setting owned tokens to zero");
-                    numberOfItemsOwned = 0;
-                }
-                
-                const itemCountDiv = document.createElement('div');
-                itemCountDiv.style.fontSize = '12px';
-                itemCountDiv.style.color = '#888'; 
-                itemCountDiv.textContent = `  Total Owned: ${numberOfItemsOwned}`; 
-
-                uniqueOwnerContainer.appendChild(ownerAddressDiv);
-                uniqueOwnerContainer.appendChild(itemCountDiv);
-
-                ownersContainer.appendChild(uniqueOwnerContainer);
-            });
-        }else{
-            const noOwnersMessage = document.createElement('span');
-            noOwnersMessage.textContent = 'No Owners Yet';
-            noOwnersMessage.style.display = 'block';
-            noOwnersMessage.style.textAlign = 'center';
-            noOwnersMessage.style.marginTop = '20px';
-            noOwnersMessage.style.color = 'white'; 
-            ownersContainer.appendChild(noOwnersMessage);
-        }
+            ownersContainer.appendChild(uniqueOwnerContainer);
+        });
+    }else{
+        const noOwnersMessage = document.createElement('span');
+        noOwnersMessage.textContent = 'No Owners Yet';
+        noOwnersMessage.style.display = 'block';
+        noOwnersMessage.style.textAlign = 'center';
+        noOwnersMessage.style.marginTop = '20px';
+        noOwnersMessage.style.color = 'white'; 
+        ownersContainer.appendChild(noOwnersMessage);
+    }
 
 }
 
@@ -2581,7 +2607,7 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     tokenContainer.style.position = 'absolute';
     tokenContainer.style.left = '0.5%';
     tokenContainer.style.top = '67vh';
-    tokenContainer.style.height = '50%';
+    tokenContainer.style.height = '55%';
     tokenContainer.style.padding = '0px';
     tokenContainer.style.boxSizing = 'border-box';
     tokenContainer.style.backgroundColor = '#404a5c';
@@ -2714,27 +2740,64 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     addBTDListeners(transferText, bulkListText, delistText);
 
     try {
+        const loadingContainer = document.createElement("div");
+        loadingContainer.className = "loading-container";
+        loadingContainer.style.position = "absolute";
+        loadingContainer.style.top = "50%";
+        loadingContainer.style.left = "50%";
+        loadingContainer.style.transform = "translate(-50%, -50%)";
+        loadingContainer.style.width = "80%";
+        loadingContainer.style.height = "60%";
+        loadingContainer.style.display = "flex";
+        loadingContainer.style.justifyContent = "center";
+        loadingContainer.style.alignItems = "center";
+        loadingContainer.style.backgroundColor = "none"; 
+
+        const loadingIcon = document.createElement("img");
+        loadingIcon.setAttribute("class", "loading-gif");
+        loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+        loadingIcon.setAttribute("alt", "Loading..."); 
+        loadingIcon.style.width = "50%"; 
+        loadingIcon.style.height = "50%";
+        loadingContainer.appendChild(loadingIcon);
+        smallContainer.appendChild(loadingContainer);
+
         if (isConnected) {
             let thisAccount = window.ethereum.selectedAddress;
             console.log('already connected trying to get nfts using the address', thisAccount);
-            makeTokenPage(thisAccount, contract, smallContainer, footer, coin);
+            makeTokenPage(thisAccount, contract, smallContainer, footer, coin, loadingContainer);
         } else {
-            if (typeof window.ethereum === 'undefined') { 
+            loadingContainer.remove();
+            const errorSpan = document.createElement('span');
+            errorSpan.style.width = '100%';
+            errorSpan.style.color = 'white';
+            errorSpan.style.fontSize = '1.5vh';
+            errorSpan.style.position = 'relative';
+            if (typeof window.ethereum === 'undefined') {
+                errorSpan.textContent = 'You must install MetaMask or another Ethereum provider to see your tokens or purchase tokens';
+                smallContainer.appendChild(errorSpan); 
                 alert('You must install MetaMask or another Ethereum provider to see your tokens or purchase tokens.');
             } else {
                 if (window.ethereum.isMetaMask) { 
                     try {
                         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                         let thisAccount = accounts[0];
+                        loadingContainer.remove();
                         makeTokenPage(thisAccount, contract, smallContainer, footer, coin);
                     } catch (error) {
                         if (error.code === -32002) { 
+                        errorSpan.textContent = 'Sorry an unexpected error occured. Please login to your metamask and try again';
+                        smallContainer.appendChild(errorSpan); 
                             alert('Please open the MetaMask extension manually, sign in, and reload the page.');
                         } else {
+                            errorSpan.textContent = 'Sorry an unexpected error occured. Please login to your metamask and try again';
+                            smallContainer.appendChild(errorSpan); 
                             alert(`Error: ${error.message || error}`);
                         }
                     }
                 } else { 
+                    errorSpan.textContent = 'MetaMask not detected. Please install MetaMask to use this feature.';
+                    smallContainer.appendChild(errorSpan); 
                     alert('MetaMask not detected. Please install MetaMask to use this feature.');
                 }
             }
@@ -2755,7 +2818,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     recentSellsPopUpBox.style.position = 'absolute';
     recentSellsPopUpBox.style.left = '0.5%';
     recentSellsPopUpBox.style.top = '67vh';
-    recentSellsPopUpBox.style.height = '50%';
+    recentSellsPopUpBox.style.height = '55%';
     recentSellsPopUpBox.style.padding = '0px';
     recentSellsPopUpBox.style.boxSizing = 'border-box';
     recentSellsPopUpBox.style.backgroundColor = '#404a5c';
@@ -3045,50 +3108,8 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     console.log('4) test deploy contract function and start to call them on hover, ...etc. Make sure to test contract on IDE devloper or whatever');
     console.log('5) make abaility to navigate pages maybe 50 items per page');
     console.log(`6) use ${userSelectedContract} to acess data for selected contract and display on page`);
-
-    const collectionBackgroundImageContainer = document.createElement('div');
-    collectionBackgroundImageContainer.style.position = 'relative';
-    collectionBackgroundImageContainer.style.width = '60%';
-    collectionBackgroundImageContainer.style.top = '-5%';
-    collectionBackgroundImageContainer.style.left = '20%';
-    collectionBackgroundImageContainer.style.height = '15%';
-
-    collectionBackgroundImageContainer.style.backgroundImage = `url('${userSelectedContract.collectionBackgroundImage}')`; 
-    collectionBackgroundImageContainer.style.backgroundSize = 'cover';
-    collectionBackgroundImageContainer.style.backgroundRepeat = 'no-repeat';
-    collectionBackgroundImageContainer.style.backgroundPosition = 'center'; 
-
-    parentElement.appendChild(collectionBackgroundImageContainer);
-
-    const contractInfoDiv = document.createElement('div');
-    contractInfoDiv.className = 'contractInfoContrainer';
-    contractInfoDiv.style.width = sideElementsWidth;
-    contractInfoDiv.style.color = 'white';
-    contractInfoDiv.style.fontSize = '1.5vh';
-    contractInfoDiv.style.position = 'absolute';
-    contractInfoDiv.style.left = '0.5%';
-    contractInfoDiv.style.top = '20vh';
-    contractInfoDiv.style.height = '45%';
-    contractInfoDiv.style.padding = '20px';
-    contractInfoDiv.style.boxSizing = 'border-box';
-    contractInfoDiv.style.backgroundColor = '#404a5c';
-    contractInfoDiv.style.borderStyle = 'solid';
-    contractInfoDiv.style.borderColor = 'black';
-    contractInfoDiv.style.borderRadius = '5px';
-    contractInfoDiv.style.borderWidth = '2px';
-
     let maxSell; let numberOfSells; let myTokens; let numberOfTokens; let allOwners; let coin;
     let minimalList; let royaltyFeePercent; let transferFee; let minimalListInETH; let transferFeeInETH;
-
-    if(userSelectedContract.ERCStandard === "ERC1155"){
-        coin = "POL";
-    }else if(userSelectedContract.ERCStandard === "ERC721"){
-         coin = "ETH";
-    }else if(userSelectedContract.ERCStandard === "ERC20"){
-        coin = "ETC"
-    }else{
-         coin = "??";
-    }
 
     const web3 = new Web3(window.ethereum);
     const contract = new web3.eth.Contract(JSON.parse(userSelectedContract.contractABI), userSelectedContract.contractAddress);
@@ -3112,6 +3133,49 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         maxSell = "Error";
         numberOfSells = "Error";
     }
+
+
+    const collectionBackgroundImageContainer = document.createElement('div');
+    collectionBackgroundImageContainer.style.position = 'relative';
+    collectionBackgroundImageContainer.style.width = '60%';
+    collectionBackgroundImageContainer.style.top = '-5%';
+    collectionBackgroundImageContainer.style.left = '20%';
+    collectionBackgroundImageContainer.style.height = '15%';
+
+    collectionBackgroundImageContainer.style.backgroundImage = `url('${userSelectedContract.collectionBackgroundImage}')`; 
+    collectionBackgroundImageContainer.style.backgroundSize = 'cover';
+    collectionBackgroundImageContainer.style.backgroundRepeat = 'no-repeat';
+    collectionBackgroundImageContainer.style.backgroundPosition = 'center'; 
+
+    parentElement.appendChild(collectionBackgroundImageContainer);
+
+    const contractInfoDiv = document.createElement('div');
+    contractInfoDiv.className = 'contractInfoContrainer';
+    contractInfoDiv.style.width = sideElementsWidth;
+    contractInfoDiv.style.color = 'white';
+    contractInfoDiv.style.fontSize = '1.3vh';
+    contractInfoDiv.style.position = 'absolute';
+    contractInfoDiv.style.left = '0.5%';
+    contractInfoDiv.style.top = '20vh';
+    contractInfoDiv.style.height = '45%';
+    contractInfoDiv.style.padding = '20px';
+    contractInfoDiv.style.boxSizing = 'border-box';
+    contractInfoDiv.style.backgroundColor = '#404a5c';
+    contractInfoDiv.style.borderStyle = 'solid';
+    contractInfoDiv.style.borderColor = 'black';
+    contractInfoDiv.style.borderRadius = '5px';
+    contractInfoDiv.style.borderWidth = '2px';
+
+    console.log('trying to set coin using', userSelectedContract);
+    if(userSelectedContract.ERCStandard === "ERC1155"){
+        coin = "POL";
+    }else if(userSelectedContract.ERCStandard === "ERC721"){
+         coin = "ETH";
+    }else if(userSelectedContract.ERCStandard === "ERC20"){
+        coin = "ETC"
+    }else{
+         coin = "??";
+    }
     let scanURL = "";
     if (coin === "ETH") {
         scanURL = `https://etherscan.io/address/${userSelectedContract.contractAddress}`;
@@ -3134,7 +3198,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
             </a>
         </p>
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Tokens: ${numberOfTokens}</p>
-        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Max Sale: ${maxSell} ${coin}</p> 
+        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Max Sell: ${maxSell} ${coin}</p> 
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Sells: ${numberOfSells}</p> 
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Royalty Fee: ${royaltyFeePercent}\%</p> 
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Transfer Fee (per token): ${transferFeeInETH.toFixed(2)} ${coin}</p> 
@@ -3156,7 +3220,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     options.style.position = 'absolute';
     options.style.left = '0.5%';
     options.style.top = '67vh';
-    options.style.height = '50%';
+    options.style.height = '55%';
     options.style.padding = '20px';
     options.style.boxSizing = 'border-box';
     options.style.backgroundColor = '#404a5c';
@@ -3186,7 +3250,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                 makeMytokensPage(contract, sideElementsWidth, coin);
             } else if (item.textContent === "All Owners") {
                 console.log('Trying to get all Unique owners and how many they own and display.');
-                makeOwnersPage(sideElementsWidth);
+                makeOwnersPage(contract, sideElementsWidth);
             } else if (item.textContent === "Utility") {
                 console.log("trying to make Utility page");
                 makeUtilityPage(sideElementsWidth);
@@ -3251,7 +3315,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     unknownDiv.id = 'crypto-chat-room';
     unknownDiv.className = 'crypto-chat-room';
     unknownDiv.style.width = sideElementsWidth;
-    unknownDiv.style.height = '68%';
+    unknownDiv.style.height = '73%';
     unknownDiv.style.position = 'absolute';
     unknownDiv.style.right = '1%';
     unknownDiv.style.top = '49%';
@@ -5984,18 +6048,32 @@ export async function getNFTS(contractName) {
             while (!done) {
                 const { value, done: readerDone } = await reader.read();
                 done = readerDone;
+
+                // Decode streamed chunks
                 jsonString += decoder.decode(value, { stream: true });
+
+                // Check if the jsonString ends with ']' to signify it's fully received
                 if (jsonString.trim().endsWith(']')) {
-                    const tokens = JSON.parse(jsonString);
-                    tokens.forEach(token => {
-                        let tokenObject = {
-                            contractName: token.contractName,
-                            contractAddress: token.contractAddress,
-                            tokenID: token.tokenID,
-                            image: token.image
-                        };
-                        tokensArray.push(tokenObject);
-                    });
+                    try {
+                        const tokens = JSON.parse(jsonString);
+
+                        // Push unique tokens to avoid duplication
+                        tokens.forEach(token => {
+                            const tokenObject = {
+                                contractName: token.contractName,
+                                contractAddress: token.contractAddress,
+                                tokenID: token.tokenID,
+                                image: token.image
+                            };
+
+                            // Optionally, you could check for duplicates here before pushing
+                            if (!tokensArray.some(t => t.tokenID === tokenObject.tokenID)) {
+                                tokensArray.push(tokenObject);
+                            }
+                        });
+                    } catch (parseError) {
+                        console.error('Error parsing JSON:', parseError);
+                    }
                 }
             }
         } else {
@@ -6607,7 +6685,8 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             tokenPricesInputsFilled = true;
             minimalListingPriceChecker = true;
-            checkboxes.forEach(async checkbox => {
+            console.log('trying to set token using checkboxes', checkboxes);
+            for (const checkbox of checkboxes) {
                 if (checkbox.checked) {
                     const parentDiv = checkbox.closest('.sold-item');
                     const parentClass = parentDiv.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
@@ -6616,23 +6695,28 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     if (textContainer) {
                         const priceInput = textContainer.querySelector('input[type="text"]');
                         const inputValue = priceInput ? priceInput.value.trim() : '';
+                        console.log('Trying to list using price (not in WEI):', inputValue);
                         if (inputValue) {
                             const parsedValue = parseFloat(inputValue);
+                            console.log(`Trying to check if the value ${inputValue} is being parsed`);
                             if (!isNaN(parsedValue)) {
                                 try {
                                     minimalListingPrice = await contract.methods.minimalListingPrice().call();
-                                    minimalListingPriceInETH = (minimalListingPrice / (10 ** 18)).toFixed(2);
-                                    if(parsedValue>= minimalListingPriceInETH){
-                                        selectedTokens.push({ tokenId: tokenCount, inputValue: parsedValue });
-                                    }else{
+                                    console.log('Checking minimal price and making sure it\'s not null', minimalListingPrice);
+                                    minimalListingPriceInETH = (BigInt(minimalListingPrice) / BigInt(10 ** 18)).toString();
+                                    console.log('Minimal price as big integer', minimalListingPriceInETH);
+                                    if (parsedValue >= parseFloat(minimalListingPriceInETH)) {
+                                        console.log('Trying to push token data into array', { tokenId: tokenCount, inputValue: minimalListingPriceInETH });
+                                        selectedTokens.push({ tokenId: tokenCount, inputValue: minimalListingPriceInETH });
+                                    } else {
                                         minimalListingPriceChecker = false;
                                     }
                                 } catch (error) {
                                     minimalListingPriceChecker = false;
-                                    minimalListingPriceInETH = 0.00;
                                     console.error('Error fetching minimalListingPrice:', error);
                                 }
                             } else {
+                                console.log(`The parsed value gave ${parsedValue}`);
                                 tokenPricesInputsFilled = false;
                             }
                         } else {
@@ -6640,124 +6724,170 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         }
                     }
                 }
-            });
+            }
+            try{
+                 console.log('trying to list NFTS using data', selectedTokens);
+                if (selectedTokens.length > 0 && tokenPricesInputsFilled &&  minimalListingPriceChecker) {
+                    let errorWithIn50Blocks = false;
+                    console.log('Final Token Data to Submit:', selectedTokens);
+                    nextButton.style.display = 'none';
+                    const loadingContainer = document.createElement("div");
+                    loadingContainer.className = "loading-container";
+                    loadingContainer.style.position = "absolute";
+                    loadingContainer.style.top = "50%";
+                    loadingContainer.style.left = "50%";
+                    loadingContainer.style.transform = "translate(-50%, -50%)";
+                    loadingContainer.style.width = "80%";
+                    loadingContainer.style.height = "60%";
+                    loadingContainer.style.display = "flex";
+                    loadingContainer.style.justifyContent = "center";
+                    loadingContainer.style.alignItems = "center";
+                    loadingContainer.style.backgroundColor = "none"; 
 
-            if (selectedTokens.length > 0 && tokenPricesInputsFilled &&  minimalListingPriceChecker) {
-                console.log('Final Token Data to Submit:', selectedTokens);
-                nextButton.style.display = 'none';
-                const loadingContainer = document.createElement("div");
-                loadingContainer.className = "loading-container";
-                loadingContainer.style.position = "absolute";
-                loadingContainer.style.top = "50%";
-                loadingContainer.style.left = "50%";
-                loadingContainer.style.transform = "translate(-50%, -50%)";
-                loadingContainer.style.width = "80%";
-                loadingContainer.style.height = "60%";
-                loadingContainer.style.display = "flex";
-                loadingContainer.style.justifyContent = "center";
-                loadingContainer.style.alignItems = "center";
-                loadingContainer.style.backgroundColor = "none"; 
+                    const loadingIcon = document.createElement("img");
+                    loadingIcon.setAttribute("class", "loading-gif");
+                    loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+                    loadingIcon.setAttribute("alt", "Loading..."); 
+                    loadingIcon.style.width = "50%"; 
+                    loadingIcon.style.height = "50%";
+                    loadingContainer.appendChild(loadingIcon);
+                    parentContainer.appendChild(loadingContainer);
 
-                const loadingIcon = document.createElement("img");
-                loadingIcon.setAttribute("class", "loading-gif");
-                loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
-                loadingIcon.setAttribute("alt", "Loading..."); 
-                loadingIcon.style.width = "50%"; 
-                loadingIcon.style.height = "50%";
-                loadingContainer.appendChild(loadingIcon);
-                parentContainer.appendChild(loadingContainer);
-
-                console.log('Trying to use contract and get result');
-                const web3 = new Web3(window.ethereum);
-                const tokenIds = [];
-                const prices = [];
-                
-                for (const token of selectedTokens) {
-                    tokenIds.push(parseInt(token.tokenId));
-                    const price_IN_WEI = web3.utils.toWei(token.inputValue.toString(), 'ether');
-                    prices.push(web3.utils.toBN(price_IN_WEI));
-                }
-
-                try {
-                    const gasEstimate = await contract.methods.listArrayOfNFTs(tokenIds, prices).estimateGas({ from: clientBlockChainAddress });
-                    const tx = await contract.methods.listArrayOfNFTs(tokenIds, prices).send({
-                        from: clientBlockChainAddress,
-                        gas: gasEstimate
-                    });
-                    if (tx && tx.transactionHash) {
-                            console.log('Transaction sent. Waiting for confirmation...');
-                            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-                            if (receipt && receipt.status === true) {
-                                console.log('The user accepted the transaction and it was successful.');
-                                successFullTokens.push(tokenIds);
-                            } else {
-                                console.log('The transaction failed.');
-                                failedTokens.push(tokenIds);
-                            }
-                    } else {
-                        console.log('The transaction could not be sent.');
-                    }
-                } catch (error) {
-                    failedTokens.push(tokenIds);
-                    console.error('Error calling listArrayOfNFTs:', error);
-                }
-                loadingContainer.remove();
-                while (parentContainer.firstChild) {
-                    parentContainer.removeChild(parentContainer.firstChild);
-                }
-                if (failedTokens.length > 0) {
-                    if (successFullTokens.length > 0) {
-                        const successContainer = document.createElement('div');
-                        successContainer.classList.add('success-tokens-container');
-                        const successList = document.createElement('ul');
-                        successFullTokens.forEach(tokenId => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `Successfully listed Token: ${tokenId}`;
-                            successList.appendChild(listItem);
-                        });
-                        successContainer.appendChild(successList);
-                        parentContainer.appendChild(successContainer);
-                    } else {
-                        const noSuccessMessage = document.createElement('div');
-                        noSuccessMessage.classList.add('no-success-message');
-                        noSuccessMessage.style.textAlign = 'center';
-                        noSuccessMessage.textContent = 'No tokens were successfully listed.';
-                        parentContainer.appendChild(noSuccessMessage);
-                    }
-                    const failedContainer = document.createElement('div');
-                    failedContainer.classList.add('failed-tokens-container'); 
-                    const failedList = document.createElement('ul');
-
+                    console.log('Trying to use contract and get result');
+                    const web3 = new Web3(window.ethereum);
+                    const tokenIds = [];
+                    const prices = [];
                     
-                    failedTokens.forEach(tokenId => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `Failed to list Token: ${tokenId}`;
-                        failedList.appendChild(listItem);
-                    });
-                    failedContainer.appendChild(failedList);
-                    parentContainer.appendChild(failedContainer);
-                } else {
-                    if (successFullTokens.length > 0) {
-                        const successDiv = document.createElement('div');
-                        successDiv.style.position = 'relative';
-                        successDiv.style.width = '100%';
-                        successDiv.style.height = '50%';
-                        successDiv.style.top = '25%';
-                        successDiv.classList.add('successDelistSpanTag');
-                        successDiv.style.textAlign = 'center'; 
-                        successDiv.textContent = 'Your items have been Listed!.';
-                        parentContainer.appendChild(successDiv);
+                    for (const token of selectedTokens) {
+                        tokenIds.push(parseInt(token.tokenId));
+                        const price_IN_WEI = web3.utils.toWei(token.inputValue.toString(), 'ether');
+                        prices.push(web3.utils.toBN(price_IN_WEI));
                     }
+
+                    try {
+                        const gasEstimateToListSingleNFT = await contract.methods.listNFT(tokenIds[0], prices[0]).estimateGas({ from: clientBlockChainAddress });
+                        const gasEstimateToListArray = gasEstimateToListSingleNFT*tokenIds.length;
+                        const gasLimit = Math.floor(gasEstimateToListArray * 1.098);
+                        const tx = await contract.methods.listArrayOfNFTs(tokenIds, prices).send({
+                            from: clientBlockChainAddress,
+                            gas: gasLimit
+                        });
+
+                        console.log('Transaction sent. Waiting for confirmation...');
+                        const listReciept = await checkTransactionReceipt(tx.transactionHash, web3);
+                        if (listReciept && listReciept.status == true) {
+                            console.log('The user accepted the transaction and it was successful.');
+                            successFullTokens.push(tokenIds);
+                                /*
+                                const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+                                if (receipt && receipt.status === true) {
+                                    console.log('The user accepted the transaction and it was successful.');
+                                    successFullTokens.push(tokenIds);
+                                } else {
+                                    console.log('The transaction failed.');
+                                    failedTokens.push(tokenIds);
+                                }
+                                */
+                        } else {
+                            //console.log('The transaction could not be sent.');
+                            console.log('The transaction failed.');
+                            failedTokens.push(tokenIds);
+                        }
+                    } catch (error) {                        
+                        if (error.message.includes('out of gas')) {
+                            console.error('Failed to list array: insufficient gas.');
+                        }else if(error.message.includes('within 50 blocks')){
+                            errorWithIn50Blocks = true;
+                        } else if (error.message.includes('denied transaction signature')) {
+                            console.error('Failed to list array: The user denied the transaction.');
+                            failedTokens.push(tokenIds);
+                        } else {
+                            console.error('Failed to list array:', error.message);
+                            failedTokens.push(tokenIds);
+                        }
+                    }
+                    console.log('trying to remove children from small container to promt user success of false');
+                    while (parentContainer.firstChild) {
+                        parentContainer.removeChild(parentContainer.firstChild);
+                    }
+                    if (failedTokens.length > 0) {
+                        if (successFullTokens.length > 0) {
+                            const successContainer = document.createElement('div');
+                            successContainer.classList.add('success-tokens-container');
+                            const successList = document.createElement('ul');
+                            successFullTokens.forEach(tokenId => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = `Successfully listed Token: ${tokenId}`;
+                                successList.appendChild(listItem);
+                            });
+                            successContainer.appendChild(successList);
+                            parentContainer.appendChild(successContainer);
+                        } else {
+                            const noSuccessMessage = document.createElement('div');
+                            noSuccessMessage.classList.add('no-success-message');
+                            noSuccessMessage.style.textAlign = 'center';
+                            noSuccessMessage.textContent = 'No tokens were successfully listed.';
+                            parentContainer.appendChild(noSuccessMessage);
+                        }
+                        const failedContainer = document.createElement('div');
+                        failedContainer.classList.add('failed-tokens-container'); 
+                        const failedList = document.createElement('ul');
+
+                        
+                        failedTokens.forEach(tokenId => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `Failed to list Token: ${tokenId}`;
+                            failedList.appendChild(listItem);
+                        });
+                        failedContainer.appendChild(failedList);
+                        parentContainer.appendChild(failedContainer);
+                    } else if(errorWithIn50Blocks === true){
+                        /*
+                            while (parentContainer.firstChild) {
+                                parentContainer.removeChild(parentContainer.firstChild);
+                            }
+                        */
+                            const successDiv = document.createElement('div');
+                            successDiv.style.position = 'relative';
+                            successDiv.style.width = '100%';
+                            successDiv.style.height = '50%';
+                            successDiv.style.top = '25%';
+                            successDiv.classList.add('successDelistSpanTag');
+                            successDiv.style.textAlign = 'center'; 
+                            successDiv.textContent = 'pelase wait until the transaction is mined come back later or speed up the transaction.';
+                            parentContainer.appendChild(successDiv);
+                    }else {
+                        while (parentContainer.firstChild) {
+                            parentContainer.removeChild(parentContainer.firstChild);
+                        }
+                        if (successFullTokens.length > 0) {
+                            const successDiv = document.createElement('div');
+                            successDiv.style.position = 'relative';
+                            successDiv.style.width = '100%';
+                            successDiv.style.height = '50%';
+                            successDiv.style.top = '25%';
+                            successDiv.classList.add('successDelistSpanTag');
+                            successDiv.style.textAlign = 'center'; 
+                            successDiv.textContent = 'Your items have been Listed!.';
+                            parentContainer.appendChild(successDiv);
+                        }
+                    }
+                } else {
+                    if(tokenPricesInputsFilled === false){
+                         alert('Please make sure to fill out all input fields for your selected tokens');
+                    }else if(minimalListingPriceChecker === false){
+                        alert(`Please make sure to list your tokens above the minimal listing price: ${minimalListingPriceInETH}`);
+                    }else if(selectedTokens.length === 0){
+                        alert('An error occurred while selected tokens. Please make sure to select the tokens you want to list');
+                    }else{
+                        alert('An unexpected error has occured');
+                        console.log('failed with variable',minimalListingPriceChecker, tokenPricesInputsFilled, selectedTokens.length);
+                    }
+                   
                 }
-            } else {
-                if(tokenPricesInputsFilled === false){
-                     alert('Please make sure to fill out all input fields for your selected tokens');
-                }else if(minimalListingPriceChecker === false){
-                    alert(`Please make sure to list your tokens above the minimal listing price: ${minimalListingPriceInETH}`);
-                }else{
-                     alert('An unexpected error has occured.');
-                }
-               
+            }catch(error){
+                console.log('Error listing tokens', error);
+
             }
         }
     }else if(listOrDelistOption === "delisting"){
@@ -6783,55 +6913,92 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             let successFullTokens = [];
             const selectedTokens = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const loadingContainer = document.createElement("div");
+            loadingContainer.className = "loading-container";
+            loadingContainer.style.position = "absolute";
+            loadingContainer.style.top = "50%";
+            loadingContainer.style.left = "50%";
+            loadingContainer.style.transform = "translate(-50%, -50%)";
+            loadingContainer.style.width = "80%";
+            loadingContainer.style.height = "60%";
+            loadingContainer.style.display = "flex";
+            loadingContainer.style.justifyContent = "center";
+            loadingContainer.style.alignItems = "center";
+            loadingContainer.style.backgroundColor = "none"; 
+
+            const loadingIcon = document.createElement("img");
+            loadingIcon.setAttribute("class", "loading-gif");
+            loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+            loadingIcon.setAttribute("alt", "Loading..."); 
+            loadingIcon.style.width = "50%"; 
+            loadingIcon.style.height = "50%";
+            loadingContainer.appendChild(loadingIcon);
+            parentContainer.appendChild(loadingContainer);
 
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
                     const parentDiv = checkbox.closest('.sold-item');
                     const parentClass = parentDiv.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
                     const tokenCount = parentClass ? parentClass.split('-')[2] : null; // Extract the count from 'sold-item-<count>'
-                    selectedTokens.push(tokenCount);
+                    selectedTokens.push(parseInt(tokenCount));
                 }
             });
 
             if (selectedTokens.length > 0) {
+                let errorWithIn50Blocks = false;
                 const web3 = new Web3(window.ethereum);
-                const tokenIds = selectedTokens.map(token => parseInt(token.tokenId));
+                //const tokenIds = selectedTokens.map(token => parseInt(token.tokenId));
                 try {
-                    const gasEstimate = await contract.methods.delistNFTArray(tokenIds).estimateGas({ from: clientBlockChainAddress });
-                    const tx = await contract.methods.delistNFTArray(tokenIds).send({
-                        from: clientBlockChainAddress,
-                        gas: gasEstimate
-                    });
-                    if (tx && tx.transactionHash) {
-                        console.log('Transaction sent. Waiting for confirmation...');
-                        const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-
-                        if (receipt && receipt.status === true) {
-                            console.log('The user accepted the transaction to delist tokens and it was successful.');
-                            successFullTokens.push(tokenIds);
+                    console.log('trying to delist tokens', selectedTokens);
+                    const gasEstimate = await contract.methods.delistNFT(selectedTokens[0]).estimateGas({ from: clientBlockChainAddress });
+                    const gasEstimateForArray = gasEstimate*selectedTokens.length;
+                    const gasLimit = Math.floor(gasEstimateForArray*1.1);
+                    if(gasLimit){
+                        console.log('trying to get send transaction using gas estimate', gasLimit);
+                        
+                        console.log('trying to estimate the gas cost to delist', gasLimit);
+                        const tx = await contract.methods.delistNFTArray(selectedTokens).send({
+                            from: clientBlockChainAddress,
+                            gas: gasLimit
+                        });
+                        if (tx && tx.transactionHash) {
+                            console.log('Transaction sent. Waiting for confirmation...');
+                            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+                            if (receipt && receipt.status === true) {
+                                console.log('The user accepted the transaction to delist tokens and it was successful.');
+                                successFullTokens.push(selectedTokens);
+                            } else {
+                                console.log('The transaction to delist failed.');
+                                failedTokens.push(selectedTokens);
+                            }
                         } else {
-                            console.log('The transaction to delist failed.');
-                            failedTokens.push(tokenIds);
+                            console.log('The transaction could not be sent.');
                         }
-                    } else {
-                        console.log('The transaction could not be sent.');
+                       for(var i =0; i< selectedTokens.length; i++){
+                            successFullTokens.push(selectedTokens[i]);
+                       } 
+                    }else{
+                        console.log('Sorry there was an error estimating the gas fee');
                     }
-                   for(i =0; i< tokenIds.length; i++){
-                        successFullTokens.push(tokenIds[i]);
-                   }
                     
                 } catch (error) {
-                    for(i =0; i< tokenIds.length; i++){
-                        failedTokens.push(tokenIds[i]);
+                    for(var i = 0; i< selectedTokens.length; i++){
+                        failedTokens.push(selectedTokens[i]);
                    }
-                    failedTokens.push(tokenIds);
-                    console.error('Error calling delistNFTArray:', error);
+                   if(error.message.includes('within 50 blocks')){
+                        errorWithIn50Blocks = true;
+                        console.error('Error mining within 50 blocks');
+                   }else{
+                        errorWithIn50Blocks = false;
+                        failedTokens.push(selectedTokens);
+                   }
                 }
 
+                loadingContainer.remove();
                 while (parentContainer.firstChild) {
                     parentContainer.removeChild(parentContainer.firstChild);
                 }
-                if (failedTokens.length > 0) {
+                if (failedTokens.length > 0 && errorWithIn50Blocks === false) {
                     if (successFullTokens.length > 0) {
                         const successContainer = document.createElement('div');
                         successContainer.classList.add('success-tokens-container');
@@ -6847,7 +7014,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         const noSuccessMessage = document.createElement('div');
                         noSuccessMessage.classList.add('no-success-message');
                         noSuccessMessage.style.textAlign = 'center';
-                        noSuccessMessage.textContent = 'No tokens were successfully Transfered.';
+                        noSuccessMessage.textContent = 'Sorry failed to delist your tokens.';
                         parentContainer.appendChild(noSuccessMessage);
                     }
                     const failedContainer = document.createElement('div');
@@ -6855,7 +7022,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     const failedList = document.createElement('ul');
                     failedTokens.forEach(tokenId => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `Failed to Transfer Token: ${tokenId}`;
+                        listItem.textContent = `Failed to delist Token: ${tokenId}`;
                         failedList.appendChild(listItem);
                     });
                     failedContainer.appendChild(failedList);
@@ -6869,8 +7036,21 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         successDiv.style.top = '25%';
                         successDiv.classList.add('successDelistSpanTag');
                         successDiv.style.textAlign = 'center'; 
-                        successDiv.textContent = 'Your items have been delisted. Make sure to come back and list them so I get my royalty fee, homies.';
+                        successDiv.textContent = 'Your items have been delisted. Make sure to come back and list them so I get my royalty fee!.';
                         parentContainer.appendChild(successDiv);
+                    }else{
+                        if(errorWithIn50Blocks === true){
+                            const successDiv = document.createElement('div');
+                            successDiv.style.position = 'relative';
+                            successDiv.style.width = '100%';
+                            successDiv.style.height = '50%';
+                            successDiv.style.top = '25%';
+                            successDiv.classList.add('successDelistSpanTag');
+                            successDiv.style.textAlign = 'center'; 
+                            successDiv.textContent = 'Sorry the transaction failed to be mined in the appropriate time due to Priority users. If you want to speed up the transaction you can go to your metamask and try to speed it up. Or you can wait and come back later thank you.';
+                            parentContainer.appendChild(successDiv);
+                            alert('Sorry the transaction failed to be mined in the appropriate time due to Priority users. If you want to speed up the transaction you can go to your metamask and try to speed it up. Or you can wait and come back later thank you.');
+                        }
                     }
                 }
             } else {
@@ -6942,10 +7122,10 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             let failedTokens = [];
             let successFullTokens = [];
             if (ethAddressRegex.test(address)) {
-                console.log('Valid Ethereum address');
+                console.log('trying to initiate Transfer to another wallet');
                 const soldItems = document.querySelectorAll('.sold-item');
                 console.log('found items to transfer', soldItems);
-                soldItems.forEach(soldItem => {
+                for(const soldItem of soldItems){
                     const classNames = soldItem.className.trim().split(/\s+/);
                     classNames.forEach(className => {
                         if (className.startsWith('sold-item-')) {
@@ -6959,12 +7139,28 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                             }
                         }
                     });
-                });
+                }
                 try {
-                    const gasEstimate = await contract.methods.transferArrayOfNFTS(address, transferTokenIds).estimateGas({ from: clientBlockChainAddress });
+                    console.log('trying to get gas estimate to call transfer Array with', transferTokenIds);
+                    console.log('trying to transfer to client', address);
+                    console.log('trying to send from', clientBlockChainAddress);
+                    const minimalTransferFee = await contract.methods.minimalTransferFee().call();
+                    console.log('minimum transfer fee=', minimalTransferFee);
+                    const valueEstimate = (BigInt(minimalTransferFee) * BigInt(110)) / BigInt(100);
+                    const valueEstimateInt = Number(valueEstimate)*transferTokenIds.length; // Convert to a regular number
+                    console.log('Value Estimate for array', valueEstimateInt);
+
+                    const gasEstimateForArray = await contract.methods.transferArrayOfNFTS(address, transferTokenIds).estimateGas({ 
+                        from: clientBlockChainAddress,
+                        value: valueEstimateInt.toString()
+                    });
+                    console.log('gas estimate for array ==', gasEstimateForArray);
+                    console.log('trying to call transferArrayOfNFTS');
+                    
                     const tx = await contract.methods.transferArrayOfNFTS(address, transferTokenIds).send({
                         from: clientBlockChainAddress,
-                        gas: gasEstimate
+                        gas: gasEstimateForArray,
+                        value: valueEstimateInt.toString()
                     });
                     if (tx && tx.transactionHash) {
                             console.log('Transaction sent. Waiting for confirmation...');
@@ -6980,9 +7176,17 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         console.log('The transaction could not be sent.');
                         failedTokens.push(transferTokenIds);
                     }
+                    
                 } catch (error) {
                     failedTokens.push(transferTokenIds);
-                    console.error('Error calling delistNFTArray:', error);
+                    console.error('Error calling transferArrayOfNFTS:', error.message);
+                    if (error.message.includes("ERR1")) {
+                        alert('The contract did not detect that you own this NFT. You can only transfer tokens you own');
+                    }else if(error.message.includes("ERR7")){
+                        alert('Insufficient gas!, please increase or estimate correctly');
+                    }else{
+                        console.log('An unexpected error occured');
+                    }   
                 }
 
                 parentContainer.innerHTML = '';
@@ -7057,36 +7261,36 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
         console.log('unexpected data for listOrDelistOption variable');
     }
 }
-async function makeTokenPage(addressString, contract, parentContainer, footer, coin){
+async function makeTokenPage(addressString, contract, parentContainer, footer, coin, loadingContainer){
     try{
         let UsersNFTsIds;
         try{
-            UsersNFTsIds = await contract.methods.getUsersTokens().call();
+            UsersNFTsIds = await contract.methods.getUsersTokens(addressString).call();
         }catch(error){
-            console.log('Error calling the function getUsersTokens() on the contract');
+            console.log('Error calling the function getUsersTokens() on the contract', error);
             UsersNFTsIds = [];
         }
         // comment to stop testing
         // UsersNFTsIds = [1,2,3,4,5, 6,7,8];
         if(UsersNFTsIds.length != 0){
             let userNFTARRay = [];
-            console.log('trying to loop through and get images for user tokens');
             for (var i = 0; i < UsersNFTsIds.length; i++) {
-                if (UsersNFTsIds[i] === currentNFTArray[i].tokenID) {
-                    console.log('need to get attributes before sending');
+                const tokenIdInINt = parseInt(UsersNFTsIds[i]);
+                const currentNFTtokenIDParsed = parseInt(currentNFTArray[i].tokenID);
+                if (tokenIdInINt && currentNFTtokenIDParsed ) {
                     let imageURL;
                     let currentObj;
                         for (const token of currentNFTArray) {
-                            if (token.tokenID === UsersNFTsIds[i]) {
+                            if (token.tokenID === tokenIdInINt) {
                                 imageURL = token.image;
                                 break;
                             }
                         }
                     try{
-                        tokenData = await contract.methods.getTokenData(UsersNFTsIds[i]).call();
+                        let tokenData = await contract.methods.getTokenData(tokenIdInINt).call();
                         if (tokenData.forSale == true) {
                             currentObj = {
-                                tokenID: UsersNFTsIds[i],
+                                tokenID: tokenIdInINt,
                                 image: imageURL,
                                 purchasePrice: tokenData.price,
                                 purchaseDate:  tokenData.lastSellData,
@@ -7094,7 +7298,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                             };
                         } else {
                             currentObj = {
-                                tokenID: UsersNFTsIds[i],
+                                tokenID: tokenIdInINt,
                                 image: imageURL,
                                 purchasePrice: tokenData.price,
                                 purchaseDate: tokenData.lastSellData,
@@ -7104,110 +7308,109 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                         userNFTARRay.push(currentObj); 
                     }catch(error){
                         // do not push uncomment this is a test 
-                        console.log('Error getting data from contract setting to dummy data');
-                        if(i==1 || i==3){    
-                            currentObj = {
-                                tokenID: UsersNFTsIds[i],
-                                image: imageURL,
-                                purchasePrice: 1000002222202020202002,
-                                purchaseDate: 22922211,
-                                listed: "active"
-                            }
-                        }else{
-                            currentObj = {
-                                tokenID: UsersNFTsIds[i],
-                                image: imageURL,
-                                purchasePrice: 92929291111122222222202,
-                                purchaseDate: 2211,
-                                listed: "Inactive"
-                            }
-                        }
-                        userNFTARRay.push(currentObj); 
+                        console.log('Error getting data', error);
+                        console.log('display error message in small container');
                     }
+                }else{
+                    console.log('contract does not give back information for tokens', UsersNFTsIds);
                 }
             }
             let count = 0; 
-            userNFTARRay.forEach(token => {
-                count+=1;
-                const soldItem = document.createElement('div');
-                soldItem.classList.add('sold-item', `sold-item-${count}`); 
-                soldItem.style.height = '100px';
-                soldItem.style.position = 'relative'; 
-                soldItem.style.overflow = 'hidden'; 
-                soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; 
-                soldItem.style.borderRadius = '5px'; 
-                soldItem.style.display = 'flex'; 
-                soldItem.style.alignItems = 'center'; 
-                soldItem.style.padding = '10px'; 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.style.display = 'none'; 
-                checkbox.style.marginRight = '10px'; 
-                soldItem.appendChild(checkbox);
-                const imageContainer = document.createElement('div');
-                imageContainer.style.position = 'relative'; 
-                imageContainer.style.height = '80%';
-                imageContainer.style.width = '25%';
-                imageContainer.style.marginRight = '10px'; 
-                imageContainer.style.flexShrink = '0'; 
-                imageContainer.style.backgroundColor = '#ddd'; 
-                soldItem.appendChild(imageContainer);
-                const img = document.createElement('img');
-                img.src = token.image;
-                img.alt = `Token ID ${token.tokenID}`;
-                img.style.width = '100%';
-                img.style.height = '100%'; 
-                img.style.borderRadius = '5px'; 
-                img.style.objectFit = 'cover'; 
-                imageContainer.appendChild(img);
-                const textContainer = document.createElement('div');
-                textContainer.className = `textContainer:${count}`;
-                textContainer.style.flex = '1'; 
-                textContainer.style.display = 'flex'; 
-                textContainer.style.flexDirection = 'column'; 
-                textContainer.style.justifyContent = 'center';
-                textContainer.style.marginLeft = '10px'; 
-                soldItem.appendChild(textContainer);
-                const listedSpan = document.createElement('div');
-                listedSpan.className = 'listedSpan';
-                const listedText = document.createElement('span');
-                listedText.textContent = 'Listed: ';
-                const statusSpan = document.createElement('span');
-                statusSpan.textContent = token.listed;
-                if (token.listed === "active") {
-                    statusSpan.style.color = 'green'; 
-                } else {
-                    statusSpan.style.color = 'red';
-                }
-                listedSpan.appendChild(listedText);
-                listedSpan.appendChild(statusSpan);
-                listedSpan.style.marginBottom = '5px'; 
-                textContainer.appendChild(listedSpan);
-                const nameSpan = document.createElement('div');
-                nameSpan.textContent = `Token ID: ${token.tokenID}`; 
-                nameSpan.style.color = 'white'; 
-                textContainer.appendChild(nameSpan);
-                const priceSpan = document.createElement('div');
-                let convertedPrice = ((token.purchasePrice)/(10**18)).toFixed(3);
-                priceSpan.textContent = `Purchase Price: `+ `${convertedPrice}` + ` ${coin}`; 
-                priceSpan.style.marginBottom = '5px'; 
-                priceSpan.style.color = 'white'; 
-                textContainer.appendChild(priceSpan);
-                const datePurchased = new Date(token.purchaseDate * 1000); 
-                const dateSpan = document.createElement('div');
-                dateSpan.textContent = `${datePurchased.toLocaleDateString("en-US", { 
-                    year: '2-digit', 
-                    month: '2-digit', 
-                    day: '2-digit' 
-                })} at ${datePurchased.toLocaleTimeString("en-US", { 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    hour12: false 
-                })}`;
-                dateSpan.style.color = 'white';
-                textContainer.appendChild(dateSpan);
-                parentContainer.appendChild(soldItem);
-            });
+            console.log('trying to set token using data,', userNFTARRay);
+            if(userNFTARRay.length == 0){
+                loadingContainer.remove();
+                const errorSpan = document.createElement('span');
+                errorSpan.style.width = '100%';
+                errorSpan.style.top = '30%';
+                errorSpan.style.color = 'white';
+                errorSpan.style.fontSize = '1.5vh';
+                errorSpan.style.position = 'relative';
+                errorSpan.textContent = 'Sorry an unexpected error occured will trying to retrieve tokens';
+                parentContainer.appendChild(errorSpan);
+            }else{
+                loadingContainer.remove();
+                userNFTARRay.forEach(token => {
+                    count+=1;
+                    const soldItem = document.createElement('div');
+                    soldItem.classList.add('sold-item', `sold-item-${count}`); 
+                    soldItem.style.height = '100px';
+                    soldItem.style.position = 'relative'; 
+                    soldItem.style.overflow = 'hidden'; 
+                    soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'; 
+                    soldItem.style.borderRadius = '5px'; 
+                    soldItem.style.display = 'flex'; 
+                    soldItem.style.alignItems = 'center'; 
+                    soldItem.style.padding = '10px'; 
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.style.display = 'none'; 
+                    checkbox.style.marginRight = '10px'; 
+                    soldItem.appendChild(checkbox);
+                    const imageContainer = document.createElement('div');
+                    imageContainer.style.position = 'relative'; 
+                    imageContainer.style.height = '80%';
+                    imageContainer.style.width = '25%';
+                    imageContainer.style.marginRight = '10px'; 
+                    imageContainer.style.flexShrink = '0'; 
+                    imageContainer.style.backgroundColor = '#ddd'; 
+                    soldItem.appendChild(imageContainer);
+                    const img = document.createElement('img');
+                    img.src = token.image;
+                    img.alt = `Token ID ${token.tokenID}`;
+                    img.style.width = '100%';
+                    img.style.height = '100%'; 
+                    img.style.borderRadius = '5px'; 
+                    img.style.objectFit = 'cover'; 
+                    imageContainer.appendChild(img);
+                    const textContainer = document.createElement('div');
+                    textContainer.className = `textContainer:${count}`;
+                    textContainer.style.flex = '1'; 
+                    textContainer.style.display = 'flex'; 
+                    textContainer.style.flexDirection = 'column'; 
+                    textContainer.style.justifyContent = 'center';
+                    textContainer.style.marginLeft = '10px'; 
+                    soldItem.appendChild(textContainer);
+                    const listedSpan = document.createElement('div');
+                    listedSpan.className = 'listedSpan';
+                    const listedText = document.createElement('span');
+                    listedText.textContent = 'Listed: ';
+                    const statusSpan = document.createElement('span');
+                    statusSpan.textContent = token.listed;
+                    if (token.listed === "active") {
+                        statusSpan.style.color = 'green'; 
+                    } else {
+                        statusSpan.style.color = 'red';
+                    }
+                    listedSpan.appendChild(listedText);
+                    listedSpan.appendChild(statusSpan);
+                    listedSpan.style.marginBottom = '5px'; 
+                    textContainer.appendChild(listedSpan);
+                    const nameSpan = document.createElement('div');
+                    nameSpan.textContent = `Token ID: ${token.tokenID}`; 
+                    nameSpan.style.color = 'white'; 
+                    textContainer.appendChild(nameSpan);
+                    const priceSpan = document.createElement('div');
+                    let convertedPrice = ((token.purchasePrice)/(10**18)).toFixed(3);
+                    priceSpan.textContent = `Purchase Price: `+ `${convertedPrice}` + ` ${coin}`; 
+                    priceSpan.style.marginBottom = '5px'; 
+                    priceSpan.style.color = 'white'; 
+                    textContainer.appendChild(priceSpan);
+                    const datePurchased = new Date(token.purchaseDate * 1000); 
+                    const dateSpan = document.createElement('div');
+                    dateSpan.textContent = `${datePurchased.toLocaleDateString("en-US", { 
+                        year: '2-digit', 
+                        month: '2-digit', 
+                        day: '2-digit' 
+                    })} at ${datePurchased.toLocaleTimeString("en-US", { 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        hour12: false 
+                    })}`;
+                    dateSpan.style.color = 'white';
+                    textContainer.appendChild(dateSpan);
+                    parentContainer.appendChild(soldItem);
+                });
+            }
             if (!document.querySelector('.nextButton')) {
                 const nextButton = document.createElement('button');
                 nextButton.className = 'nextButton'; 
@@ -7255,13 +7458,14 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
             spanContainer.style.boxSizing = 'border-box';
             const spanTextContent = document.createElement('span');
             spanTextContent.textContent = 'No Tokens Yet';
+            loadingContainer.remove()
             spanTextContent.style.color = 'white';
             spanTextContent.style.fontSize = '12px';
             spanContainer.appendChild(spanTextContent);
-            parentElement.appendChild(spanContainer);
+            parentContainer.appendChild(spanContainer);
         }
     }catch(error){
-        console.log('Error calling function on contract to get array of recent sells');
+        console.log('Error calling function on contract to get array of recent sells', error);
     }
 }
 function printInfo(div, strings) {
@@ -7619,22 +7823,21 @@ function createContract(data) {
     //SPDX-License-Identifier: UNLICENSED
     pragma solidity ${version};
     contract ${data.name.replace(/ /g, '')}{
-        // Struct to declare NFT (Non-Fungible Token) data attributes stored on contract.
         struct NFT {
-            uint256 id;            // Unique identifier for the NFT
-            uint256 price;         // Price of the NFT in wei (1 ether = 1e18 wei)
-            address owner;         // Current owner of the NFT
-            address lastOwner;     // last owner for purchases 
-            uint256 mintDate;      // Date of mint
-            string tokenName;      // Token name
-            bool forSale;          // Flag indicating if the NFT is for sale
-            bool flagged;          // Flag indicating if nfts has been marked as suspicious
-            uint256 lastSellData;  // changes each time a sell occurs
-            bool burned;          // Flag to indicate if token has been burned
+            uint256 id;   
+            uint256 price;     
+            address owner;       
+            address lastOwner;   
+            uint256 mintDate;   
+            string tokenName;    
+            bool forSale;        
+            bool flagged;          
+            uint256 lastSellData;  
+            bool burned;          
         }
 
         mapping(uint256 => NFT) public nfts;
-        mapping(address => uint256[]) private userTokens; 
+        //mapping(address => uint256[]) private userTokens; 
         mapping(address => bool) private seenOwners;
         NFT[] private recentSells; 
 
@@ -7680,12 +7883,14 @@ function createContract(data) {
             isTokensPausible = ${data.options[3].active};
             isTokensBurnable = ${data.options[4].active};
         }
-
         function changeMinimalTransferFee(uint256 amountInWEI) external {
-            require(msg.sender == owners[0], "Privilege denied");
+            require(msg.sender == owners[0] || msg.sender == manager, "ERR1");
             minimalTransferFee = amountInWEI;
         }
-
+        function changeMinimalListingFee(uint256 amountInWEI) external {
+            require(msg.sender == owners[0] || msg.sender == manager, "ERR1");
+            minimalListingPrice = amountInWEI;
+        }
         function checkIfOwner(address _address) internal view returns (bool) {
             for (uint256 i = 0; i < owners.length; i++) {
                 if (owners[i] == _address) {
@@ -7694,38 +7899,36 @@ function createContract(data) {
             }
             return false;
         }
-
         function getNumberOfOwnedTokens(address _address) public view returns (uint256) {
             uint256 count = 0;
-            for (uint256 i = 0; i < tokenCount; i++) { // Use tokenCount instead of totalTokens
+            for (uint256 i = 0; i < tokenCount; i++) { 
                 if (nfts[i].owner == _address) {
                     count++;
                 }
             }
             return count;
         }
-
         function changeCreatorFee(uint256 newPercentFee) public {
-            require(newPercentFee >= 1 && newPercentFee <= 100, "Fee must be between 1 and 100");
+            require(newPercentFee >= 1 && newPercentFee <= 100, "ERR2");
             require(isRoyaltyFeeChangeable, "Sorry the contract creator fee cannot be changed");
-            require(msg.sender == manager || msg.sender == owners[0], "sorry you must be an the owner or manager to change to creator fee");
+            require(msg.sender == manager || msg.sender == owners[0], "ERR1");
             creatorFee = newPercentFee;
         }
         function changeContractManager(address newManagerAdress) public {
             require(isManagerInitiated, "Sorry the contract does not have manager Privilege");
-            require(msg.sender == owners[0], 'to change the manager you must be the owner');
+            require(msg.sender == owners[0], 'ERR1');
             manager = newManagerAdress;
         }
         function changeContractOwner(address _newOwner) public{
-            require(isContractSellable, 'Sorry the contract is not sellable');
-            require(msg.sender == owners[0], "only the owner can change the owners address when they sell it");
+            require(isContractSellable, 'ERR3');
+            require(msg.sender == owners[0], "ERR1");
             owners[0] = _newOwner;
         }
 
         function burnToken(uint256 tokenId) public{
-            require(isTokensBurnable, 'sorry the tokens are not burnable');
-            require(msg.sender == nfts[tokenId].owner, 'You must own the token to burnt it');
-            require(!nfts[tokenId].flagged, ' you cannot burn flagged tokens');
+            require(isTokensBurnable, 'ERR4');
+            require(msg.sender == nfts[tokenId].owner, 'ERR1');
+            require(!nfts[tokenId].flagged, 'ERR5');
             nfts[tokenId].burned = true;
             nfts[tokenId].forSale = false;
         }
@@ -7733,25 +7936,24 @@ function createContract(data) {
             if (!checkIfOwner(msg.sender)) {
                 return false;
             } else { 
-                tokenCount+=1;
                 nfts[tokenCount] = NFT({ 
-                    id: tokenCount,
+                    id: tokenCount+1,
                     price: price, 
-                    owner: owners[0], 
-                    lastOwner: owners[0], 
+                    owner: msg.sender, 
+                    lastOwner: msg.sender, 
                     mintDate: block.timestamp,
                     tokenName: "${data.name}",
-                    forSale: true, 
+                    forSale: false, 
                     flagged: false,
                     lastSellData: block.timestamp,
                     burned: false       
                 });
-                userTokens[owners[0]].push(tokenCount); 
+                tokenCount+=1;
+                //userTokens[owners[0]].push(tokenCount); 
                 emit NFTMinted(tokenCount, owners[0]);
                 return true;
             }
         }
-
         function mintArrayOfNFTs(NFT[] memory nftArray) external payable returns (bool) {
             for (uint256 i = 0; i < nftArray.length; i++) {
                 if (!mintNFT(nftArray[i].price)) {
@@ -7760,87 +7962,77 @@ function createContract(data) {
             }
             return true;
         }
-
         function listNFT(uint256 tokenId, uint256 userListPrice) public payable {
-            require(nfts[tokenId].burned != true, 'Sorry burned tokens cannot be listed');
-            require(owners[tokenId] == msg.sender, "Only the owner can list the NFT");
-            require(nfts[tokenId].flagged == false, "Only tokens that are not flagged can be listed ");
-            require(userListPrice >= minimalListingPrice, "Price below minimum listing price");
+            require(nfts[tokenId].burned != true, 'ERR4');
+            require(nfts[tokenId].owner == msg.sender, "ERR1");
+            require(nfts[tokenId].flagged == false, "ERR5");
+            require(userListPrice >= minimalListingPrice, "ERR8");
             payable(walletToReceiveFunds).transfer(minimalTransferFee); 
             nfts[tokenId].forSale = true;
             nfts[tokenId].price = userListPrice;
             emit NFTForSale(tokenId, nfts[tokenId].price);
         }
-
         function listArrayOfNFTs(uint256[] memory tokenIdArray, uint256[] memory userListPrice) external payable {
-            require(tokenIdArray.length == userListPrice.length, "Arrays must be of the same length");
+            require(tokenIdArray.length == userListPrice.length, "ERR6");
             uint256 totalFee = minimalTransferFee * tokenIdArray.length;
-            require(msg.value >= totalFee, "Insufficient funds for listing fee");
-            
+            require(msg.value >= totalFee, "ERR7");
             for (uint256 i = 0; i < tokenIdArray.length; i++) {
                 uint256 id = tokenIdArray[i];
                 uint256 price = userListPrice[i];
                 listNFT(id, price);
             }
-
             if (msg.value > totalFee) {
                 payable(msg.sender).transfer(msg.value - totalFee);
             }
         }
-
         function delistNFT(uint256 tokenId) public {
-            require(owners[tokenId] == msg.sender, "Only the owner can delist the NFT");
+            require(nfts[tokenId].owner == msg.sender, "ERR1");
             nfts[tokenId].forSale = false;
         }
-
         function delistNFTArray(uint256[] memory tokenIdArray) external {
             for (uint256 i = 0; i  < tokenIdArray.length; i++) {
                 delistNFT(tokenIdArray[i]);
             }
         }
-
         function getTokenData(uint256 tokenID) public view returns (NFT memory) {
             return nfts[tokenID];
         }
-
         function flagToken(uint256 tokenID) public {
-            require(isTokensPausible," sorry tokens are not able to be flagged good luck to you");
-            require(msg.sender == owners[0] || msg.sender == manager, 'only the owner or trusted manager can flag tokens');
+            require(isTokensPausible, "ERR5");
+            require(msg.sender == owners[0] || msg.sender == manager, 'ERR1');
             nfts[tokenID].flagged = true;
         }
-
         function relistflaggedToken(uint256 tokenID) public {
-            require(msg.sender == owners[0] ||msg.sender == manager, 'only the owner or manager can relist flagged tokens');
+            require(msg.sender == owners[0] ||msg.sender == manager, 'ERR1');
             nfts[tokenID].flagged = false;
         }
-
         function changeOwner(address _address) public {
-            require(isContractSellable, 'contract must be sellable when initially deployed');
-            require(msg.sender == owners[0], 'only the owner can change the owners address');
+            require(isContractSellable, 'ERR8');
+            require(msg.sender == owners[0], 'ERR1');
             owners[0] = _address;
         }
-
-
+        function addOwnerToContract(address _address) public {
+            require(isContractSellable, 'ERR8');
+            require(checkIfOwner(msg.sender), ' only owners can add other owners to the contract');
+            owners.push(_address);
+        }
         function purchaseSingleNFT(uint256 tokenId) payable public returns (bool) {
-            require(msg.value >= nfts[tokenId].price, "Insufficient payment");
-            require(!nfts[tokenId].flagged, 'Sorry you cannot purchase flagged tokens');
-            require(!nfts[tokenId].burned, 'Sorry you cannot purchase tokens that are burned');
-            require(!nfts[tokenId].forSale, 'Sorry the token is unavailable');
-
+            require(msg.value >= nfts[tokenId].price, "ERR7");
+            require(!nfts[tokenId].flagged, 'ERR5');
+            require(!nfts[tokenId].burned, 'ERR4');
+            require(!nfts[tokenId].forSale, 'ERR1');
             NFT storage nft = nfts[tokenId];
-            require(nft.forSale, "NFT is not for sale");
-            require(msg.value >= nft.price, "Insufficient payment");
+            require(nft.forSale, "ERR1");
+            require(msg.value >= nft.price, "ERR7");
             uint256 fee = (nft.price * creatorFee) / 100;
             uint256 ownerShare = nft.price - fee;
             payable(walletToReceiveFunds).transfer(fee);
             payable(nft.owner).transfer(ownerShare);
-
             nft.lastOwner = nft.owner;
             nft.owner = msg.sender; 
             nft.forSale = false;
             nft.lastSellData = block.timestamp; 
             recentSells.push(nft);
-
             if (recentSells.length > 10000) {
                 for (uint i = 0; i < recentSells.length - 1; i++) {
                     recentSells[i] = recentSells[i + 1];
@@ -7851,13 +8043,12 @@ function createContract(data) {
             numberOfSells += 1;
             return true;
         }
-
         function purchaseArrayOfNFT(uint256[] memory tokenIdArray) external payable returns (bool) {
             uint256 totalCost;
             for (uint256 i = 0; i < tokenIdArray.length; i++) {
-                require(nfts[tokenIdArray[i]].forSale, "NFT not for sale");
+                require(nfts[tokenIdArray[i]].forSale, "ERR1");
                 totalCost += nfts[tokenIdArray[i]].price;
-                require(msg.sender != nfts[tokenIdArray[i]].owner, "Owner cannot purchase own NFT");
+                require(msg.sender != nfts[tokenIdArray[i]].owner, "ERR1");
             }
             require(msg.value >= totalCost, "Insufficient payment");
             for (uint256 i = 0; i < tokenIdArray.length; i++) {
@@ -7865,35 +8056,30 @@ function createContract(data) {
             }
             return true;
         }
-
-        function checkIfOwnerOfArray(uint256[] memory tokenIdArray) public view returns (bool) {
+        function checkIfOwnerOfArray(uint256[] memory tokenIdArray, address _sender) public view returns (bool) {
             for (uint256 k = 0; k < tokenIdArray.length; k++) {
-                if (msg.sender != nfts[tokenIdArray[k]].owner) {
-                    return false; // Return false immediately if sender doesn't own any token
+                if (_sender != nfts[tokenIdArray[k]].owner) {
+                    return false; 
                 }
             }
             return true; 
         }
-
-        function transferSingleNFT(address recipient, uint256 tokenId) payable public returns (bool) {
-            require(msg.value >= minimalTransferFee, "Insufficient payment");
-            require(!nfts[tokenId].flagged, "NFT has been flagged; cannot be sold");
-            require(nfts[tokenId].forSale, "NFT is not for sale");
-            require(msg.sender == nfts[tokenId].owner, "Only owner can transfer NFT");
-            require(!nfts[tokenId].burned, 'sorry you cannot transfer burned tokens');
-            payable(walletToReceiveFunds).transfer(minimalTransferFee); // send Roy minimal transfer fee
-            nfts[tokenId].owner = recipient;
-            return true;
-        }
-
-        function transferArrayOfNFTS(address recipient, uint256[] memory tokenIdArray) public returns (bool) {
-            require(checkIfOwnerOfArray(tokenIdArray), "Sender is not owner of one or more NFTs");
-            for (uint256 i = 0; i < tokenIdArray.length; i++) {
-                transferSingleNFT(recipient, tokenIdArray[i]);
+        function transferArrayOfNFTS(address recipient, uint256[] memory tokenIds) payable public returns (bool) {
+            uint256 totalTransferFee = minimalTransferFee * tokenIds.length; 
+            require(msg.value >= totalTransferFee, "ERR7");
+            for (uint256 i = 0; i < tokenIds.length; i++) {
+                uint256 tokenId = tokenIds[i];
+                require(!nfts[tokenId].flagged, "ERR5");
+                require(msg.sender == nfts[tokenId].owner, "ERR1");
+                require(!nfts[tokenId].burned, "ERR4");
+            }
+            payable(walletToReceiveFunds).transfer(totalTransferFee); 
+            for (uint256 i = 0; i < tokenIds.length; i++) {
+                uint256 tokenId = tokenIds[i];
+                nfts[tokenId].owner = recipient;
             }
             return true;
         }
-
         function getMaxSell() public view returns (uint256 maxPrice) {
             maxPrice = 0;
             for (uint256 i = 0; i < recentSells.length; i++) {
@@ -7903,7 +8089,6 @@ function createContract(data) {
             }
             return maxPrice;
         }
-
         function getRecentSells() public view returns (NFT[] memory) {
             uint256 limit = recentSells.length;
             NFT[] memory sells = new NFT[](limit);
@@ -7915,40 +8100,41 @@ function createContract(data) {
         function getUsersTokens(address user) public view returns (uint256[] memory) {
             uint256[] memory tempTokens = new uint256[](tokenCount); 
             uint256 count = 0;
-
             for (uint256 i = 0; i < tokenCount; i++) {
                 if (nfts[i].owner == user) {
                     tempTokens[count] = nfts[i].id; 
-                    count++; // Increment the counter
+                    count++;
                 }
             }
-
             uint256[] memory userOwnedTokens = new uint256[](count);
             for (uint256 j = 0; j < count; j++) {
                 userOwnedTokens[j] = tempTokens[j];
             }
-
             return userOwnedTokens; 
         }
 
-        function getAllUniqueOwners() public returns (address[] memory) {
-            address[] memory tempOwners = new address[](owners.length);
+        function getAllUniqueOwners() public view returns (address[] memory) {
+            address[] memory uniqueOwners = new address[](tokenCount);
             uint256 count = 0;
-
-            for (uint256 i = 0; i < owners.length; i++) {
-                if (!seenOwners[owners[i]]) {
-                    tempOwners[count] = owners[i];
-                    seenOwners[owners[i]] = true; 
+            for (uint256 i = 0; i < tokenCount; i++) {
+                address owner = nfts[i].owner;
+                bool isUnique = true;
+                for (uint256 j = 0; j < count; j++) {
+                    if (uniqueOwners[j] == owner) {
+                        isUnique = false; 
+                        break;
+                    }
+                }
+                if (isUnique) {
+                    uniqueOwners[count] = owner;
                     count++;
                 }
             }
-
-            address[] memory uniqueOwners = new address[](count);
-            for (uint256 j = 0; j < count; j++) {
-                uniqueOwners[j] = tempOwners[j];
+            address[] memory result = new address[](count);
+            for (uint256 k = 0; k < count; k++) {
+                result[k] = uniqueOwners[k];
             }
-
-            return uniqueOwners;
+            return result;
         }
     }`;
     return contractString;
@@ -8368,7 +8554,7 @@ async function deployContractUsingServer(data){
                     const currentNetwork = await web3.eth.net.getId();
                     console.log('web3 window object', await web3.eth.net);
                     console.log(`Connected to ${currentNetwork} network`);
-                    if ((data.token === 'ERC115' && currentNetwork !== 137) || (data.token === 'ERC721' && currentNetwork !== 1)) {
+                    if ((data.token === 'ERC1155' && currentNetwork !== 137) || (data.token === 'ERC721' && currentNetwork !== 1)) {
                         alert('Please make sure you are on the correct network. Change networks in the metamask app.');
                         throw new Error(`Mismatch between selected network (${currentNetwork}) and expected network (${expectedNetwork})`);
                     }
@@ -8408,6 +8594,7 @@ async function deployContractUsingServer(data){
                                 contractABI: serverMessage.contractABI,
                                 collectionBackground: data.backgroundImage
                             };
+                            console.log('trying to save data to database');
                             try {
                                 const response = await fetch('/saveNFTCollection', {
                                     method: 'POST',
@@ -8420,15 +8607,22 @@ async function deployContractUsingServer(data){
                                     let serverMessage = await response.json();
                                     if (serverMessage.success === true) {
                                         console.log('Data saved successfully. Make a pop-up form containing information (ABI and Address with hyperlinks).');
+                                        const deployerform = document.querySelector('.Deployer-form');
+                                        if(deployerform){
+                                            deployerform.remove();
+                                        }
                                         alert('data successfully saved to database');
                                         return {
                                             success: contractDeploymentSuccess,
                                             abi: contractInformation.contractABI,
                                             contractAddress: contractInformation.contractAddress  // initially null
                                         };
-                                    } else {
-                                        console.log('serverMessage was false');
-                                        alert('Error saving collection to database. Check your internet connection.');
+                                    } else if(serverMessage.success === false && serverMessage.code === 121){
+                                        console.log('Error saving collection to database');
+                                        alert(`Error saving collection to database. ${serverMessage.error}$`);
+                                    }else{
+                                        console.log('Error saving collection to database');
+                                        alert(`An unexpected error occured`);
                                     }
                                 } else {
                                     console.error('Failed to get response from server');
@@ -8745,50 +8939,60 @@ async function makeMintingForm() {
             if(filesArray.length == 0){
                 alert('Please Insert files to be processed');
             }else{
-                const tryToAddDocument = await addTokensToDataBase(filesArray, mintPasscode.value, selectedContract,  mintingAddress); // returns serverMessageArray with at last 1 document
-                console.log('addTokensToDataBase() retuns',tryToAddDocument);
-                const successCheckerArray = await checkDocumentsSuccess(tryToAddDocument);
+                const tryToAddDocument = await addTokensToDataBase(filesArray, mintPasscode.value, selectedContract,  mintingAddress);
+                let successCheckerArray = await checkDocumentsSuccess(tryToAddDocument);
+                console.log('try to add document', tryToAddDocument);
+                console.log('succss array = ', successCheckerArray);
                 if (successCheckerArray.length !== 0) {
                     let mintableArray = [];
                     let numberOfNFTs = successCheckerArray.length;
+                    console.log('trying to loop through and make mintable array');
 
-                    for (const k = 1; k <= successCheckerArray.length; k++) { 
-                        let maticMintPrice = 20;
-                        let myNFTobjType = {
-                            id: successCheckerArray.tokenID,
-                            price: maticMintPrice * (10 ** 18), 
+                    for (var k = 0; k < numberOfNFTs; k++) { 
+                        console.log("printing ID to make sure its integer", successCheckerArray[k].tokenID);
+                        let maticMintPrice = 0.0; // start at zero it should not be for sale and not have price during mint
+                        let myNFTobjType = {    // mint is only designed to push object to contract so it exist
+                            id: successCheckerArray[k].tokenID,
+                            price: BigInt(maticMintPrice * (10 ** 18)), 
                             owner: RoysWallet,
+                            lastOwner: RoysWallet,
                             mintDate: Math.floor(Date.now() / 1000), 
-                            tokenName: selectedContract.contractName,
-                            forSale: true, 
-                            flagged: false    
+                            tokenName: selectedContract,
+                            forSale: false, 
+                            flagged: false,
+                            lastSellData: Math.floor(Date.now() / 1000), 
+                            burned: false
                         };
                         mintableArray.push(myNFTobjType);
                     }
+                    console.log('trying to mint array from contract using array', mintableArray);
                     try {
-                        // Estimate gas
+                        console.log('trying to estimate the gas', mintableArray);
                         const gasEstimate = await contract.methods.mintArrayOfNFTs(mintableArray).estimateGas({
-                            from: userAddress
+                            from: account
                         });                        
-                        // Add a buffer (e.g., 10%)
-                        const gasLimit = Math.floor(gasEstimate * 1.1);
-                        const totalFeeInWei = web3.utils.toWei(feePerNFTInMATIC.toString(), 'ether'); // Adjust for MATIC if necessary
+                        console.log('gas estimate to mint array', gasEstimate);
+                        const gasLimit = Math.floor(gasEstimate * 1.2);
                         const mintResult = await contract.methods.mintArrayOfNFTs(mintableArray).send({
-                            from: userAddress,
-                            value: totalFeeInWei,
-                            gas: gasLimit // Use the gas limit with buffer
+                            from: account,
+                            gas: gasLimit 
                         });
+                        // checking poll increments of 3 seconds 
 
-                        if (mintResult.status) { 
+
+                        const mintReceipt = await checkTransactionReceipt(mintResult.transactionHash, web3);
+
+                        //const mintReceipt = await web3.eth.getTransactionReceipt(txHash);
+                        if (mintReceipt.status) { 
                             console.log('Mint was a success, lets check');
+                            mintCollectionSuccessPopUpForm(selectedContract, filesArray[0].image);
                         } else {
-                            console.log('Error minting array, contract returned false');
+                            alert('Error minting array, contract returned false', mintResult);
                         }
                     } catch (error) {
                         console.error('Error calling contract mintArrayOfNFTs:', error);
+                        alert('there was an unexpected error minting');
                     }
-
-                    mintCollectionSuccessPopUpForm(selectedContract, filesArray[0].image);
                 } else {
                     alert('There are no documents to mint');
                 }
@@ -8878,6 +9082,16 @@ async function makeMintingForm() {
     }
 }
 
+const checkTransactionReceipt = async (txHash, web3) => {
+    console.log('trying to check for reciept using hash', txHash);
+    while (true) {
+        const receipt = await web3.eth.getTransactionReceipt(txHash);
+        if (receipt) {
+            return receipt;
+        }
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 1 second before checking again
+    }
+};
 async function checkDocumentsSuccess(array) {
     let successArray = [];
     // code 10900: bad server response
@@ -8935,7 +9149,7 @@ async function addTokensToDataBase(array, passcode, contract, address) {
                 }else if(serverMessage.code == 21202021122344){
                     console.log(`Error adding token ${ii} to the database mongoose failed`);
                 }else{
-                    console.log('trying to change progressBar length token added successfully');
+                    console.log('Token added successfully');
                     const submitedProgressPercentage = ((ii / (array.length)))*100;
                     const submitedProgressBar = document.querySelector(".submitedProgressBar");
                     const submitedProgressText = document.querySelector(".submitedProgressText");
