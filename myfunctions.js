@@ -327,78 +327,84 @@ export async function addDigitalElementListener(digitalElement){
                                 if(nfts.length!= 0){
                                     currentNFTArray = nfts;
                                     setTimeout(async () => { 
-                                        contractsForm.remove();
-                                        console.log('trying to make dummy page with array', currentNFTArray);
-                                        sideElementsWidthPercent = '15%'; 
-                                        GridWidth = '65%';
-                                        gridItemWidth = '100%';
-                                        rowWidth = '10%';
-
-                                        if(window.innerWidth >= 999 ){
-                                            if(currentNFTArray.length >= 24){
-                                                makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 4, GridWidth, gridItemWidth);
-                                            }else{
-                                                makeNFTPage(currentNFTArray, currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 4, GridWidth, gridItemWidth);
-                                            }
-                                        }else if(window.innerWidth <= 998 && window.innerWidth >= 610 ){
-                                            GridWidth = '52%';
-                                            gridItemWidth = '95%';
-                                            sideElementsWidthPercent = '20%'; 
-                                            rowWidth = '33%';
-
-                                            if(currentNFTArray.length >= 24){
-                                                makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 3, GridWidth, gridItemWidth);
-                                            }else{
-                                                makeNFTPage(currentNFTArray, currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 3, GridWidth, gridItemWidth);
-                                            }
-
-                                            var grid = document.querySelector('.NewGrid');
-                                            grid.style.left = '23%';
-
-                                        }else if(window.innerWidth <= 609 && window.innerWidth >= 500){
-                                            sideElementsWidthPercent = '24%'; 
-                                            GridWidth = '80%';
+                                        console.log('trying to gather data from contract to display on nft page');
+                                        let asyncPageObjectData =  await gatherAsyncNFTPageData();
+                                        if(asyncPageObjectData){
+                                            console.log('we got the data back', asyncPageObjectData);
+                                            contractsForm.remove();
+                                            console.log('trying to make dummy page with array', currentNFTArray);
+                                            sideElementsWidthPercent = '15%'; 
+                                            GridWidth = '65%';
                                             gridItemWidth = '100%';
-                                            rowWidth = '50%';
+                                            rowWidth = '10%';
+                                            if(window.innerWidth >= 999 ){
+                                                if(currentNFTArray.length >= 24){
+                                                    makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 4, GridWidth, gridItemWidth, asyncPageObjectData);
+                                                }else{
+                                                    makeNFTPage(currentNFTArray, currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 4, GridWidth, gridItemWidth, asyncPageObjectData);
+                                                }
+                                            }else if(window.innerWidth <= 998 && window.innerWidth >= 610 ){
+                                                GridWidth = '52%';
+                                                gridItemWidth = '95%';
+                                                sideElementsWidthPercent = '20%'; 
+                                                rowWidth = '33%';
 
-                                            if(currentNFTArray.length >= 24){
-                                                makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 3, GridWidth, gridItemWidth);
-                                            }else{
-                                                makeNFTPage(currentNFTArray, currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 3, GridWidth, gridItemWidth);
+                                                if(currentNFTArray.length >= 24){
+                                                    makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 3, GridWidth, gridItemWidth, asyncPageObjectData);
+                                                }else{
+                                                    makeNFTPage(currentNFTArray, currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 3, GridWidth, gridItemWidth, asyncPageObjectData);
+                                                }
+
+                                                var grid = document.querySelector('.NewGrid');
+                                                grid.style.left = '23%';
+
+                                            }else if(window.innerWidth <= 609 && window.innerWidth >= 500){
+                                                sideElementsWidthPercent = '24%'; 
+                                                GridWidth = '80%';
+                                                gridItemWidth = '100%';
+                                                rowWidth = '50%';
+
+                                                if(currentNFTArray.length >= 24){
+                                                    makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 3, GridWidth, gridItemWidth, asyncPageObjectData);
+                                                }else{
+                                                    makeNFTPage(currentNFTArray, currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 3, GridWidth, gridItemWidth, asyncPageObjectData);
+                                                }
+
+                                                const contractInfoContainer = document.querySelector('.contractInfoContrainer');
+                                                const contractTools = document.querySelector('.contractTools');
+                                                const contractOptions = document.querySelector('.contractOptions');
+                                                const chatBox = document.querySelector('.crypto-chat-room');
+
+                                                const gridContainer = document.querySelector('.NewGrid');
+                                                gridContainer.style.left = '10%';
+
+                                                contractInfoContainer.remove();
+                                                contractTools.remove();
+                                                contractOptions.remove();
+                                                chatBox.remove();
+                                            }else if(window.innerWidth <= 499 && window.innerWidth >= 350 ){
+                                                GridWidth = '80%';
+                                                gridItemWidth = '100%';
+                                                if(currentNFTArray.length >= 24){
+                                                    makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 2, GridWidth, gridItemWidth, asyncPageObjectData);
+                                                }else{
+                                                    makeNFTPage(currentNFTArray, currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 2, GridWidth, gridItemWidth, asyncPageObjectData);
+                                                }
+                                                const contractInfoContainer = document.querySelector('.contractInfoContrainer');
+                                                const contractTools = document.querySelector('.contractTools');
+                                                const contractOptions = document.querySelector('.contractOptions');
+                                                const chatBox = document.querySelector('.crypto-chat-room');
+                                                const gridContainer = document.querySelector('.NewGrid');
+                                                gridContainer.style.left = '10%';
+                                                contractInfoContainer.remove();
+                                                contractTools.remove();
+                                                contractOptions.remove();
+                                                chatBox.remove();
+                                            }else if(window.innerWidth <= 350) {
+                                                window.location.href = 'unsupported.html'; 
                                             }
-
-                                            const contractInfoContainer = document.querySelector('.contractInfoContrainer');
-                                            const contractTools = document.querySelector('.contractTools');
-                                            const contractOptions = document.querySelector('.contractOptions');
-                                            const chatBox = document.querySelector('.crypto-chat-room');
-
-                                            const gridContainer = document.querySelector('.NewGrid');
-                                            gridContainer.style.left = '10%';
-
-                                            contractInfoContainer.remove();
-                                            contractTools.remove();
-                                            contractOptions.remove();
-                                            chatBox.remove();
-                                        }else if(window.innerWidth <= 499 && window.innerWidth >= 350 ){
-                                            GridWidth = '80%';
-                                            gridItemWidth = '100%';
-                                            if(currentNFTArray.length >= 24){
-                                                makeNFTPage(currentNFTArray.slice(0,24), currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 2, GridWidth, gridItemWidth);
-                                            }else{
-                                                makeNFTPage(currentNFTArray, currentNFTsPurchaseArray, sideElementsWidthPercent,  document.body, 2, GridWidth, gridItemWidth);
-                                            }
-                                            const contractInfoContainer = document.querySelector('.contractInfoContrainer');
-                                            const contractTools = document.querySelector('.contractTools');
-                                            const contractOptions = document.querySelector('.contractOptions');
-                                            const chatBox = document.querySelector('.crypto-chat-room');
-                                            const gridContainer = document.querySelector('.NewGrid');
-                                            gridContainer.style.left = '10%';
-                                            contractInfoContainer.remove();
-                                            contractTools.remove();
-                                            contractOptions.remove();
-                                            chatBox.remove();
-                                        }else if(window.innerWidth <= 350) {
-                                            window.location.href = 'unsupported.html'; 
+                                        }else{
+                                            alert('Sorry We could not get the data to the contract please reload the page and try again');
                                         }
                                     }, 101)
                                 }else{
@@ -3061,15 +3067,10 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     console.log("called the recent sells function");
             
 }
-export async function makeNFTPage(array, purchaseArray, sideElementsWidth, parentElement, numColumns, gridWidthPercent, gridItemWidth) {
-    console.log('2) make header to hold collection logo directly above grid from database'); 
-    console.log('3) make grid work on all screen sizes');
-    console.log('4) test deploy contract function and start to call them on hover, ...etc. Make sure to test contract on IDE devloper or whatever');
-    console.log('5) make abaility to navigate pages maybe 50 items per page');
-    console.log(`6) use ${userSelectedContract} to acess data for selected contract and display on page`);
-    let maxSell; let numberOfSells; let myTokens; let numberOfTokens; let allOwners; let coin;
-    let minimalList; let royaltyFeePercent; let transferFee; let minimalListInETH; let transferFeeInETH;
 
+async function gatherAsyncNFTPageData() {
+    let maxSell; let numberOfSells; let numberOfTokens; let allOwners; let coin;
+    let minimalList; let royaltyFeePercent; let transferFee; let minimalListInETH; let transferFeeInETH;
     const web3 = new Web3(window.ethereum);
     const contract = new web3.eth.Contract(JSON.parse(userSelectedContract.contractABI), userSelectedContract.contractAddress);
     try {
@@ -3092,7 +3093,50 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
         maxSell = "Error";
         numberOfSells = "Error";
     }
+    console.log('trying to set coin using', userSelectedContract);
+    if(userSelectedContract.ERCStandard === "ERC1155"){
+        coin = "POL";
+    }else if(userSelectedContract.ERCStandard === "ERC721"){
+         coin = "ETH";
+    }else if(userSelectedContract.ERCStandard === "ERC20"){
+        coin = "ETC"
+    }else{
+         coin = "??";
+    }
 
+    return [{
+        minimalList,
+        minimalListInETH,
+        transferFee,
+        transferFeeInETH,
+        royaltyFeePercent,
+        numberOfTokens,
+        maxSell,
+        numberOfSells, 
+        coin
+    }, contract]
+
+}
+export async function makeNFTPage(array, purchaseArray, sideElementsWidth, parentElement, numColumns, gridWidthPercent, gridItemWidth, asyncPageObjectData) {
+    console.log('2) make header to hold collection logo directly above grid from database'); 
+    console.log('3) make grid work on all screen sizes');
+    console.log('4) test deploy contract function and start to call them on hover, ...etc. Make sure to test contract on IDE devloper or whatever');
+    console.log('5) make abaility to navigate pages maybe 50 items per page');
+    console.log(`6) use ${userSelectedContract} to acess data for selected contract and display on page`);
+
+    let {        
+        minimalList,
+        minimalListInETH,
+        transferFee,
+        transferFeeInETH,
+        royaltyFeePercent,
+        numberOfTokens,
+        maxSell,
+        numberOfSells, 
+        coin
+    } = asyncPageObjectData[0];
+
+    let contract = asyncPageObjectData[1];
 
     const collectionBackgroundImageContainer = document.createElement('div');
     collectionBackgroundImageContainer.style.position = 'relative';
@@ -3125,16 +3169,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     contractInfoDiv.style.borderRadius = '5px';
     contractInfoDiv.style.borderWidth = '2px';
 
-    console.log('trying to set coin using', userSelectedContract);
-    if(userSelectedContract.ERCStandard === "ERC1155"){
-        coin = "POL";
-    }else if(userSelectedContract.ERCStandard === "ERC721"){
-         coin = "ETH";
-    }else if(userSelectedContract.ERCStandard === "ERC20"){
-        coin = "ETC"
-    }else{
-         coin = "??";
-    }
     let scanURL = "";
     if (coin === "ETH") {
         scanURL = `https://etherscan.io/address/${userSelectedContract.contractAddress}`;
