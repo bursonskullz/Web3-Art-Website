@@ -7,13 +7,13 @@
     ```javascript
     const paintingUploadCode = 'Painting-code-here!';
     const appPasscode = 'google-app-passcode-here';
-    const businessEmail = 'your-business-email@gmail.com';
+    const buisnessEmial = 'your-buisiness-email@gmail.com';
     const dbURL = 'your-mongoose-db-string';
     const googleAPIKEY = 'your-google-api-maps-key';
-    const myDomain = 'localhost';
     const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
-    const OPENAI_API_KEY = 'YOUR-OPENAI-KEY';
-    const PORT = process.env.PORT || 27015; 
+    const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
+    const addNFTCollectionDataPasscode = 'your-passcode-to-add-nfts';
+    const deployableContractPasscode = 'passcode-to-deploy-contract';
     ```
 
 3. Change Roy's wallet address to your wallet address in the `myfunction.js` file (it must be a MetaMask wallet for time being):
