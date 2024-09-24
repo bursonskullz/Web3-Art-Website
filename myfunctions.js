@@ -1365,7 +1365,7 @@ export function makeNewNFTGrid(array, grid,coin, contract) {
 
         let hoverTimeout;
         gridItem.addEventListener('mouseenter', async function() {
-            clearTimeout(hoverTimeout); // Clear the timeout if mouse leaves before it's set
+            clearTimeout(hoverTimeout); 
             gridItem.style.transform = 'translateY(-5px)';
             overlay.style.display = 'flex';
             const buyButton = document.querySelector('.buy-button' + gridItem.id);
@@ -1566,8 +1566,6 @@ export function makePaintGrid(array, parentElement, columns, gridWidthPercent) {
     parentElement.appendChild(gridContainer);
 
 }
-
-
 async function getAccetableCoinPrices(coins) {
     try {
         const response = await fetch('/get-prices', {
@@ -1587,10 +1585,7 @@ async function getAccetableCoinPrices(coins) {
         return [];
     }
 }
-
-
 async function addCryptoTokens(div){
-
     const ethpopup = document.createElement('div');
     const ethlogo = document.createElement('div');
     const ethptagContainer = document.createElement('div'); 
@@ -2407,7 +2402,7 @@ async function makeOwnersPage(contract,sideElementsWidth) {
         allOwnersAddressArray = [];
     }
 
-    // test by uncommmenting next line 
+    // test without contract by uncommmenting next two line (if it unaviable)
     //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
     //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
 
@@ -2472,130 +2467,36 @@ async function makeOwnersPage(contract,sideElementsWidth) {
 
 }
 
-function addBTDListeners(transferText, bulkListText, delistText){
-    transferText.addEventListener('click', () => {
+function removeSmallHeaderTools(){
+    try{
         const delistTool = document.querySelector(".delistTool");
         const bulklistingTool = document.querySelector(".bulkListTool");
         const tansferTool = document.querySelector(".transferTool");
-        if (delistTool) {
+        if (delistTool && bulklistingTool && tansferTool) {
             delistTool.innerHTML ='';
-            listingOrDelisting = "Transfering";
-        }
-        if(bulklistingTool){
             bulklistingTool.innerHTML = '';
-        } 
-        if(tansferTool){
-            tansferTool.innerHTML = '';
+            tansferTool.innerHTML = '';   
         }
-        const listedSpans = document.querySelectorAll('.listedSpan');
-        let count = 0; 
-        listedSpans.forEach(() => {
-            count += 1; 
-            const parentContainer = document.querySelector(`.sold-item-${count}`);
-            if (parentContainer) {
-                const checkbox = parentContainer.querySelector('input[type="checkbox"]');
-                if (checkbox) {
-                    const parentText = parentContainer.textContent.toLowerCase();
-                     checkbox.style.display = 'inline-block';
-                } else {
-                    console.log(`Checkbox not found in parent container ${count}.`);
-                }
-            } else {
-                console.log(`Parent container not found for count: ${count}.`);
+    }catch(error){
+        console.log('sorry cannot delist tool, list tool, and transfer tool to list');
+    }
+}
+function addBTDListeners(array){
+    for(const item of array){
+        item.addEventListener('click', () => {
+            console.log('clicking current item', item);
+            if(item.textContent === 'Bulk list'){
+                listingOrDelisting = 'Listing';
+            }else if(item.textContent === 'Delist'){
+                listingOrDelisting = 'Delisting';
+            }else if(item.textContent === 'Transfer Tokens'){
+                listingOrDelisting = 'Transfering';
             }
+            console.log('tool selected =', listingOrDelisting);
+            removeSmallHeaderTools();
+            removeCheckBoxes(listingOrDelisting);
         });
-    });
-
-    bulkListText.addEventListener('click', () => {
-        const delistTool = document.querySelector(".delistTool");
-        const bulklistingTool = document.querySelector(".bulkListTool");
-        const tansferTool = document.querySelector(".transferTool");
-        if (delistTool) {
-            delistTool.innerHTML ='';
-            listingOrDelisting = "listing";
-        }
-        if(bulklistingTool){
-            bulklistingTool.innerHTML = '';
-        }
-        if(tansferTool){
-            tansferTool.innerHTML = '';
-        }
-        
-        const listedSpans = document.querySelectorAll('.listedSpan');
-        let count = 0; 
-        listedSpans.forEach(() => {
-            count += 1; 
-            const parentContainer = document.querySelector(`.sold-item-${count}`);
-
-            if (parentContainer) {
-                const checkbox = parentContainer.querySelector('input[type="checkbox"]');
-
-                if (checkbox) {
-                    const parentText = parentContainer.textContent.toLowerCase();
-                    console.log(`Checking parent container ${count} for "active" text.`); 
-                    if (parentText.includes("inactive")) {
-                        checkbox.style.display = 'inline-block';
-                        console.log(`Checkbox shown for parent container ${count} because it does not contain "Inactive".`);
-                    } else {
-                         checkbox.style.display = 'none'; 
-                         console.log(`Checkbox hidden for parent container ${count} because it contains "active".`); 
-                    }
-                } else {
-                    console.log(`Checkbox not found in parent container ${count}.`);
-                }
-            } else {
-                console.log(`Parent container not found for count: ${count}.`);
-            }
-        });
-    });
-
-    delistText.addEventListener('click', () => {
-        console.log('bulk delist tool clicked!');
-        const delistTool = document.querySelector(".delistTool");
-        const bulklistingTool = document.querySelector(".bulkListTool");
-        const tansferTool = document.querySelector(".transferTool");
-
-        if (delistTool) {
-            delistTool.innerHTML = '';
-            listingOrDelisting = "delisting";
-        }
-
-        if(bulklistingTool){
-            bulklistingTool.innerHTML = '';
-        } 
-
-        if(tansferTool){
-            tansferTool.innerHTML = '';
-        }
-
-        const listedSpans = document.querySelectorAll('.listedSpan');
-
-        let count = 0; 
-        listedSpans.forEach(() => {
-            count += 1;
-            const parentContainer = document.querySelector(`.sold-item-${count}`);
-
-            if (parentContainer) {
-                const checkbox = parentContainer.querySelector('input[type="checkbox"]');
-
-                if (checkbox) {
-                    const parentText = parentContainer.textContent.toLowerCase(); 
-                    console.log(`Checking parent container ${count} for "active" text.`); 
-                    if (!parentText.includes("inactive")) {
-                        checkbox.style.display = 'inline-block';
-                        console.log(`Checkbox shown for parent container ${count} because it does not contain "Inactive".`);
-                    } else {
-                         checkbox.style.display = 'none';
-                         console.log(`Checkbox hidden for parent container ${count} because it contains "active".`);
-                    }
-                } else {
-                    console.log(`Checkbox not found in parent container ${count}.`);
-                }
-            } else {
-                console.log(`Parent container not found for count: ${count}.`);
-            }
-        });
-    });
+    }
 }
 async function makeMytokensPage(contract, sideElementsWidth, coin){
     console.log('Trying to get my tokens to display.');
@@ -2736,8 +2637,11 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     footer.style.justifyContent = 'center';
     footer.style.alignItems = 'center';
     tokenContainer.appendChild(footer);
-
-    addBTDListeners(transferText, bulkListText, delistText);
+    let listernerArray = []; 
+    listernerArray.push(transferText);
+    listernerArray.push(bulkListText)
+    listernerArray.push(delistText);
+    addBTDListeners(listernerArray);
 
     try {
         const loadingContainer = document.createElement("div");
@@ -2806,6 +2710,61 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
         alert('You must connect your MetaMask wallet to see your tokens.');
     }
     
+}
+
+function removeCheckBoxes(description){
+    console.log('removing checkbox using description', description);
+    const itemInsideContainer = document.querySelector('.token-inside-Container');
+    const containerChildren = itemInsideContainer.children;
+    const itemsInSmallContainer = Array.from(containerChildren);
+    for (const item of itemsInSmallContainer){
+        if(description === 'Delisting'){
+            if(item.innerHTML.includes('Inactive')){
+                console.log('removing item because it is not active');
+                item.remove();
+            }else{
+                alignItems(item);
+            }
+        }else if(description === 'Listing'){
+            if(!item.innerHTML.includes('Inactive')){
+                    console.log('removing item because it is not active');
+                item.remove();
+            }else{
+                alignItems(item);
+            }
+        }else if(description === 'Transfering'){
+            alignItems(item);
+        }
+    }
+}
+function alignItems(item){
+    console.log('item = ', item);
+    const itemChildren = Array.from(item.children);
+    let textContainer;
+    for(const child of itemChildren){
+        console.log('checking className manuelly', child.className);
+        if(child.className === 'priceSpantag'){
+            child.remove();
+        }else if(child.className === 'dateSpantag'){
+            child.remove();
+        }else if(child.className.includes('textContainer:')){
+            textContainer = child;
+        }
+    }
+    if (textContainer) {
+        console.log('trying to align items');
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (checkbox) {
+            // grab parent and 
+            const parentText = item.textContent.toLowerCase();
+            checkbox.style.display = 'inline-block';
+        } else {
+            console.log(`Checkbox not found in parent container.`);
+        }
+        console.log('add input bar here if listingOrDelisting=== Listing');
+    } else {
+        console.log(`text container with items to remove not found`);
+    }
 }
 async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     let recentSells;
@@ -5211,11 +5170,9 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
 
                             if(integerValue <= gridItems.length && integerValue != 0){
                                 for(var k = 0; k< integerValue; k++){
-                                    console.log("grid item swep", gridItems[k].id);
-                                    console.log('trying to get id and parse to integer');
-                                   let tokenID =  parseInt(gridItems[k].id);
-                                   console.log('tokenID is', tokenID);
-                                   let tokenData;
+                                    let tokenID =  parseInt(gridItems[k].id);
+                                    console.log('tokenID is', tokenID);
+                                    let tokenData;
                                     try{
                                         tokenData = await contract.methods.getTokenData(tokenID).call();
                                         if(tokenData.forSale){
@@ -5227,8 +5184,8 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                         console.log('Error calling getTokenData() on contract', error);
                                     }
                                 }
-                                if(unavailableTokens.length == 0 && availabeTokens.length != 0){
-                                    console.log('trying to sweep the floor');
+                                if(unavailableTokens.length == 0 && availabeTokens.length != 0 && tokenData){
+                                    console.log('trying to sweep the floor!!!!');
                                     try{
                                         let currentAddressGasSender;
                                         if (isConnected) {
@@ -5255,6 +5212,7 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                                 }
                                             }
                                         }
+                                        console.log(`${currentAddressGasSender} is attempt ing to sweep the floor`);
                                         if(currentAddressGasSender){
                                             const gasEstimate = await contract.methods.purchaseArrayOfNFT(availabeTokens).estimateGas({ from: currentAddressGasSender });
                                             const tx = await contract.methods.purchaseArrayOfNFT(availabeTokens).send({
@@ -6614,20 +6572,18 @@ function createSearchBar(parentElement) {
     searchInput.addEventListener('keyup', handleSearch);
 }
 
-async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlockChainAddress, contract, parentContainer){
+async function createContractOptionAbility(nextButton, listOrDelistOption, clientBlockChainAddress, contract, parentContainer){
     let tokenPricesInputsFilled = true;
     let minimalListingPriceChecker = true;
     let dictatedTokenPlaceHolder;
-    if(listOrDelistOption === "listing"){
+    if(listOrDelistOption === "Listing"){
+        console.log('trying to remove elements that have not been checked and add input bars before chaging button text to submit');
         const failedTokens = [];
         if (nextButton.textContent === 'Next') {
             const selectedTokens = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             const soldItems = document.querySelectorAll('.sold-item');
-            const smallHeaderText = document.querySelector(".smallHeader");
-            if (smallHeaderText) {
-                smallHeaderText.firstChild.textContent = 'List Tokens';
-            }
+
             if(userSelectedContract.ERCStandard === "ERC1155"){
                 dictatedTokenPlaceHolder = 'Price in POL';    
             }else if(userSelectedContract.ERCStandard === "ERC70"){
@@ -6637,46 +6593,53 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             }else{
                 dictatedTokenPlaceHolder = 'Price';
             }
-            soldItems.forEach(soldItem => {
+            console.log('trying to remove items that dont have a checkbox (some seem to not be showing up double check):', soldItems);
+            for(const soldItem of soldItems){
                 const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
-                if (!checkbox || !checkbox.checked) {
+                console.log('checkboxes found', checkbox);
+                if (!checkbox.checked) {
                     soldItem.remove(); 
                 } else if (checkbox.checked) {
-                    const parentClass = soldItem.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
-                    const tokenCount = parentClass ? parentClass.split('-')[2] : null; 
-                    const textContainer = soldItem.querySelector(`.textContainer\\:${tokenCount}`); 
-                    if (textContainer) {
-                        const purchasePriceDiv = Array.from(textContainer.children).find(child => 
-                            child.textContent.includes('Purchase Price:')
-                        );
-                        if (purchasePriceDiv) {
-                            textContainer.removeChild(purchasePriceDiv); 
-                        }
-                        const datePurchasedDiv = Array.from(textContainer.children).find(child => 
-                            child.textContent.includes('Date Purchased:')
-                        );
-                        if (datePurchasedDiv) {
-                            textContainer.removeChild(datePurchasedDiv); 
-                        }
+                    console.log('trying to add input input bar to element', soldItem);
+                    //const textContainer = soldItem.querySelector('.textContainer');
+                    const textContainer = soldItem.querySelector('[class*="textContainer"]');
+                    const priceContainer = soldItem.querySelector('.priceSpantag');
+                    const dateContainer = soldItem.querySelector('.dateSpantag');
+
+                    if(dateContainer && textContainer){
+                        console.log('trying to remove date contaniner and replace with the input bar');
+                        dateContainer.remove();
+
+                        const inputContainer = document.createElement('div');
+                        inputContainer.style.position = 'relative';
+                        inputContainer.style.width = '100%';
+                        inputContainer.style.height = '25%';
+                        inputContainer.style.bottom = '0%';
+                        
                         const priceInput = document.createElement('input');
-                        priceInput.type = 'text';
+                        priceInput.type = 'number';
                         priceInput.placeholder = dictatedTokenPlaceHolder; 
-                        priceInput.style.marginRight = '10px'; 
-                        priceInput.style.padding = '2px';
-                        priceInput.style.left = '2px';
-                        priceInput.style.width = '80%'; 
+                        priceInput.style.left = '0%';
+                        priceInput.style.height = '80%';
+                        priceInput.style.position = 'relative';
+                        priceInput.style.width = '100%'; 
                         priceInput.style.borderRadius = '5px'; 
                         priceInput.style.border = '1px solid #ccc';  
                         priceInput.classList.add('price-input'); 
-                        textContainer.appendChild(priceInput);
-                        if (tokenCount) {
-                            const inputValue = priceInput.value || ''; 
-                            selectedTokens.push({ tokenId: tokenCount, inputValue });
-                        }
+
+                        textContainer.appendChild(inputContainer);
+                        inputContainer.appendChild(priceInput);
+                    }else if(!textContainer){
+                        console.log('sorry cannot find the text container to add the input bar');
                     }
                 }
-            });
+            }
+            console.log(' input bars should be added. Changing the header and button text content');
             nextButton.textContent = 'Submit';
+            const smallHeaderText = document.querySelector(".smallHeader");
+            if (smallHeaderText) {
+                smallHeaderText.firstChild.textContent = 'List Tokens';
+            }
         } else if (nextButton.textContent === 'Submit') {
             const selectedTokens = [];
             let successFullTokens = [];
@@ -6685,48 +6648,53 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             tokenPricesInputsFilled = true;
             minimalListingPriceChecker = true;
-            console.log('trying to set token using checkboxes', checkboxes);
+            console.log('trying to retrieve token ids to list using checkboxes', checkboxes);
             for (const checkbox of checkboxes) {
                 if (checkbox.checked) {
                     const parentDiv = checkbox.closest('.sold-item');
-                    const parentClass = parentDiv.classList.value.split(' ').find(className => className.startsWith('sold-item-'));
-                    const tokenCount = parentClass ? parentClass.split('-')[2] : null; 
-                    const textContainer = parentDiv.querySelector(`.textContainer\\:${tokenCount}`);
-                    if (textContainer) {
-                        const priceInput = textContainer.querySelector('input[type="text"]');
-                        const inputValue = priceInput ? priceInput.value.trim() : '';
-                        console.log('Trying to list using price (not in WEI):', inputValue);
-                        if (inputValue) {
-                            const parsedValue = parseFloat(inputValue);
-                            console.log(`Trying to check if the value ${inputValue} is being parsed`);
-                            if (!isNaN(parsedValue)) {
-                                try {
-                                    minimalListingPrice = await contract.methods.minimalListingPrice().call();
-                                    console.log('Checking minimal price and making sure it\'s not null', minimalListingPrice);
-                                    minimalListingPriceInETH = (BigInt(minimalListingPrice) / BigInt(10 ** 18)).toString();
-                                    console.log('Minimal price as big integer', minimalListingPriceInETH);
-                                    if (parsedValue >= parseFloat(minimalListingPriceInETH)) {
-                                        console.log('Trying to push token data into array', { tokenId: tokenCount, inputValue: minimalListingPriceInETH });
-                                        selectedTokens.push({ tokenId: tokenCount, inputValue: minimalListingPriceInETH });
-                                    } else {
-                                        minimalListingPriceChecker = false;
-                                    }
-                                } catch (error) {
+                    let tokenIdToSend;
+                    if (parentDiv) {
+                        const soldItemClass = parentDiv.className;
+                        tokenIdToSend = parseInt(soldItemClass.split('sold-item-')[1], 10);
+                    }
+                    console.log('retrieved token ID to send', tokenIdToSend);
+                    console.log('trying to set the price for this particular token');
+                    const priceInput = parentDiv.querySelector('input[type="number"]');
+                    console.log('price input ==', priceInput);
+                    const inputValue = priceInput ? priceInput.value.trim() : '';
+                    console.log('Trying to list using price (not in WEI):', inputValue);
+                    if (inputValue) {
+                        const parsedValue = parseFloat(inputValue);
+                        console.log(`Trying to check if the value ${inputValue} is being parsed`);
+                        if (!isNaN(parsedValue)) {
+                            try {
+                                minimalListingPrice = await contract.methods.minimalListingPrice().call();
+                                console.log('Checking minimal price and making sure it\'s not null', minimalListingPrice);
+                                const minimalListingPriceInBigInt = BigInt(minimalListingPrice); 
+                                console.log('minimal listing price as big integer');
+                                minimalListingPriceInETH = minimalListingPriceInBigInt / BigInt(10 ** 18);
+                                console.log('Minimal price as big integer', minimalListingPriceInETH);
+                                if (parsedValue >= parseFloat(minimalListingPriceInETH)) {
+                                    console.log('Trying to push token data into array', { tokenId: tokenIdToSend, inputValue: minimalListingPriceInETH });
+                                    selectedTokens.push({ tokenId: parseInt(tokenIdToSend), inputValue: parsedValue });
+                                } else {
                                     minimalListingPriceChecker = false;
-                                    console.error('Error fetching minimalListingPrice:', error);
                                 }
-                            } else {
-                                console.log(`The parsed value gave ${parsedValue}`);
-                                tokenPricesInputsFilled = false;
+                            } catch (error) {
+                                minimalListingPriceChecker = false;
+                                console.error('Error fetching minimalListingPrice:', error);
                             }
                         } else {
+                            console.log(`The parsed value gave ${parsedValue}`);
                             tokenPricesInputsFilled = false;
                         }
+                    } else {
+                        tokenPricesInputsFilled = false;
                     }
                 }
             }
             try{
-                 console.log('trying to list NFTS using data', selectedTokens);
+                console.log('trying to list NFTS using data', selectedTokens);
                 if (selectedTokens.length > 0 && tokenPricesInputsFilled &&  minimalListingPriceChecker) {
                     let errorWithIn50Blocks = false;
                     console.log('Final Token Data to Submit:', selectedTokens);
@@ -6760,39 +6728,71 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     
                     for (const token of selectedTokens) {
                         tokenIds.push(parseInt(token.tokenId));
-                        const price_IN_WEI = web3.utils.toWei(token.inputValue.toString(), 'ether');
-                        prices.push(web3.utils.toBN(price_IN_WEI));
+                        const price_IN_WEI = (parseFloat(token.inputValue) * 10**18).toString();
+                        prices.push(price_IN_WEI);
                     }
 
                     try {
-                        const gasEstimateToListSingleNFT = await contract.methods.listNFT(tokenIds[0], prices[0]).estimateGas({ from: clientBlockChainAddress });
-                        const gasEstimateToListArray = gasEstimateToListSingleNFT*tokenIds.length;
-                        const gasLimit = Math.floor(gasEstimateToListArray * 1.098);
-                        const tx = await contract.methods.listArrayOfNFTs(tokenIds, prices).send({
+                        console.log('initial try statement trying to get gas estimates');
+                        const minimalListingPrice = await contract.methods.minimalListingPrice().call();
+                        console.log('minimum listing fee per token =', minimalListingPrice);
+                        const valueEstimate = (BigInt(minimalListingPrice) * BigInt(110)) / BigInt(100);
+                        console.log('Value Estimated as string ', valueEstimate.toString());
+                        console.log('trying to call constract using data', tokenIds, prices);
+                        console.log('trying to use address', clientBlockChainAddress);
+                        console.log('trying to send value', valueEstimate.toString());
+
+                        const nftOwner = await contract.methods.nfts(tokenIds[0]).call();
+                        console.log('NFT owner:', nftOwner.owner);
+                        console.log('Calling from address:', clientBlockChainAddress);
+
+                        console.log('user tokens from getUsersTokens()', tokenIds);
+                        console.log('prices from small container', prices);
+                        const gasEstimateToListSingleNFT = await contract.methods.listNFT(tokenIds[0], prices[0]).estimateGas({
                             from: clientBlockChainAddress,
-                            gas: gasLimit
+                            value: valueEstimate.toString()
+                        });
+                        console.log('gasEstimateToListSingleNFT', gasEstimateToListSingleNFT);
+                        const valueEstimateInt = Number(valueEstimate)*tokenIds.length; 
+                        console.log('Value Estimated to list array as integer', valueEstimateInt);
+                        const gasEstimateToListArray = gasEstimateToListSingleNFT*tokenIds.length;
+                        console.log('gasEstimateToListArray', gasEstimateToListArray)
+                        const gasLimit = Math.floor(gasEstimateToListArray * 1.1);
+                        
+                        console.log('gas limit as a buffer', gasLimit);
+
+                        contract.methods.listArrayOfNFTs(tokenIds, prices)
+                        .send({
+                            from: clientBlockChainAddress,
+                            gas: gasLimit,
+                            value: valueEstimateInt.toString()
+                        })
+                        .on('transactionHash', function(hash) {
+                            console.log("User accepted the transaction. Transaction hash:", hash);
+                            successFullTokens.push(tokenIds);
+                            // At this point, the user has signed and accepted the transaction
+                        })
+                        .on('receipt', function(listReceipt) {
+                            console.log("Transaction Receipt:", listReceipt);
+                            if (listReciept && listReceipt.status == true) {
+                                console.log('The user accepted the transaction and it was successful.');
+                            } else {
+                                console.log('The transaction failed.');
+                                failedTokens.push(tokenIds);
+                            }
+                        })
+                        .on('error', function(error, receipt) {
+                            console.log("Transaction rejected or failed:", error);
+                            if (error.code === 4001) {
+                                console.log('The transaction was rejected prompt the user.');
+                            } else if(error.message.includes('Transaction was not mined within 50 blocks')){
+                                console.log('The transaction is taking to long.');
+                            }else {
+                                console.log('an unepexected error occured');
+                            }
+                            failedTokens.push(tokenIds);
                         });
 
-                        console.log('Transaction sent. Waiting for confirmation...');
-                        const listReciept = await checkTransactionReceipt(tx.transactionHash, web3);
-                        if (listReciept && listReciept.status == true) {
-                            console.log('The user accepted the transaction and it was successful.');
-                            successFullTokens.push(tokenIds);
-                                /*
-                                const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-                                if (receipt && receipt.status === true) {
-                                    console.log('The user accepted the transaction and it was successful.');
-                                    successFullTokens.push(tokenIds);
-                                } else {
-                                    console.log('The transaction failed.');
-                                    failedTokens.push(tokenIds);
-                                }
-                                */
-                        } else {
-                            //console.log('The transaction could not be sent.');
-                            console.log('The transaction failed.');
-                            failedTokens.push(tokenIds);
-                        }
                     } catch (error) {                        
                         if (error.message.includes('out of gas')) {
                             console.error('Failed to list array: insufficient gas.');
@@ -6890,7 +6890,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
 
             }
         }
-    }else if(listOrDelistOption === "delisting"){
+    }else if(listOrDelistOption === "Delisting"){
         console.log('trying to delist items in bulk ');
         const failedTokens = [];
         if (nextButton.textContent === 'Next') {
@@ -6955,12 +6955,35 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     const gasLimit = Math.floor(gasEstimateForArray*1.1);
                     if(gasLimit){
                         console.log('trying to get send transaction using gas estimate', gasLimit);
-                        
-                        console.log('trying to estimate the gas cost to delist', gasLimit);
                         const tx = await contract.methods.delistNFTArray(selectedTokens).send({
                             from: clientBlockChainAddress,
                             gas: gasLimit
+                        })
+                        .on('transactionHash', function(hash) {
+                            console.log("User accepted the transaction. Transaction hash:", hash);
+                            successFullTokens.push(selectedTokens);
+                            // At this point, the user has signed and accepted the transaction
+                        })
+                        .on('receipt', function(delistReceipt) {
+                            console.log("Transaction Receipt:", delistReceipt);
+                            if (delistReceipt && delistReceipt.status == true) {
+                                console.log('The user accepted the transaction and it was successful.');
+                            } else {
+                                console.log('The transaction failed.');
+                                failedTokens.push(selectedTokens);
+                            }
+                        })
+                        .on('error', function(error, receipt) {
+                            console.log("Transaction rejected or failed:", error);
+                            if (error.code === 4001) {
+                                console.log('The transaction was rejected prompt the user.');
+                            } else {
+                                console.log('an unepexected error occured');
+                            }
+                            failedTokens.push(selectedTokens);
                         });
+
+                        /*
                         if (tx && tx.transactionHash) {
                             console.log('Transaction sent. Waiting for confirmation...');
                             const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
@@ -6977,6 +7000,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                        for(var i =0; i< selectedTokens.length; i++){
                             successFullTokens.push(selectedTokens[i]);
                        } 
+                       */
                     }else{
                         console.log('Sorry there was an error estimating the gas fee');
                     }
@@ -7057,7 +7081,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                 alert('No tokens have been selected to delist.');
             }
         }
-    }else if(listOrDelistOption === "transfering"){
+    }else if(listOrDelistOption === "Transfering"){
         const failedTokens = [];
         if (nextButton.textContent === 'Next') {
             const selectedTokens = [];
@@ -7161,7 +7185,32 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                         from: clientBlockChainAddress,
                         gas: gasEstimateForArray,
                         value: valueEstimateInt.toString()
+                    })
+                    .on('transactionHash', function(hash) {
+                        console.log("User accepted the transaction. Transaction hash:", hash);
+                        successFullTokens.push(selectedTokens);
+                        // At this point, the user has signed and accepted the transaction
+                        })
+                    .on('receipt', function(transferReceipt) {
+                        console.log("Transaction Receipt:", transferReceipt);
+                        if (transferReceipt && transferReceipt.status == true) {
+                            console.log('The user accepted the transaction and it was successful.');
+                        } else {
+                            console.log('The transaction failed.');
+                            failedTokens.push(selectedTokens);
+                        }
+                    })
+                    .on('error', function(error, receipt) {
+                        console.log("Transaction rejected or failed:", error);
+                        if (error.code === 4001) {
+                            console.log('The transaction was rejected prompt the user.');
+                        } else {
+                            console.log('an unepexected error occured');
+                        }
+                        failedTokens.push(selectedTokens);
                     });
+
+                    /*    
                     if (tx && tx.transactionHash) {
                             console.log('Transaction sent. Waiting for confirmation...');
                             const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
@@ -7175,7 +7224,7 @@ async function sendListingOrDElistData(nextButton, listOrDelistOption, clientBlo
                     } else {
                         console.log('The transaction could not be sent.');
                         failedTokens.push(transferTokenIds);
-                    }
+                    }*/
                     
                 } catch (error) {
                     failedTokens.push(transferTokenIds);
@@ -7265,6 +7314,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
     try{
         let UsersNFTsIds;
         try{
+            console.log('trying to get all tokens for the client', addressString);
             UsersNFTsIds = await contract.methods.getUsersTokens(addressString).call();
         }catch(error){
             console.log('Error calling the function getUsersTokens() on the contract', error);
@@ -7276,8 +7326,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
             let userNFTARRay = [];
             for (var i = 0; i < UsersNFTsIds.length; i++) {
                 const tokenIdInINt = parseInt(UsersNFTsIds[i]);
-                const currentNFTtokenIDParsed = parseInt(currentNFTArray[i].tokenID);
-                if (tokenIdInINt && currentNFTtokenIDParsed ) {
+                if (tokenIdInINt) {
                     let imageURL;
                     let currentObj;
                         for (const token of currentNFTArray) {
@@ -7332,7 +7381,8 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 userNFTARRay.forEach(token => {
                     count+=1;
                     const soldItem = document.createElement('div');
-                    soldItem.classList.add('sold-item', `sold-item-${count}`); 
+                    //soldItem.className = `sold-item-${token.tokenID}`; 
+                    soldItem.className = `sold-item sold-item-${token.tokenID}`;
                     soldItem.style.height = '100px';
                     soldItem.style.position = 'relative'; 
                     soldItem.style.overflow = 'hidden'; 
@@ -7392,6 +7442,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     const priceSpan = document.createElement('div');
                     let convertedPrice = ((token.purchasePrice)/(10**18)).toFixed(3);
                     priceSpan.textContent = `Purchase Price: `+ `${convertedPrice}` + ` ${coin}`; 
+                    priceSpan.className = 'priceSpantag';
                     priceSpan.style.marginBottom = '5px'; 
                     priceSpan.style.color = 'white'; 
                     textContainer.appendChild(priceSpan);
@@ -7407,6 +7458,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                         hour12: false 
                     })}`;
                     dateSpan.style.color = 'white';
+                    dateSpan.className = 'dateSpantag';
                     textContainer.appendChild(dateSpan);
                     parentContainer.appendChild(soldItem);
                 });
@@ -7429,12 +7481,12 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     const isDelistToolActive =document.querySelector(".delistTool");
                     if(listingOrDelisting === undefined){
                         alert("please select bulk list or delist before clicking next");
-                    }else if(listingOrDelisting === "listing"){
-                        sendListingOrDElistData(nextButton, "listing", addressString, contract, parentContainer);
-                    }else if(listingOrDelisting === "delisting"){
-                        sendListingOrDElistData(nextButton, "delisting", addressString, contract, parentContainer);
+                    }else if(listingOrDelisting === "Listing"){
+                        createContractOptionAbility(nextButton, "Listing", addressString, contract, parentContainer);
+                    }else if(listingOrDelisting === "Delisting"){
+                        createContractOptionAbility(nextButton, "Delisting", addressString, contract, parentContainer);
                     }else if(listingOrDelisting === "Transfering"){
-                        sendListingOrDElistData(nextButton, "transfering", addressString, contract, parentContainer);
+                        createContractOptionAbility(nextButton, "Transfering", addressString, contract, parentContainer);
                     }else{
                        alert("an unexpected eror has occured");
                     }
@@ -8098,19 +8150,21 @@ function createContract(data) {
             return sells;
         }
         function getUsersTokens(address user) public view returns (uint256[] memory) {
-            uint256[] memory tempTokens = new uint256[](tokenCount); 
             uint256 count = 0;
             for (uint256 i = 0; i < tokenCount; i++) {
                 if (nfts[i].owner == user) {
-                    tempTokens[count] = nfts[i].id; 
                     count++;
                 }
             }
             uint256[] memory userOwnedTokens = new uint256[](count);
-            for (uint256 j = 0; j < count; j++) {
-                userOwnedTokens[j] = tempTokens[j];
+            uint256 index = 0;
+            for (uint256 i = 0; i < tokenCount; i++) {
+                if (nfts[i].owner == user) {
+                    userOwnedTokens[index] = nfts[i].id; 
+                    index++;
+                }
             }
-            return userOwnedTokens; 
+            return userOwnedTokens;
         }
 
         function getAllUniqueOwners() public view returns (address[] memory) {
@@ -8977,12 +9031,9 @@ async function makeMintingForm() {
                             from: account,
                             gas: gasLimit 
                         });
-                        // checking poll increments of 3 seconds 
-
-
-                        const mintReceipt = await checkTransactionReceipt(mintResult.transactionHash, web3);
-
-                        //const mintReceipt = await web3.eth.getTransactionReceipt(txHash);
+                        // use .on() method instead of trying to get reciept 
+                        // need to check when user approves transaction not when the reciept is mined
+                        const mintReceipt = await web3.eth.getTransactionReceipt(mintResult.transactionHash);
                         if (mintReceipt.status) { 
                             console.log('Mint was a success, lets check');
                             mintCollectionSuccessPopUpForm(selectedContract, filesArray[0].image);
@@ -9069,7 +9120,6 @@ async function makeMintingForm() {
                 readFilePromises.push(promise);
             }
         }
-
         Promise.all(readFilePromises)
             .then(() => {
                 console.log('Files read and processed:', filesArray);
@@ -9082,22 +9132,8 @@ async function makeMintingForm() {
     }
 }
 
-const checkTransactionReceipt = async (txHash, web3) => {
-    console.log('trying to check for reciept using hash', txHash);
-    while (true) {
-        const receipt = await web3.eth.getTransactionReceipt(txHash);
-        if (receipt) {
-            return receipt;
-        }
-        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 1 second before checking again
-    }
-};
 async function checkDocumentsSuccess(array) {
     let successArray = [];
-    // code 10900: bad server response
-    // code 222102999221121: success document added
-    // code: 21202021122344: error with .save() threw catch error possibly internet 
-    // code: 83939111110001: passcode incorrect
     let success = false;
     for(const indicator of array){
         if(indicator.code == 10900){
