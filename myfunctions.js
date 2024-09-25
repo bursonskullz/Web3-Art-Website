@@ -93,8 +93,6 @@ export async function painting_section_click(parentElement) {
                             document.body.removeChild(loadingAnimation);
                         }
                     }
-
-                    
             } else {
                 console.error('Failed to fetch paintings the response we not okay', response.statusText);
                 // Hide the loading animation if there's an error
@@ -126,7 +124,7 @@ function makeSelectorForm(){
     form.style.backgroundColor = 'dimgray';
     form.style.border = '1px solid #ccc';
     form.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-    form.style.padding = '10px';
+    //form.style.padding = '10px';
     form.style.overflow = 'hidden'; 
     form.style.zIndex = '1000'; 
     form.style.overflowY = 'scroll';
@@ -226,6 +224,13 @@ export async function addDigitalElementListener(digitalElement){
                     loadingContainer.remove();
                     const titleSpanTag = document.querySelector(".slectorFormTitleSpanTag");
                     titleSpanTag.textContent = 'Collections';
+                    titleSpanTag.style.fontSize = '3vh';
+                    titleSpanTag.style.fontWeight = 'bold'; 
+                    titleSpanTag.style.color = 'white'; 
+                    titleSpanTag.style.textAlign = 'center'; 
+                    titleSpanTag.style.padding = '10px';
+                    titleSpanTag.style.backgroundColor = 'none'; 
+                    titleSpanTag.style.borderRadius = '5px'; 
                     result.forEach((item) => {
                         console.log('trying to add collection to container');
                         const contractDiv = document.createElement('div');
@@ -233,10 +238,11 @@ export async function addDigitalElementListener(digitalElement){
                         contractDiv.style.alignItems = 'center';
                         contractDiv.style.cursor = 'pointer';
                         contractDiv.style.position = 'relative';
-                        contractDiv.style.transition = 'background-color 0.3s, transform 0.2s';
-                        contractDiv.style.width = '100%';
-                        contractDiv.style.padding = '10px'; 
-                        contractDiv.style.backgroundColor = 'dimgray'; 
+                        contractDiv.style.width = '98%';
+                        contractDiv.style.left = '1%';
+                        contractDiv.style.padding = '1px'
+                        contractDiv.style.border = '1px groove black';
+                        contractDiv.style.backgroundColor = 'darkgrey'; 
 
                         contractDiv.addEventListener('mouseenter', () => {
                             contractDiv.style.backgroundImage = 'linear-gradient(180deg, #2F2F2F, #4A4A4A)'; 
@@ -245,14 +251,14 @@ export async function addDigitalElementListener(digitalElement){
 
                         contractDiv.addEventListener('mouseleave', () => {
                             contractDiv.style.backgroundImage = '';
-                            contractDiv.style.backgroundColor = 'dimgray';
+                            contractDiv.style.backgroundColor = 'darkgrey';
                             contractDiv.style.transform = 'translateY(0)';
                         });
 
                         const imageContainer = document.createElement('div');
-                        imageContainer.style.marginRight = '10px';
-                        imageContainer.style.width = '50px'; 
-                        imageContainer.style.height = '50px';
+                        imageContainer.style.position = 'relative';
+                        imageContainer.style.width = '100%'; 
+                        imageContainer.style.height = '7vh';
                         imageContainer.style.overflow = 'hidden';
                         imageContainer.style.display = 'flex';
                         imageContainer.style.alignItems = 'center';
@@ -261,22 +267,13 @@ export async function addDigitalElementListener(digitalElement){
 
                         const image = document.createElement('img');
                         image.src = item.collectionBackgroundImage;
-                        image.style.width = '100%';
-                        image.style.height = 'auto';
+                        image.style.width = '70%';
+                        image.style.height = '70%';
                         image.style.objectFit = 'cover';
 
                         imageContainer.appendChild(image);
 
-                        const contractNameSpan = document.createElement('span');
-                        contractNameSpan.textContent = item.contractName;
-                        contractNameSpan.style.flex = '1';
-                        contractNameSpan.style.textAlign = 'center';
-                        contractNameSpan.style.fontSize = '16px';
-                        contractNameSpan.style.color = 'white'; 
-
                         contractDiv.appendChild(imageContainer);
-                        contractDiv.appendChild(contractNameSpan);
-
                         contractDiv.addEventListener('click', async () => {
                             if(!tryingToAccessData){
                                 const msgSpanTag = document.querySelector(".msgSpanTag");
@@ -2491,7 +2488,7 @@ function addBTDListeners(array){
     for(const item of array){
         item.addEventListener('click', () => {
             console.log('clicking current item', item);
-            if(item.textContent === 'Bulk list'){
+            if(item.textContent === 'Bulk List'){
                 listingOrDelisting = 'Listing';
             }else if(item.textContent === 'Delist'){
                 listingOrDelisting = 'Delisting';
@@ -2537,69 +2534,60 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
     smallHeader.style.display = 'flex';
     smallHeader.style.alignItems = 'center';
     smallHeader.style.justifyContent = 'center';
-    smallHeader.style.marginBottom = '17px'; 
+    smallHeader.style.marginBottom = '1px'; 
+
+    const actionContainer = document.createElement('div');
+    actionContainer.style.width = '100%'; 
+    actionContainer.style.display = 'flex';
+    actionContainer.style.justifyContent = 'space-evenly';
+    actionContainer.style.alignItems = 'center'; 
+    actionContainer.style.height = '40px'; 
+    actionContainer.style.position = 'relative';
+    actionContainer.style.top = '0%';
+
 
     const bulkListSPanTagContainer = document.createElement('div');
-    bulkListSPanTagContainer.className ="bulkListTool";
-    bulkListSPanTagContainer.style.position = 'absolute'; 
-    bulkListSPanTagContainer.style.bottom = '2%';
-    bulkListSPanTagContainer.style.left = '5%'; 
-    bulkListSPanTagContainer.style.height = '17%';
-    bulkListSPanTagContainer.style.width = '30%';
+    bulkListSPanTagContainer.className = "bulkListTool";
+    bulkListSPanTagContainer.style.width = '30%'; 
+    bulkListSPanTagContainer.style.textAlign = 'center';
 
     const bulkListText = document.createElement('span');
-    bulkListText.textContent = 'Bulk list'; 
-    bulkListText.style.position = 'absolute';
-    bulkListText.style.top = '0%'; 
-    bulkListText.style.left = '0%';
+    bulkListText.textContent = 'Bulk List'; 
     bulkListText.style.cursor = 'pointer';
-    bulkListText.style.fontSize = '10px'; 
+    bulkListText.style.fontSize = '12px'; 
     bulkListText.style.color = 'white'; 
+    bulkListSPanTagContainer.appendChild(bulkListText);
 
     const delistSPanTagContainer = document.createElement('div');
-    delistSPanTagContainer.style.position = 'absolute'; 
     delistSPanTagContainer.className = 'delistTool';
-    delistSPanTagContainer.style.bottom = '2%';
-    delistSPanTagContainer.style.right = '5%'; 
-    delistSPanTagContainer.style.height = '17%';
     delistSPanTagContainer.style.width = '30%';
+    delistSPanTagContainer.style.textAlign = 'center'; 
 
     const delistText = document.createElement('span');
     delistText.textContent = 'Delist'; 
-    delistText.style.position = 'absolute';
-    delistText.style.bottom = '0px'; 
-    delistText.style.right = '0px';
     delistText.style.cursor = 'pointer';
-    delistText.style.fontSize = '10px'; 
+    delistText.style.fontSize = '12px'; 
     delistText.style.color = 'white'; 
+    delistSPanTagContainer.appendChild(delistText);
 
     const transferSPanTagContainer = document.createElement('div');
-    transferSPanTagContainer.style.position = 'absolute'; 
     transferSPanTagContainer.className = 'transferTool';
-    transferSPanTagContainer.style.bottom = '0%';
-    transferSPanTagContainer.style.right = '36%'; 
-    transferSPanTagContainer.style.height = '17%';
-    transferSPanTagContainer.style.width = '37%';
+    transferSPanTagContainer.style.width = '30%';
+    transferSPanTagContainer.style.textAlign = 'center';
 
     const transferText = document.createElement('span');
     transferText.textContent = 'Transfer Tokens'; 
-    transferText.style.position = 'absolute';
-    transferText.style.bottom = '0px'; 
-    transferText.style.right = '0px';
     transferText.style.cursor = 'pointer';
-    transferText.style.fontSize = '10px'; 
+    transferText.style.fontSize = '12px'; 
     transferText.style.color = 'white'; 
-
     transferSPanTagContainer.appendChild(transferText);
-    smallHeader.appendChild(transferSPanTagContainer);
 
-    bulkListSPanTagContainer.appendChild(bulkListText);
-    smallHeader.appendChild(bulkListSPanTagContainer);
-
-    delistSPanTagContainer.appendChild(delistText);
-    smallHeader.appendChild(delistSPanTagContainer);
+    actionContainer.appendChild(bulkListSPanTagContainer);
+    actionContainer.appendChild(delistSPanTagContainer);
+    actionContainer.appendChild(transferSPanTagContainer);
 
     tokenContainer.appendChild(smallHeader);
+    tokenContainer.appendChild(actionContainer);
 
     const closeIcon = document.createElement('div');
     closeIcon.textContent = '×'; 
@@ -6649,6 +6637,8 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                         inputContainer.style.width = '100%';
                         inputContainer.style.height = '25%';
                         inputContainer.style.bottom = '0%';
+                        inputContainer.style.left = '0%';
+                        inputContainer.style.margin = '0%';
                         
                         const priceInput = document.createElement('input');
                         priceInput.type = 'number';
@@ -6658,7 +6648,8 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                         priceInput.style.position = 'relative';
                         priceInput.style.width = '100%'; 
                         priceInput.style.borderRadius = '5px'; 
-                        priceInput.style.border = '1px solid #ccc';  
+                        priceInput.style.border = '1px solid #ccc';
+                        priceInput.style.margin = '0%';  
                         priceInput.classList.add('price-input'); 
 
                         textContainer.appendChild(inputContainer);
@@ -6803,8 +6794,9 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                         })
                         .on('transactionHash', function(hash) {
                             console.log("User accepted the transaction. Transaction hash:", hash);
-                            successFullTokens.push(tokenIds);
-                            // At this point, the user has signed and accepted the transaction
+                            if(parentContainer){
+                                createContractInteractionMsg(parentContainer, listOrDelistOption, true);    
+                            }
                         })
                         .on('receipt', function(listReceipt) {
                             console.log("Transaction Receipt:", listReceipt);
@@ -6812,7 +6804,9 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                                 console.log('The user accepted the transaction and it was successful.');
                             } else {
                                 console.log('The transaction failed.');
-                                failedTokens.push(tokenIds);
+                                if(parentContainer){
+                                    createContractInteractionMsg(parentContainer, listOrDelistOption, false);    
+                                }
                             }
                         })
                         .on('error', function(error, receipt) {
@@ -6824,86 +6818,22 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                             }else {
                                 console.log('an unepexected error occured');
                             }
-                            failedTokens.push(tokenIds);
+                            if(parentContainer){
+                                createContractInteractionMsg(parentContainer, listOrDelistOption, false);    
+                            }
                         });
 
                     } catch (error) {                        
                         if (error.message.includes('out of gas')) {
                             console.error('Failed to list array: insufficient gas.');
                         }else if(error.message.includes('within 50 blocks')){
-                            errorWithIn50Blocks = true;
+                            console.log('Error mining transaction within 50 blocks');
                         } else if (error.message.includes('denied transaction signature')) {
                             console.error('Failed to list array: The user denied the transaction.');
-                            failedTokens.push(tokenIds);
+                            //failedTokens.push(tokenIds);
                         } else {
                             console.error('Failed to list array:', error.message);
-                            failedTokens.push(tokenIds);
-                        }
-                    }
-                    console.log('trying to remove children from small container to promt user success of false');
-                    while (parentContainer.firstChild) {
-                        parentContainer.removeChild(parentContainer.firstChild);
-                    }
-                    if (failedTokens.length > 0) {
-                        if (successFullTokens.length > 0) {
-                            const successContainer = document.createElement('div');
-                            successContainer.classList.add('success-tokens-container');
-                            const successList = document.createElement('ul');
-                            successFullTokens.forEach(tokenId => {
-                                const listItem = document.createElement('li');
-                                listItem.textContent = `Successfully listed Token: ${tokenId}`;
-                                successList.appendChild(listItem);
-                            });
-                            successContainer.appendChild(successList);
-                            parentContainer.appendChild(successContainer);
-                        } else {
-                            const noSuccessMessage = document.createElement('div');
-                            noSuccessMessage.classList.add('no-success-message');
-                            noSuccessMessage.style.textAlign = 'center';
-                            noSuccessMessage.textContent = 'No tokens were successfully listed.';
-                            parentContainer.appendChild(noSuccessMessage);
-                        }
-                        const failedContainer = document.createElement('div');
-                        failedContainer.classList.add('failed-tokens-container'); 
-                        const failedList = document.createElement('ul');
-
-                        
-                        failedTokens.forEach(tokenId => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `Failed to list Token: ${tokenId}`;
-                            failedList.appendChild(listItem);
-                        });
-                        failedContainer.appendChild(failedList);
-                        parentContainer.appendChild(failedContainer);
-                    } else if(errorWithIn50Blocks === true){
-                        /*
-                            while (parentContainer.firstChild) {
-                                parentContainer.removeChild(parentContainer.firstChild);
-                            }
-                        */
-                            const successDiv = document.createElement('div');
-                            successDiv.style.position = 'relative';
-                            successDiv.style.width = '100%';
-                            successDiv.style.height = '50%';
-                            successDiv.style.top = '25%';
-                            successDiv.classList.add('successDelistSpanTag');
-                            successDiv.style.textAlign = 'center'; 
-                            successDiv.textContent = 'pelase wait until the transaction is mined come back later or speed up the transaction.';
-                            parentContainer.appendChild(successDiv);
-                    }else {
-                        while (parentContainer.firstChild) {
-                            parentContainer.removeChild(parentContainer.firstChild);
-                        }
-                        if (successFullTokens.length > 0) {
-                            const successDiv = document.createElement('div');
-                            successDiv.style.position = 'relative';
-                            successDiv.style.width = '100%';
-                            successDiv.style.height = '50%';
-                            successDiv.style.top = '25%';
-                            successDiv.classList.add('successDelistSpanTag');
-                            successDiv.style.textAlign = 'center'; 
-                            successDiv.textContent = 'Your items have been Listed!.';
-                            parentContainer.appendChild(successDiv);
+                            //failedTokens.push(tokenIds);
                         }
                     }
                 } else {
@@ -6979,9 +6909,7 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
             });
 
             if (selectedTokens.length > 0) {
-                let errorWithIn50Blocks = false;
                 const web3 = new Web3(window.ethereum);
-                //const tokenIds = selectedTokens.map(token => parseInt(token.tokenId));
                 try {
                     console.log('trying to delist tokens', selectedTokens);
                     const gasEstimate = await contract.methods.delistNFT(selectedTokens[0]).estimateGas({ from: clientBlockChainAddress });
@@ -6996,50 +6924,41 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                         .on('transactionHash', function(hash) {
                             console.log("User accepted the transaction. Transaction hash:", hash);
                             successFullTokens.push(selectedTokens);
-                            // At this point, the user has signed and accepted the transaction
+                            loadingContainer.remove();
+                            createContractInteractionMsg(parentContainer, listOrDelistOption, true, failedTokens, successFullTokens);
                         })
                         .on('receipt', function(delistReceipt) {
                             console.log("Transaction Receipt:", delistReceipt);
                             if (delistReceipt && delistReceipt.status == true) {
-                                console.log('The user accepted the transaction and it was successful.');
+                                console.log('At this point the transaction has been mined in the appropriate amount of time for the client. no need to do anything');
+
                             } else {
-                                console.log('The transaction failed.');
+                                console.log('The transaction failed the receipt status is false', delistReceipt.status);
                                 failedTokens.push(selectedTokens);
+                                createContractInteractionMsg(parentContainer, listOrDelistOption, false, failedTokens, successFullTokens);
                             }
                         })
                         .on('error', function(error, receipt) {
                             console.log("Transaction rejected or failed:", error);
+                            console.log("Transaction failed receipt:", receipt);
+                            if(loadingContainer){// may have been removed from the hash
+                                loadingContainer.remove();
+                            }
                             if (error.code === 4001) {
                                 console.log('The transaction was rejected prompt the user.');
                             } else {
                                 console.log('an unepexected error occured');
                             }
                             failedTokens.push(selectedTokens);
+                            createContractInteractionMsg(parentContainer, listOrDelistOption, false, failedTokens, successFullTokens);
                         });
-
-                        /*
-                        if (tx && tx.transactionHash) {
-                            console.log('Transaction sent. Waiting for confirmation...');
-                            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-                            if (receipt && receipt.status === true) {
-                                console.log('The user accepted the transaction to delist tokens and it was successful.');
-                                successFullTokens.push(selectedTokens);
-                            } else {
-                                console.log('The transaction to delist failed.');
-                                failedTokens.push(selectedTokens);
-                            }
-                        } else {
-                            console.log('The transaction could not be sent.');
-                        }
-                       for(var i =0; i< selectedTokens.length; i++){
-                            successFullTokens.push(selectedTokens[i]);
-                       } 
-                       */
                     }else{
                         console.log('Sorry there was an error estimating the gas fee');
                     }
                     
                 } catch (error) {
+                    console.log('Error calling listing function', error);
+                    /*
                     for(var i = 0; i< selectedTokens.length; i++){
                         failedTokens.push(selectedTokens[i]);
                    }
@@ -7049,67 +6968,7 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                    }else{
                         errorWithIn50Blocks = false;
                         failedTokens.push(selectedTokens);
-                   }
-                }
-
-                loadingContainer.remove();
-                while (parentContainer.firstChild) {
-                    parentContainer.removeChild(parentContainer.firstChild);
-                }
-                if (failedTokens.length > 0 && errorWithIn50Blocks === false) {
-                    if (successFullTokens.length > 0) {
-                        const successContainer = document.createElement('div');
-                        successContainer.classList.add('success-tokens-container');
-                        const successList = document.createElement('ul');
-                        successFullTokens.forEach(tokenId => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `Successfully Transfered Token: ${tokenId}`;
-                            successList.appendChild(listItem);
-                        });
-                        successContainer.appendChild(successList);
-                        parentContainer.appendChild(successContainer);
-                    } else {
-                        const noSuccessMessage = document.createElement('div');
-                        noSuccessMessage.classList.add('no-success-message');
-                        noSuccessMessage.style.textAlign = 'center';
-                        noSuccessMessage.textContent = 'Sorry failed to delist your tokens.';
-                        parentContainer.appendChild(noSuccessMessage);
-                    }
-                    const failedContainer = document.createElement('div');
-                    failedContainer.classList.add('failed-tokens-container'); 
-                    const failedList = document.createElement('ul');
-                    failedTokens.forEach(tokenId => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `Failed to delist Token: ${tokenId}`;
-                        failedList.appendChild(listItem);
-                    });
-                    failedContainer.appendChild(failedList);
-                    parentContainer.appendChild(failedContainer);
-                } else {
-                    if (successFullTokens.length > 0) {
-                        const successDiv = document.createElement('div');
-                        successDiv.style.position = 'relative';
-                        successDiv.style.width = '100%';
-                        successDiv.style.height = '50%';
-                        successDiv.style.top = '25%';
-                        successDiv.classList.add('successDelistSpanTag');
-                        successDiv.style.textAlign = 'center'; 
-                        successDiv.textContent = 'Your items have been delisted. Make sure to come back and list them so I get my royalty fee!.';
-                        parentContainer.appendChild(successDiv);
-                    }else{
-                        if(errorWithIn50Blocks === true){
-                            const successDiv = document.createElement('div');
-                            successDiv.style.position = 'relative';
-                            successDiv.style.width = '100%';
-                            successDiv.style.height = '50%';
-                            successDiv.style.top = '25%';
-                            successDiv.classList.add('successDelistSpanTag');
-                            successDiv.style.textAlign = 'center'; 
-                            successDiv.textContent = 'Sorry the transaction failed to be mined in the appropriate time due to Priority users. If you want to speed up the transaction you can go to your metamask and try to speed it up. Or you can wait and come back later thank you.';
-                            parentContainer.appendChild(successDiv);
-                            alert('Sorry the transaction failed to be mined in the appropriate time due to Priority users. If you want to speed up the transaction you can go to your metamask and try to speed it up. Or you can wait and come back later thank you.');
-                        }
-                    }
+                   }*/
                 }
             } else {
                 alert('No tokens have been selected to delist.');
@@ -7222,16 +7081,22 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                     })
                     .on('transactionHash', function(hash) {
                         console.log("User accepted the transaction. Transaction hash:", hash);
-                        successFullTokens.push(selectedTokens);
+                        //successFullTokens.push(selectedTokens);
                         // At this point, the user has signed and accepted the transaction
-                        })
+                        if(parentContainer){
+                            createContractInteractionMsg(parentContainer,listingOrDelisting,true)
+                        }
+                    })
                     .on('receipt', function(transferReceipt) {
                         console.log("Transaction Receipt:", transferReceipt);
                         if (transferReceipt && transferReceipt.status == true) {
                             console.log('The user accepted the transaction and it was successful.');
                         } else {
                             console.log('The transaction failed.');
-                            failedTokens.push(selectedTokens);
+                            //failedTokens.push(selectedTokens);
+                            if(parentContainer){
+                                createContractInteractionMsg(parentContainer,listingOrDelisting,false)
+                            }
                         }
                     })
                     .on('error', function(error, receipt) {
@@ -7241,37 +7106,25 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                         } else {
                             console.log('an unepexected error occured');
                         }
-                        failedTokens.push(selectedTokens);
+                        //failedTokens.push(selectedTokens);
+                        if(parentContainer){
+                            createContractInteractionMsg(parentContainer, listOrDelistOption, false);    
+                        }
                     });
 
-                    /*    
-                    if (tx && tx.transactionHash) {
-                            console.log('Transaction sent. Waiting for confirmation...');
-                            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-                            if (receipt && receipt.status === true) {
-                                console.log('The user accepted the transaction and it was successful.');
-                                successFullTokens.push(transferTokenIds);
-                            } else {
-                                console.log('The transaction failed.');
-                                failedTokens.push(transferTokenIds);
-                            }
-                    } else {
-                        console.log('The transaction could not be sent.');
-                        failedTokens.push(transferTokenIds);
-                    }*/
                     
                 } catch (error) {
-                    failedTokens.push(transferTokenIds);
+                    //failedTokens.push(transferTokenIds);
                     console.error('Error calling transferArrayOfNFTS:', error.message);
                     if (error.message.includes("ERR1")) {
                         alert('The contract did not detect that you own this NFT. You can only transfer tokens you own');
                     }else if(error.message.includes("ERR7")){
                         alert('Insufficient gas!, please increase or estimate correctly');
                     }else{
-                        console.log('An unexpected error occured');
+                        console.log('An unexpected error occured cannot get error message transfering');
                     }   
                 }
-
+                /*
                 parentContainer.innerHTML = '';
                 const inputContainer = document.querySelector('.inputTrasnferAddress');
                 if(inputContainer){
@@ -7292,6 +7145,7 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                 closeIcon.addEventListener('click', () => {
                     parentContainer.remove();
                 });
+                
                 if (failedTokens.length > 0) {
                     if (successFullTokens.length > 0) {
                         const successContainer = document.createElement('div');
@@ -7333,7 +7187,7 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                         successDiv.textContent = 'Your items have transfered. Make sure to check your wallet';
                         parentContainer.appendChild(successDiv);
                     }
-                }
+                }*/
             } else {
                 alert('Please enter a valid crypto address to transfer your tokens');
             }
@@ -7343,6 +7197,35 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
     }else{
         console.log('unexpected data for listOrDelistOption variable');
     }
+}
+
+function createContractInteractionMsg(parentContainer, listOrDelistOption, success){
+    while (parentContainer.firstChild) {
+        parentContainer.removeChild(parentContainer.firstChild);
+    }
+    const successDiv = document.createElement('div');
+    successDiv.style.position = 'relative';
+    successDiv.style.width = '100%';
+    successDiv.style.height = '50%';
+    successDiv.style.top = '25%';
+    successDiv.classList.add('successDelistSpanTag');
+    successDiv.style.textAlign = 'center'; 
+    if(listingOrDelisting === 'Delisting' && success === true ){
+        successDiv.textContent = 'Your items have been delisted. The transaction make time some time to mine so you might night see the results right way. You can come back at a later or time or speed up the transaction in your wallet. Also, Make sure to come back and list your tokens whenever your ready so I can get my royalty fee!.';
+    }else if(listingOrDelisting === 'Delisting' && success === false ){
+        successDiv.textContent = 'Sorry failed to Delist your tokens. Please try again at a later time';
+    }else if(listingOrDelisting === 'Listing' && success === true ){ 
+        successDiv.textContent = 'Your items have been Listed! Make sure to give the contract some time or initiate the metamask to speed up the transaction if you dont see its affect yet';
+        parentContainer.appendChild(successDiv);
+    }else if(listingOrDelisting === 'Listing' && success === false ){
+        successDiv.textContent = 'Sorry failed to List your Tokens. please try again at a later time';
+    }else if(listingOrDelisting === 'Transfering' && success === true ){
+        successDiv.textContent = 'your items have been successfully transfered.';
+        parentContainer.appendChild(successDiv);
+    }else if(listingOrDelisting === 'Transfering' && success === false ){
+        successDiv.textContent = 'Sorry failed to transfer your tokens. Please try again at a later time';
+    }
+    parentContainer.appendChild(successDiv);
 }
 async function makeTokenPage(addressString, contract, parentContainer, footer, coin, loadingContainer){
     try{
