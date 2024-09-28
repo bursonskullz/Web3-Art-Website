@@ -3,7 +3,6 @@ import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.0.8/dist/ethers.es
 
 const myWebDomain = 'http://localhost:27015/'; 
 var msgCount = 0; 
-const WEIFACTOR = 0.001;
 const RoysWallet = '0x5cdad7876270364242ade65e8e84655b53398b76';
 const socket = io();
 const iconHeaderWidth = '11.4vh';
@@ -13,7 +12,7 @@ let currentNFTcollections = [];
 let userSelectedContract;
 let contractName;
 let totalChunks = 0;
-
+let currentClientWallet; 
 var submitButtonIsClicked = false;
 var currentlyPrinted = false;
 var gridPageNumber = 1;
@@ -93,6 +92,8 @@ export async function painting_section_click(parentElement) {
                             document.body.removeChild(loadingAnimation);
                         }
                     }
+
+                    
             } else {
                 console.error('Failed to fetch paintings the response we not okay', response.statusText);
                 // Hide the loading animation if there's an error
@@ -218,7 +219,7 @@ export async function addDigitalElementListener(digitalElement){
                 loadingContainer.appendChild(loadingIcon);
                 contractsForm.appendChild(loadingContainer);
 
-                nft_section_click(digitalElement).then(async (result) => {
+                gatherContracts().then(async (result) => {
                     console.log('collections data recived from database:', result);
                     currentNFTcollections = result;
                     loadingContainer.remove();
@@ -318,9 +319,7 @@ export async function addDigitalElementListener(digitalElement){
                                 msgSpanTag.textContent = "Searching for token data. Please Wait a moment until tokens are presented.";
                                 msgSpanTag.style.color = 'white';
                                 const nfts = await getNFTS(item.contractName);
-                                console.log('We got the documents', nfts);
-                                loadingContainer.remove();
-
+                                console.log('We got the documents', nfts); 
                                 if(nfts.length!= 0){
                                     currentNFTArray = nfts;
                                     setTimeout(async () => { 
@@ -946,7 +945,7 @@ async function createContractSelectionForm(array) {
         document.body.appendChild(form);
     });
 }
-export async function nft_section_click(parentElement) {
+export async function gatherContracts() {
     let listofCollections ;
     try {
          const response = await fetch('/getALLDeployedCollections', {
@@ -1168,84 +1167,7 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
         gridItem.style.backgroundRepeat = 'no-repeat';
         gridItem.style.backgroundPosition = 'center'; 
         gridItem.style.backgroundSize = '100%'; 
-        if(columns == 4){
-             // above 999 pixels 
-            if(window.innerWidth >= 1500){
-                gridItem.style.height = '205px'; 
-                gridItem.style.width = '205px';    
-                rowHeight = '210px'; 
-            }else if(window.innerWidth >= 1400){
-                gridItem.style.height = '195px'; 
-                gridItem.style.width = '195px';    
-                rowHeight = '200px'; 
-            }else if(window.innerWidth >= 1300){
-                gridItem.style.height = '185px'; 
-                gridItem.style.width = '185px';    
-                rowHeight = '190px'; 
-            }else if (window.innerWidth >= 1200) {
-                gridItem.style.height = '175px'; 
-                gridItem.style.width = '175px';    
-                rowHeight = '180px'; 
-            }else if (window.innerWidth >= 1100) {
-                gridItem.style.height = '165px'; 
-                gridItem.style.width = '165px';    
-                rowHeight = '170px'; 
-            }else if (window.innerWidth >= 999) {
-                gridItem.style.height = '155px'; 
-                gridItem.style.width = '155px';    
-                rowHeight = '160px'; 
-            }else{
-
-            }     
-        }else if(columns == 3){
-            // 999 to 500 pixels changisng size of grid
-            if(window.innerWidth >= 950){
-                gridItem.style.height = '140px'; 
-                gridItem.style.width = '140px';    
-                rowHeight = '150px'; 
-            }else if(window.innerWidth >= 900){
-                gridItem.style.height = '130px'; 
-                gridItem.style.width = '135px';    
-                rowHeight = '135px';  
-            }else if(window.innerWidth >= 850){
-                gridItem.style.height = '125px'; 
-                gridItem.style.width = '125px';    
-                rowHeight = '132px';  
-            }else if(window.innerWidth >= 700){
-                gridItem.style.height = '115px'; 
-                gridItem.style.width = '115px';    
-                rowHeight = '130px';    
-            }else if(window.innerWidth >= 650){
-                gridItem.style.height = '110px';
-                gridItem.style.width = '110px';    
-                rowHeight = '125px';  
-            }else if(window.innerWidth >= 550){
-                gridItem.style.height = '100px'; 
-                gridItem.style.width = '100px';    
-                rowHeight = '120px'; 
-            }else if(window.innerWidth >= 500){
-                gridItem.style.height = '95px'; 
-                gridItem.style.width = '95px';    
-                rowHeight = '115px'; 
-            }else{
-            }     
-        }else if(columns == 2){
-            // 500 pixels to 350 pixels
-            if(window.innerWidth >= 450){
-                gridItem.style.height = '160px'; 
-                gridItem.style.width = '160px';    
-                rowHeight = '165px'; 
-            }else if(window.innerWidth >= 400){
-                gridItem.style.height = '140px';
-                gridItem.style.width = '140px';    
-                rowHeight = '145px'; 
-            }else if(window.innerWidth < 400 && window.innerWidth >= 350){
-                gridItem.style.height = '130px'; // Keep it square
-                gridItem.style.width = '130px';    
-                rowHeight = '135px'; 
-            }  
-        }else{
-        }
+        setImageDataWidthAndHeight(columns, gridItem);
         gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`; 
         gridContainer.style.gridTemplateRows = `repeat(${numRows}, ${rowHeight})`; 
 
@@ -1257,46 +1179,52 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
         overlay.style.top = 0;
         overlay.style.left = 0;
         overlay.style.setProperty('border-radius', '10px', 'important'); 
+        overlay.style.className = 'grid-overlay'+ gridItem.id;
         overlay.style.backgroundColor = 'dimgray'; 
-        overlay.style.display = 'none'; 
         overlay.style.flexDirection = 'column'; 
         overlay.style.justifyContent = 'flex-end'; 
         overlay.style.opacity = '.6';
         overlay.style.cursor = 'pointer'; 
-        overlay.addEventListener('contextmenu', event => event.preventDefault());
+        overlay.style.overflowWrap = 'break-word';
+        overlay.style.display = 'flex';
 
         let hoverTimeout;
         gridItem.addEventListener('mouseenter', async function() {
             clearTimeout(hoverTimeout); 
             gridItem.style.transform = 'translateY(-5px)';
-            overlay.style.display = 'flex';
             const buyButton = document.querySelector('.buy-button' + gridItem.id);
+            const overlayCheck = document.querySelector('.grid-overlay'+ gridItem.id);
             if(buyButton){
                 buyButton.remove();
+            }
+            if(overlayCheck){
+                overlayCheck.remove();
             }         
             var descriptionP = document.createElement('p');
-            descriptionP.className = 'descriptionNFTPTAG';
+            descriptionP.className = 'descriptionNFTPTAG'+ gridItem.id;
             descriptionP.style.cssText = 'width: 100%; height: 80%; top: 0%; position: absolute; overflow-y: scroll; font-size: 1.8vh; color: white;';
 
-            let tokenData, value, NFTOwner, description, thisAccount;
-            if(isConnected){
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                thisAccount = accounts[0];
-                try {
-                    tokenData = await contract.methods.getTokenData(item.tokenID).call();
-                    if(tokenData) {
-                        value = (tokenData.price) / (10**18);
-                        NFTOwner = tokenData.owner;
-                        description = tokenData.flagged ? 'flagged' : 
-                                     tokenData.forSale ? 'for sale' : 
-                                     NFTOwner === thisAccount ? 'You Own This Token' : 'not for sale';
+            let tokenData, value, NFTOwner, description;
+            try {
+                tokenData = await contract.methods.nfts(item.tokenID).call();
+                if(tokenData) {
+                    value = (tokenData.price) / (10**18);
+                    NFTOwner = tokenData.owner;
+                    if(isConnected){
+                        if(tokenData.flagged){
+                            description = 'flagged';
+                        }else if(tokenData.owner == currentClientWallet){
+                            description = 'You Own This Token';
+                        }else if(tokenData.forSale && tokenData.owner != currentClientWallet){
+                            description = 'for sale';
+                        }
+                    }else{
+                        description = 'please connect wallet';
                     }
-                } catch(error) {
-                    console.error('Error getting token data on contract to display', error);
-                    value = "Error"; NFTOwner = "Error"; description = 'Error';
                 }
-            } else {
-                description = 'please connect wallet';
+            } catch(error) {
+                console.error('Error getting token data on contract to display', error);
+                value = "Error"; NFTOwner = "Error"; description = 'Error';
             }
 
             descriptionP.innerHTML = value === 'Error' || value === undefined || value === null ?
@@ -1305,33 +1233,30 @@ export function makeNFTGrid(array, parentElement, columns, gridWidthPercent, coi
 
             overlay.appendChild(descriptionP);
             gridItem.appendChild(overlay);
-            addNFTBuyButton(gridItem, description, gridItem.id, value, thisAccount, contract, item.image, coin);
+            console.log(`creating button using description = ${description}`);
+            addNFTBuyButton(gridItem, description, gridItem.id, value, currentClientWallet, contract, item.image, coin);
         });
 
         gridItem.addEventListener('mouseleave', function() {
-            hoverTimeout = setTimeout(() => {
-                gridItem.style.transform = 'translateY(0)';
-                const buyButton = document.querySelector('.buy-button' + gridItem.id);
-                const descriptionP = document.querySelector('.descriptionNFTPTAG');
-
-                if (buyButton) buyButton.remove();
-                if (descriptionP) descriptionP.remove();
-                overlay.remove(); 
-            }, 100); 
+            gridItem.style.transform = 'translateY(0)';
+            const buyButton = document.querySelector('.buy-button' + gridItem.id);
+            const descriptionP = document.querySelector('.descriptionNFTPTAG'+gridItem.id);
+            if (buyButton) buyButton.remove();
+            if (descriptionP) descriptionP.remove();
+            overlay.remove(); 
         });
         gridContainer.appendChild(gridItem);
     });
     parentElement.appendChild(gridContainer);
 }
 
-export function makeNewNFTGrid(array, grid,coin, contract) {
+export function makeNewNFTGrid(array, grid,coin, contract, columns) {
     console.log('trying to make new grid');
     array.forEach(item => {
         console.log('trying to make items to append to grid');
         var gridItem = document.createElement('div');
-        console.log(item.price);
-        gridItem.classList.add('grid-item'+ item.price);
-        gridItem.setAttribute('id', item.id);
+        gridItem.classList.add('grid-item'+ item.contractAddress);
+        gridItem.setAttribute('id', item.tokenID);
         gridItem.textContent = item; 
         gridItem.style.position = 'relative';
         gridItem.style.backgroundColor = '#aaaaaa'; 
@@ -1350,7 +1275,7 @@ export function makeNewNFTGrid(array, grid,coin, contract) {
         gridItem.style.backgroundRepeat = 'no-repeat';
         gridItem.style.backgroundPosition = 'center'; 
         gridItem.style.backgroundSize = '100%'; 
-
+        setImageDataWidthAndHeight(columns, gridItem);
         var overlay = document.createElement('div');
         overlay.classList.add('overlay');
         overlay.style.position = 'absolute';
@@ -1374,30 +1299,32 @@ export function makeNewNFTGrid(array, grid,coin, contract) {
             const buyButton = document.querySelector('.buy-button' + gridItem.id);
             if(buyButton){
                 buyButton.remove();
-            }
+            }         
             var descriptionP = document.createElement('p');
             descriptionP.className = 'descriptionNFTPTAG';
             descriptionP.style.cssText = 'width: 100%; height: 80%; top: 0%; position: absolute; overflow-y: scroll; font-size: 1.8vh; color: white;';
 
             let tokenData, value, NFTOwner, description, thisAccount;
-            if(isConnected){
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                thisAccount = accounts[0];
-                try {
-                    tokenData = await contract.methods.getTokenData(item.tokenID).call();
-                    if(tokenData) {
-                        value = (tokenData.price) / (10**18);
-                        NFTOwner = tokenData.owner;
-                        description = tokenData.flagged ? 'flagged' : 
-                                     tokenData.forSale ? 'for sale' : 
-                                     NFTOwner === thisAccount ? 'You Own This Token' : 'not for sale';
+            try {
+                tokenData = await contract.methods.nfts(item.tokenID).call();
+                if(tokenData) {
+                    value = (tokenData.price) / (10**18);
+                    NFTOwner = tokenData.owner;
+                    if(isConnected){
+                        if(tokenData.flagged){
+                            description = 'flagged';
+                        }else if(tokenData.owner == thisAccount){
+                            description = 'You Own This Token';
+                        }else if(tokenData.forSale && tokenData.owner != thisAccount){
+                            description = 'for sale';
+                        }
+                    }else{
+                        description = 'please connect wallet';
                     }
-                } catch(error) {
-                    console.error('Error getting token data on contract to display', error);
-                    value = "Error"; NFTOwner = "Error"; description = 'Error';
                 }
-            } else {
-                description = 'please connect wallet';
+            } catch(error) {
+                console.error('Error getting token data on contract to display', error);
+                value = "Error"; NFTOwner = "Error"; description = 'Error';
             }
 
             descriptionP.innerHTML = value === 'Error' || value === undefined || value === null ?
@@ -1406,7 +1333,8 @@ export function makeNewNFTGrid(array, grid,coin, contract) {
 
             overlay.appendChild(descriptionP);
             gridItem.appendChild(overlay);
-            addNFTBuyButton(gridItem, description, gridItem.id, value, thisAccount, contract, item.image, coin);
+            console.log(`creating button using description = ${description}`);
+            addNFTBuyButton(gridItem, description, gridItem.id, value, currentClientWallet, contract, item.image, coin);
         });
 
         gridItem.addEventListener('mouseleave', function() {
@@ -2129,10 +2057,11 @@ function addTreeList(parentDiv, array, parentElement, numColumns, gridWidthPerce
     }
 }
 
-function createCircularSweeper(container) {
+async function createCircularSweeper(container, contract) {
     const sweeperCircle = document.createElement('div');
     sweeperCircle.classList.add('sweeper-circle');
     container.appendChild(sweeperCircle);
+
     const sun = document.createElement('div');
     sun.classList.add('sun');
     sun.textContent = '🌕'; 
@@ -2140,16 +2069,20 @@ function createCircularSweeper(container) {
 
     const emoji = document.createElement('div');
     emoji.classList.add('emoji');
-    emoji.textContent = '🌍'; // Moon emoji
+    emoji.textContent = '🌍'; 
     sweeperCircle.appendChild(emoji);
+
     const infoSpan = document.createElement('span');
     infoSpan.classList.add('info-span');
     container.appendChild(infoSpan);
 
     let isDragging = false;
+    let moveTimer = null; // Timer to track mouse movement
     const radius = sweeperCircle.offsetWidth / 2 - emoji.offsetWidth / 2;
-    const maxItems = 25;
+    const maxItemsFromContract = await contract.methods.tokenCount().call();
+    const maxItems = parseInt(maxItemsFromContract);
     let angle = -Math.PI / 2; 
+    let lastSweptItems = 0; // Track last swept items
 
     function updateEmojiPosition() {
         const x = radius * Math.cos(angle) + sweeperCircle.offsetWidth / 2;
@@ -2159,12 +2092,54 @@ function createCircularSweeper(container) {
         updateSweepInfo();
     }
 
-    function updateSweepInfo() {
-        const percent = (angle + Math.PI / 2) / (2 * Math.PI) * 100; 
+    async function updateSweepInfo() {
+        const percent = ((angle + Math.PI / 2) / (2 * Math.PI)) * 100; 
         const items = Math.round((percent / 100) * maxItems); 
         infoSpan.textContent = `Sweep ${items} items`;
         infoSpan.style.color = 'white';
         sweeperCircle.style.background = `conic-gradient(#4caf50 ${percent}%, transparent ${percent}%)`;
+    }
+
+    async function updateGridBorders(numberOfItems) {
+        let oldGrid = document.querySelector(".NewGrid");
+        let gridItems = Array.from(oldGrid.children);  
+        gridItems.forEach(item => {
+            item.style.setProperty("border", "none", "important"); 
+        });
+
+        if (numberOfItems <= gridItems.length) {
+            for (let i = 0; i < numberOfItems; i++) {
+                await updateItemBorder(gridItems[i]);
+            }
+        } else {
+            for (let i = 0; i < gridItems.length; i++) {
+                await updateItemBorder(gridItems[i]);
+            }
+        }
+    }
+
+    async function updateItemBorder(item) {
+        const itemID = item.id;
+        const itemIdToInt = parseInt(itemID, 10); 
+        try {
+            const tokenData = await contract.methods.nfts(itemIdToInt).call();
+            console.log('tokenData owner', tokenData.owner);
+            console.log('current connect wallet', currentClientWallet);
+            const ownerAddress = String(tokenData.owner).toLowerCase();
+            const clientWalletAddress = String(currentClientWallet).toLowerCase();
+            if (ownerAddress === clientWalletAddress) {
+                console.log('trying to set borders to yellow');
+                item.style.border = '3px dotted yellow';
+            } else if (!tokenData.flagged && !tokenData.burned && tokenData.forSale) {
+                item.style.border = "3px dotted green";
+            } else {
+                item.style.border = '3px dotted red';
+            }
+            
+        } catch (error) {
+            console.error("Error fetching token data:", error);
+        }
+        item.style.animation = "border-dance 2s linear infinite"; 
     }
 
     function onMouseMove(event) {
@@ -2174,7 +2149,6 @@ function createCircularSweeper(container) {
             const y = event.clientY - rect.top - sweeperCircle.offsetHeight / 2;
             angle = Math.atan2(y, x); 
             if (angle < -Math.PI / 2) angle += 2 * Math.PI; 
-
             updateEmojiPosition();
         }
     }
@@ -2186,6 +2160,19 @@ function createCircularSweeper(container) {
 
     function onMouseUp() {
         isDragging = false;
+        if (moveTimer) {
+            clearTimeout(moveTimer); // Clear any existing timer
+        }
+        moveTimer = setTimeout(() => {
+            const percent = ((angle + Math.PI / 2) / (2 * Math.PI)) * 100; 
+            const items = Math.round((percent / 100) * maxItems); 
+            if (items !== lastSweptItems) { // Only update if the item count has changed
+                lastSweptItems = items; // Update last swept items
+                if (items !== 0) {
+                    updateGridBorders(items); // Call border update after dragging
+                }
+            }
+        }, 300); // Change 300 to the desired debounce time in milliseconds
     }
 
     document.addEventListener('mousemove', onMouseMove);
@@ -2670,7 +2657,9 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
             errorSpan.style.width = '100%';
             errorSpan.style.color = 'white';
             errorSpan.style.fontSize = '1.5vh';
-            errorSpan.style.position = 'relative';
+            errorSpan.style.position = 'absolute';
+            errorSpan.style.textAlign = 'center';
+            errorSpan.style.top = '30%';
             if (typeof window.ethereum === 'undefined') {
                 errorSpan.textContent = 'You must install MetaMask or another Ethereum provider to see your tokens or purchase tokens';
                 smallContainer.appendChild(errorSpan); 
@@ -2681,16 +2670,14 @@ async function makeMytokensPage(contract, sideElementsWidth, coin){
                         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                         let thisAccount = accounts[0];
                         loadingContainer.remove();
-                        makeTokenPage(thisAccount, contract, smallContainer, footer, coin);
+                        makeTokenPage(thisAccount, contract, smallContainer, footer, coin, loadingContainer);
                     } catch (error) {
                         if (error.code === -32002) { 
-                        errorSpan.textContent = 'Sorry an unexpected error occured. Please login to your metamask and try again';
+                        errorSpan.textContent = 'Please login to your Metamask wallet to view your tokens';
                         smallContainer.appendChild(errorSpan); 
-                            alert('Please open the MetaMask extension manually, sign in, and reload the page.');
                         } else {
-                            errorSpan.textContent = 'Sorry an unexpected error occured. Please login to your metamask and try again';
+                            errorSpan.textContent = `Sorry an unexpected error occured: ${error.message}`;
                             smallContainer.appendChild(errorSpan); 
-                            alert(`Error: ${error.message || error}`);
                         }
                     }
                 } else { 
@@ -2721,13 +2708,31 @@ function removeCheckBoxes(description){
             }
         }else if(description === 'Listing'){
             if(!item.innerHTML.includes('Inactive')){
-                    console.log('removing item because it is not active');
+                console.log('removing item because it is not active');
                 item.remove();
             }else{
                 alignItems(item);
             }
         }else if(description === 'Transfering'){
             alignItems(item);
+        }
+    }
+
+    const smallContainerChecker = document.querySelector('.token-inside-Container');
+    if(smallContainerChecker){
+        const length = Array.from(smallContainerChecker.children).length;
+        if(length === 0){
+            const messageSpan = document.createElement('span');
+            messageSpan.style.position = 'relative';
+            messageSpan.style.width = '90%';
+            messageSpan.style.left = '10%';
+            messageSpan.style.top = '28.5%';
+            messageSpan.textContent = 'All your documents are listed or delisted! You cannot list or delist items that are already active in their curent state.';
+            smallContainerChecker.appendChild(messageSpan);
+            let isnextButtonActive = document.querySelector('.nextButton');
+            if (isnextButtonActive) {
+                isnextButtonActive.remove();
+            }
         }
     }
 }
@@ -2761,7 +2766,7 @@ function alignItems(item){
     }
 }
 async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
-    let recentSells;
+    let recentSells = []; const tokenDataArray = [];
     console.log('Trying to get recent sells to display.');
     const recentSellsPopUpBox = document.createElement('div');
     recentSellsPopUpBox.className = 'recentSellsPopUpBox';
@@ -2839,84 +2844,72 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
     loadingContainer.appendChild(loadingIcon);
     recentSellsPopUpBox.appendChild(loadingContainer);
 
-    try{
-        recentSells = await contract.methods.getRecentSells().call();
-    }catch(error){
-        console.log('Error calling function on contract to get array of recent sells');
-        recentSells = null;
+    let sellsMaxLength = await contract.methods.sellsMaxLength().call();
+
+    for (let i = 0; i < parseInt(sellsMaxLength); i++) {
+        try {
+            // Fetch each item by its index in the array
+            const sellItem = await contract.methods.recentSells(i).call();
+            recentSells.push(sellItem);
+        } catch (error) {
+            console.log(`Error accessing index ${i}:`, error);
+            break; 
+        }
     }
+    console.log('recent sells from contract using client side code:', recentSells);
 
-
-    let testObj = {
-        image: "/images/BursonSKullText.png", 
-        tokenID: 1,
-        price: 14000000000 
-    };
-
-    let testArray = [];
-    testArray.push(testObj);
-    testArray.push(testObj);
-    testArray.push(testObj);
-    testArray.push(testObj);
-
-    //recentSells = testArray; // comment to stop test and remove test data
-    
-    if (recentSells != null && recentSells.length != 0) {
-        console.log('Trying to get corresponding image to each token contract returns and make div and display data inside');
-        console.log('Trying to loop through recent sells and display inside pop up');
-        
-        const tokenDataArray = [];
+    if (recentSells.length != 0) {
         let tokenSingularData;
-
-        recentSells.forEach(async (sell) => {
+        for(const sell of recentSells){
             let image;
             for (const token of currentNFTArray) {
-                if (token.tokenID === sell.tokenID) {
+                if (token.tokenID === parseInt(sell.id)) {
                     image = token.image;
                     break;
                 }
             }
             try{
-                tokenSingularData = await contract.methods.getTokenData(sell.tokenID).call();
+                tokenSingularData = await contract.methods.nfts(parseInt(sell.id)).call();
+                if(tokenSingularData){
+                    try{
+                        for(const nft of currentNFTArray){
+                            let nftId = nft.tokenID;
+                            let id = nftId.toString().trim(); 
+                            let sId = tokenSingularData.id;
+                            let sIdID = sId.toString().trim();
+                            if(id === sId){
+                                image = nft.image;
+                                break;
+                            }
+                        }
+
+                        if (image) {
+                            console.log('creating new object with image attribute');
+                            let tokenData = {
+                                image: image,
+                                price: parseInt(tokenSingularData.price),
+                                owner: tokenSingularData.owner,
+                                lastOwner: tokenSingularData.lastOwner,
+                                mintDate: parseInt(tokenSingularData.mintDate),
+                                tokenName: tokenSingularData.tokenName,
+                                forSale: tokenSingularData.forSale,
+                                flagged: tokenSingularData.flagged,
+                                tokenID: parseInt(tokenSingularData.id),
+                                lastSellData: parseInt(tokenSingularData.lastSellData)
+                            };
+                            tokenDataArray.push(tokenData);
+                        } else {
+                            console.log('Cannot set token data: unable to find image for', sell.id);
+                        }
+                    }catch(error){
+                    console.log('Error setting token image', error);
+                    }
+                }
             }catch(error){
-                console.log('Error calling getTokenData() on contract');
-                console.log('making Temporary test data to pass into next function');
-
-                // uncomment onject below when contract is calling correctly
-                tokenSingularData = {
-                    id: sell.tokenID,
-                    price: 10020203333333333332022222,
-                    owner: RoysWallet,
-                    lastOwner: RoysWallet,
-                    mintDate: 10000,
-                    tokenName: "Burson Skull",
-                    forSale: true,
-                    flagged: false,
-                    lastSellData: 10000000
-                };
+                console.log('Error getting NFT data to display for recent sell that was detected');
             }
-
-            if (image !== undefined) {
-                let tokenData = {
-                    image: image,
-                    price: tokenSingularData.price,
-                    owner: tokenSingularData.owner,
-                    lastOwner: tokenSingularData.lastOwner,
-                    mintDate: tokenSingularData.mintDate,
-                    tokenName: tokenSingularData.tokenName,
-                    forSale: tokenSingularData.forSale,
-                    flagged: tokenSingularData.flagged,
-                    tokenID: tokenSingularData.id,
-                    dateOfLastSell: tokenSingularData.lastSellData
-                };
-                tokenDataArray.push(tokenData);
-            } else {
-                console.log('Cannot set token data: unable to find image for', sell.id);
-            }
-        });
-
+        }
         const recentSellsPopUpBox = document.querySelector('.recentSellsPopUpBox'); 
-
         if (tokenDataArray.length > 0) {
             loadingContainer.remove();
             tokenDataArray.forEach(token => {
@@ -2932,7 +2925,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 soldItem.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
                 soldItem.style.borderRadius = '5px'; 
                 soldItem.style.marginBottom = '20px';
-                soldItem.style.border = '1px solid white';
+                soldItem.style.border = '1px solid black';
 
                 const imageContainer = document.createElement('div');
                 imageContainer.style.height = '80%';
@@ -2940,6 +2933,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 imageContainer.style.left = '2.5%';
                 imageContainer.style.top = '10%';
                 imageContainer.style.display = 'inline-block';
+                imageContainer.style.position = 'relative';
                 soldItem.appendChild(imageContainer);
 
                 const img = document.createElement('img');
@@ -2979,7 +2973,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
 
                 let convertedPrice = ((token.price)/(10**18)).toFixed(4);
                 const price = document.createElement('p');
-                price.textContent = `${convertedPrice}` + ` ${coin}`;
+                price.textContent = `Price: ${convertedPrice}` + ` ${coin}`;
                 price.style.color = 'white'; 
                 price.style.margin = "0";
                 price.style.textAlign = 'right';
@@ -2996,7 +2990,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
                 infoContainer.appendChild(currentTokenID);
 
                 const date = document.createElement('p');
-                const dateSold = new Date(token.dateOfLastSell * 1000); 
+                const dateSold = new Date(token.lastSellData * 1000); 
                 date.textContent = `${dateSold.toLocaleDateString("en-US", { 
                     year: '2-digit', 
                     month: '2-digit', 
@@ -3017,10 +3011,12 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
         } else {
             loadingContainer.remove();
             const noSellsMessage = document.createElement('span');
-            noSellsMessage.textContent = 'No sells have occurred yet.';
-            noSellsMessage.style.display = 'block';
+            noSellsMessage.textContent = 'The contract did not detect any sells yet. Come back at a later time or make a purchase to help fill this section';
+            noSellsMessage.style.position = 'absolute';
             noSellsMessage.style.textAlign = 'center';
-            noSellsMessage.style.marginTop = '20px';
+            noSellsMessage.style.top = '30%';
+            noSellsMessage.style.left = '2.5%';
+            noSellsMessage.style.width = '95%';
             noSellsMessage.style.color = 'white'; 
             recentSellsPopUpBox.appendChild(noSellsMessage);
         }
@@ -3050,10 +3046,7 @@ async function makeRecentSellsPage(item, contract, sideElementsWidth, coin){
         loadingContainer.remove();
         spanContainer.appendChild(spanTextContent);
         recentSellsPopUpBox.appendChild(spanContainer);
-    }
-    
-    console.log("called the recent sells function");
-            
+    }       
 }
 
 async function gatherAsyncNFTPageData() {
@@ -3106,12 +3099,6 @@ async function gatherAsyncNFTPageData() {
 
 }
 export async function makeNFTPage(array, purchaseArray, sideElementsWidth, parentElement, numColumns, gridWidthPercent, gridItemWidth, asyncPageObjectData) {
-    console.log('2) make header to hold collection logo directly above grid from database'); 
-    console.log('3) make grid work on all screen sizes');
-    console.log('4) test deploy contract function and start to call them on hover, ...etc. Make sure to test contract on IDE devloper or whatever');
-    console.log('5) make abaility to navigate pages maybe 50 items per page');
-    console.log(`6) use ${userSelectedContract} to acess data for selected contract and display on page`);
-
     let {        
         minimalList,
         minimalListInETH,
@@ -3179,7 +3166,7 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
             </a>
         </p>
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Tokens: ${numberOfTokens}</p>
-        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Max Sell: ${maxSell} ${coin}</p> 
+        <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Max Sell: ${(maxSell/(10**18)).toFixed(2)} ${coin}</p> 
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Number of Sells: ${numberOfSells}</p> 
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Royalty Fee: ${royaltyFeePercent}\%</p> 
         <p style="display: flex; align-items: center; justify-content: center; width: 100%; flex-grow: 1; border-bottom: 1px solid white; margin: 0;">Transfer Fee (per token): ${transferFeeInETH.toFixed(2)} ${coin}</p> 
@@ -3316,10 +3303,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     chatBox.style.borderBottom = '1px solid black';
     chatBox.style.backgroundColor = '#404a5c';
     chatBox.style.borderRadius = '5px';
-    //chatBox.style.borderTopLeftRadius = '1vh'; 
-    //chatBox.style.borderTopRightRadius = '1vh';
-    //chatBox.style.borderBottomLeftRadius = '0'; 
-    //chatBox.style.borderBottomRightRadius = '0'; 
     unknownDiv.appendChild(chatBox);
     const emojiButton = document.createElement('div');
     emojiButton.classList.add('emoji-button');
@@ -3438,7 +3421,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     });
 
     const messageInput = document.createElement('input');
-
     messageInput.id = 'message-input';
     messageInput.placeholder = 'Type your message...';
     messageInput.style.width = '80%';
@@ -3454,7 +3436,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     messageInput.style.margin = 'auto';
     messageInput.style.overflowWrap = 'break-word';
     messageInput.style.whiteSpace = 'nowrap'; 
-
     messageInput.addEventListener('focus', () => {
         messageInput.style.border = '1px solid black'; 
     });
@@ -4345,7 +4326,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             digitalElement.addEventListener('click', function() {
                 if(!NFTDivOverlay){
                     NFTDivOverlay = true;
-                    nft_section_click(digitalElement);                   
+                    gatherContracts(digitalElement);                   
                 }
             }); 
         }else{
@@ -4417,37 +4398,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             makeElementDraggable(containerInput);
             document.body.appendChild(containerInput);
             const mediaQuery = window.matchMedia('(max-width: 768px)');
-            const handleMediaQuery = (mq) => {
-                if (mq.matches) {
-                    const screenWidth = window.innerWidth;
-                    if (screenWidth <= 360) {
-                        containerInput.style.left = '0%';
-                        containerInput.style.width = '330px';
-                        containerInput.style.zIndex = '100000000';
-                    }else if (screenWidth <= 400) {
-                        containerInput.style.left = '5%';
-                        containerInput.style.width = '330px';
-                        containerInput.style.zIndex = '100000000';
-                    }else if (screenWidth <= 450) {
-                        containerInput.style.left = '11%';
-                        containerInput.style.width = '330px';
-                        containerInput.style.zIndex = '100000000';
-                    } else if (screenWidth <= 540) {
-                        containerInput.style.left = '16%';
-                        containerInput.style.width = '350px';
-                        containerInput.style.zIndex = '100000000';
-                    } else if (screenWidth <= 770) {
-                        containerInput.style.left = '20%';
-                        containerInput.style.width = '400px';
-                        containerInput.style.zIndex = '100000000';
-                    }
-                }else{
-                    const parentWidth = containerInput.parentElement.clientWidth;
-                    const containerWidth = containerInput.offsetWidth;
-                    const leftPosition = (parentWidth - containerWidth) / 2;
-                    containerInput.style.left = leftPosition + 'px';
-                }
-            };
             handleMediaQuery(mediaQuery);
             mediaQuery.addEventListener('change', (event) => {
                 handleMediaQuery(event.target);
@@ -5116,881 +5066,934 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement, numColumns){
     document.querySelectorAll('.option-item-2').forEach((item) => {
         item.addEventListener('click', async function () {
-            if(item.textContent == 'Sweep'){
-                console.log('trying to perform sweep');
-                const sweepBox = document.createElement('div');
-                sweepBox.style.position = 'absolute';
-                sweepBox.style.right = '1%';
-                sweepBox.style.top = '20vh';
-                sweepBox.style.height = '27%';
-                sweepBox.style.boxSizing = 'border-box';
-                sweepBox.style.width = sideElementsWidth;
-                sweepBox.style.backgroundColor = '#404a5c';
-                sweepBox.style.border = '2px solid black';
+            const isLoadingContainerActive = document.querySelector('grid-overlay-loader');
+            if(isLoadingContainerActive){
+                console.log('click is active waiting for sort to finish');
+            }else{
+                if(item.textContent == 'Sweep'){
+                    const sweepBox = document.createElement('div');
+                    sweepBox.style.position = 'absolute';
+                    sweepBox.style.right = '1%';
+                    sweepBox.style.top = '20vh';
+                    sweepBox.style.height = '27%';
+                    sweepBox.style.boxSizing = 'border-box';
+                    sweepBox.style.width = sideElementsWidth;
+                    sweepBox.style.backgroundColor = '#404a5c';
+                    sweepBox.style.border = '2px solid black';
 
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.className = 'closeIcon';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px'; 
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px'; 
-                closeIcon.style.color = 'red';
-                sweepBox.appendChild(closeIcon);
-                closeIcon.addEventListener('click', ()=>{
-                    document.body.removeChild(sweepBox);
-                });
-                document.body.appendChild(sweepBox);
-
-                createCircularSweeper(sweepBox);
-
-                const searchButton = document.createElement('button');
-                searchButton.style.position = 'absolute';
-                searchButton.textContent = 'Sweep';
-                searchButton.style.marginTop = '2px';
-                searchButton.style.backgroundColor = 'dimgray';
-                searchButton.style.width = '38%';
-                searchButton.style.radius = '1px';
-                searchButton.style.bottom = '0%';
-                searchButton.style.left = '29%';
-                searchButton.style.color = 'white';
-                searchButton.style.borderRadius = '1px';
-                sweepBox.appendChild(searchButton);
-
-                async function sweepGrid(){
-                    console.log('trying to sweep grid with specified amount in span tag');
-                    try{
-                        const spanText = document.querySelector('.info-span');
-                        const spanTextContent = spanText.textContent.replace(/Sweep|items| /g, '');
-                        const integerValue = parseInt(spanTextContent.trim(), 10);  
-                        console.log('trying to sweep this many items:', integerValue );
+                    const closeIcon = document.createElement('span');
+                    closeIcon.textContent = '×';
+                    closeIcon.className = 'closeIcon';
+                    closeIcon.style.position = 'absolute';
+                    closeIcon.style.top = '10px'; 
+                    closeIcon.style.right = '10px';
+                    closeIcon.style.cursor = 'pointer';
+                    closeIcon.style.fontSize = '20px'; 
+                    closeIcon.style.color = 'red';
+                    sweepBox.appendChild(closeIcon);
+                    closeIcon.addEventListener('click', ()=>{
+                        document.body.removeChild(sweepBox); 
                         let oldGrid = document.querySelector(".NewGrid");
                         let gridItems = Array.from(oldGrid.children);  
-                        const children = Array.from(sweepBox.children);
-                        for (let i = children.length - 1; i >= 0; i--) {
-                            const child = children[i];
-                            if (!child.classList.contains('closeIcon')) {
-                                child.remove();
-                            }
-                        }
-                        const messageLoadingSpan = document.createElement('span');
-                        messageLoadingSpan.style.fontSize = '1.5vh';
-                        messageLoadingSpan.style.color = 'white';
-                        messageLoadingSpan.style.width = '100%';
-                        messageLoadingSpan.style.height = '10%';
-                        messageLoadingSpan.style.position = 'absolute'; 
-                        messageLoadingSpan.style.textAlign = 'center';
-                        messageLoadingSpan.style.top = '30%';
-                        messageLoadingSpan.textContent = 'Loading . . . ';
-                        sweepBox.appendChild(messageLoadingSpan);
-                        try{    
-                            let availabeTokens = [];
-                            let unavailableTokens = [];
-                            console.log('trying to sweep this many items:', integerValue);
-                            console.log('trying to compare to length of grid:', gridItems.length);
+                        gridItems.forEach(item => {
+                            item.style.setProperty("border", "none", "important"); 
+                        });
+                    });
+                    document.body.appendChild(sweepBox);
+                    createCircularSweeper(sweepBox, contract);
+                    const searchButton = document.createElement('button');
+                    searchButton.style.position = 'absolute';
+                    searchButton.textContent = 'Sweep';
+                    searchButton.style.marginTop = '2px';
+                    searchButton.style.backgroundColor = 'dimgray';
+                    searchButton.style.width = '38%';
+                    searchButton.style.radius = '1px';
+                    searchButton.style.bottom = '0%';
+                    searchButton.style.left = '29%';
+                    searchButton.style.color = 'white';
+                    searchButton.style.borderRadius = '1px';
+                    sweepBox.appendChild(searchButton);
+                    sweepBox.style.overflowY = 'scroll';
 
-                            if(integerValue <= gridItems.length && integerValue != 0){
-                                for(var k = 0; k< integerValue; k++){
-                                    let tokenID =  parseInt(gridItems[k].id);
-                                    console.log('tokenID is', tokenID);
-                                    let tokenData;
-                                    try{
-                                        tokenData = await contract.methods.getTokenData(tokenID).call();
-                                        if(tokenData.forSale){
-                                            availabeTokens.push(tokenID);
-                                        }else{
-                                            unavailableTokens.push(tokenID);
-                                        }
-                                    }catch(error){
-                                        console.log('Error calling getTokenData() on contract', error);
-                                    }
+                    async function sweepGrid(){
+                        try{
+                            const spanText = document.querySelector('.info-span');
+                            const spanTextContent = spanText.textContent.replace(/Sweep|items| /g, '');
+                            const integerValue = parseInt(spanTextContent.trim(), 10);  
+                            let oldGrid = document.querySelector(".NewGrid");
+                            let gridItems = Array.from(oldGrid.children);  
+                            const children = Array.from(sweepBox.children);
+                            for (let i = children.length - 1; i >= 0; i--) {
+                                const child = children[i];
+                                if (!child.classList.contains('closeIcon')) {
+                                    child.remove();
                                 }
-                                if(unavailableTokens.length == 0 && availabeTokens.length != 0 && tokenData){
-                                    console.log('trying to sweep the floor!!!!');
-                                    try{
-                                        let currentAddressGasSender;
-                                        if (isConnected) {
-                                            let thisAccount = window.ethereum.selectedAddress;
-                                            currentAddressGasSender = thisAccount;
-                                        } else {
-                                            if (typeof window.ethereum === 'undefined') { 
-                                                alert('You must install MetaMask or another Ethereum provider to purchase tokens');
-                                            } else {
-                                                if (window.ethereum.isMetaMask) { 
-                                                    try {
-                                                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                                                        let thisAccount = accounts[0];
-                                                        currentAddressGasSender = thisAccount;
-                                                    } catch (error) {
-                                                        if (error.code === -32002) { 
-                                                            alert('Please open the MetaMask extension manually, sign in, and reload the page.');
-                                                        } else {
-                                                            alert(`Error: ${error.message || error}`);
-                                                        }
-                                                    }
-                                                } else { 
-                                                    alert('MetaMask not detected. Please install MetaMask to use this feature.');
-                                                }
+                            }
+                            const messageLoadingSpan = document.createElement('span');
+                            messageLoadingSpan.style.fontSize = '1.5vh';
+                            messageLoadingSpan.style.color = 'white';
+                            messageLoadingSpan.style.width = '100%';
+                            messageLoadingSpan.style.height = '10%';
+                            messageLoadingSpan.style.position = 'absolute'; 
+                            messageLoadingSpan.style.textAlign = 'center';
+                            messageLoadingSpan.style.top = '20%';
+                            messageLoadingSpan.textContent = 'Loading . . . ';
+                            sweepBox.appendChild(messageLoadingSpan);
+                            try{    
+                                let availabeTokens = [];
+                                let unavailableTokens = [];
+                                if(integerValue <= gridItems.length && integerValue != 0){
+                                    for(var k = 0; k< integerValue; k++){
+                                        let tokenID =  parseInt(gridItems[k].id);
+                                        console.log('tokenID is', tokenID);
+                                        let tokenData;
+                                        try{
+                                            tokenData = await contract.methods.nfts(tokenID).call();
+                                            if(tokenData.forSale && tokenData.owner != currentClientWallet && !tokenData.flagged){
+                                                availabeTokens.push(tokenID);
+                                            }else{
+                                                unavailableTokens.push(tokenID);
                                             }
+                                        }catch(error){
+                                            console.log('Error calling nfts() on contract', error);
                                         }
-                                        console.log(`${currentAddressGasSender} is attempt ing to sweep the floor`);
-                                        if(currentAddressGasSender){
-                                            const gasEstimate = await contract.methods.purchaseArrayOfNFT(availabeTokens).estimateGas({ from: currentAddressGasSender });
-                                            const tx = await contract.methods.purchaseArrayOfNFT(availabeTokens).send({
-                                                    from: currentAddressGasSender,
-                                                    gas: gasEstimate
-                                            });
-                                            if (tx && tx.transactionHash) {
-                                                console.log('Transaction sent. Waiting for confirmation...');
-                                                const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-                                                if (receipt && receipt.status === true) {
-                                                    console.log('The user accepted the transaction and it was successful.');
-                                                    console.log('creating success span tag inside contaniner');
-                                                    messageLoadingSpan.textContent = '';
-                                                    messageLoadingSpan.textContent = 'Sweep successful! Thank you come again.';
-                                                } else {
-                                                    console.log('The transaction failed.');
-                                                    messageLoadingSpan.textContent = '';
-                                                    messageLoadingSpan.textContent = 'Sorry an error occured. The transaction failed';
-                                                }
-                                            } else {
-                                                console.log('The transaction could not be sent.');
-                                                messageLoadingSpan.textContent = '';
-                                                messageLoadingSpan.textContent = 'The transaction could not be sent.';
-                                            }
-                                        }else{
-                                            messageLoadingSpan.textContent = '';
-                                            messageLoadingSpan.textContent = 'Login to your metamask before proceeding.';
-                                        }
-                                    }catch(error){
-                                        console.log('Error calling purchaseArrayOfNFT on the contract', error);
-                                        messageLoadingSpan.textContent = '';
-                                        messageLoadingSpan.textContent = 'error calling contract function may not be set up yet.';
                                     }
-                                }else if(unavailableTokens.length == 0 && availabeTokens.length == 0) {
-                                    messageLoadingSpan.textContent = '';
-                                    messageLoadingSpan.textContent = 'Sorry the contract is not setup yet.';
-                                }else if(unavailableTokens.length != 0 && availabeTokens.length != 0) {
-                                    messageLoadingSpan.textContent = '';
-                                    messageLoadingSpan.textContent = 'Sorry some of the tokens you are trying to sweep are unavailable. Please enter a smaller amount and try again. You can check which tokens are availabe by hovering over them';
+                                    if(availabeTokens.length != 0 && isConnected){
+                                        try{
+                                            let currentAddressGasSender = currentClientWallet;
+                                            if(currentAddressGasSender){
+                                                var totalCost = 0;
+                                                for(const token of availabeTokens){
+                                                    const thisTokenData = await contract.methods.nfts(token).call();
+                                                    const thisTokenPrice = parseInt(thisTokenData.price);
+                                                    totalCost+= thisTokenPrice;
+                                                }
+
+                                                let bufferInWEI = totalCost * 0.10; 
+                                                let totalValueBuffer = totalCost + bufferInWEI;
+                                                const gasEstimate = await contract.methods.purchaseArrayOfNFT(availabeTokens).estimateGas({ 
+                                                    from: currentAddressGasSender,
+                                                    value: totalValueBuffer.toString() 
+                                                });
+                                                let buffer = Math.floor((0.00285)*(10*18));
+                                                let gasPriceTotal = BigInt(gasEstimate)+BigInt(buffer);
+                                                const tx = await contract.methods.purchaseArrayOfNFT(availabeTokens).send({
+                                                        from: currentAddressGasSender,
+                                                        gas: Number(gasPriceTotal),
+                                                        value: totalValueBuffer.toString()
+                                                })
+                                                .on('transactionHash', function(hash) {
+                                                    console.log("User accepted the transaction. Transaction hash:", hash);
+                                                    messageLoadingSpan.textContent = '';
+                                                    messageLoadingSpan.textContent = 'Your Sweep was a Success!';
+                                                    createPurchaseArraySuccessForm(availabeTokens, coin, contract);
+                                                })
+                                                .on('receipt', function(listReceipt) {
+                                                    console.log("Transaction Receipt:", listReceipt);
+                                                    messageLoadingSpan.textContent = '';
+                                                    messageLoadingSpan.textContent = `Thank you the transaction was successful! 
+                                                                                        You will not sweep items that are already 
+                                                                                        owned buy you or flagged`;
+                                                    
+                                                })
+                                                .on('error', function(error, receipt) {
+                                                    console.log("Transaction rejected or failed:", error);
+                                                    if (error.code === 4001) {
+                                                        messageLoadingSpan.textContent = '';
+                                                        messageLoadingSpan.textContent = 'Your transaction was rejected!';
+                                                    } else if(error.message.includes('Transaction was not mined within 50 blocks')){
+                                                        messageLoadingSpan.textContent = '';
+                                                        messageLoadingSpan.textContent = `Your transaction is taking to long it may still be mined
+                                                                                             but if you want it to process faster you might need to manuelly suggest 
+                                                                                             Metamask to speed up the transaction. Thank you for understanding.`;
+                                                    }else {
+                                                        messageLoadingSpan.textContent = '';
+                                                        messageLoadingSpan.textContent = 'An unexpected error occured';
+                                                    }
+                                                });
+                                            }else{
+                                                messageLoadingSpan.textContent = '';
+                                                messageLoadingSpan.textContent = 'Login to your metamask before proceeding.';
+                                            }
+                                        }catch(error){
+                                            console.log('Error calling purchaseArrayOfNFT on the contract', error);
+                                            messageLoadingSpan.textContent = '';
+                                            messageLoadingSpan.textContent = 'error calling contract .';
+                                        }
+                                    }else if(unavailableTokens.length != 0 && availabeTokens.length == 0) {
+                                        messageLoadingSpan.textContent = '';
+                                        messageLoadingSpan.textContent = `No tokens are available on the contract. The are either not listed, flagged, or you own them.
+                                                                          Please try again at a later time. Thank you for understanding.`;
+                                    }else if(unavailableTokens.length == 0 && availabeTokens.length == 0) {
+                                        messageLoadingSpan.textContent = '';
+                                        messageLoadingSpan.textContent = 'Sorry an unexpected error occured pelase try again later.';
+                                    }else if(!isConnected){
+                                        messageLoadingSpan.textContent = '';
+                                        messageLoadingSpan.textContent = 'Please connect your wallet before trying to perform a sweep on the floor.';
+                                    }else{
+                                        messageLoadingSpan.textContent = '';
+                                        messageLoadingSpan.textContent = 'Sorry an unexpected error occured.';
+                                    }
                                 }else{
                                     messageLoadingSpan.textContent = '';
-                                    messageLoadingSpan.textContent = 'Sorry an unexpected error occured.';
+                                    messageLoadingSpan.textContent = `Please enter an appropriate integer to sweep the grid only has ${gridItems.length} tokens available`;
+                                }
+                            }catch(error){
+                                console.log('Error sweeping items', error);
+                                messageLoadingSpan.textContent = '';
+                                messageLoadingSpan.textContent = `Please contact support if you keep experiencing issues`;
+                            }
+                        }catch(error){
+                            console.log('error getting item number for sweep', error);
+                        }
+                        
+                    }
+                    searchButton.addEventListener('click', sweepGrid);
+                }else if (item.textContent == 'Search') {
+                    const searchContainer = document.createElement('div');
+                    searchContainer.style.position = 'absolute';
+                    searchContainer.style.right = '1%';
+                    searchContainer.style.top = '20vh';
+                    searchContainer.style.height = '27%';
+                    searchContainer.style.boxSizing = 'border-box';
+                    searchContainer.style.width = sideElementsWidth;
+                    searchContainer.style.borderRadius = '5px';
+                    searchContainer.style.backgroundColor = '#404a5c';
+                    searchContainer.style.border = '2px solid black';
+                    searchContainer.style.display = 'flex';
+                    searchContainer.style.flexDirection = 'column';
+                    searchContainer.style.alignItems = 'center';
+                    searchContainer.style.justifyContent = 'space-evenly';
+                    searchContainer.style.overflowY = 'scroll';
+
+                    const closeIcon = document.createElement('span');
+                    closeIcon.textContent = '×';
+                    closeIcon.style.position = 'absolute';
+                    closeIcon.style.top = '10px';
+                    closeIcon.style.right = '10px';
+                    closeIcon.style.cursor = 'pointer';
+                    closeIcon.style.fontSize = '20px';
+                    closeIcon.style.color = 'red';
+
+                    searchContainer.appendChild(closeIcon);
+                    closeIcon.addEventListener('click', () => {
+                        document.body.removeChild(searchContainer);
+                    });
+
+                    const searchBar = document.createElement('input');
+                    searchBar.setAttribute('placeholder', 'Search By Token ID ...');
+                    searchBar.style.width = '70%';
+                    searchBar.style.height = '6%'; 
+                    searchBar.style.margin = '0'; 
+                    searchBar.style.position = 'relative';
+                    searchBar.style.top  = '1%';
+                    searchBar.style.left = '0%';
+                    searchBar.type = 'number';
+                    let searchedTokenID = searchBar.value;
+
+                    searchContainer.appendChild(searchBar);
+                    const searchButton = document.createElement('button');
+                    searchButton.textContent = 'Search';
+                    searchButton.style.marginTop = '10px';
+                    searchButton.style.backgroundColor = 'dimgray';
+                    searchButton.style.width = '38%';
+                    searchButton.style.borderRadius = '1px';
+                    searchButton.style.color = 'white';
+                    searchContainer.appendChild(searchButton);
+
+                    const imageContainer = document.createElement('div');
+                    imageContainer.style.width = '45%';
+                    imageContainer.style.height = '32%'; 
+                    imageContainer.style.top = '21%';
+                    imageContainer.style.left = '17%';
+                    imageContainer.style.display = 'none'; 
+                    searchContainer.appendChild(imageContainer);
+
+                    const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
+                    const divContainer = document.createElement('div');
+                    divContainer.style.width = '100%';
+                    divContainer.style.display = 'flex';
+                    divContainer.style.flexDirection = 'column';
+                    divContainer.style.alignItems = 'center'; 
+                    divContainer.style.height = '35%'; 
+                    divContainer.style.bottom = '0%';
+                    divContainer.style.fontSize = '2vh';
+                    divContainer.style.display = 'none'; 
+                    searchContainer.appendChild(divContainer);
+                    document.body.appendChild(searchContainer);
+
+                    const promptMessage = document.createElement('p');
+                    promptMessage.textContent = 'Please enter a token ID to retrieve its information';
+                    promptMessage.style.color = 'white'; 
+                    promptMessage.style.fontSize = '2vh';  
+                    promptMessage.style.position = 'relative';
+                    promptMessage.style.width = '80%';
+                    //promptMessage.style.left = '10%';
+                    promptMessage.style.textAlign = 'center';  
+                    //promptMessage.style.margin = '10px 0'; 
+
+                    searchContainer.appendChild(searchBar);
+                    searchContainer.appendChild(promptMessage); 
+                    searchContainer.appendChild(searchButton);
+
+                    async function revealContent() {
+                        promptMessage.textContent = '';
+                        searchButton.remove();
+                        searchBar.remove();
+                        const loadingContainer = document.createElement("div");
+                        loadingContainer.className = "loading-container";
+                        loadingContainer.style.position = "absolute";
+                        loadingContainer.style.top = "50%";
+                        loadingContainer.style.left = "50%";
+                        loadingContainer.style.transform = "translate(-50%, -50%)";
+                        loadingContainer.style.width = "80%";
+                        loadingContainer.style.height = "60%";
+                        loadingContainer.style.display = "flex";
+                        loadingContainer.style.justifyContent = "center";
+                        loadingContainer.style.alignItems = "center";
+                        loadingContainer.style.backgroundColor = "none"; 
+
+                        const loadingIcon = document.createElement("img");
+                        loadingIcon.setAttribute("class", "loading-gif");
+                        loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+                        loadingIcon.setAttribute("alt", "Loading..."); 
+                        loadingIcon.style.width = "50%"; 
+                        loadingIcon.style.height = "50%";
+                        loadingContainer.appendChild(loadingIcon);
+                        searchContainer.appendChild(loadingContainer);
+                        let tokenExist = false;
+                        searchedTokenID = searchBar.value;
+                        if (searchedTokenID === '' || isNaN(searchedTokenID)) {
+                            alert('Please enter a valid number in the search bar');
+                        } else {
+                            searchedTokenID = parseInt(searchedTokenID);
+                            for(const text of divData){
+                                const div = document.createElement('div');
+                                div.style.width = '90%';
+                                div.style.height = '20%'; 
+                                div.style.display = 'flex'; 
+                                div.style.alignItems = 'center'; 
+                                div.style.justifyContent = 'space-between'; 
+                                div.style.cursor = 'pointer';
+                                div.style.boxSizing = 'border-box';
+
+                                const textContainer = document.createElement('div');
+                                textContainer.style.minWidth = '40%'; 
+                                textContainer.style.textAlign = 'left'; 
+                                textContainer.style.color = 'white';
+                                textContainer.textContent = text;
+
+                                const resultContainer = document.createElement('div');
+                                resultContainer.style.minWidth = '40%'; 
+                                resultContainer.style.textAlign = 'right'; 
+                                resultContainer.style.color = 'lightgray';
+                                if(text == "Highest Sell"){
+                                    try {
+                                        const recentSellsLength = await contract.methods.numberOfSells().call();
+
+                                        const loopLength = parseInt(recentSellsLength);
+                                        let recentSellsFromContract = [];
+                                        for(var i = 0; i< loopLength; i++){
+                                            let sell = await contract.methods.recentSells(i).call();
+                                            recentSellsFromContract.push(sell);
+                                        }
+                                        let highestTokenSell = 0;
+                                        console.log('trying to go through recent sells on contract', recentSellsFromContract);
+                                        for (const nft of recentSellsFromContract) {
+                                            if (parseInt(nft.id) === searchedTokenID) {
+                                                if (parseInt(nft.price) > highestTokenSell) {
+                                                    highestTokenSell = parseInt(nft.price);
+                                                }
+                                            }
+                                        }
+                                        let highestTokenSellInETH = (highestTokenSell / (10 ** 18)).toFixed(2); 
+                                        console.log('Highest sell in ETH:', highestTokenSellInETH);
+                                        resultContainer.textContent = `${highestTokenSellInETH} ${coin}`;
+                                    } catch (error) {
+                                        console.log('Error getting highestTokenSellInETH from contract', error);
+                                        resultContainer.textContent = `Error Error Error`;
+
+                                    }
+                                }else if(text == "Current Owner"){
+                                    let currentOwner;
+                                    try{
+                                        let data = await contract.methods.nfts(searchedTokenID).call();
+                                        currentOwner = data.owner.substring(0,8)+ "~~~";
+                                    }catch(error){
+                                        console.log('Error calling the function nfts() on the contract and setting the current', error);
+                                        currentOwner = "Error";
+                                        
+                                    }
+                                    resultContainer.textContent = currentOwner;
+                                }else if(text == "Date of Last Sell"){
+                                    let dateOfLastSell;
+                                    try{
+                                        let data = await contract.methods.nfts(searchedTokenID).call();
+                                        const dateSold = new Date(parseInt(data.lastSellData) * 1000); 
+                                        const dateSpan = document.createElement('div');
+                                        dateSpan.textContent = `${dateSold.toLocaleDateString("en-US", { 
+                                            year: '2-digit', 
+                                            month: '2-digit', 
+                                            day: '2-digit' 
+                                        })} at ${dateSold.toLocaleTimeString("en-US", { 
+                                            hour: '2-digit', 
+                                            minute: '2-digit', 
+                                            hour12: false 
+                                        })}`;
+                                        dateOfLastSell = dateSpan.textContent.substring(0,8);
+                                    }catch(error){
+                                        console.log('Error calling the function nfts() on the contract and setting the current', error);
+                                        dateOfLastSell = 'Error';
+                                        
+                                    }
+                                    resultContainer.textContent = dateOfLastSell;
+                                }else if(text == "Previous Owner"){
+                                    let previousOwner;
+                                    try{
+                                        let data = await contract.methods.nfts(searchedTokenID).call();
+                                        previousOwner = data.lastOwner.substring(0,8) + "~~~";
+                                    }catch(error){
+                                        console.log('Error calling the function nfts() on the contract and setting the current', error);
+                                        previousOwner = "Error";
+                                        
+                                    }
+                                    resultContainer.textContent = previousOwner;
+                                }else{
+                                    console.log('an unexpected error occured on the result container', error);
+                                }
+                                
+                                div.appendChild(textContainer);
+                                div.appendChild(resultContainer);
+                                divContainer.appendChild(div);
+                            }
+                            let imageUrl = null;
+                            for (const nft of currentNFTArray) {
+                                if (nft.tokenID === searchedTokenID) {
+                                    tokenExist = true;
+                                    imageUrl = nft.image; 
+                                    console.log('We found the token with ID:', nft.tokenID);
+                                    break;
+                                }
+                            }
+                            if (tokenExist) {
+                                try {
+                                    if (imageUrl) {
+                                        imageContainer.style.backgroundImage = `url(${imageUrl})`;
+                                        imageContainer.style.backgroundSize = 'cover'; 
+                                        imageContainer.style.backgroundRepeat = 'no-repeat';
+                                        imageContainer.style.backgroundPosition = 'center'; 
+                                        imageContainer.style.display = 'block';
+                                        console.log('Image set successfully');
+                                    } else {
+                                        console.log('Image URL is not found');
+                                    }
+                                } catch (error) {
+                                    console.log('Error setting image:', error);
+                                }             
+                                promptMessage.remove();
+                                divContainer.style.display = 'flex';
+                            } else {
+                                alert('Please enter a valid token ID');
+                            }
+                            loadingContainer.remove();
+                        }
+                    }
+                    searchBar.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            revealContent();
+                        }
+                    });
+                    searchButton.addEventListener('click', revealContent);
+                }else if(item.textContent == 'Sort'){
+                    console.log('make 4 div elements here');
+                    const sortContainer = document.createElement('div');
+                    sortContainer.style.position = 'absolute';
+                    sortContainer.style.right = '1%';
+                    sortContainer.style.top = '20vh';
+                    sortContainer.style.height = '27%';
+                    sortContainer.style.boxSizing = 'border-box';
+                    sortContainer.style.width = sideElementsWidth;
+                    sortContainer.style.borderRadius = '5px';
+                    sortContainer.style.backgroundColor = '#404a5c';
+                    sortContainer.style.border = '2px solid black';
+                    sortContainer.style.display = 'flex';
+                    sortContainer.style.flexDirection = 'column';
+                    sortContainer.style.alignItems = 'center';
+                    sortContainer.style.justifyContent = 'space-evenly';
+
+                    const closeIcon = document.createElement('span');
+                    closeIcon.textContent = '×';
+                    closeIcon.style.position = 'absolute';
+                    closeIcon.style.top = '10px';
+                    closeIcon.style.right = '10px';
+                    closeIcon.style.cursor = 'pointer';
+                    closeIcon.style.fontSize = '20px';
+                    closeIcon.style.color = 'red';
+
+                    sortContainer.appendChild(closeIcon);
+
+                    closeIcon.addEventListener('click', () => {
+                        document.body.removeChild(sortContainer);
+                    });
+
+                    document.body.appendChild(sortContainer);
+                    const sortingData = ['Listed', 'Not Listed', 'Highest Price', 'Lowest Price'];
+                    const miniSortContainer = document.createElement('div');    
+                    miniSortContainer.style.position = 'absolute';
+                    miniSortContainer.style.width = "100%";
+                    miniSortContainer.style.height = '85%';
+                    miniSortContainer.style.left = '0%';
+                    miniSortContainer.style.bottom = '1%';
+                    sortContainer.appendChild(miniSortContainer);
+
+                    sortingData.forEach((text) => {
+                        const div = document.createElement('div');
+                        div.style.width = '99%'; 
+                        div.style.left = '0.5%';
+                        div.style.height = '20%';
+                        div.style.display = 'flex';
+                        div.style.alignItems = 'center'; 
+                        div.style.justifyContent = 'center'; 
+                        div.style.textAlign = 'center';
+                        div.style.color = 'white';
+                        div.style.borderRadius = '5px';
+                        div.style.cursor = 'pointer';
+                        div.textContent = text;
+                        div.style.fontSize = '2vh';
+                        div.style.borderBottom = '1px solid white';
+
+                        div.addEventListener('mouseover', () => {
+                            div.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                            div.style.color = 'black';
+                        });
+                        div.addEventListener('mouseout', () => {
+                            div.style.backgroundColor = '#404a5c';
+                            div.style.color = 'white';
+                        });
+                        div.addEventListener('click', async () => {
+                            let listedItems = [];
+                            let itemsNotListed = [];
+                            let sortedClientSideIDs = [];
+                            let gridItemsNew = [];
+                            let gridOverlay = makeGridOverlayLoader();
+                            if(text === "Listed"){
+                                let oldGrid = document.querySelector(".NewGrid");
+                                let gridItems = Array.from(oldGrid.children);  
+                                try{
+                                    for(var i =0; i<gridItems.length; i++){
+                                        if(gridItems[i].className === 'grid-overlay-loader'){
+                                            // do nothing
+                                        }else{
+                                            let tokenData;
+                                            let gridItemIDString = gridItems[i].id; 
+                                            let gridIDINT = parseInt(gridItemIDString.trim());
+                                            try {
+                                                tokenData = await contract.methods.nfts(gridIDINT).call();
+                                                if(tokenData.forSale === true){
+                                                    listedItems.push(gridIDINT);
+                                                }else{
+                                                    itemsNotListed.push(gridIDINT);
+                                                }
+                                            } catch (error) {
+                                                console.error(`Error fetching toking Data ${tokenData}`);
+                                            }
+                                        }
+                                    }
+                                    for(const item of listedItems){
+                                        sortedClientSideIDs.push(item);
+                                    }
+                                    for(const item of itemsNotListed){
+                                        sortedClientSideIDs.push(item);
+                                    }
+                                    gridItemsNew = sortByID(gridItems,sortedClientSideIDs);
+                                    gridItemsNew.pop();
+                                    let sortedTokenIDs = gridItemsNew.map(item => parseInt(item.id.trim()));
+                                    let oldGrid = document.querySelector(".NewGrid");
+                                    currentNFTArray.sort((a, b) => {
+                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                        return indexA - indexB;
+                                    });
+                                    if (oldGrid) {
+                                        oldGrid.innerHTML = '';
+                                    }
+                                    makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract, numColumns);
+                                }catch(error){
+                                    console.log('Error making new nft grid to call', error);
+                                }
+                            }if(text === "Not Listed"){
+                                let oldGrid = document.querySelector(".NewGrid");
+                                let gridItems = Array.from(oldGrid.children);  
+                                try{
+                                    for(var i = 0; i < gridItems.length; i++){
+                                        if(gridItems[i].className === 'grid-overlay-loader'){
+                                            // do nothing
+                                        }else{
+                                            let tokenData;
+                                            let gridItemIDString = gridItems[i].id; 
+                                            let gridIDINT = parseInt(gridItemIDString.trim());
+                                            try {
+                                                tokenData = await contract.methods.nfts(gridIDINT).call();
+                                                if(tokenData.forSale === false){
+                                                    itemsNotListed.push(gridIDINT); 
+                                                }else{
+                                                    listedItems.push(gridIDINT);  
+                                                }
+                                            } catch (error) {
+                                                console.error(`Error fetching token Data ${tokenData}`);
+                                            }
+                                        }
+
+                                    }
+                                    for(const item of itemsNotListed){
+                                        sortedClientSideIDs.push(item);
+                                    }
+                                    for(const item of listedItems){
+                                        sortedClientSideIDs.push(item);
+                                    }
+                                    gridItemsNew = sortByID(gridItems,sortedClientSideIDs);
+                                    gridItemsNew.pop();
+                                    let sortedTokenIDs = gridItemsNew.map(item => parseInt(item.id.trim()));
+                                    let oldGrid = document.querySelector(".NewGrid");
+                                    currentNFTArray.sort((a, b) => {
+                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                        return indexA - indexB;
+                                    });
+                                    if (oldGrid) {
+                                        oldGrid.innerHTML = '';
+                                        console.log('items Cleared from DOM');
+                                    }
+                                    makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract, numColumns); 
+                                }catch(error){
+                                    console.log('Error making new NFT grid to call', error);
+                                }
+                            }else if(text === "Highest Price"){
+                                let oldGrid = document.querySelector(".NewGrid");
+                                let gridItems = Array.from(oldGrid.children); 
+                                let savedItems = [];
+                                for(const item of gridItems){
+                                    savedItems.push(item);
+                                } 
+                                try {
+                                    let organizedByHighestIDarray = []; 
+                                    gridItems.pop(); 
+                                    while (gridItems.length > 0) {
+                                        let highestCount = BigInt(0);
+                                        let highestTokenID = null;
+                                        let counterJ = 0;
+                                        for (let j = 0; j < gridItems.length; j++) {
+                                            if(gridItems[j].className ==="grid-overlay-loader"){
+                                                // do nothing
+                                            }else{
+                                                let gridItemIDString2 = gridItems[j].id; 
+                                                let gridIDINT2 = parseInt(gridItemIDString2.trim());
+                                                try {
+                                                    let tokenDataCounter = await contract.methods.nfts(gridIDINT2).call();
+                                                    let tokenPrice = BigInt(parseInt(tokenDataCounter.price));
+                                                    if (highestCount <= tokenPrice) {
+                                                        highestCount = tokenPrice;
+                                                        highestTokenID = parseInt(tokenDataCounter.id);
+                                                        counterJ = j;
+                                                    }
+
+                                                } catch (error) {
+                                                    console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
+                                                }
+                                            }
+                                        }
+                                        if (highestTokenID !== null) {
+                                            console.log('removing element from grid and pushing to array');
+                                            const index = gridItems.indexOf(gridItems[counterJ]);
+                                            if (index > -1) {
+                                                gridItems.splice(index, 1); 
+                                            }
+                                            organizedByHighestIDarray.push(highestTokenID); 
+                                        }else{
+                                            break;
+                                        }
+                                    }
+                                    savedItems.pop();
+                                    if (organizedByHighestIDarray.length !=0) {   
+                                        savedItems = sortByID(savedItems,organizedByHighestIDarray);
+                                        let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
+                                        currentNFTArray.sort((a, b) => {
+                                            let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                            let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                            return indexA - indexB;
+                                        });
+
+                                        if (oldGrid) {
+                                            oldGrid.innerHTML = ''; 
+                                        }
+                                        makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract, numColumns);  
+                                    }else{
+                                        console.log('Loop finished but failed to push to array');
+                                    }
+                                } catch (error) {
+                                    console.error('Error making new NFT grid:', error);
+                                }
+                            }else if(text === "Lowest Price") {
+                                let oldGrid = document.querySelector(".NewGrid");
+                                let gridItems = Array.from(oldGrid.children); 
+                                let savedItems = [];
+                                for(const item of gridItems){
+                                    savedItems.push(item);
+                                } 
+                                try {
+                                    let organizedByLowestIDarray = []; 
+                                    while (gridItems.length > 0) {
+                                        let lowestCount = BigInt(Number.MAX_SAFE_INTEGER);
+                                        let lowestTokenID = null;
+                                        let counterJ = 0;
+                                        for (let j = 0; j < gridItems.length; j++) {
+                                            if(gridItems[j].className ==="grid-overlay-loader"){
+                                                // do nothing
+                                            }else{
+                                                let gridItemIDString2 = gridItems[j].id; 
+                                                let gridIDINT2 = parseInt(gridItemIDString2.trim());
+                                                try {
+                                                    let tokenDataCounter = await contract.methods.nfts(gridIDINT2).call();
+                                                    let tokenPrice = BigInt(parseInt(tokenDataCounter.price));
+
+                                                    if (lowestCount >= tokenPrice) {
+                                                        lowestCount = tokenPrice;
+                                                        lowestTokenID = tokenDataCounter.id;
+                                                        counterJ = j;
+                                                    }
+                                                } catch (error) {
+                                                    console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
+                                                }
+                                            }
+                                        }
+                                        if (lowestTokenID !== null) {
+                                            const index = gridItems.indexOf(gridItems[counterJ]);
+                                            if (index > -1) {
+                                                gridItems.splice(index, 1);
+                                            }
+                                            organizedByLowestIDarray.push(lowestTokenID); 
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    savedItems.pop();
+                                    if (organizedByLowestIDarray.length != 0) {
+                                        savedItems = sortByID(savedItems,organizedByLowestIDarray);
+                                        let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
+                                        currentNFTArray.sort((a, b) => {
+                                            let indexA = sortedTokenIDs.indexOf(a.tokenID);
+                                            let indexB = sortedTokenIDs.indexOf(b.tokenID);
+                                            return indexA - indexB;
+                                        });
+                                        if (oldGrid) {
+                                            oldGrid.innerHTML = ''; 
+                                        }
+                                        makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract, numColumns); 
+                                    }else{
+                                        console.log('loop finished but failed to add items to the LowestIDarray');
+                                    }
+                                } catch (error) {
+                                    console.error('Error making new NFT grid:', error);
+                                }
+                            }
+                            if(gridOverlay !== undefined){
+                                gridOverlay.remove();    
+                            }
+                            
+                        });
+
+                        miniSortContainer.appendChild(div);
+                    });
+                }else if(item.textContent == 'File a Report'){
+                    console.log('Opening report form');
+                    const reportContainer = document.createElement('div');
+                    reportContainer.style.position = 'absolute';
+                    reportContainer.style.right = '1%';
+                    reportContainer.style.top = '20vh';
+                    reportContainer.style.width = sideElementsWidth;
+                    reportContainer.style.borderRadius = '5px';
+                    reportContainer.style.backgroundColor = '#404a5c';
+                    reportContainer.style.border = '2px solid black';
+                    reportContainer.style.display = 'flex';
+                    reportContainer.style.flexDirection = 'column';
+                    reportContainer.style.alignItems = 'center';
+                    reportContainer.style.justifyContent = 'space-evenly';
+                    //reportContainer.style.maxHeight = '80vh';
+                    reportContainer.style.height = '27%'; 
+                    reportContainer.style.overflowY = 'scroll';
+                    const closeIcon = document.createElement('span');
+                    closeIcon.textContent = '×';
+                    closeIcon.style.position = 'absolute';
+                    closeIcon.style.top = '5px';
+                    closeIcon.style.right = '5px';
+                    closeIcon.style.cursor = 'pointer';
+                    closeIcon.style.fontSize = '16px';
+                    closeIcon.style.color = 'red';
+                    closeIcon.addEventListener('click', () => {
+                        document.body.removeChild(reportContainer);
+                    });
+                    reportContainer.appendChild(closeIcon);
+
+                    const tokenIdLabel = document.createElement('label');
+                    tokenIdLabel.textContent = 'Token ID';
+                    tokenIdLabel.style.color = 'white';
+                    tokenIdLabel.style.fontSize = '12px';
+                    reportContainer.appendChild(tokenIdLabel);
+
+                    const tokenIdInput = document.createElement('input');
+                    tokenIdInput.type = 'number';
+                    tokenIdInput.placeholder = 'Enter Token ID';
+                    tokenIdInput.style.width = '80%';
+                    tokenIdInput.style.height = '12%'; 
+                    tokenIdInput.style.fontSize = '12px'; 
+                    tokenIdInput.style.top = '2%';
+                    tokenIdInput.style.position = 'relative';
+                    tokenIdInput.min = '1'; 
+                    tokenIdInput.step = '1';
+                    reportContainer.appendChild(tokenIdInput);
+
+                    const emailLabel = document.createElement('label');
+                    emailLabel.textContent = 'Email';
+                    emailLabel.style.color = 'white';
+                    emailLabel.style.left = "5%";
+                    emailLabel.style.fontSize = '12px'; 
+                    reportContainer.appendChild(emailLabel);
+
+                    const emailInput = document.createElement('input');
+                    emailInput.type = 'email';
+                    emailInput.placeholder = 'Enter your email';
+                    emailInput.style.width = '80%';
+                    emailInput.style.left = "5%";
+                    emailInput.style.height = '12%';
+                    emailInput.style.fontSize = '12px'; 
+                    reportContainer.appendChild(emailInput);
+
+                    const messageLabel = document.createElement('label');
+                    messageLabel.textContent = 'Message';
+                    messageLabel.style.color = 'white';
+                    messageLabel.style.fontSize = '12px'; 
+                    messageLabel.style.marginBottom = '5px';
+                    reportContainer.appendChild(messageLabel);
+
+                    const messageInput = document.createElement('textarea');
+                    messageInput.placeholder = 'Enter your message';
+                    messageInput.maxLength = 500; 
+                    messageInput.style.width = '80%';
+                    messageInput.style.flexGrow = '1'; 
+                    messageInput.style.fontSize = '10px'; 
+                    messageInput.style.padding = '5px'; 
+                    messageInput.style.resize = 'none';
+                    messageInput.style.overflowY = 'auto';
+                    messageInput.style.height = 'auto';
+                    messageInput.style.position = 'relative';
+                    reportContainer.appendChild(messageInput);
+
+                    const fileButton = document.createElement('button');
+                    fileButton.textContent = 'Submit';
+                    fileButton.style.width = '40%';
+                    fileButton.style.padding = '5px'; 
+                    fileButton.style.backgroundColor = 'dimgray';
+                    fileButton.style.color = 'white';
+                    fileButton.style.border = 'none';
+                    fileButton.style.borderRadius = '5px';
+                    fileButton.style.cursor = 'pointer';
+                    fileButton.style.fontSize = '12px';
+
+                    fileButton.addEventListener('click', async () => { 
+                        const tokenID = tokenIdInput.value;
+                        const email = emailInput.value;
+                        const message = messageInput.value;
+
+                        console.log(`Token ID: ${tokenID}, Email: ${email}, Message: ${message}`);
+                        const fields = [tokenID, email, message];
+                        const fieldNames = ['Token ID', 'Email', 'Message'];
+                        for (let i = 0; i < fields.length; i++) {
+                            if (!fields[i]) {
+                                alert(`Please make sure to properly fill out all fields`);
+                                return; 
+                            }
+                        }
+
+                        let walletSender;
+                        if(isConnected === false){
+                            alert('Please make sure to login to your main wallet before filing a report');
+                        }else{
+                            if(window.ethereum.selectedAddress != null && window.ethereum.isMetaMask){ 
+                                walletSender = window.ethereum.selectedAddress;
+                                let reportData = {
+                                    clientWallet: walletSender,
+                                    contractName: userSelectedContract.contractName,
+                                    ERCStandard: userSelectedContract.ERCStandard,
+                                    tokenID: tokenID.toString(),   
+                                    email: email, 
+                                    message: message
+                                };
+
+                                try {
+                                    const reportResponse = await fetch('/file-a-report', {
+                                        method: "POST", 
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(reportData)
+                                    });
+
+                                    if (reportResponse.ok) {
+                                        const responseJson = await reportResponse.json();
+                                        if (responseJson.success === false) {
+                                            console.log('Did not get back expected response');
+                                            if(responseJson.code == 10002444222202 ){
+                                                alert('Make sure to entere a valid email address invalid email');
+                                            }else if(responseJson.code == 3433444 ){
+                                                alert('Error with try and catch on server');
+                                            }else if(responseJson.code == 1000202 ){
+                                                alert('Sorry we already dedicated that you filed a report. We will contact you as soon as possible');
+                                            }else if(responseJson.code == 34444411 ){
+                                                alert('error with response from server');
+                                            }else{
+                                                alert('unexpected code error');
+                                            }
+                                        }else {
+                                            try{
+                                                tokenIdLabel.remove();
+                                                tokenIdInput.remove();
+                                                emailLabel.remove();
+                                                emailInput.remove();
+                                                messageLabel.remove();
+                                                messageInput.remove();
+                                                fileButton.remove();
+
+                                                const successSpan = document.createElement('span');
+                                                successSpan.textContent = "Thank you for filing a report. We will get back to it as soon as possible and pause the token if we find an issue!";
+                                                successSpan.style.display = 'block';
+                                                successSpan.style.textAlign = 'center';
+                                                successSpan.style.marginTop = '20px';
+                                                successSpan.style.fontSize = '10px';
+                                                successSpan.style.color = 'white';
+                                                reportContainer.appendChild(successSpan);
+                                            }catch(error){
+                                                console.log('Error', error);
+                                            }
+                                        }
+                                    } else {
+                                        console.error('Failed to fetch: Response was not okay', reportResponse.statusText);
+                                        alert('An error occurred while sending the report please try again at a later time');
+                                    }
+                                } catch (error) {
+                                    console.error('Failed to fetch: An error occurred', error);
+                                    alert('An error occurred while sending the report');
                                 }
                             }else{
-                                messageLoadingSpan.textContent = '';
-                                messageLoadingSpan.textContent = `Please enter an appropriate integer to sweep the grid only has ${gridItems.length} tokens available`;
+                                alert('Please make sure to sign into a wallet before sending a report');
                             }
-                        }catch(error){
-                            console.log('Error sweeping items', error);
-                            messageLoadingSpan.textContent = '';
-                            messageLoadingSpan.textContent = `Please contact support if you keep experiencing issues`;
                         }
-                    }catch(error){
-                        console.log('error getting item number for sweep', error);
-                    }
-                    
+                    });
+
+                    reportContainer.appendChild(fileButton);
+                    document.body.appendChild(reportContainer);
+                }else{
+                    console.log('Unepexected click');
                 }
-                searchButton.addEventListener('click', sweepGrid);
-            }else if (item.textContent == 'Search') {
-                const searchContainer = document.createElement('div');
-                searchContainer.style.position = 'absolute';
-                searchContainer.style.right = '1%';
-                searchContainer.style.top = '20vh';
-                searchContainer.style.height = '27%';
-                searchContainer.style.boxSizing = 'border-box';
-                searchContainer.style.width = sideElementsWidth;
-                searchContainer.style.borderRadius = '5px';
-                searchContainer.style.backgroundColor = '#404a5c';
-                searchContainer.style.border = '2px solid black';
-                searchContainer.style.display = 'flex';
-                searchContainer.style.flexDirection = 'column';
-                searchContainer.style.alignItems = 'center';
-                searchContainer.style.justifyContent = 'space-evenly';
-                searchContainer.style.overflowY = 'scroll';
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px';
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px';
-                closeIcon.style.color = 'red';
-
-                searchContainer.appendChild(closeIcon);
-                closeIcon.addEventListener('click', () => {
-                    document.body.removeChild(searchContainer);
-                });
-
-                const searchBar = document.createElement('input');
-                searchBar.setAttribute('placeholder', 'Search By Token ID ...');
-                searchBar.style.width = '70%';
-                searchBar.style.height = '6%'; 
-                searchBar.style.margin = '0'; 
-                searchBar.style.position = 'relative';
-                searchBar.style.top  = '1%';
-                searchBar.style.left = '0%';
-                searchBar.type = 'number';
-
-                searchContainer.appendChild(searchBar);
-                const searchButton = document.createElement('button');
-                searchButton.textContent = 'Search';
-                searchButton.style.marginTop = '10px';
-                searchButton.style.backgroundColor = 'dimgray';
-                searchButton.style.width = '38%';
-                searchButton.style.borderRadius = '1px';
-                searchContainer.appendChild(searchButton);
-
-                const imageContainer = document.createElement('div');
-                imageContainer.style.width = '45%';
-                imageContainer.style.height = '32%'; 
-                imageContainer.style.top = '21%';
-                imageContainer.style.left = '17%';
-                imageContainer.style.display = 'none'; 
-                searchContainer.appendChild(imageContainer);
-
-                const divData = ['Highest Sell', 'Current Owner', 'Date of Last Sell', 'Previous Owner'];
-                const divContainer = document.createElement('div');
-                divContainer.style.width = '100%';
-                divContainer.style.display = 'flex';
-                divContainer.style.flexDirection = 'column';
-                divContainer.style.alignItems = 'center'; 
-                divContainer.style.height = '35%'; 
-                divContainer.style.bottom = '0%';
-                divContainer.style.fontSize = '2vh';
-                divContainer.style.display = 'none'; 
-                divData.forEach(async (text) => {
-                    const div = document.createElement('div');
-                    div.style.width = '90%';
-                    div.style.height = '20%'; 
-                    div.style.display = 'flex'; 
-                    div.style.alignItems = 'center'; 
-                    div.style.justifyContent = 'space-between'; 
-                    div.style.cursor = 'pointer';
-                    div.style.boxSizing = 'border-box';
-
-                    const textContainer = document.createElement('div');
-                    textContainer.style.minWidth = '40%'; 
-                    textContainer.style.textAlign = 'left'; 
-                    textContainer.style.color = 'white';
-                    textContainer.textContent = text;
-
-                    const resultContainer = document.createElement('div');
-                    resultContainer.style.minWidth = '40%'; 
-                    resultContainer.style.textAlign = 'right'; 
-                    resultContainer.style.color = 'lightgray';
-                    if(text == "Highest Sell"){
-                        let highestTokenSell;
-                        try {
-                            let recentSellsFromContract = await contract.methods.getRecentSells().call();
-                            highestTokenSell = 0;
-                            for (const nft of recentSellsFromContract) {
-                                if (nft.id == searchedTokenID) {
-                                    if (parseInt(nft.price) > highestTokenSell) {
-                                        highestTokenSell = parseInt(nft.price);
-                                    }
-                                }
-                            }
-                            if (highestTokenSell === 0) {
-                                console.log('No sells found for this token.');
-                            }
-                            let highestTokenSellInETH = (highestTokenSell / (10 ** 18)).toFixed(2); 
-                            console.log('Highest sell in ETH:', highestTokenSellInETH);
-                            resultContainer.textContent = `${highestTokenSellInETH} ${coin}`;
-
-                        } catch (error) {
-                            console.log('Error calling the function getRecentSells() on the contract', error);
-                            highestTokenSell = 0;
-                            resultContainer.textContent = '0 ETH'; 
-                        }
-                        let highesTokenConverted = (highestTokenSell)/(10**18).toFixed(2);
-                        resultContainer.textContent = `${highesTokenConverted}`+ `${coin}`;
-                    }else if(text == "Current Owner"){
-                        let currentOwner;
-                        try{
-                            let data = await contract.methods.getTokenData(searchedTokenID).call();
-                            currentOwner = data.owner.substring(0,8)+ "~~~";
-                        }catch(error){
-                            console.log('Error calling the function getTokenData() on the contract and setting the current');
-                            currentOwner = RoysWallet.substring(0,8)+ "~~~";
-                            
-                        }
-                        resultContainer.textContent = currentOwner;
-                    }else if(text == "Date of Last Sell"){
-                        let dateOfLastSell;
-                        try{
-                            let data = await contract.methods.getTokenData(searchedTokenID).call();
-                            const dateSold = new Date(data.lastSellData * 1000); 
-                            const dateSpan = document.createElement('div');
-                            dateSpan.textContent = `${dateSold.toLocaleDateString("en-US", { 
-                                year: '2-digit', 
-                                month: '2-digit', 
-                                day: '2-digit' 
-                            })} at ${datePurchased.toLocaleTimeString("en-US", { 
-                                hour: '2-digit', 
-                                minute: '2-digit', 
-                                hour12: false 
-                            })}`;
-                            dateOfLastSell = dateSpan.textContent;
-                        }catch(error){
-                            console.log('Error calling the function getTokenData() on the contract and setting the current');
-                            dateOfLastSell = 'No sell yet';
-                            
-                        }
-                        resultContainer.textContent = dateOfLastSell;
-                    }else if(text == "Previous Owner"){
-                        let previousOwner;
-                        try{
-                            let data = await contract.methods.getTokenData(searchedTokenID).call();
-                            previousOwner = data.lastOwner.substring(0,8) + "~~~";
-                        }catch(error){
-                            console.log('Error calling the function getTokenData() on the contract and setting the current');
-                            previousOwner = RoysWallet.substring(0,8) + "~~~";
-                            
-                        }
-                        resultContainer.textContent = previousOwner;
-                    }else{
-                        console.log('an unexpected error occured on the result container');
-                    }
-                    
-                    div.appendChild(textContainer);
-                    div.appendChild(resultContainer);
-                    divContainer.appendChild(div);
-                });
-
-                searchContainer.appendChild(divContainer);
-                document.body.appendChild(searchContainer);
-
-                const promptMessage = document.createElement('p');
-                promptMessage.textContent = 'Please enter a token ID to retrieve its information';
-                promptMessage.style.color = 'white'; 
-                promptMessage.style.fontSize = '14px';  
-                promptMessage.style.textAlign = 'center';  
-                promptMessage.style.margin = '10px 0'; 
-
-                searchContainer.appendChild(searchBar);
-                searchContainer.appendChild(promptMessage); 
-                searchContainer.appendChild(searchButton);
-
-                function revealContent() {
-                    let tokenExist = false;
-                    let searchedTokenID = searchBar.value;
-                    if (searchedTokenID === '' || isNaN(searchedTokenID)) {
-                        alert('Please enter a valid number in the search bar');
-                    } else {
-                        searchedTokenID = parseInt(searchedTokenID);
-                        let imageUrl = null;
-                        for (const nft of currentNFTArray) {
-                            if (nft.tokenID === searchedTokenID) {
-                                tokenExist = true;
-                                imageUrl = nft.image; 
-                                console.log('We found the token with ID:', nft.tokenID);
-                                break;
-                            }
-                        }
-                        if (tokenExist) {
-                            try {
-                                if (imageUrl) {
-                                    imageContainer.style.backgroundImage = `url(${imageUrl})`;
-                                    imageContainer.style.backgroundSize = 'cover'; 
-                                    imageContainer.style.backgroundRepeat = 'no-repeat';
-                                    imageContainer.style.backgroundPosition = 'center'; 
-                                    imageContainer.style.display = 'block';
-                                    console.log('Image set successfully');
-                                } else {
-                                    console.log('Image URL is not found');
-                                }
-                            } catch (error) {
-                                console.log('Error setting image:', error);
-                            }             
-                            searchButton.remove();
-                            searchBar.remove();
-                            promptMessage.remove();
-                            divContainer.style.display = 'flex';
-                        } else {
-                            alert('Please enter a valid token ID');
-                        }
-                    }
-                }
-                searchBar.addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter') {
-                        revealContent();
-                    }
-                });
-                searchButton.addEventListener('click', revealContent);
-            }else if(item.textContent == 'Sort'){
-                console.log('make 4 div elements here');
-                const sortContainer = document.createElement('div');
-                sortContainer.style.position = 'absolute';
-                sortContainer.style.right = '1%';
-                sortContainer.style.top = '20vh';
-                sortContainer.style.height = '27%';
-                sortContainer.style.boxSizing = 'border-box';
-                sortContainer.style.width = sideElementsWidth;
-                sortContainer.style.borderRadius = '5px';
-                sortContainer.style.backgroundColor = '#404a5c';
-                sortContainer.style.border = '2px solid black';
-                sortContainer.style.display = 'flex';
-                sortContainer.style.flexDirection = 'column';
-                sortContainer.style.alignItems = 'center';
-                sortContainer.style.justifyContent = 'space-evenly';
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px';
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px';
-                closeIcon.style.color = 'red';
-
-                sortContainer.appendChild(closeIcon);
-
-                closeIcon.addEventListener('click', () => {
-                    document.body.removeChild(sortContainer);
-                });
-
-                document.body.appendChild(sortContainer);
-                const sortingData = ['Listed', 'Not Listed', 'Highest Price', 'Lowest Price'];
-                const miniSortContainer = document.createElement('div');    
-                miniSortContainer.style.position = 'absolute';
-                miniSortContainer.style.width = "100%";
-                miniSortContainer.style.height = '85%';
-                miniSortContainer.style.left = '0%';
-                miniSortContainer.style.bottom = '1%';
-                sortContainer.appendChild(miniSortContainer);
-
-                sortingData.forEach((text) => {
-                    const div = document.createElement('div');
-                    div.style.width = '99%'; 
-                    div.style.left = '0.5%';
-                    div.style.height = '20%';
-                    div.style.display = 'flex';
-                    div.style.alignItems = 'center'; 
-                    div.style.justifyContent = 'center'; 
-                    div.style.textAlign = 'center';
-                    div.style.color = 'white';
-                    div.style.borderRadius = '5px';
-                    div.style.cursor = 'pointer';
-                    div.textContent = text;
-                    div.style.fontSize = '2vh';
-                    div.style.borderBottom = '1px solid white';
-
-                    div.addEventListener('mouseover', () => {
-                        div.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                        div.style.color = 'black';
-                    });
-                    div.addEventListener('mouseout', () => {
-                        div.style.backgroundColor = '#404a5c';
-                        div.style.color = 'white';
-                    });
-                    div.addEventListener('click', async () => {
-                        let listedItems = [];
-                        let itemsNotListed = [];
-                        if(text === "Listed"){
-                            let oldGrid = document.querySelector(".NewGrid");
-                            let gridItems = Array.from(oldGrid.children);  
-                            try{
-                                for(var i =0; i<gridItems.length; i++){
-                                    let tokenData;
-                                    let gridItemIDString = gridItems[i].id; 
-                                    let gridIDINT = parseInt(gridItemIDString.trim());
-
-                                    console.log('calling contract using tokenID:', gridIDINT);
-                                    try {
-                                        tokenData = await contract.methods.getTokenData(gridIDINT).call();
-                                        if(tokenData.forSale === true){
-                                            listedItems.push(gridIDINT);
-                                        }else{
-                                            itemsNotListed.push(gridIDINT);
-                                        }
-                                    } catch (error) {
-                                        console.error(`Error fetching toking Data ${tokenData}`);
-                                    }
-                                }
-                                gridItems = sortByID(gridItems, [...listedItems, ...itemsNotListed]);
-                                let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
-                                let oldGrid = document.querySelector(".NewGrid");
-                                currentNFTArray.sort((a, b) => {
-                                    let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                    let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                    return indexA - indexB;
-                                });
-                                if (oldGrid) {
-                                    oldGrid.innerHTML = '';
-                                    console.log('items Cleared from dome');
-                                }
-                                makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract);
-                            }catch(error){
-                                console.log('Error making new nft grid to call', error);
-                            }
-                        }if(text === "Not Listed"){
-                            let oldGrid = document.querySelector(".NewGrid");
-                            let gridItems = Array.from(oldGrid.children);  
-                            try{
-                                for(var i = 0; i < gridItems.length; i++){
-                                    let tokenData;
-                                    let gridItemIDString = gridItems[i].id; 
-                                    let gridIDINT = parseInt(gridItemIDString.trim());
-
-                                    console.log('calling contract using tokenID:', gridIDINT);
-                                    try {
-                                        tokenData = await contract.methods.getTokenData(gridIDINT).call();
-                                        if(tokenData.forSale === true){
-                                            itemsNotListed.push(gridIDINT); 
-                                        }else{
-                                            listedItems.push(gridIDINT);  
-                                        }
-                                    } catch (error) {
-                                        console.error(`Error fetching token Data ${tokenData}`);
-                                    }
-                                }
-                                gridItems = sortByID(gridItems, [...itemsNotListed, ...listedItems]);
-                                let sortedTokenIDs = gridItems.map(item => parseInt(item.id.trim()));
-
-                                let oldGrid = document.querySelector(".NewGrid");
-                                currentNFTArray.sort((a, b) => {
-                                    let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                    let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                    return indexA - indexB;
-                                });
-                                if (oldGrid) {
-                                    oldGrid.innerHTML = '';
-                                    console.log('items Cleared from DOM');
-                                }
-                                makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract); 
-                            }catch(error){
-                                console.log('Error making new NFT grid to call', error);
-                            }
-                        }else if(text === "Highest Price"){
-                            console.log('Trying to filter by highest price');
-                            let oldGrid = document.querySelector(".NewGrid");
-                            let gridItems = Array.from(oldGrid.children); 
-                            let savedItems = gridItems; 
-                            let LoopNotBroken = false;
-                            try {
-                                let organizedByHighestIDarray = []; 
-                                console.log('trying to initiate while loop');
-                                while (gridItems.length > 0) {
-                                    let highestCount = BigInt(0);
-                                    let highestTokenID = null;
-                                    let counterJ = 0;
-
-                                    for (let j = 0; j < gridItems.length; j++) {
-                                        let gridItemIDString2 = gridItems[j].id; 
-                                        let gridIDINT2 = parseInt(gridItemIDString2.trim());
-                                        
-                                        try {
-                                            let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
-                                            let tokenPrice = BigInt(tokenDataCounter.price);
-
-                                            if (highestCount <= tokenPrice) {
-                                                highestCount = tokenPrice;
-                                                highestTokenID = tokenDataCounter.id;
-                                                counterJ = j;
-                                            }
-                                        } catch (error) {
-                                            console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
-                                        }
-                                    }
-                                    console.log('finished first loop with counterJ', counterJ);
-                                    console.log('finished first loop with highestTokenID', highestTokenID);
-                                    console.log('finished first loop with highestCount', highestCount);
-                                    if (highestTokenID !== null) {
-                                        const index = gridItems.indexOf(gridItems[counterJ]);
-                                        if (index > -1) {
-                                            gridItems.splice(index, 1); 
-                                        }
-                                        organizedByHighestIDarray.push(highestTokenID); 
-                                    }else{
-                                        LoopNotBroken = true;
-                                        alert('Sorry we could not find the highest token id');
-                                        break;
-                                    }
-                                }
-                                if (LoopNotBroken === false) {   
-                                    savedItems = sortByID(savedItems, [...organizedByHighestIDarray]);
-                                    let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
-
-                                    currentNFTArray.sort((a, b) => {
-                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                        return indexA - indexB;
-                                    });
-
-                                    if (oldGrid) {
-                                        oldGrid.innerHTML = ''; 
-                                        console.log('Items cleared from DOM');
-                                    }
-                                    makeNewNFTGrid(currentNFTArray, oldGrid,coin, contract);  
-                                }
-                            } catch (error) {
-                                console.error('Error making new NFT grid:', error);
-                            }
-                        }else if(text === "Lowest Price") {
-                            console.log('Trying to filter by lowest price');
-                            let oldGrid = document.querySelector(".NewGrid");
-                            let gridItems = Array.from(oldGrid.children); 
-                            let savedItems = gridItems; 
-                            let LoopNotBroken = false;
-                            try {
-                                let organizedByLowestIDarray = []; 
-                                console.log('trying to initiate while loop');
-                                
-                                while (gridItems.length > 0) {
-                                    let lowestCount = BigInt(Number.MAX_SAFE_INTEGER);
-                                    let lowestTokenID = null;
-                                    let counterJ = 0;
-
-                                    for (let j = 0; j < gridItems.length; j++) {
-                                        let gridItemIDString2 = gridItems[j].id; 
-                                        let gridIDINT2 = parseInt(gridItemIDString2.trim());
-
-                                        try {
-                                            let tokenDataCounter = await contract.methods.getTokenData(gridIDINT2).call();
-                                            let tokenPrice = BigInt(tokenDataCounter.price);
-
-                                            if (lowestCount >= tokenPrice) {
-                                                lowestCount = tokenPrice;
-                                                lowestTokenID = tokenDataCounter.id;
-                                                counterJ = j;
-                                            }
-                                        } catch (error) {
-                                            console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
-                                        }
-                                    }
-                                    console.log('Finished loop with counterJ', counterJ);
-                                    console.log('Finished loop with lowestTokenID', lowestTokenID);
-                                    console.log('Finished loop with lowestCount', lowestCount);
-
-                                    if (lowestTokenID !== null) {
-                                        const index = gridItems.indexOf(gridItems[counterJ]);
-                                        if (index > -1) {
-                                            gridItems.splice(index, 1);
-                                        }
-                                        organizedByLowestIDarray.push(lowestTokenID); 
-                                    } else {
-                                        LoopNotBroken = true;
-                                        alert('Sorry we could not find the lowest token id');
-                                        break;
-                                    }
-                                }
-
-                                if (LoopNotBroken === false) {
-                                    savedItems = sortByID(savedItems, [...organizedByLowestIDarray]);
-                                    let sortedTokenIDs = savedItems.map(item => parseInt(item.id.trim()));
-
-                                    currentNFTArray.sort((a, b) => {
-                                        let indexA = sortedTokenIDs.indexOf(a.tokenID);
-                                        let indexB = sortedTokenIDs.indexOf(b.tokenID);
-                                        return indexA - indexB;
-                                    });
-
-                                    if (oldGrid) {
-                                        oldGrid.innerHTML = ''; 
-                                        console.log('Items cleared from DOM');
-                                    }
-
-                                    makeNewNFTGrid(currentNFTArray, oldGrid, coin, contract); 
-                                }
-                            } catch (error) {
-                                console.error('Error making new NFT grid:', error);
-                            }
-                        }
-                    });
-
-                    miniSortContainer.appendChild(div);
-                });
-            }else if(item.textContent == 'File a Report'){
-                console.log('Opening report form');
-                const reportContainer = document.createElement('div');
-                reportContainer.style.position = 'absolute';
-                reportContainer.style.right = '1%';
-                reportContainer.style.top = '20vh';
-                reportContainer.style.height = '27%'; 
-                reportContainer.style.boxSizing = 'border-box';
-                reportContainer.style.width = sideElementsWidth;
-                reportContainer.style.borderRadius = '5px';
-                reportContainer.style.backgroundColor = '#404a5c';
-                reportContainer.style.border = '2px solid black';
-                reportContainer.style.display = 'flex';
-                reportContainer.style.flexDirection = 'column';
-                reportContainer.style.alignItems = 'center';
-                reportContainer.style.justifyContent = 'space-evenly';
-                reportContainer.style.overflowY = 'scroll';
-
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×';
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '5px';
-                closeIcon.style.right = '5px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '16px';
-                closeIcon.style.color = 'red';
-                closeIcon.addEventListener('click', () => {
-                    document.body.removeChild(reportContainer);
-                });
-                reportContainer.appendChild(closeIcon);
-
-                const tokenIdLabel = document.createElement('label');
-                tokenIdLabel.textContent = 'Token ID';
-                tokenIdLabel.style.color = 'white';
-                tokenIdLabel.style.fontSize = '12px';
-                reportContainer.appendChild(tokenIdLabel);
-
-                const tokenIdInput = document.createElement('input');
-                tokenIdInput.type = 'number';
-                tokenIdInput.placeholder = 'Enter Token ID';
-                tokenIdInput.style.width = '80%';
-                tokenIdInput.style.height = '12%'; 
-                tokenIdInput.style.fontSize = '12px'; 
-                tokenIdInput.style.top = '2%';
-                tokenIdInput.style.position = 'relative';
-                tokenIdInput.min = '1'; 
-                tokenIdInput.step = '1';
-                reportContainer.appendChild(tokenIdInput);
-
-                const emailLabel = document.createElement('label');
-                emailLabel.textContent = 'Email';
-                emailLabel.style.color = 'white';
-                emailLabel.style.left = "5%";
-                emailLabel.style.fontSize = '12px'; 
-                reportContainer.appendChild(emailLabel);
-
-                const emailInput = document.createElement('input');
-                emailInput.type = 'email';
-                emailInput.placeholder = 'Enter your email';
-                emailInput.style.width = '80%';
-                emailInput.style.left = "5%";
-                emailInput.style.height = '12%';
-                emailInput.style.fontSize = '12px'; 
-                reportContainer.appendChild(emailInput);
-
-                const messageLabel = document.createElement('label');
-                messageLabel.textContent = 'Message';
-                messageLabel.style.color = 'white';
-                messageLabel.style.fontSize = '12px'; 
-                messageLabel.style.marginBottom = '5px';
-                reportContainer.appendChild(messageLabel);
-
-                const messageInput = document.createElement('textarea');
-                messageInput.placeholder = 'Enter your message';
-                messageInput.maxLength = 500; 
-                messageInput.style.width = '80%';
-                messageInput.style.height = '250px'; 
-                messageInput.style.fontSize = '10px'; 
-                messageInput.style.padding = '5px'; 
-                messageInput.style.left = "5%";
-                messageInput.style.resize = 'vertical';
-                reportContainer.appendChild(messageInput);
-
-                const fileButton = document.createElement('button');
-                fileButton.textContent = 'Submit';
-                fileButton.style.width = '40%';
-                fileButton.style.padding = '5px'; 
-                fileButton.style.backgroundColor = 'dimgray';
-                fileButton.style.color = 'white';
-                fileButton.style.border = 'none';
-                fileButton.style.borderRadius = '5px';
-                fileButton.style.cursor = 'pointer';
-                fileButton.style.fontSize = '12px';
-
-                fileButton.addEventListener('click', async () => { 
-                    const tokenID = tokenIdInput.value;
-                    const email = emailInput.value;
-                    const message = messageInput.value;
-
-                    console.log(`Token ID: ${tokenID}, Email: ${email}, Message: ${message}`);
-                    const fields = [tokenID, email, message];
-                    const fieldNames = ['Token ID', 'Email', 'Message'];
-                    for (let i = 0; i < fields.length; i++) {
-                        if (!fields[i]) {
-                            alert(`Please make sure to properly fill out all fields`);
-                            return; 
-                        }
-                    }
-
-                    let walletSender;
-                    if(isConnected === false){
-                        alert('Please make sure to login to your main wallet before filing a report');
-                    }else{
-                        if(window.ethereum.selectedAddress != null && window.ethereum.isMetaMask){ 
-                            walletSender = window.ethereum.selectedAddress;
-                            let reportData = {
-                                clientWallet: walletSender,
-                                contractName: userSelectedContract.contractName,
-                                ERCStandard: userSelectedContract.ERCStandard,
-                                tokenID: tokenID.toString(),   
-                                email: email, 
-                                message: message
-                            };
-
-                            try {
-                                const reportResponse = await fetch('/file-a-report', {
-                                    method: "POST", 
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify(reportData)
-                                });
-
-                                if (reportResponse.ok) {
-                                    const responseJson = await reportResponse.json();
-                                    if (responseJson.success === false) {
-                                        console.log('Did not get back expected response');
-                                        if(responseJson.code == 10002444222202 ){
-                                            alert('Make sure to entere a valid email address invalid email');
-                                        }else if(responseJson.code == 3433444 ){
-                                            alert('Error with try and catch on server');
-                                        }else if(responseJson.code == 1000202 ){
-                                            alert('Sorry we already dedicated that you filed a report. We will contact you as soon as possible');
-                                        }else if(responseJson.code == 34444411 ){
-                                            alert('error with response from server');
-                                        }else{
-                                            alert('unexpected code error');
-                                        }
-                                    }else {
-                                        try{
-                                            tokenIdLabel.remove();
-                                            tokenIdInput.remove();
-                                            emailLabel.remove();
-                                            emailInput.remove();
-                                            messageLabel.remove();
-                                            messageInput.remove();
-                                            fileButton.remove();
-
-                                            const successSpan = document.createElement('span');
-                                            successSpan.textContent = "Thank you for filing a report. We will get back to it as soon as possible and pause the token if we find an issue!";
-                                            successSpan.style.display = 'block';
-                                            successSpan.style.textAlign = 'center';
-                                            successSpan.style.marginTop = '20px';
-                                            successSpan.style.fontSize = '10px';
-                                            successSpan.style.color = 'white';
-                                            reportContainer.appendChild(successSpan);
-                                        }catch(error){
-                                            console.log('Error', error);
-                                        }
-                                    }
-                                } else {
-                                    console.error('Failed to fetch: Response was not okay', reportResponse.statusText);
-                                    alert('An error occurred while sending the report please try again at a later time');
-                                }
-                            } catch (error) {
-                                console.error('Failed to fetch: An error occurred', error);
-                                alert('An error occurred while sending the report');
-                            }
-                        }else{
-                            alert('Please make sure to sign into a wallet before sending a report');
-                        }
-                    }
-                });
-
-                reportContainer.appendChild(fileButton);
-                document.body.appendChild(reportContainer);
-            }else{
-                console.log('Unepexected click');
             }
         });
         item.addEventListener('mouseenter', function () {
@@ -6028,16 +6031,10 @@ export async function getNFTS(contractName) {
             while (!done) {
                 const { value, done: readerDone } = await reader.read();
                 done = readerDone;
-
-                // Decode streamed chunks
                 jsonString += decoder.decode(value, { stream: true });
-
-                // Check if the jsonString ends with ']' to signify it's fully received
                 if (jsonString.trim().endsWith(']')) {
                     try {
                         const tokens = JSON.parse(jsonString);
-
-                        // Push unique tokens to avoid duplication
                         tokens.forEach(token => {
                             const tokenObject = {
                                 contractName: token.contractName,
@@ -6045,8 +6042,6 @@ export async function getNFTS(contractName) {
                                 tokenID: token.tokenID,
                                 image: token.image
                             };
-
-                            // Optionally, you could check for duplicates here before pushing
                             if (!tokensArray.some(t => t.tokenID === tokenObject.tokenID)) {
                                 tokensArray.push(tokenObject);
                             }
@@ -6063,6 +6058,225 @@ export async function getNFTS(contractName) {
         console.error('Error fetching NFTs:', error);
     }
     return tokensArray;
+}
+function handleMediaQuery(containerInput){
+    const screenWidth = window.innerWidth;
+    if (screenWidth <= 360) {
+        containerInput.style.left = '0%';
+        containerInput.style.width = '330px';
+        containerInput.style.zIndex = '100000000';
+    }else if (screenWidth <= 400) {
+        containerInput.style.left = '5%';
+        containerInput.style.width = '330px';
+        containerInput.style.zIndex = '100000000';
+    }else if (screenWidth <= 450) {
+        containerInput.style.left = '11%';
+        containerInput.style.width = '330px';
+        containerInput.style.zIndex = '100000000';
+    } else if (screenWidth <= 540) {
+        containerInput.style.left = '16%';
+        containerInput.style.width = '350px';
+        containerInput.style.zIndex = '100000000';
+    } else if (screenWidth <= 770) {
+        containerInput.style.left = '20%';
+        containerInput.style.width = '400px';
+        containerInput.style.zIndex = '100000000';
+    }
+}
+async function createPurchaseArraySuccessForm(availabeTokensArray, coin, contract){
+    const formContainer = document.createElement('div');
+    formContainer.style.position = 'absolute';
+    formContainer.style.top = '50%';
+    formContainer.style.left = '50%';
+    formContainer.style.transform = 'translate(-50%, -50%)';
+    formContainer.style.width = '25%'; 
+    formContainer.style.height = '400px';
+    formContainer.style.padding = '20px';
+    formContainer.style.backgroundColor = '#404a5c';
+    formContainer.style.borderRadius = '10px';
+    formContainer.style.color = 'white';
+    formContainer.style.fontSize = '2vh';
+    formContainer.style.zIndex = '1000';
+    formContainer.style.textAlign = 'center';
+    formContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+    formContainer.style.overflowY = 'scroll';
+    formContainer.style.border = '2px solid black';
+    formContainer.style.borderRadius = '5px';
+    document.body.appendChild(formContainer);
+    handleMediaQuery(formContainer);
+    const closeButton = document.createElement('span');
+    closeButton.textContent = 'X';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '15px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.color = 'red';
+    closeButton.style.fontSize = '1.5vh';
+    closeButton.onclick = function() {
+        document.body.removeChild(formContainer);
+    };
+    formContainer.appendChild(closeButton);
+    const title = document.createElement('span');
+    title.textContent = `Tokens Purchased`;
+    title.style.color = 'white';
+    title.style.textAlign = 'center';
+    title.style.display = 'block';
+    title.style.marginBottom = '10px';
+    formContainer.appendChild(title);
+
+    const tokenContainer = document.createElement('div');
+    tokenContainer.style.position = 'absolute';
+    tokenContainer.className = 'tokenContainerForArrayPurchased';
+    tokenContainer.style.height = '80%';
+    tokenContainer.style.left = '10%';
+    tokenContainer.style.width = '80%';
+    tokenContainer.style.bottom = '5%';
+    tokenContainer.style.overflowY = 'scroll';
+    formContainer.appendChild(tokenContainer);
+
+    const loadingContainer = document.createElement("div");
+    loadingContainer.className = "loading-container";
+    loadingContainer.style.position = "absolute";
+    loadingContainer.style.top = "50%";
+    loadingContainer.style.left = "50%";
+    loadingContainer.style.transform = "translate(-50%, -50%)";
+    loadingContainer.style.width = "80%";
+    loadingContainer.style.height = "60%";
+    loadingContainer.style.display = "flex";
+    loadingContainer.style.justifyContent = "center";
+    loadingContainer.style.alignItems = "center";
+    loadingContainer.style.backgroundColor = "none"; 
+
+    const loadingIcon = document.createElement("img");
+    loadingIcon.setAttribute("class", "loading-gif");
+    loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+    loadingIcon.setAttribute("alt", "Loading..."); 
+    loadingIcon.style.width = "50%"; 
+    loadingIcon.style.height = "50%";
+    loadingContainer.appendChild(loadingIcon);
+    formContainer.appendChild(loadingContainer);
+
+    for(var i=0; i< availabeTokensArray.length; i++){
+        try{
+            let currentOwner; let lastOwner; let lastSellDate;
+            let thisTokenID; let thisTokenName; let isforSale; let isFlag; 
+            let isburned; let mintData; let thisTokenPrice;
+
+            let data = await contract.methods.nfts(parseInt(availabeTokensArray[i])).call();
+            console.log('we got the token data from the contract', data);
+            currentOwner = data.owner.substring(0,8) + "~~~";
+            lastOwner = data.lastOwner.substring(0,8) + "~~~";
+            lastSellDate = parseInt(data.lastSellData);
+            thisTokenPrice = parseInt(data.price); 
+            thisTokenID = parseInt(data.id);
+            thisTokenName = data.tokenName;   
+            isforSale = data.forSale;        
+            isFlag = data.flagged; 
+            isburned = data.burned;
+            mintData = data.mintDate;
+
+            const smallTokenContainer = document.createElement('div');
+            smallTokenContainer.style.position = 'relative';
+            smallTokenContainer.style.height = '30%';
+            smallTokenContainer.style.width = '100%';
+            smallTokenContainer.style.left = '0%';
+        
+
+            let imageURL;
+            for (const token of currentNFTArray) {
+                if (token.tokenID === thisTokenID) {
+                    imageURL = token.image;
+                    break;
+                }
+            }
+            const imageContainer = document.createElement('div');
+            imageContainer.style.height = '80%';
+            imageContainer.style.width = '35%';
+            imageContainer.style.left = '2.5%';
+            imageContainer.style.top = '10%';
+            imageContainer.style.display = 'inline-block';
+            imageContainer.style.position = 'relative';
+            smallTokenContainer.appendChild(imageContainer);
+
+            const img = document.createElement('img');
+            img.src = imageURL;
+            img.style.width = '100%';
+            img.style.height = '100%'; 
+            img.style.borderRadius = '5px'; 
+            img.style.backgroundSize = 'cover';
+            img.style.backgroundRepeat = 'no-repeat';
+            img.style.backgroundPosition = 'center';
+            imageContainer.appendChild(img);
+
+            const infoContainer = document.createElement('div');
+            infoContainer.style.display = 'inline-block'; 
+            infoContainer.style.height = '100%'; 
+            infoContainer.style.width = '50%'; 
+            infoContainer.style.right = '0%';
+            infoContainer.style.fontSize = '1.5vh';
+            smallTokenContainer.appendChild(infoContainer);
+
+            const currentOwnerpTag = document.createElement('p');
+            currentOwnerpTag.textContent = `Current Owner: ${currentOwner.substring(0, 12)}`;
+            currentOwnerpTag.style.right = '0%';
+            currentOwnerpTag.style.color = 'white'; 
+            currentOwnerpTag.style.borderRadius = '3px'; 
+            currentOwnerpTag.style.margin = '0';
+            currentOwnerpTag.style.textAlign = 'right'; 
+            infoContainer.appendChild(currentOwnerpTag);
+
+            const seller = document.createElement('p');
+            seller.textContent = `last Owner: ${lastOwner.substring(0,12)}`;
+            seller.style.color = 'white'; 
+            seller.style.borderRadius = '3px'; 
+            seller.style.margin = "0";
+            seller.style.textAlign = 'right'; 
+            infoContainer.appendChild(seller);
+
+            let convertedPrice = ((thisTokenPrice)/(10**18)).toFixed(2);
+            const price = document.createElement('p');
+            price.textContent = `Listed Price: ${convertedPrice}` + ` ${coin}`;
+            price.style.color = 'white'; 
+            price.style.margin = "0";
+            price.style.textAlign = 'right';
+            price.style.borderRadius = '3px'; 
+            infoContainer.appendChild(price);
+
+            const currentTokenID = document.createElement('p');
+            currentTokenID.textContent = `Token ID: ${thisTokenID}`;
+            currentTokenID.style.color = 'white'; 
+            currentTokenID.style.margin = '0';
+            currentTokenID.style.borderRadius = '3px'; 
+            currentTokenID.style.textAlign = 'right'; 
+
+            infoContainer.appendChild(currentTokenID);
+
+            const date = document.createElement('p');
+            const dateSold = new Date(lastSellDate * 1000); 
+            date.textContent = `${dateSold.toLocaleDateString("en-US", { 
+                year: '2-digit', 
+                month: '2-digit', 
+                day: '2-digit' 
+            })} at ${dateSold.toLocaleTimeString("en-US", { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: false 
+            })}`;
+
+            date.style.color = 'white';
+            date.style.margin = "0";
+            date.style.borderRadius = '3px'; 
+            date.style.textAlign = 'right'; 
+            infoContainer.appendChild(date);
+            tokenContainer.appendChild(smallTokenContainer);
+            formContainer.appendChild(smallTokenContainer);
+        }catch(error){
+            console.log('Error calling the function nfts() on the contract with id:', availabeTokensArray[i]);
+            
+        }
+
+    } 
+    loadingContainer.remove();
 }
 export function addMessage(message, username, timestamp, color) {
     msgCount +=1 ; 
@@ -6126,6 +6340,62 @@ export function addMessage(message, username, timestamp, color) {
     p.appendChild(timestampDiv);
         
 }
+function makeGridOverlayLoader() {
+    try {
+        const loadingChecker = document.querySelector('.grid-overlay-loader');
+        if(loadingChecker){
+            console.log('container is already active');
+            return undefined;
+        }else{
+            const currentGrid = document.querySelector('.NewGrid');
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.style.position = 'absolute';
+            loadingOverlay.className = 'grid-overlay-loader';
+            loadingOverlay.style.height = '100%';
+            loadingOverlay.style.width = '100%';
+            loadingOverlay.style.opacity = '0.6';
+            loadingOverlay.style.backgroundColor = 'gray';
+            loadingOverlay.style.borderRadius = '3vh';
+            loadingOverlay.style.zIndex = '999999999999901101';
+
+            const loadingContainer = document.createElement('div');
+            loadingContainer.className = 'loading-container';
+            loadingContainer.style.position = 'absolute';
+            loadingContainer.style.top = '50%';
+            loadingContainer.style.left = '50%';
+            loadingContainer.style.transform = 'translate(-50%, -50%)';
+            loadingContainer.style.width = '80px';
+            loadingContainer.style.height = '80px';
+            loadingContainer.style.display = 'flex';
+            loadingContainer.style.justifyContent = 'center';
+            loadingContainer.style.alignItems = 'center';
+
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner';
+            spinner.style.border = '8px solid rgba(0, 0, 0, 0.1)';
+            spinner.style.borderTop = '8px solid #3498db';
+            spinner.style.borderRadius = '50%';
+            spinner.style.width = '60px';
+            spinner.style.height = '60px';
+            spinner.style.animation = 'spin 1s linear infinite';
+            loadingContainer.appendChild(spinner);
+            loadingOverlay.appendChild(loadingContainer);
+            currentGrid.appendChild(loadingOverlay);
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+            return loadingOverlay;
+        }
+    } catch (error) {
+        console.log('Error returning overlay', error);
+        return undefined;
+    }
+}
 export async function checkifConnected(){
     let connectButtton = document.createElement("div"); 
     let loggedInButton = document.createElement("div"); 
@@ -6160,6 +6430,7 @@ export async function checkifConnected(){
     }else{
         if(window.ethereum.selectedAddress != null && window.ethereum.isMetaMask){ 
             isConnected = true; 
+            currentClientWallet = window.ethereum.selectedAddress;
             buttonContainer.appendChild(greenLight);
             buttonContainer.appendChild(loggedInButton);
             const connectButtonPTAG = document.createElement('p');
@@ -6179,6 +6450,7 @@ export async function checkifConnected(){
                 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                 if (accounts.length > 0 && window.ethereum.isMetaMask) {
                     isConnected = true; 
+                    currentClientWallet = accounts[0];
                     buttonContainer.appendChild(greenLight);
                     buttonContainer.appendChild(loggedInButton);
                     const connectButtonPTAG = document.createElement('p');
@@ -6196,7 +6468,6 @@ export async function checkifConnected(){
                     loggedInButton.appendChild(connectButtonPTAG);
                     toggleGreenLight(); 
                 } else {
-                    console.log('MetaMask is installed but not connected.');
                     isConnected = false; 
                     buttonContainer.appendChild(connectButtton);
                     connectButtton.style.boxShadow = '0px 0px 15px rgba(0, 0, 0, 0.5)'; 
@@ -6222,6 +6493,7 @@ export async function checkifConnected(){
     
 }
 function sortByID(currentArray, sortByArray) {
+    let stripedArray = [];
     if (!Array.isArray(currentArray)) {
         console.error('currentArray is not an array:', currentArray);
         return [];
@@ -6231,12 +6503,19 @@ function sortByID(currentArray, sortByArray) {
         return map;
     }, {});
     return currentArray.sort((a, b) => {
-        let idA = parseInt(a.className.replace("grid-item", "").trim());
-        let idB = parseInt(b.className.replace("grid-item", "").trim());
-        return (orderMap[idA] || Infinity) - (orderMap[idB] || Infinity);
+        let idA = parseInt(a.id);
+        let idB = parseInt(b.id);
+        if (orderMap.hasOwnProperty(idA) && orderMap.hasOwnProperty(idB)) {
+            return orderMap[idA] - orderMap[idB];
+        } else if (orderMap.hasOwnProperty(idA)) {
+            return -1; 
+        } else if (orderMap.hasOwnProperty(idB)) {
+            return 1;
+        } else {
+            return 0;  
+        }
     });
 }
-
 async function createChangeUsernamePopup() {
     if(changeUserNamePopUpExist){
         console.log('popup already exist');
@@ -6411,6 +6690,7 @@ if(typeof window.ethereum !== 'undefined'){
         } else {
                const currentAddress = accounts[0];
                console.log('New current wallet address:', currentAddress);
+               currentClientWallet = currentAddress;
              if(isConnected){
                 document.querySelector(".centered-text").innerHTML = currentAddress.substring(0, 8) + '~~~';
              }
@@ -6599,7 +6879,6 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
     let minimalListingPriceChecker = true;
     let dictatedTokenPlaceHolder;
     if(listOrDelistOption === "Listing"){
-        console.log('trying to remove elements that have not been checked and add input bars before chaging button text to submit');
         const failedTokens = [];
         if (nextButton.textContent === 'Next') {
             const selectedTokens = [];
@@ -6615,23 +6894,17 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
             }else{
                 dictatedTokenPlaceHolder = 'Price';
             }
-            console.log('trying to remove items that dont have a checkbox (some seem to not be showing up double check):', soldItems);
             for(const soldItem of soldItems){
                 const checkbox = soldItem.querySelector('input[type="checkbox"]'); 
-                console.log('checkboxes found', checkbox);
                 if (!checkbox.checked) {
                     soldItem.remove(); 
                 } else if (checkbox.checked) {
-                    console.log('trying to add input input bar to element', soldItem);
-                    //const textContainer = soldItem.querySelector('.textContainer');
                     const textContainer = soldItem.querySelector('[class*="textContainer"]');
                     const priceContainer = soldItem.querySelector('.priceSpantag');
                     const dateContainer = soldItem.querySelector('.dateSpantag');
 
                     if(dateContainer && textContainer){
-                        console.log('trying to remove date contaniner and replace with the input bar');
                         dateContainer.remove();
-
                         const inputContainer = document.createElement('div');
                         inputContainer.style.position = 'relative';
                         inputContainer.style.width = '100%';
@@ -6651,7 +6924,6 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                         priceInput.style.border = '1px solid #ccc';
                         priceInput.style.margin = '0%';  
                         priceInput.classList.add('price-input'); 
-
                         textContainer.appendChild(inputContainer);
                         inputContainer.appendChild(priceInput);
                     }else if(!textContainer){
@@ -6659,13 +6931,13 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                     }
                 }
             }
-            console.log(' input bars should be added. Changing the header and button text content');
             nextButton.textContent = 'Submit';
             const smallHeaderText = document.querySelector(".smallHeader");
             if (smallHeaderText) {
                 smallHeaderText.firstChild.textContent = 'List Tokens';
             }
         } else if (nextButton.textContent === 'Submit') {
+            nextButton.style.display = 'none';
             const selectedTokens = [];
             let successFullTokens = [];
             let minimalListingPrice;
@@ -6673,7 +6945,6 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             tokenPricesInputsFilled = true;
             minimalListingPriceChecker = true;
-            console.log('trying to retrieve token ids to list using checkboxes', checkboxes);
             for (const checkbox of checkboxes) {
                 if (checkbox.checked) {
                     const parentDiv = checkbox.closest('.sold-item');
@@ -6682,25 +6953,16 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                         const soldItemClass = parentDiv.className;
                         tokenIdToSend = parseInt(soldItemClass.split('sold-item-')[1], 10);
                     }
-                    console.log('retrieved token ID to send', tokenIdToSend);
-                    console.log('trying to set the price for this particular token');
                     const priceInput = parentDiv.querySelector('input[type="number"]');
-                    console.log('price input ==', priceInput);
                     const inputValue = priceInput ? priceInput.value.trim() : '';
-                    console.log('Trying to list using price (not in WEI):', inputValue);
                     if (inputValue) {
                         const parsedValue = parseFloat(inputValue);
-                        console.log(`Trying to check if the value ${inputValue} is being parsed`);
                         if (!isNaN(parsedValue)) {
                             try {
                                 minimalListingPrice = await contract.methods.minimalListingPrice().call();
-                                console.log('Checking minimal price and making sure it\'s not null', minimalListingPrice);
                                 const minimalListingPriceInBigInt = BigInt(minimalListingPrice); 
-                                console.log('minimal listing price as big integer');
                                 minimalListingPriceInETH = minimalListingPriceInBigInt / BigInt(10 ** 18);
-                                console.log('Minimal price as big integer', minimalListingPriceInETH);
                                 if (parsedValue >= parseFloat(minimalListingPriceInETH)) {
-                                    console.log('Trying to push token data into array', { tokenId: tokenIdToSend, inputValue: minimalListingPriceInETH });
                                     selectedTokens.push({ tokenId: parseInt(tokenIdToSend), inputValue: parsedValue });
                                 } else {
                                     minimalListingPriceChecker = false;
@@ -6719,7 +6981,6 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                 }
             }
             try{
-                console.log('trying to list NFTS using data', selectedTokens);
                 if (selectedTokens.length > 0 && tokenPricesInputsFilled &&  minimalListingPriceChecker) {
                     let errorWithIn50Blocks = false;
                     console.log('Final Token Data to Submit:', selectedTokens);
@@ -6745,8 +7006,6 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                     loadingIcon.style.height = "50%";
                     loadingContainer.appendChild(loadingIcon);
                     parentContainer.appendChild(loadingContainer);
-
-                    console.log('Trying to use contract and get result');
                     const web3 = new Web3(window.ethereum);
                     const tokenIds = [];
                     const prices = [];
@@ -6758,38 +7017,24 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                     }
 
                     try {
-                        console.log('initial try statement trying to get gas estimates');
                         const minimalListingPrice = await contract.methods.minimalListingPrice().call();
-                        console.log('minimum listing fee per token =', minimalListingPrice);
                         const valueEstimate = (BigInt(minimalListingPrice) * BigInt(110)) / BigInt(100);
-                        console.log('Value Estimated as string ', valueEstimate.toString());
-                        console.log('trying to call constract using data', tokenIds, prices);
-                        console.log('trying to use address', clientBlockChainAddress);
-                        console.log('trying to send value', valueEstimate.toString());
-
                         const nftOwner = await contract.methods.nfts(tokenIds[0]).call();
-                        console.log('NFT owner:', nftOwner.owner);
-                        console.log('Calling from address:', clientBlockChainAddress);
-
-                        console.log('user tokens from getUsersTokens()', tokenIds);
-                        console.log('prices from small container', prices);
                         const gasEstimateToListSingleNFT = await contract.methods.listNFT(tokenIds[0], prices[0]).estimateGas({
                             from: clientBlockChainAddress,
                             value: valueEstimate.toString()
                         });
-                        console.log('gasEstimateToListSingleNFT', gasEstimateToListSingleNFT);
-                        const valueEstimateInt = Number(valueEstimate)*tokenIds.length; 
-                        console.log('Value Estimated to list array as integer', valueEstimateInt);
-                        const gasEstimateToListArray = gasEstimateToListSingleNFT*tokenIds.length;
-                        console.log('gasEstimateToListArray', gasEstimateToListArray)
-                        const gasLimit = Math.floor(gasEstimateToListArray * 1.1);
-                        
-                        console.log('gas limit as a buffer', gasLimit);
 
+                        const valueEstimateInt = Number(valueEstimate)*tokenIds.length; 
+                        const gasEstimateToListArray = gasEstimateToListSingleNFT*tokenIds.length;
+                        const gasLimit = Math.floor(gasEstimateToListArray * 1.1);
+                        const gasLimitBigInt = BigInt(gasLimit);
+                        let buffer = BigInt(Math.floor((0.00285)*(10*18)));
+                        const gasPriceTotal= gasLimitBigInt + buffer;
                         contract.methods.listArrayOfNFTs(tokenIds, prices)
                         .send({
                             from: clientBlockChainAddress,
-                            gas: gasLimit,
+                            gas: Number(gasPriceTotal), 
                             value: valueEstimateInt.toString()
                         })
                         .on('transactionHash', function(hash) {
@@ -6855,7 +7100,6 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
             }
         }
     }else if(listOrDelistOption === "Delisting"){
-        console.log('trying to delist items in bulk ');
         const failedTokens = [];
         if (nextButton.textContent === 'Next') {
             const selectedTokens = [];
@@ -6874,6 +7118,7 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
             });
             nextButton.textContent = 'Delist';
         } else if (nextButton.textContent === 'Delist') {
+            nextButton.style.display = 'none';
             let successFullTokens = [];
             const selectedTokens = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -6915,11 +7160,13 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                     const gasEstimate = await contract.methods.delistNFT(selectedTokens[0]).estimateGas({ from: clientBlockChainAddress });
                     const gasEstimateForArray = gasEstimate*selectedTokens.length;
                     const gasLimit = Math.floor(gasEstimateForArray*1.1);
+                    let buffer = Math.floor((0.00285)*(10*18));
+                    const gasPriceTotal= BigInt(gasLimit) + BigInt(buffer);
                     if(gasLimit){
                         console.log('trying to get send transaction using gas estimate', gasLimit);
                         const tx = await contract.methods.delistNFTArray(selectedTokens).send({
                             from: clientBlockChainAddress,
-                            gas: gasLimit
+                            gas: Number(gasPriceTotal)
                         })
                         .on('transactionHash', function(hash) {
                             console.log("User accepted the transaction. Transaction hash:", hash);
@@ -6958,17 +7205,6 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                     
                 } catch (error) {
                     console.log('Error calling listing function', error);
-                    /*
-                    for(var i = 0; i< selectedTokens.length; i++){
-                        failedTokens.push(selectedTokens[i]);
-                   }
-                   if(error.message.includes('within 50 blocks')){
-                        errorWithIn50Blocks = true;
-                        console.error('Error mining within 50 blocks');
-                   }else{
-                        errorWithIn50Blocks = false;
-                        failedTokens.push(selectedTokens);
-                   }*/
                 }
             } else {
                 alert('No tokens have been selected to delist.');
@@ -7017,29 +7253,51 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
             inputWrapper.style.position = 'absolute';
             inputWrapper.style.bottom = '0'; 
             inputWrapper.style.width = '100%'; 
-            inputWrapper.style.height = '60%'; 
-            inputWrapper.style.marginTop = '10px';
+            inputWrapper.style.height = '51.5%'; 
+            inputWrapper.style.marginTop = '14px';
             inputAddress.className = 'inputTrasnferAddress';
             inputAddress.style.width = '90%'; 
             inputAddress.style.height = '80%';
             inputAddress.style.marginLeft = '5%'; 
             inputAddress.style.marginTop = '3px';
             inputAddress.style.boxSizing = 'border-box'; 
+            inputAddress.style.fontSize = '1.2vh';
             inputAddress.type = 'text';
             inputAddress.id = 'TransferInput';
             inputAddress.placeholder = 'Transfer Address';
             inputWrapper.appendChild(inputAddress);
             inputContainer.appendChild(inputWrapper);
         }else if (nextButton.textContent === 'Transfer') {
-            console.log('trying to transfer tokens and call the contract');
             const inputChecker = document.querySelector('.inputTrasnferAddress');
             const address = inputChecker.value.trim();
+            inputChecker.remove();
             const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
             let transferTokenIds = [];
             let failedTokens = [];
             let successFullTokens = [];
             if (ethAddressRegex.test(address)) {
-                console.log('trying to initiate Transfer to another wallet');
+                nextButton.style.display = 'none';
+                const loadingContainer = document.createElement("div");
+                loadingContainer.className = "loading-container";
+                loadingContainer.style.position = "absolute";
+                loadingContainer.style.top = "50%";
+                loadingContainer.style.left = "50%";
+                loadingContainer.style.transform = "translate(-50%, -50%)";
+                loadingContainer.style.width = "80%";
+                loadingContainer.style.height = "60%";
+                loadingContainer.style.display = "flex";
+                loadingContainer.style.justifyContent = "center";
+                loadingContainer.style.alignItems = "center";
+                loadingContainer.style.backgroundColor = "none"; 
+
+                const loadingIcon = document.createElement("img");
+                loadingIcon.setAttribute("class", "loading-gif");
+                loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+                loadingIcon.setAttribute("alt", "Loading..."); 
+                loadingIcon.style.width = "50%"; 
+                loadingIcon.style.height = "50%";
+                loadingContainer.appendChild(loadingIcon);
+                parentContainer.appendChild(loadingContainer);
                 const soldItems = document.querySelectorAll('.sold-item');
                 console.log('found items to transfer', soldItems);
                 for(const soldItem of soldItems){
@@ -7058,31 +7316,24 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                     });
                 }
                 try {
-                    console.log('trying to get gas estimate to call transfer Array with', transferTokenIds);
-                    console.log('trying to transfer to client', address);
-                    console.log('trying to send from', clientBlockChainAddress);
                     const minimalTransferFee = await contract.methods.minimalTransferFee().call();
-                    console.log('minimum transfer fee=', minimalTransferFee);
                     const valueEstimate = (BigInt(minimalTransferFee) * BigInt(110)) / BigInt(100);
-                    const valueEstimateInt = Number(valueEstimate)*transferTokenIds.length; // Convert to a regular number
-                    console.log('Value Estimate for array', valueEstimateInt);
-
+                    const valueEstimateInt = Number(valueEstimate)*transferTokenIds.length; 
                     const gasEstimateForArray = await contract.methods.transferArrayOfNFTS(address, transferTokenIds).estimateGas({ 
                         from: clientBlockChainAddress,
                         value: valueEstimateInt.toString()
                     });
-                    console.log('gas estimate for array ==', gasEstimateForArray);
-                    console.log('trying to call transferArrayOfNFTS');
-                    
+                    let buffer = Math.floor((0.00285)*(10*18));
+                    const gasPriceTotal = BigInt(gasEstimateForArray) + BigInt(buffer);
                     const tx = await contract.methods.transferArrayOfNFTS(address, transferTokenIds).send({
                         from: clientBlockChainAddress,
-                        gas: gasEstimateForArray,
+                        gas: Number(gasPriceTotal),
                         value: valueEstimateInt.toString()
                     })
                     .on('transactionHash', function(hash) {
-                        console.log("User accepted the transaction. Transaction hash:", hash);
-                        //successFullTokens.push(selectedTokens);
-                        // At this point, the user has signed and accepted the transaction
+                        if(loadingContainer){
+                            loadingContainer.remove();
+                        }
                         if(parentContainer){
                             createContractInteractionMsg(parentContainer,listingOrDelisting,true)
                         }
@@ -7093,20 +7344,25 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
                             console.log('The user accepted the transaction and it was successful.');
                         } else {
                             console.log('The transaction failed.');
-                            //failedTokens.push(selectedTokens);
                             if(parentContainer){
                                 createContractInteractionMsg(parentContainer,listingOrDelisting,false)
                             }
                         }
                     })
                     .on('error', function(error, receipt) {
-                        console.log("Transaction rejected or failed:", error);
-                        if (error.code === 4001) {
-                            console.log('The transaction was rejected prompt the user.');
-                        } else {
-                            console.log('an unepexected error occured');
+                        if(loadingContainer){
+                            loadingContainer.remove();
                         }
-                        //failedTokens.push(selectedTokens);
+                        console.log("Transaction rejected, failed, or took to long to mine", error);
+                        if (error.code === 4001) {
+                            console.log('The transaction was rejected by the client.');
+                        }else if (error.message.includes("ERR1")) {
+                            alert('The contract did not detect that you own this NFT. You can only transfer tokens you own');
+                        }else if(error.message.includes("ERR7")){
+                            alert('Insufficient gas!, please increase or estimate correctly');
+                        } else {
+                            console.log('an unepexected error occured it was not the client');
+                        }
                         if(parentContainer){
                             createContractInteractionMsg(parentContainer, listOrDelistOption, false);    
                         }
@@ -7114,80 +7370,8 @@ async function createContractOptionAbility(nextButton, listOrDelistOption, clien
 
                     
                 } catch (error) {
-                    //failedTokens.push(transferTokenIds);
                     console.error('Error calling transferArrayOfNFTS:', error.message);
-                    if (error.message.includes("ERR1")) {
-                        alert('The contract did not detect that you own this NFT. You can only transfer tokens you own');
-                    }else if(error.message.includes("ERR7")){
-                        alert('Insufficient gas!, please increase or estimate correctly');
-                    }else{
-                        console.log('An unexpected error occured cannot get error message transfering');
-                    }   
                 }
-                /*
-                parentContainer.innerHTML = '';
-                const inputContainer = document.querySelector('.inputTrasnferAddress');
-                if(inputContainer){
-                    inputContainer.remove();
-                }
-                const footer = document.querySelector('.footer');
-                if(footer){
-                    footer.remove();
-                }
-                const closeIcon = document.createElement('span');
-                closeIcon.textContent = '×'; 
-                closeIcon.style.position = 'absolute';
-                closeIcon.style.top = '10px';
-                closeIcon.style.right = '10px';
-                closeIcon.style.cursor = 'pointer';
-                closeIcon.style.fontSize = '20px';
-                closeIcon.style.color = '#000';
-                closeIcon.addEventListener('click', () => {
-                    parentContainer.remove();
-                });
-                
-                if (failedTokens.length > 0) {
-                    if (successFullTokens.length > 0) {
-                        const successContainer = document.createElement('div');
-                        successContainer.classList.add('success-tokens-container');
-                        const successList = document.createElement('ul');
-                        successFullTokens.forEach(tokenId => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `Successfully Transfered Your Token: ${tokenId}`;
-                            successList.appendChild(listItem);
-                        });
-                        successContainer.appendChild(successList);
-                        parentContainer.appendChild(successContainer);
-                    } else {
-                        const noSuccessMessage = document.createElement('div');
-                        noSuccessMessage.classList.add('no-success-message');
-                        noSuccessMessage.style.textAlign = 'center';
-                        noSuccessMessage.textContent = 'Sorry unable to transfer tokens';
-                        parentContainer.appendChild(noSuccessMessage);
-                    }
-                    const failedContainer = document.createElement('div');
-                    failedContainer.classList.add('failed-tokens-container'); 
-                    const failedList = document.createElement('ul');
-                    failedTokens.forEach(tokenId => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `Failed to Tranfer Token: ${tokenId}`;
-                        failedList.appendChild(listItem);
-                    });
-                    failedContainer.appendChild(failedList);
-                    parentContainer.appendChild(failedContainer);
-                } else {
-                    if (successFullTokens.length > 0) {
-                        const successDiv = document.createElement('div');
-                        successDiv.style.position = 'relative';
-                        successDiv.style.width = '100%';
-                        successDiv.style.height = '50%';
-                        successDiv.style.top = '25%';
-                        successDiv.classList.add('successDelistSpanTag');
-                        successDiv.style.textAlign = 'center'; 
-                        successDiv.textContent = 'Your items have transfered. Make sure to check your wallet';
-                        parentContainer.appendChild(successDiv);
-                    }
-                }*/
             } else {
                 alert('Please enter a valid crypto address to transfer your tokens');
             }
@@ -7211,11 +7395,12 @@ function createContractInteractionMsg(parentContainer, listOrDelistOption, succe
     successDiv.classList.add('successDelistSpanTag');
     successDiv.style.textAlign = 'center'; 
     if(listingOrDelisting === 'Delisting' && success === true ){
-        successDiv.textContent = 'Your items have been delisted. The transaction make time some time to mine so you might night see the results right way. You can come back at a later or time or speed up the transaction in your wallet. Also, Make sure to come back and list your tokens whenever your ready so I can get my royalty fee!.';
+        successDiv.textContent = `Your items have been delisted. The transaction may time some time to mine so if the results are not reflecting right away you may need to speed up the transaction manuelly. 
+        You can come back at a later or time or speed up the transaction in your wallet. Also, Make sure to come back and list your tokens whenever your ready so I can get my royalty fee!.`;
     }else if(listingOrDelisting === 'Delisting' && success === false ){
-        successDiv.textContent = 'Sorry failed to Delist your tokens. Please try again at a later time';
+        successDiv.textContent = 'Sorry failed to Delist your tokens. You received this message if you rejected the transaction of re there was an error. Please try again at a later time';
     }else if(listingOrDelisting === 'Listing' && success === true ){ 
-        successDiv.textContent = 'Your items have been Listed! Make sure to give the contract some time or initiate the metamask to speed up the transaction if you dont see its affect yet';
+        successDiv.textContent = 'Your items have been Listed! Make sure to give the contract some time or initiate Metamask to speed up the transaction if you dont see its effect yet.';
         parentContainer.appendChild(successDiv);
     }else if(listingOrDelisting === 'Listing' && success === false ){
         successDiv.textContent = 'Sorry failed to List your Tokens. please try again at a later time';
@@ -7229,16 +7414,24 @@ function createContractInteractionMsg(parentContainer, listOrDelistOption, succe
 }
 async function makeTokenPage(addressString, contract, parentContainer, footer, coin, loadingContainer){
     try{
-        let UsersNFTsIds;
+        let UsersNFTsIds = [];
         try{
             console.log('trying to get all tokens for the client', addressString);
-            UsersNFTsIds = await contract.methods.getUsersTokens(addressString).call();
+            const tokenCount = await contract.methods.tokenCount().call();
+            for(var tokenID = 1; tokenID<= tokenCount; tokenID++){
+                const nft = await contract.methods.nfts(tokenID).call();
+                if (nft.owner.toLowerCase().trim() === addressString.toLowerCase().trim()) {
+                     UsersNFTsIds.push(parseInt(nft.id));
+                }
+            } 
         }catch(error){
-            console.log('Error calling the function getUsersTokens() on the contract', error);
+            console.log('Error getting token from contract', error);
             UsersNFTsIds = [];
         }
+
         // comment to stop testing
         // UsersNFTsIds = [1,2,3,4,5, 6,7,8];
+        console.log('tokens id from contract using loop on client side', UsersNFTsIds);
         if(UsersNFTsIds.length != 0){
             let userNFTARRay = [];
             for (var i = 0; i < UsersNFTsIds.length; i++) {
@@ -7253,7 +7446,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                             }
                         }
                     try{
-                        let tokenData = await contract.methods.getTokenData(tokenIdInINt).call();
+                        let tokenData = await contract.methods.nfts(tokenIdInINt).call();
                         if (tokenData.forSale == true) {
                             currentObj = {
                                 tokenID: tokenIdInINt,
@@ -7294,12 +7487,16 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 errorSpan.textContent = 'Sorry an unexpected error occured will trying to retrieve tokens';
                 parentContainer.appendChild(errorSpan);
             }else{
+                console.log('trying to display data using token IDs in recent sells', userNFTARRay);
                 loadingContainer.remove();
-                userNFTARRay.forEach(token => {
+
+                for(const token of userNFTARRay){
                     count+=1;
                     const soldItem = document.createElement('div');
                     //soldItem.className = `sold-item-${token.tokenID}`; 
-                    soldItem.className = `sold-item sold-item-${token.tokenID}`;
+                    console.log('trying to set className to', token.tokenID);
+                    let tokenIDConverted = token.tokenID.toString();
+                    soldItem.className = `sold-item sold-item-${tokenIDConverted}`;
                     soldItem.style.height = '100px';
                     soldItem.style.position = 'relative'; 
                     soldItem.style.overflow = 'hidden'; 
@@ -7308,6 +7505,9 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     soldItem.style.display = 'flex'; 
                     soldItem.style.alignItems = 'center'; 
                     soldItem.style.padding = '10px'; 
+                    if (count === userNFTARRay.length) {
+                        soldItem.style.marginBottom = '50px'; 
+                    }
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.style.display = 'none'; 
@@ -7323,7 +7523,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     soldItem.appendChild(imageContainer);
                     const img = document.createElement('img');
                     img.src = token.image;
-                    img.alt = `Token ID ${token.tokenID}`;
+                    img.alt = `Token ID ${tokenIDConverted}`;
                     img.style.width = '100%';
                     img.style.height = '100%'; 
                     img.style.borderRadius = '5px'; 
@@ -7353,7 +7553,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     listedSpan.style.marginBottom = '5px'; 
                     textContainer.appendChild(listedSpan);
                     const nameSpan = document.createElement('div');
-                    nameSpan.textContent = `Token ID: ${token.tokenID}`; 
+                    nameSpan.textContent = `Token ID: ${tokenIDConverted}`; 
                     nameSpan.style.color = 'white'; 
                     textContainer.appendChild(nameSpan);
                     const priceSpan = document.createElement('div');
@@ -7378,7 +7578,7 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     dateSpan.className = 'dateSpantag';
                     textContainer.appendChild(dateSpan);
                     parentContainer.appendChild(soldItem);
-                });
+                };
             }
             if (!document.querySelector('.nextButton')) {
                 const nextButton = document.createElement('button');
@@ -7515,8 +7715,9 @@ export async function getVeChainPrice(element) {
     fetchVETPrice();
     setInterval(fetchVETPrice, retryInterval);
 }
+
 function addSecretMenu() {
-    const menuItems = ['upload painting', 'remove painting', 'send tracking number', 'Deploy a Contract', 'Mint a Collection'];
+    const menuItems = ['upload painting', 'remove painting', 'send tracking number', 'Deploy a Contract', 'Mint a Collection', 'Manage Contracts'];
     const secretMenu = document.createElement('div');
     secretMenu.className = 'secret-menu';
     secretMenu.style.width = '250px';
@@ -7771,6 +7972,8 @@ function addSecretMenu() {
                     console.log('form is not active calling function to make form');
                     makeDeployerForm();
                 }
+            }else if(item == 'Manage Contracts'){
+                createContractManagerForm();
             }else{
                 console.log('button not found');
             } 
@@ -7783,6 +7986,736 @@ function addSecretMenu() {
     });
     secretMenu.appendChild(itemList);
     document.body.appendChild(secretMenu);
+}
+
+async function createContractManagerForm() {
+    const form = document.createElement('div');
+    form.style.position = 'absolute';
+    form.style.top = '20%';
+    form.style.left = '30%';
+    form.style.padding = '20px';
+    form.style.width = '300px';
+    form.style.height = '400px';
+    form.style.backgroundColor = 'dimgray';
+    form.style.border = '1px solid #ccc';
+    form.style.borderRadius = '10px';
+    form.style.boxShadow = '0px 0px 10px rgba(0,0,0,0.1)';
+    form.id = 'contractManagerForm';
+    handleMediaQuery(form);
+    const loadingSymbol = document.createElement('div');
+    loadingSymbol.innerHTML = '🔄'; 
+    loadingSymbol.style.fontSize = '30px';
+    loadingSymbol.style.textAlign = 'center';
+
+    const statusMessage = document.createElement('span');
+    statusMessage.innerText = 'Gathering data...';
+    statusMessage.style.display = 'block';
+    statusMessage.style.textAlign = 'center';
+    statusMessage.style.margin = '10px 0';
+
+    const exitButton = document.createElement('span');
+    exitButton.innerHTML = '&times;';
+    exitButton.style.position = 'absolute';
+    exitButton.style.top = '10px';
+    exitButton.style.right = '10px';
+    exitButton.style.cursor = 'pointer';
+    exitButton.style.fontSize = '20px';
+    exitButton.onclick = () => form.remove();
+    form.appendChild(exitButton);
+    form.appendChild(loadingSymbol);
+    form.appendChild(statusMessage);
+    makeElementDraggable(form);
+    document.body.appendChild(form);
+
+    try {
+        const result = await gatherContracts();
+        console.log(`We got the contracts as array of objects`, result);
+        loadingSymbol.remove();
+        statusMessage.innerText = 'Select a contract:';
+        const contractSelect = document.createElement('select');
+        contractSelect.style.display = 'block';
+        contractSelect.style.margin = '10px auto';
+        contractSelect.style.padding = '10px';
+        contractSelect.style.width = '100%';
+        result.forEach(contract => {
+            const option = document.createElement('option');
+            option.value = contract.contractName;
+            option.innerText = contract.contractName;
+            contractSelect.appendChild(option);
+        });
+        form.appendChild(contractSelect);
+        const nextButton = document.createElement('button');
+        nextButton.innerText = 'Next';
+        nextButton.style.display = 'block';
+        nextButton.style.margin = '20px auto';
+        nextButton.style.padding = '10px 20px';
+        nextButton.style.cursor = 'pointer';
+        form.appendChild(nextButton);
+        nextButton.onclick = () => {
+            const selectedContractName = contractSelect.value;
+            const selectedContract = result.find(contract => contract.contractName === selectedContractName);
+            if (selectedContract) {
+                console.log('Selected contract:', selectedContract);
+                form.innerHTML = '';
+                const exitButton = document.createElement('span');
+                exitButton.innerHTML = '&times;';
+                exitButton.style.position = 'absolute';
+                exitButton.style.top = '10px';
+                exitButton.style.right = '10px';
+                exitButton.style.cursor = 'pointer';
+                exitButton.style.fontSize = '20px';
+                exitButton.onclick = () => form.remove();
+                form.appendChild(exitButton);
+                const parent = form; 
+                const options = [
+                    'Flag tokens',
+                    'Unflag tokens',
+                    'Burn tokens',
+                    'Add Contract Owner',
+                    'Add Contract Manager',
+                    'Change Contract Owner',
+                    'Change minimal Listing price',
+                    'Change minimal transfer fee',
+                    'Change creator fee'
+                ];
+                const web3 = new Web3(window.ethereum);
+                const contract = new web3.eth.Contract(JSON.parse(selectedContract.contractABI), selectedContract.contractAddress);
+                let selectedTokens = [];
+                let optionSelected = ''; 
+
+                options.forEach((optionText) => {
+                    const optionButton = document.createElement('div');
+                    optionButton.innerText = optionText;
+                    optionButton.style.padding = '10px';
+                    optionButton.style.margin = '5px 0';
+                    optionButton.style.backgroundColor = 'lightgray';
+                    optionButton.style.textAlign = 'center';
+                    optionButton.style.cursor = 'pointer';
+                    optionButton.style.border = '1px solid #ccc';
+                    optionButton.style.borderRadius = '5px';
+
+                    optionButton.onclick = async () => {
+                        parent.innerHTML = ''; 
+                        parent.style.height = '450px'; 
+                        parent.style.overflowY = 'scroll';
+                        if (['Flag tokens', 'Unflag tokens', 'Burn tokens'].includes(optionText)) {
+                            optionSelected = optionText; 
+                            const closeButton = document.createElement('span');
+                            closeButton.innerText = '❌'; // X emoji
+                            closeButton.style.position = 'absolute';
+                            closeButton.style.top = '10px';
+                            closeButton.style.right = '10px';
+                            closeButton.style.fontSize = '10px';
+                            closeButton.style.cursor = 'pointer';
+                            closeButton.onclick = () => {
+                                parent.remove(); 
+                            };
+                            parent.appendChild(closeButton);
+                            const contractNameSpan = document.createElement('span');
+                            contractNameSpan.innerText = `Contract: ${selectedContractName}`;
+                            contractNameSpan.style.display = 'block';
+                            contractNameSpan.style.textAlign = 'center';
+                            contractNameSpan.style.fontSize = '18px';
+                            contractNameSpan.style.marginBottom = '10px';
+                            contractNameSpan.style.fontWeight = 'bold';
+                            parent.appendChild(contractNameSpan);
+                            const actionSpan = document.createElement('span');
+                            actionSpan.innerText = `Action: ${optionSelected}`;
+                            actionSpan.style.display = 'block';
+                            actionSpan.style.textAlign = 'center';
+                            actionSpan.style.marginBottom = '20px';
+                            actionSpan.style.fontWeight = 'bold';
+                            actionSpan.style.color = 'white';
+                            parent.appendChild(actionSpan);
+                            const gridParentContainer = document.createElement('div');
+                            gridParentContainer.style.width = '80%';
+                            gridParentContainer.style.margin = '0 auto'; 
+                            gridParentContainer.style.height = '300px'; 
+                            gridParentContainer.style.overflowY = 'auto'; 
+                            gridParentContainer.style.border = '1px solid #ccc';
+                            gridParentContainer.style.borderRadius = '10px';
+                            gridParentContainer.style.padding = '10px';
+                            gridParentContainer.style.marginBottom = '20px';
+                            parent.appendChild(gridParentContainer);
+
+                            const gridContainer = document.createElement('div');
+                            gridContainer.style.display = 'grid';
+                            gridContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(50px, 1fr))';
+                            gridContainer.style.gridGap = '10px';
+                            gridParentContainer.appendChild(gridContainer); 
+
+                            const tcount = await contract.methods.tokenCount().call(); 
+                            const tcountP = parseInt(tcount);
+                            for (let i = 1; i <= tcountP; i++) {
+                                const tokenElement = document.createElement('div');
+                                tokenElement.innerText = i;
+                                tokenElement.style.width = '50px';
+                                tokenElement.style.height = '50px';
+                                tokenElement.style.backgroundColor = '#ccc';
+                                tokenElement.style.display = 'flex';
+                                tokenElement.style.justifyContent = 'center';
+                                tokenElement.style.alignItems = 'center';
+                                tokenElement.style.cursor = 'pointer';
+                                tokenElement.style.border = '1px solid #000';
+                                tokenElement.onclick = function () {
+                                    const tokenId = i;
+                                    if (selectedTokens.includes(tokenId)) {
+                                        selectedTokens.splice(selectedTokens.indexOf(tokenId), 1); 
+                                        tokenElement.style.backgroundColor = '#ccc'; 
+                                    } else {
+                                        selectedTokens.push(parseInt(tokenId));
+                                        tokenElement.style.backgroundColor = '#0067b3'; 
+                                    }
+                                    console.log('Selected Tokens:', selectedTokens);
+                                };
+
+                                gridContainer.appendChild(tokenElement);
+                            }
+
+                            const submitContainer = document.createElement('div');
+                            submitContainer.style.display = 'fixed';
+                            submitContainer.style.marginTop = '0px';
+                            submitContainer.style.bottom = '0%';
+                            submitContainer.style.height = '15%';
+
+                            const submitButton = document.createElement('button');
+                            submitButton.innerText = 'Submit';
+                            submitButton.style.padding = '10px 20px';
+                            submitButton.style.backgroundColor = 'gray';
+                            submitButton.style.color = 'white';
+                            submitButton.style.border = 'none';
+                            submitButton.style.borderRadius = '5px';
+                            submitButton.style.cursor = 'pointer';
+                            submitButton.style.left = '33%';
+                            submitButton.style.width = '30%';
+                            submitButton.style.position = 'relative';
+
+                            submitButton.onclick = async () => {
+                                console.log('Final Array of Selected Tokens:', selectedTokens);
+                                //alert(`Action: ${optionSelected}\nSelected Tokens: ${selectedTokens.join(', ')}`);
+                                if (optionSelected === 'Flag tokens') {
+                                    console.log('trying to estimate the gas to call flagArrayOfTokens() via solidity');
+                                    const gasEstimate = await contract.methods.flagArrayOfTokens(selectedTokens).estimateGas({
+                                        from: currentClientWallet
+                                    });                        
+                                    console.log('gas estimate determined:', gasEstimate);
+                                    const gasLimit = Math.floor(gasEstimate * 1.2);// adding buffer
+                                    const mintResult = await contract.methods.flagArrayOfTokens(selectedTokens).send({
+                                        from: currentClientWallet,
+                                        gas: gasLimit 
+                                    })
+                                    .on('transactionHash', function(hash) {
+                                            console.log("User accepted the transaction. Transaction hash:", hash);
+                                            gridParentContainer.removeChild();
+                                            submitButton.remove();
+                                            const successSpan = document.createElement('span');
+                                            successSpan.textContent = "Tokens have been successfully flaged!";
+                                            successSpan.style.display = 'block';
+                                            successSpan.style.textAlign = 'center';
+                                            successSpan.style.marginTop = '20px';
+                                            successSpan.style.fontSize = '1.3vh';
+                                            successSpan.style.color = 'white';
+                                            parent.appendChild(successSpan);
+                                    })
+                                    .on('receipt', function(flagArrayReciept) {
+                                        if(flagArrayReciept && flagArrayReciept.status === true){
+                                            console.log('we received the receipt for the client', flagArrayReciept);
+                                        }else{
+                                            console.log('Error getting the receipt may have took more than 50 blocks');
+                                        }
+                                    })
+                                    .on('error', function(error, receipt) {
+                                        console.log("Transaction rejected or failed:", error);
+                                        console.log("Transaction failed receipt:", receipt);
+                                        inputBar.removeChild();
+                                        submitButton.remove();
+                                        const successSpan = document.createElement('span');
+                                        successSpan.textContent = `there was an unexpected error ${error}`;
+                                        successSpan.style.display = 'block';
+                                        successSpan.style.textAlign = 'center';
+                                        successSpan.style.marginTop = '20px';
+                                        successSpan.style.fontSize = '1.3vh';
+                                        successSpan.style.color = 'white';
+                                        parent.appendChild(successSpan);
+                                    });
+                                } else if (optionSelected === 'Unflag tokens') {
+                                    // Call unflagToken function in the contract
+                                    console.log('trying to estimate the gas to call unflag array via solidity');
+                                    const gasEstimate = await contract.methods.undoFlagedTokenArray(selectedTokens).estimateGas({
+                                        from: currentClientWallet
+                                    });                        
+                                    console.log('gas estimate to call flagNFT', gasEstimate);
+                                    const gasLimit = Math.floor(gasEstimate * 1.2);
+                                    const mintResult = await contract.methods.undoFlagedTokenArray(selectedTokens).send({
+                                        from: currentClientWallet,
+                                        gas: gasLimit 
+                                    })
+                                    .on('transactionHash', function(hash) {
+                                        console.log("User accepted the transaction. Transaction hash:", hash);
+                                        gridParentContainer.removeChild();
+                                        submitButton.remove();
+                                        const successSpan = document.createElement('span');
+                                        successSpan.textContent = "Unflag operation was a success!";
+                                        successSpan.style.display = 'block';
+                                        successSpan.style.textAlign = 'center';
+                                        successSpan.style.marginTop = '20px';
+                                        successSpan.style.fontSize = '1.3vh';
+                                        successSpan.style.color = 'white';
+                                        parent.appendChild(successSpan);
+                                    })
+                                    .on('receipt', function(flagArrayReciept) {
+                                        if(flagArrayReciept && flagArrayReciept.status === true){
+                                            console.log('we received the receipt for the client', flagArrayReciept);
+                                        }else{
+                                            console.log('Error getting the receipt may have took more than 50 blocks');
+                                        }
+                                    })
+                                    .on('error', function(error, receipt) {
+                                        console.log("Transaction rejected or failed:", error);
+                                        console.log("Transaction failed receipt:", receipt);
+                                        inputBar.removeChild();
+                                        submitButton.remove();
+                                        const successSpan = document.createElement('span');
+                                        successSpan.textContent = `there was an unexpected error ${error}`;
+                                        successSpan.style.display = 'block';
+                                        successSpan.style.textAlign = 'center';
+                                        successSpan.style.marginTop = '20px';
+                                        successSpan.style.fontSize = '1.3vh';
+                                        successSpan.style.color = 'white';
+                                        parent.appendChild(successSpan);
+                                    });
+                                } else if (optionSelected === 'Burn tokens') {
+                                    console.log('trying to estimate the gas to call Burn Token Array via solidity');
+                                    const gasEstimate = await contract.methods.burnTokenArray(selectedTokens).estimateGas({
+                                        from: currentClientWallet
+                                    });                    
+                                    console.log('gas estimate to call flagNFT', gasEstimate);
+                                    const gasLimit = Math.floor(gasEstimate * 1.2);
+                                    const mintResult = await contract.methods.burnTokenArray(selectedTokens).send({
+                                        from: currentClientWallet,
+                                        gas: gasLimit 
+                                    })
+                                    .on('transactionHash', function(hash) {
+                                        console.log("User accepted the transaction. Transaction hash:", hash);
+                                        gridParentContainer.removeChild();
+                                        submitButton.remove();
+                                        const successSpan = document.createElement('span');
+                                        successSpan.textContent = "Burn token operation successful! These tokens can no longer be listed for sell!";
+                                        successSpan.style.display = 'block';
+                                        successSpan.style.textAlign = 'center';
+                                        successSpan.style.marginTop = '20px';
+                                        successSpan.style.fontSize = '1.3vh';
+                                        successSpan.style.color = 'white';
+                                        parent.appendChild(successSpan);
+                                    })
+                                    .on('receipt', function(flagArrayReciept) {
+                                        if(flagArrayReciept && flagArrayReciept.status === true){
+                                            console.log('we received the receipt for the client', flagArrayReciept);
+                                        }else{
+                                            console.log('Error getting the receipt may have took more than 50 blocks');
+                                        }
+                                    })
+                                    .on('error', function(error, receipt) {
+                                        console.log("Transaction rejected or failed:", error);
+                                        console.log("Transaction failed receipt:", receipt);
+                                        inputBar.removeChild();
+                                        submitButton.remove();
+                                        const successSpan = document.createElement('span');
+                                        successSpan.textContent = `there was an unexpected error ${error}`;
+                                        successSpan.style.display = 'block';
+                                        successSpan.style.textAlign = 'center';
+                                        successSpan.style.marginTop = '20px';
+                                        successSpan.style.fontSize = '1.3vh';
+                                        successSpan.style.color = 'white';
+                                        parent.appendChild(successSpan);
+                                    });
+                                }
+                            };
+
+                            submitContainer.appendChild(submitButton);
+                            parent.appendChild(submitContainer);
+                        } else if (['Add Contract Owner', 'Add Contract Manager', 'Change Contract Owner'].includes(optionText)) {
+                            parent.innerHTML = '';
+                            parent.style.height = '300px';
+                            const closeButton = document.createElement('span');
+                            closeButton.innerText = '❌'; // X emoji
+                            closeButton.style.position = 'absolute';
+                            closeButton.style.top = '10px';
+                            closeButton.style.right = '10px';
+                            closeButton.style.fontSize = '1.2vh';
+                            closeButton.style.cursor = 'pointer';
+                            closeButton.onclick = () => {
+                                parent.remove(); 
+                            };
+                            parent.appendChild(closeButton);
+                            const titleSpan = document.createElement('span');
+                            titleSpan.innerText = optionText;
+                            titleSpan.style.display = 'block';
+                            titleSpan.style.textAlign = 'center';
+                            titleSpan.style.fontSize = '2vh';
+                            titleSpan.style.marginTop = '20px';
+                            parent.appendChild(titleSpan);
+                            const inputBar = document.createElement('input');
+                            inputBar.type = 'text';
+                            inputBar.style.display = 'block';
+                            inputBar.style.margin = '20px auto';
+                            inputBar.style.width = '80%';
+                            inputBar.style.padding = '10px';
+                            inputBar.style.fontSize = '2vh';
+                            inputBar.placeholder = 'Enter value here';
+                            parent.appendChild(inputBar);
+
+                            const submitButton = document.createElement('button');
+                            submitButton.innerText = 'Submit';
+                            submitButton.style.display = 'block';
+                            submitButton.style.margin = '20px auto';
+                            submitButton.style.padding = '10px 20px';
+                            submitButton.style.fontSize = '2vh';
+                            submitButton.style.cursor = 'pointer';
+                            parent.appendChild(submitButton);
+                            const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+                            submitButton.onclick = async () => {
+                                const inputValue = inputBar.value;
+                                if(ethAddressRegex.test(inputValue)){
+                                    if (inputValue) {
+                                        console.log(`Option: ${optionText}, Input: ${inputValue}`);
+                                        if (optionSelected === 'Add Contract Owner') {
+                                            console.log('trying to estimate the gas to call addOwnerToContract');
+                                            const gasEstimate = await contract.methods.addOwnerToContract(inputValue).estimateGas({
+                                                from: currentClientWallet
+                                            });                        
+                                            console.log('gas estimate to call flagNFT', gasEstimate);
+                                            const gasLimit = Math.floor(gasEstimate * 1.2);
+                                            const mintResult = await contract.methods.addOwnerToContract(inputValue).send({
+                                                from: currentClientWallet,
+                                                gas: gasLimit 
+                                            })
+                                            .on('transactionHash', function(hash) {
+                                                console.log("User accepted the transaction. Transaction hash:", hash);
+                                                inputBar.removeChild();
+                                                submitButton.remove();
+                                                const successSpan = document.createElement('span');
+                                                successSpan.textContent = `successfully added the owner ${inputValue} to the owner array on the contract`;
+                                                successSpan.style.display = 'block';
+                                                successSpan.style.textAlign = 'center';
+                                                successSpan.style.marginTop = '20px';
+                                                successSpan.style.fontSize = '1.3vh';
+                                                successSpan.style.color = 'white';
+                                                parent.appendChild(successSpan);
+                                            })
+                                            .on('receipt', function(flagArrayReciept) {
+                                                if(flagArrayReciept && flagArrayReciept.status === true){
+                                                    console.log('we received the receipt for the client', flagArrayReciept);
+                                                }else{
+                                                    console.log('Error getting the receipt may have took more than 50 blocks');
+                                                }
+                                            })
+                                            .on('error', function(error, receipt) {
+                                                console.log("Transaction rejected or failed:", error);
+                                                console.log("Transaction failed receipt:", receipt);
+                                                inputBar.removeChild();
+                                                submitButton.remove();
+                                                const successSpan = document.createElement('span');
+                                                successSpan.textContent = `there was an unexpected error ${error}`;
+                                                successSpan.style.display = 'block';
+                                                successSpan.style.textAlign = 'center';
+                                                successSpan.style.marginTop = '20px';
+                                                successSpan.style.fontSize = '1.3vh';
+                                                successSpan.style.color = 'white';
+                                                parent.appendChild(successSpan);
+                                            });
+                                        } else if (optionSelected === 'Add Contract Manager') {
+                                            console.log('trying to estimate the gas to call changeContractManager');
+                                            const gasEstimate = await contract.methods.addManager(inputValue).estimateGas({
+                                                from: currentClientWallet
+                                            });                        
+                                            console.log('gas estimate to call changeContractManager ', gasEstimate);
+                                            const gasLimit = Math.floor(gasEstimate * 1.2);
+                                            const mintResult = await contract.methods.changeContractManager(inputValue).send({
+                                                from: currentClientWallet,
+                                                gas: gasLimit 
+                                            })
+                                            .on('transactionHash', function(hash) {
+                                                console.log("User accepted the transaction. Transaction hash:", hash);
+                                                inputBar.removeChild();
+                                                submitButton.remove();
+                                                const successSpan = document.createElement('span');
+                                                successSpan.textContent = `successfully added the new manager ${inputValue} to the contract. They can now flag and unflag tokens`;
+                                                successSpan.style.display = 'block';
+                                                successSpan.style.textAlign = 'center';
+                                                successSpan.style.marginTop = '20px';
+                                                successSpan.style.fontSize = '1.3vh';
+                                                successSpan.style.color = 'white';
+                                                parent.appendChild(successSpan);
+                                            })
+                                            .on('receipt', function(flagArrayReciept) {
+                                                if(flagArrayReciept && flagArrayReciept.status === true){
+                                                    console.log('we received the receipt for the client', flagArrayReciept);
+                                                }else{
+                                                    console.log('Error getting the receipt may have took more than 50 blocks');
+                                                }
+                                            })
+                                            .on('error', function(error, receipt) {
+                                                console.log("Transaction rejected or failed:", error);
+                                                console.log("Transaction failed receipt:", receipt);
+                                                inputBar.removeChild();
+                                                submitButton.remove();
+                                                const successSpan = document.createElement('span');
+                                                successSpan.textContent = `there was an unexpected error ${error}`;
+                                                successSpan.style.display = 'block';
+                                                successSpan.style.textAlign = 'center';
+                                                successSpan.style.marginTop = '20px';
+                                                successSpan.style.fontSize = '1.3vh';
+                                                successSpan.style.color = 'white';
+                                                parent.appendChild(successSpan);
+                                            });
+                                        } else if (optionSelected === 'Change Contract Owner') {
+                                            console.log('trying to estimate the gas to call changeContractManager');
+                                            const gasEstimate = await contract.methods.changeContractOwner(inputValue).estimateGas({
+                                                from: currentClientWallet
+                                            });                        
+                                            console.log('gas estimate to call changeContractManager ', gasEstimate);
+                                            const gasLimit = Math.floor(gasEstimate * 1.2);
+                                            const mintResult = await contract.methods.changeContractOwner(inputValue).send({
+                                                from: currentClientWallet,
+                                                gas: gasLimit 
+                                            })
+                                            .on('transactionHash', function(hash) {
+                                                console.log("User accepted the transaction. Transaction hash:", hash);
+                                                inputBar.removeChild();
+                                                submitButton.remove();
+                                                const successSpan = document.createElement('span');
+                                                successSpan.textContent = `Successfully changed the owner ${inputValue} of the contract. 
+                                                                            They can now flag unflag tokens, burn tokens, and change the manager`;
+                                                successSpan.style.display = 'block';
+                                                successSpan.style.textAlign = 'center';
+                                                successSpan.style.marginTop = '20px';
+                                                successSpan.style.fontSize = '1.3vh';
+                                                successSpan.style.color = 'white';
+                                                parent.appendChild(successSpan);
+                                            })
+                                            .on('receipt', function(flagArrayReciept) {
+                                                if(flagArrayReciept && flagArrayReciept.status === true){
+                                                    console.log('we received the receipt for the client', flagArrayReciept);
+                                                }else{
+                                                    console.log('Error getting the receipt may have took more than 50 blocks');
+                                                }
+                                            })
+                                            .on('error', function(error, receipt) {
+                                                console.log("Transaction rejected or failed:", error);
+                                                console.log("Transaction failed receipt:", receipt);
+                                                inputBar.removeChild();
+                                                submitButton.remove();
+                                                const successSpan = document.createElement('span');
+                                                successSpan.textContent = `there was an unexpected error ${error}`;
+                                                successSpan.style.display = 'block';
+                                                successSpan.style.textAlign = 'center';
+                                                successSpan.style.marginTop = '20px';
+                                                successSpan.style.fontSize = '1.3vh';
+                                                successSpan.style.color = 'white';
+                                                parent.appendChild(successSpan);
+                                            });
+                                        }
+
+                                    } else {
+                                        console.log('No input provided.');
+                                    }
+                                }else{
+                                    alert('Please enter a valid Wallet Address');
+                                }
+                            };
+                        }else if (['Change minimal Listing price', 'Change minimal transfer fee', 'Change creator fee'].includes(optionText)) {
+                            parent.innerHTML = '';
+                            parent.style.height = '200px';
+                            const closeButton = document.createElement('span');
+                            closeButton.innerText = '❌';
+                            closeButton.style.position = 'absolute';
+                            closeButton.style.top = '10px';
+                            closeButton.style.right = '10px';
+                            closeButton.style.fontSize = '1.5vh'; 
+                            closeButton.style.cursor = 'pointer';
+                            closeButton.onclick = () => {
+                                parent.remove(); 
+                            };
+                            parent.appendChild(closeButton);
+                            const titleSpan = document.createElement('span');
+                            titleSpan.innerText = optionText;
+                            titleSpan.style.display = 'block';
+                            titleSpan.style.textAlign = 'center';
+                            titleSpan.style.fontSize = '1.5vh'; 
+                            titleSpan.style.marginTop = '15px';
+                            parent.appendChild(titleSpan);
+                            const inputBar = document.createElement('input');
+                            inputBar.type = 'number'; 
+                            inputBar.style.display = 'block';
+                            inputBar.style.margin = '15px auto';
+                            inputBar.style.width = '70%';
+                            inputBar.style.padding = '8px'; 
+                            inputBar.style.fontSize = '1.5vh'; 
+                            inputBar.placeholder = 'Enter number';
+                            parent.appendChild(inputBar);
+                            const submitButton = document.createElement('button');
+                            submitButton.innerText = 'Submit';
+                            submitButton.style.display = 'block';
+                            submitButton.style.margin = '15px auto';
+                            submitButton.style.padding = '8px 16px'; 
+                            submitButton.style.fontSize = '1.5vh'; 
+                            submitButton.style.cursor = 'pointer';
+                            parent.appendChild(submitButton);
+                            submitButton.onclick = async () => {
+                                const inputValue = inputBar.value;
+                                if (inputValue) {
+                                    if (optionSelected === 'Change minimal Listing price') {
+                                        const gasEstimate = await contract.methods.changeMinimalListingFee(parseInt(inputValue)).estimateGas({
+                                            from: currentClientWallet
+                                        });                        
+                                        console.log('gas estimate to call changeMinimalListingFee ', gasEstimate);
+                                        const gasLimit = Math.floor(gasEstimate * 1.2);
+                                        const mintResult = await contract.methods.changeMinimalListingFee(parseInt(inputValue)).send({
+                                            from: currentClientWallet,
+                                            gas: gasLimit 
+                                        })
+                                        .on('transactionHash', function(hash) {
+                                            console.log("User accepted the transaction. Transaction hash:", hash);
+                                            inputBar.removeChild();
+                                            submitButton.remove();
+                                            const successSpan = document.createElement('span');
+                                            successSpan.textContent = `Successfully changed the minimal listing fee ${inputValue}`;
+                                            successSpan.style.display = 'block';
+                                            successSpan.style.textAlign = 'center';
+                                            successSpan.style.marginTop = '20px';
+                                            successSpan.style.fontSize = '1.3vh';
+                                            successSpan.style.color = 'white';
+                                            parent.appendChild(successSpan);
+                                        })
+                                        .on('receipt', function(flagArrayReciept) {
+                                            if(flagArrayReciept && flagArrayReciept.status === true){
+                                                console.log('we received the receipt for the client', flagArrayReciept);
+                                            }else{
+                                                console.log('Error getting the receipt may have took more than 50 blocks');
+                                            }
+                                        })
+                                        .on('error', function(error, receipt) {
+                                            console.log("Transaction rejected or failed:", error);
+                                            console.log("Transaction failed receipt:", receipt);
+                                            inputBar.removeChild();
+                                            submitButton.remove();
+                                            const successSpan = document.createElement('span');
+                                            successSpan.textContent = `there was an unexpected error ${error}`;
+                                            successSpan.style.display = 'block';
+                                            successSpan.style.textAlign = 'center';
+                                            successSpan.style.marginTop = '20px';
+                                            successSpan.style.fontSize = '1.3vh';
+                                            successSpan.style.color = 'white';
+                                            parent.appendChild(successSpan);
+                                        });
+                                    } else if (optionSelected === 'Change minimal transfer fee') {
+                                        const gasEstimate = await contract.methods.changeMinimalTransferFee(parseint(inputValue)).estimateGas({
+                                            from: currentClientWallet
+                                        });                        
+                                        console.log('gas estimate to call changeMinimalListingFee ', gasEstimate);
+                                        const gasLimit = Math.floor(gasEstimate * 1.2);
+                                        const mintResult = await contract.methods.changeMinimalTransferFee(parseInt(inputValue)).send({
+                                            from: currentClientWallet,
+                                            gas: gasLimit 
+                                        })
+                                        .on('transactionHash', function(hash) {
+                                            console.log("User accepted the transaction. Transaction hash:", hash);
+                                            inputBar.removeChild();
+                                            submitButton.remove();
+                                            const successSpan = document.createElement('span');
+                                            successSpan.textContent = `Successfully changed the minimal listing fee ${inputValue}`;
+                                            successSpan.style.display = 'block';
+                                            successSpan.style.textAlign = 'center';
+                                            successSpan.style.marginTop = '20px';
+                                            successSpan.style.fontSize = '1.3vh';
+                                            successSpan.style.color = 'white';
+                                            parent.appendChild(successSpan);
+                                        })
+                                        .on('receipt', function(flagArrayReciept) {
+                                            if(flagArrayReciept && flagArrayReciept.status === true){
+                                                console.log('we received the receipt for the client', flagArrayReciept);
+                                            }else{
+                                                console.log('Error getting the receipt may have took more than 50 blocks');
+                                            }
+                                        })
+                                        .on('error', function(error, receipt) {
+                                            console.log("Transaction rejected or failed:", error);
+                                            console.log("Transaction failed receipt:", receipt);
+                                            inputBar.removeChild();
+                                            submitButton.remove();
+                                            const successSpan = document.createElement('span');
+                                            successSpan.textContent = `there was an unexpected error ${error}`;
+                                            successSpan.style.display = 'block';
+                                            successSpan.style.textAlign = 'center';
+                                            successSpan.style.marginTop = '20px';
+                                            successSpan.style.fontSize = '1.3vh';
+                                            successSpan.style.color = 'white';
+                                            parent.appendChild(successSpan);
+                                        });
+                                    } else if (optionSelected === 'Change creator fee') {
+                                        const gasEstimate = await contract.methods.changeCreatorFee(parseInt(inputValue)).estimateGas({
+                                            from: currentClientWallet
+                                        })                       
+                                        console.log('gas estimate to call changeMinimalListingFee ', gasEstimate);
+                                        const gasLimit = Math.floor(gasEstimate * 1.2);
+                                        const mintResult = await contract.methods.changeCreatorFee(parseInt(inputValue)).send({
+                                            from: currentClientWallet,
+                                            gas: gasLimit 
+                                        })
+                                        .on('transactionHash', function(hash) {
+                                            console.log("User accepted the transaction. Transaction hash:", hash);
+                                            inputBar.removeChild();
+                                            submitButton.remove();
+                                            const successSpan = document.createElement('span');
+                                            successSpan.textContent = `Successfully changed the minimal listing fee ${inputValue}`;
+                                            successSpan.style.display = 'block';
+                                            successSpan.style.textAlign = 'center';
+                                            successSpan.style.marginTop = '20px';
+                                            successSpan.style.fontSize = '1.3vh';
+                                            successSpan.style.color = 'white';
+                                            parent.appendChild(successSpan);
+                                        })
+                                        .on('receipt', function(flagArrayReciept) {
+                                            if(flagArrayReciept && flagArrayReciept.status === true){
+                                                console.log('we received the receipt for the client', flagArrayReciept);
+                                            }else{
+                                                console.log('Error getting the receipt may have took more than 50 blocks');
+                                            }
+                                        })
+                                        .on('error', function(error, receipt) {
+                                            console.log("Transaction rejected or failed:", error);
+                                            console.log("Transaction failed receipt:", receipt);
+                                            inputBar.removeChild();
+                                            submitButton.remove();
+                                            const successSpan = document.createElement('span');
+                                            successSpan.textContent = `there was an unexpected error ${error}`;
+                                            successSpan.style.display = 'block';
+                                            successSpan.style.textAlign = 'center';
+                                            successSpan.style.marginTop = '20px';
+                                            successSpan.style.fontSize = '1.3vh';
+                                            successSpan.style.color = 'white';
+                                            parent.appendChild(successSpan);
+                                        });
+                                    }
+                                } else {
+                                    console.log('No input provided.');
+                                }
+                            };
+                        }else{
+                            console.log('funtionality is not setup yet');
+                        }
+                    };
+                    parent.appendChild(optionButton);
+                });
+
+
+            }
+        };
+    } catch (error) {
+        console.error('Error gathering contracts:', error);
+        statusMessage.innerText = 'Failed to gather contract data.';
+    }
 }
 function createContract(data) {
     let minimalListingPrice = parseInt(parseFloat(data.minListingPrice)*(10**18));
@@ -7806,9 +8739,8 @@ function createContract(data) {
         }
 
         mapping(uint256 => NFT) public nfts;
-        //mapping(address => uint256[]) private userTokens; 
         mapping(address => bool) private seenOwners;
-        NFT[] private recentSells; 
+        NFT[] public recentSells; 
 
         event NFTMinted(uint256 id, address owner);
         event NFTForSale(uint256 id, uint256 price);
@@ -7819,6 +8751,7 @@ function createContract(data) {
         address[] internal owners;
         address public manager;
         uint256 public creatorFee;
+        uint256 public sellsMaxLength;
         address public walletToReceiveFunds;
         address public RoysWallet;
         uint256 public minimalTransferFee;
@@ -7846,6 +8779,7 @@ function createContract(data) {
             tokenCount = 0;
             numberOfSells = 0;
             maximumTokenCount = ${Number(data.numberOfTokens)};
+            sellsMaxLength = 10000;
             isManagerInitiated = ${data.options[0].active};
             isContractSellable = ${data.options[1].active};
             isRoyaltyFeeChangeable = ${data.options[2].active};
@@ -7879,34 +8813,35 @@ function createContract(data) {
         }
         function changeCreatorFee(uint256 newPercentFee) public {
             require(newPercentFee >= 1 && newPercentFee <= 100, "ERR2");
-            require(isRoyaltyFeeChangeable, "Sorry the contract creator fee cannot be changed");
+            require(isRoyaltyFeeChangeable, "ERR10");
             require(msg.sender == manager || msg.sender == owners[0], "ERR1");
             creatorFee = newPercentFee;
         }
         function changeContractManager(address newManagerAdress) public {
-            require(isManagerInitiated, "Sorry the contract does not have manager Privilege");
+            require(isManagerInitiated, "ERR1");
             require(msg.sender == owners[0], 'ERR1');
             manager = newManagerAdress;
-        }
-        function changeContractOwner(address _newOwner) public{
-            require(isContractSellable, 'ERR3');
-            require(msg.sender == owners[0], "ERR1");
-            owners[0] = _newOwner;
         }
 
         function burnToken(uint256 tokenId) public{
             require(isTokensBurnable, 'ERR4');
-            require(msg.sender == nfts[tokenId].owner, 'ERR1');
+            require(msg.sender == owners[0], 'ERR1');
             require(!nfts[tokenId].flagged, 'ERR5');
             nfts[tokenId].burned = true;
             nfts[tokenId].forSale = false;
+        }
+        function burnTokenArray(uint256[] memory tokenIdArray) public{
+            for(uint256 i=0; i< tokenIdArray; i++){
+                burnToken(tokenIdArray[i]);
+            }
         }
         function mintNFT(uint256 price) public payable returns (bool) {
             if (!checkIfOwner(msg.sender)) {
                 return false;
             } else { 
-                nfts[tokenCount] = NFT({ 
-                    id: tokenCount+1,
+                tokenCount+=1;
+                nfts[tokenCount-1] = NFT({ 
+                    id: tokenCount,
                     price: price, 
                     owner: msg.sender, 
                     lastOwner: msg.sender, 
@@ -7917,9 +8852,7 @@ function createContract(data) {
                     lastSellData: block.timestamp,
                     burned: false       
                 });
-                tokenCount+=1;
-                //userTokens[owners[0]].push(tokenCount); 
-                emit NFTMinted(tokenCount, owners[0]);
+                emit NFTMinted(tokenCount, msg.sender);
                 return true;
             }
         }
@@ -7963,50 +8896,62 @@ function createContract(data) {
                 delistNFT(tokenIdArray[i]);
             }
         }
-        function getTokenData(uint256 tokenID) public view returns (NFT memory) {
-            return nfts[tokenID];
-        }
         function flagToken(uint256 tokenID) public {
             require(isTokensPausible, "ERR5");
             require(msg.sender == owners[0] || msg.sender == manager, 'ERR1');
-            nfts[tokenID].flagged = true;
+            nfts[tokenID].flagged = true;   
         }
-        function relistflaggedToken(uint256 tokenID) public {
-            require(msg.sender == owners[0] ||msg.sender == manager, 'ERR1');
+        function flagArrayOfTokens(uint256[] memory tokenIdArray) public {
+            for(uint256 i= 0; i<tokenIdArray.length; i++){
+                flagToken(tokenIdArray[i]);
+            }
+        }
+        function undoFlagedToken(uint256 tokenID) public {
+            require(isTokensPausible, "ERR5");
+            require(msg.sender == owners[0] || msg.sender == manager, 'ERR1');
             nfts[tokenID].flagged = false;
         }
-        function changeOwner(address _address) public {
+        function undoFlagedTokenArray(uint256[] memory tokenIdArray) public {
+            for(uint256 i= 0; i<tokenIdArray.length; i++){
+                undoFlagedToken(tokenIdArray[i]);
+            }
+        }
+        function changeContractOwner(address _address) public {
             require(isContractSellable, 'ERR8');
             require(msg.sender == owners[0], 'ERR1');
             owners[0] = _address;
         }
         function addOwnerToContract(address _address) public {
             require(isContractSellable, 'ERR8');
-            require(checkIfOwner(msg.sender), ' only owners can add other owners to the contract');
+            require(checkIfOwner(msg.sender), 'ERR1');
             owners.push(_address);
         }
         function purchaseSingleNFT(uint256 tokenId) payable public returns (bool) {
             require(msg.value >= nfts[tokenId].price, "ERR7");
             require(!nfts[tokenId].flagged, 'ERR5');
             require(!nfts[tokenId].burned, 'ERR4');
-            require(!nfts[tokenId].forSale, 'ERR1');
+            require(nfts[tokenId].forSale, 'ERR1');
+            require(msg.value >= nfts[tokenId].price, "ERR7");
             NFT storage nft = nfts[tokenId];
-            require(nft.forSale, "ERR1");
-            require(msg.value >= nft.price, "ERR7");
             uint256 fee = (nft.price * creatorFee) / 100;
             uint256 ownerShare = nft.price - fee;
             payable(walletToReceiveFunds).transfer(fee);
             payable(nft.owner).transfer(ownerShare);
-            nft.lastOwner = nft.owner;
+
+            nft.id = tokenId;
+            nft.lastOwner = nfts[tokenId].owner;
             nft.owner = msg.sender; 
             nft.forSale = false;
             nft.lastSellData = block.timestamp; 
-            recentSells.push(nft);
-            if (recentSells.length > 10000) {
+            
+            if (recentSells.length > sellsMaxLength) {
                 for (uint i = 0; i < recentSells.length - 1; i++) {
                     recentSells[i] = recentSells[i + 1];
                 }
                 recentSells.pop();
+                recentSells.push(nft);
+            }else{
+                recentSells.push(nft);
             }
             emit NFTSells(tokenId, msg.value, block.timestamp);
             numberOfSells += 1;
@@ -8058,32 +9003,6 @@ function createContract(data) {
             }
             return maxPrice;
         }
-        function getRecentSells() public view returns (NFT[] memory) {
-            uint256 limit = recentSells.length;
-            NFT[] memory sells = new NFT[](limit);
-            for (uint256 i = 0; i < limit; i++) {
-                sells[i] = recentSells[i];
-            }
-            return sells;
-        }
-        function getUsersTokens(address user) public view returns (uint256[] memory) {
-            uint256 count = 0;
-            for (uint256 i = 0; i < tokenCount; i++) {
-                if (nfts[i].owner == user) {
-                    count++;
-                }
-            }
-            uint256[] memory userOwnedTokens = new uint256[](count);
-            uint256 index = 0;
-            for (uint256 i = 0; i < tokenCount; i++) {
-                if (nfts[i].owner == user) {
-                    userOwnedTokens[index] = nfts[i].id; 
-                    index++;
-                }
-            }
-            return userOwnedTokens;
-        }
-
         function getAllUniqueOwners() public view returns (address[] memory) {
             address[] memory uniqueOwners = new address[](tokenCount);
             uint256 count = 0;
@@ -9644,6 +10563,7 @@ async function checkNetwork(network_name) {
     }
 }
 function addNFTBuyButton(parentDiv, description, buttonClassName, value, address, contract, tokenImage, coin){
+    console.log('trying to make purchase with this account', address);
     var buyButton = document.createElement("div");
     buyButton.className =  'buy-button' + buttonClassName;
     buyButton.style.position = "fixed";
@@ -9659,20 +10579,25 @@ function addNFTBuyButton(parentDiv, description, buttonClassName, value, address
     buyButton.style.borderTopLeftRadius = '0.4vh';
     buyButton.style.borderTopRightRadius = '0.4vh';
     buyButton.style.fontSize = '1.8vh';
+    buyButton.style.alignItems = 'center';
+    buyButton.style.textAlign = 'center';
 
-    if(description == 'for sell'){
-        var buttonText = document.createTextNode("Purchase");
+    //description = "flagged"; // test other descriptions here
+    if(description == 'for sale'){
+       buyButton.textContent = 'Purchase';
+       buyButton.style.cursor = 'pointer';
     }else if(description == 'flagged'){
-        var buttonText = document.createTextNode("flagged");
+        buyButton.textContent = 'flagged';
+        buyButton.style.color = 'red';
     }else if(description == 'please connect wallet'){
-        var buttonText = document.createTextNode("Connect your wallet");
+        buyButton.textContent = 'Connect Wallet';
     }else{
-        var buttonText = document.createTextNode("Unavailable");
+        buyButton.textContent ="Unavailable";
     }
-    buyButton.appendChild(buttonText);
     parentDiv.appendChild(buyButton);
 
-    if (buttonText.textContent == "Purchase") {
+    if (buyButton.textContent === "Purchase") {
+        console.log('trying to purchase token :', parentDiv.id);
         buyButton.addEventListener("click", async function() {
             if (isConnected) {
                 const web3 = new Web3(window.ethereum);
@@ -9682,25 +10607,37 @@ function addNFTBuyButton(parentDiv, description, buttonClassName, value, address
                     return; 
                 }
                 try {
-                    const tokenData = await contract.methods.getTokenData(parseInt(parentDiv.id)).call();// should fail until contract is setup
-                    const purchaseAmount = tokenData.price;
-                    const gasEstimate = await contract.methods.purchaseSingleNFT(parseInt(parentDiv.id), purchaseAmount).estimateGas({ from: address });
-                    const tx = await contract.methods.purchaseSingleNFT(parseInt(parentDiv.id), purchaseAmount).send({
-                        from: address,
-                        gas: gasEstimate
+                    const hoveredtokenData = await contract.methods.nfts(parseInt(parentDiv.id)).call();
+                    const tokenPrice = hoveredtokenData.price;
+                    console.log('token price from contract in WEI', tokenPrice);
+                    console.log('trying to purchase using address', address);
+                    let buffer = Math.floor((0.00285)*(10*18));
+                    const gasEstimate = await contract.methods.purchaseSingleNFT(parseInt(parentDiv.id)).estimateGas({ 
+                        from: address, 
+                        value: tokenPrice.toString()
                     });
-                    if (tx && tx.transactionHash) {
-                        console.log('Transaction sent. Waiting for confirmation...');
-                        const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-                        if (receipt && receipt.status === true) {
-                            alert('Your Transaction was a success.');
-                            tokenPurchaseForm(parentDid.id, purchaseAmount, gasEstimate, tx.transactionHash, reciept, tokenImage, coin);
-                        } else {
-                            alert('The transaction failed.');
+                    const gasPriceTotal= BigInt(gasEstimate) + BigInt(buffer);
+                    const tx = await contract.methods.purchaseSingleNFT(parseInt(parentDiv.id)).send({
+                        from: address,
+                        gas: Number(gasPriceTotal),
+                        value: tokenPrice.toString()
+                    })
+                    .on('transactionHash', function(hash) {
+                            console.log("User accepted the transaction. Transaction hash:", hash);
+                            tokenPurchaseForm(parentDiv.id, tokenPrice, gasEstimate, hash, tokenImage, coin);
+                    })
+                    .on('receipt', function(purchaseRceipt) {
+                        if(purchaseRceipt && purchaseRceipt.status === true){
+                            console.log('we received the receipt for the client', purchaseRceipt);
+                        }else{
+                            console.log('Error getting the receipt may have took more than 50 blocks');
                         }
-                    } else {
-                        alert('The transaction could not be sent.');
-                    }
+                    })
+                    .on('error', function(error, receipt) {
+                        console.log("Transaction rejected or failed:", error);
+                        console.log("Transaction failed receipt:", receipt);
+                    });
+
                 } catch (error) {
                     console.error('Transaction rejected or failed:', error);
                 }
@@ -9708,17 +10645,23 @@ function addNFTBuyButton(parentDiv, description, buttonClassName, value, address
                 alert('You must connect your wallet to make a purchase');
             }
         });
+    }else if(buyButton.textContent === "Connect Wallet"){
+        buyButton.addEventListener("click", async function() {
+            makeConnection(); 
+            addMetaMaskListener();
+        });
     }
     parentDiv.appendChild(buyButton);
 }
-function tokenPurchaseForm(tokenID, purchaseAmount, gasEstimate, transactionHash, receipt, tokenImage,coin) {
+
+function tokenPurchaseForm(tokenID, purchaseAmount, gasEstimate, transactionHash, tokenImage, coin) {
     const formContainer = document.createElement('div');
     formContainer.style.position = 'absolute';
     formContainer.style.top = '50%';
     formContainer.style.left = '50%';
     formContainer.style.transform = 'translate(-50%, -50%)';
-    formContainer.style.width = '30%';
-    formContainer.style.height = '55%';
+    formContainer.style.width = '25%'; 
+    formContainer.style.height = 'auto';
     formContainer.style.padding = '20px';
     formContainer.style.backgroundColor = '#404a5c';
     formContainer.style.borderRadius = '10px';
@@ -9730,6 +10673,7 @@ function tokenPurchaseForm(tokenID, purchaseAmount, gasEstimate, transactionHash
     formContainer.style.overflowY = 'scroll';
     formContainer.style.border = '2px solid black';
     formContainer.style.borderRadius = '5px';
+    handleMediaQuery(formContainer);
     const closeButton = document.createElement('span');
     closeButton.textContent = 'X';
     closeButton.style.position = 'absolute';
@@ -9744,39 +10688,60 @@ function tokenPurchaseForm(tokenID, purchaseAmount, gasEstimate, transactionHash
     formContainer.appendChild(closeButton);
     const tokenIDContainer = document.createElement('span');
     tokenIDContainer.textContent = `Token ID: ${tokenID}`;
-    tokenIDContainer.style.color = 'black';
+    tokenIDContainer.style.color = 'white';
     tokenIDContainer.style.display = 'block';
     tokenIDContainer.style.marginBottom = '10px';
     formContainer.appendChild(tokenIDContainer);
     const imageContainer = document.createElement('div');
     const img = document.createElement('img');
-    imageContainer.style.position = 'relative';
-    imageContainer.style.width = '58%';
-    imageContainer.style.left = '20%';
-    imageContainer.style.height = '45%';
-    imageContainer.style.border = '1px solid black';
-    img.src = tokenImage;
-    img.style.position = 'relative';
-    img.style.height = '100%';
-    img.style.width = '100%';
+    img.src = tokenImage; 
+    img.style.width = '70%';
+    img.style.height = '70%'; 
+    img.style.maxHeight = '250px';
+    img.style.marginBottom = '15px';
+    img.style.border = '1px solid black';
     imageContainer.appendChild(img);
     formContainer.appendChild(imageContainer);
+
     const infoContainer = document.createElement('div');
     infoContainer.style.marginTop = '15px';
-    const purchaseAmountText = document.createElement('p');
-    purchaseAmount = purchaseAmount/(10**18);// reset before displaying
-    purchaseAmountText.textContent = `Purchase Amount: ${purchaseAmount.toFixed(3).toString()} ${coin}`;
-    infoContainer.appendChild(purchaseAmountText);
-    const gasEstimateText = document.createElement('p');
-    const gasEstimateInETH = BigInt(gasEstimate)/BigInt(10**18);
-    gasEstimateText.textContent = `Gas Estimate: ${gasEstimateInETH} ${coin}`;
-    infoContainer.appendChild(gasEstimateText);
-    const transactionHashText = document.createElement('p');
-    transactionHashText.textContent = `Transaction Hash: ${transactionHash}`;
-    infoContainer.appendChild(transactionHashText);
-    const receiptStatus = document.createElement('p');
-    receiptStatus.textContent = `Transaction Status: ${receipt.status ? 'Success' : 'Failed'}`;
-    infoContainer.appendChild(receiptStatus);
+
+    const createInfoElement = (text) => {
+        const p = document.createElement('p');
+        p.textContent = text;
+        p.style.margin = '10px 0'; 
+        p.style.borderBottom = '1px dashed white'; 
+        p.style.paddingBottom = '5px'; 
+        infoContainer.appendChild(p);
+    };
+
+    purchaseAmount = purchaseAmount / (10 ** 18); 
+    createInfoElement(`Purchase Amount: ${purchaseAmount.toFixed(2).toString()} ${coin}`);
+
+    const gasEstimateInETH = BigInt(gasEstimate) / BigInt(10 ** 18);
+    createInfoElement(`Gas Estimate: ${gasEstimateInETH} ${coin}`);
+    const transactionHashContainer = document.createElement('p');
+    const link = document.createElement('a');
+    if (coin === "POL") {
+        link.href = `https://polyscan.io/tx/${transactionHash}`; 
+    } else if (coin === "ETH") {
+        link.href = `https://etherscan.io/tx/${transactionHash}`; 
+    } else if (coin === "ETC") {
+        link.href = `https://blockscout.com/etc/mainnet/tx/${transactionHash}`; 
+    } else {
+        link.href = `#`;
+    }
+
+    link.textContent = `Transaction Hash: ${transactionHash.slice(0, 17)}~~~~`; 
+    link.style.color = '#007bff'; 
+    link.style.textDecoration = 'underline'; 
+    link.target = '_blank'; 
+
+    transactionHashContainer.appendChild(link);
+    transactionHashContainer.style.margin = '10px 0';
+    transactionHashContainer.style.borderBottom = '1px dashed white';
+    transactionHashContainer.style.paddingBottom = '5px';
+    infoContainer.appendChild(transactionHashContainer);
     formContainer.appendChild(infoContainer);
     document.body.appendChild(formContainer);
     makeElementDraggable(formContainer);
@@ -10758,4 +11723,82 @@ async function  organizePaintingArrayByMostExpensive(array) {
 async function organizePaintingArrayByMostViewed(array) {
     array.sort((a, b) => b.views - a.views);
     return array;
+}
+function setImageDataWidthAndHeight(columns, gridItem){
+    if(columns == 4){
+        if(window.innerWidth >= 1500){
+            gridItem.style.height = '205px'; 
+            gridItem.style.width = '205px';    
+            rowHeight = '210px'; 
+        }else if(window.innerWidth >= 1400){
+            gridItem.style.height = '195px'; 
+            gridItem.style.width = '195px';    
+            rowHeight = '200px'; 
+        }else if(window.innerWidth >= 1300){
+            gridItem.style.height = '185px'; 
+            gridItem.style.width = '185px';    
+            rowHeight = '190px'; 
+        }else if (window.innerWidth >= 1200) {
+            gridItem.style.height = '175px'; 
+            gridItem.style.width = '175px';    
+            rowHeight = '180px'; 
+        }else if (window.innerWidth >= 1100) {
+            gridItem.style.height = '165px'; 
+            gridItem.style.width = '165px';    
+            rowHeight = '170px'; 
+        }else if (window.innerWidth >= 999) {
+            gridItem.style.height = '155px'; 
+            gridItem.style.width = '155px';    
+            rowHeight = '160px'; 
+        }else{
+
+        }     
+    }else if(columns == 3){
+        if(window.innerWidth >= 950){
+            gridItem.style.height = '140px'; 
+            gridItem.style.width = '140px';    
+            rowHeight = '150px'; 
+        }else if(window.innerWidth >= 900){
+            gridItem.style.height = '130px'; 
+            gridItem.style.width = '135px';    
+            rowHeight = '135px';  
+        }else if(window.innerWidth >= 850){
+            gridItem.style.height = '125px'; 
+            gridItem.style.width = '125px';    
+            rowHeight = '132px';  
+        }else if(window.innerWidth >= 700){
+            gridItem.style.height = '115px'; 
+            gridItem.style.width = '115px';    
+            rowHeight = '130px';    
+        }else if(window.innerWidth >= 650){
+            gridItem.style.height = '110px';
+            gridItem.style.width = '110px';    
+            rowHeight = '125px';  
+        }else if(window.innerWidth >= 550){
+            gridItem.style.height = '100px'; 
+            gridItem.style.width = '100px';    
+            rowHeight = '120px'; 
+        }else if(window.innerWidth >= 500){
+            gridItem.style.height = '95px'; 
+            gridItem.style.width = '95px';    
+            rowHeight = '115px'; 
+        }else{
+        }     
+    }else if(columns == 2){
+        if(window.innerWidth >= 450){
+            gridItem.style.height = '160px'; 
+            gridItem.style.width = '160px';    
+            rowHeight = '165px'; 
+        }else if(window.innerWidth >= 400){
+            gridItem.style.height = '140px';
+            gridItem.style.width = '140px';    
+            rowHeight = '145px'; 
+        }else if(window.innerWidth < 400 && window.innerWidth >= 350){
+            gridItem.style.height = '130px'; 
+            gridItem.style.width = '130px';    
+            rowHeight = '135px'; 
+        }  
+    }else{
+    }
+    return rowHeight;
 }
