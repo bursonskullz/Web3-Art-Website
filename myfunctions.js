@@ -220,7 +220,6 @@ export async function addDigitalElementListener(digitalElement){
                 contractsForm.appendChild(loadingContainer);
 
                 gatherContracts().then(async (result) => {
-                    console.log('collections data recived from database:', result);
                     currentNFTcollections = result;
                     loadingContainer.remove();
                     const titleSpanTag = document.querySelector(".slectorFormTitleSpanTag");
@@ -233,7 +232,6 @@ export async function addDigitalElementListener(digitalElement){
                     titleSpanTag.style.backgroundColor = 'none'; 
                     titleSpanTag.style.borderRadius = '5px'; 
                     result.forEach((item) => {
-                        console.log('trying to add collection to container');
                         const contractDiv = document.createElement('div');
                         contractDiv.style.display = 'flex';
                         contractDiv.style.alignItems = 'center';
@@ -282,8 +280,6 @@ export async function addDigitalElementListener(digitalElement){
                                 console.log(`Contract selected: ${item.contractName}`);
                                 console.log('setting contract data locally for client side access');
                                 tryingToAccessData = true;
-
-
                                 userSelectedContract = {
                                     contractName: item.contractName, 
                                     ERCStandard: item.ERCStandard,
@@ -291,8 +287,6 @@ export async function addDigitalElementListener(digitalElement){
                                     contractABI: item.contractABI, 
                                     collectionBackgroundImage: item.collectionBackgroundImage
                                 };
-
-                                console.log('setting the contract ERC standard locally', userSelectedContract);
                                 const loadingContainer = document.createElement("div");
                                 loadingContainer.className = "loading-container";
                                 loadingContainer.style.position = "absolute";
@@ -304,7 +298,6 @@ export async function addDigitalElementListener(digitalElement){
                                 loadingContainer.style.display = "flex";
                                 loadingContainer.style.justifyContent = "center";
                                 loadingContainer.style.alignItems = "center";
-
                                 loadingContainer.style.backgroundColor = "none"; 
 
                                 const loadingIcon = document.createElement("img");
@@ -326,9 +319,7 @@ export async function addDigitalElementListener(digitalElement){
                                         console.log('trying to gather data from contract to display on nft page');
                                         let asyncPageObjectData =  await gatherAsyncNFTPageData();
                                         if(asyncPageObjectData){
-                                            console.log('we got the data back', asyncPageObjectData);
                                             contractsForm.remove();
-                                            console.log('trying to make dummy page with array', currentNFTArray);
                                             sideElementsWidthPercent = '15%'; 
                                             GridWidth = '65%';
                                             gridItemWidth = '100%';
@@ -785,7 +776,6 @@ export async function addPaintingElementListener(paintingElement) {
                         }
                         gridNavigator.style.display = 'none';
                         let msgHisotry = await getMessageHistory();
-
                         for(const element of msgHisotry){
                             addMessage(element.msg, element.username, element.time, 'dimgray');
                         }
@@ -2386,16 +2376,23 @@ async function makeOwnersPage(contract,sideElementsWidth) {
     loadingContainer.appendChild(loadingIcon);
     ownersContainer.appendChild(loadingContainer);
     try{
-        allOwnersAddressArray = await contract.methods.getAllUniqueOwners().call();
+        const currentTokenCount = await contract.methods.tokenCount().call();
+        const currentTokenCountParsed = parseInt(currentTokenCount);
+        let counterArray = [];
+        for(var i = 0; i< currentTokenCountParsed; i++){
+            const nftData = await contract.methods.nfts(i).call();
+            const thisOwner = nftData.owner;
+            if(counterArray.includes(thisOwner)){
+
+            }else{
+                counterArray.push(thisOwner);
+            }
+        }
+        allOwnersAddressArray = counterArray;
     }catch(error){
         console.log('Error calling the function getAllOwners() on the contract', error);
         allOwnersAddressArray = [];
     }
-
-    // test without contract by uncommmenting next two line (if it unaviable)
-    //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
-    //allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);allOwnersAddressArray.push(RoysWallet);
-
     loadingContainer.remove();
     if (allOwnersAddressArray.length > 0) {
         let count = 0; 
@@ -2404,8 +2401,6 @@ async function makeOwnersPage(contract,sideElementsWidth) {
         }
         allOwnersAddressArray.forEach(async (owner) => {
             count += 1;
-            console.log('Trying to display token data inside pop up allOwnersAddressArray');
-
             const uniqueOwnerContainer = document.createElement('div');
             uniqueOwnerContainer.classList.add('ownerItem', `-${count}`); 
             uniqueOwnerContainer.style.height = 'auto';
@@ -2424,17 +2419,13 @@ async function makeOwnersPage(contract,sideElementsWidth) {
             ownerAddressDiv.style.whiteSpace = 'normal'; 
             ownerAddressDiv.style.maxWidth = 'calc(100% - 50px)';
             ownerAddressDiv.textContent = `Owner: ${owner}`; 
-
-    
             let numberOfItemsOwned;
             try{
                 numberOfItemsOwned = await contract.methods.getNumberOfOwnedTokens(owner).call();
             }catch(error){
                 console.log("Error calling contract function getNumberOfOwnedTokens()", error);
-                console.log("setting owned tokens to zero");
                 numberOfItemsOwned = 0;
             }
-            
             const itemCountDiv = document.createElement('div');
             itemCountDiv.style.fontSize = '12px';
             itemCountDiv.style.color = '#888'; 
@@ -2454,7 +2445,6 @@ async function makeOwnersPage(contract,sideElementsWidth) {
         noOwnersMessage.style.color = 'white'; 
         ownersContainer.appendChild(noOwnersMessage);
     }
-
 }
 
 function removeSmallHeaderTools(){
@@ -3112,19 +3102,16 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     } = asyncPageObjectData[0];
 
     let contract = asyncPageObjectData[1];
-
     const collectionBackgroundImageContainer = document.createElement('div');
     collectionBackgroundImageContainer.style.position = 'relative';
     collectionBackgroundImageContainer.style.width = '60%';
     collectionBackgroundImageContainer.style.top = '-5%';
     collectionBackgroundImageContainer.style.left = '20%';
     collectionBackgroundImageContainer.style.height = '15%';
-
     collectionBackgroundImageContainer.style.backgroundImage = `url('${userSelectedContract.collectionBackgroundImage}')`; 
     collectionBackgroundImageContainer.style.backgroundSize = 'cover';
     collectionBackgroundImageContainer.style.backgroundRepeat = 'no-repeat';
     collectionBackgroundImageContainer.style.backgroundPosition = 'center'; 
-
     parentElement.appendChild(collectionBackgroundImageContainer);
 
     const contractInfoDiv = document.createElement('div');
@@ -3209,7 +3196,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
     options.style.justifyContent = 'center'; 
     options.style.textAlign = 'center'; 
     parentElement.appendChild(options);
-
     document.querySelectorAll('.option-item').forEach((item) => {
         item.addEventListener('click', async function () {
             if (item.textContent === "Recent Sells") {
@@ -3224,12 +3210,10 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                 makeUtilityPage(sideElementsWidth);
             }
         });
-
         item.addEventListener('mouseenter', function () {
             this.style.backgroundColor = '#5a647d'; 
             this.style.color = '#f0f0f0'; 
         });
-
         item.addEventListener('mouseleave', function () {
             this.style.backgroundColor = ''; 
             this.style.color = ''; 
@@ -3337,12 +3321,9 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
 
     unknownDiv.appendChild(emojiButton);
     unknownDiv.appendChild(changeUserName);
-
     emojiButton.addEventListener('click', (event) => {
         const emojiMenuIsOpen = document.querySelector('.emoji-menu');
-
         if(emojiMenuIsOpen){
-            console.log('emoji menu is already open');
         }else{
             const emojiMenu = document.createElement('div');
             emojiMenu.classList.add('emoji-menu');
@@ -3555,7 +3536,6 @@ export async function makeNFTPage(array, purchaseArray, sideElementsWidth, paren
                 messageInput.value = ''; 
             }
         }
-
         const emojiMenu = document.querySelector('.emoji-menu');
 
         if(emojiMenu){
@@ -4164,10 +4144,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
 
             const dateNode =  document.createElement("div");
             dateNode.textContent = `Date Purchased: ${purchase.datePurchased}`;
-
             const firstNameDiv = document.createElement("div");
             firstNameDiv.textContent = `Buyer: ${purchase.firstName}`;
-
             const priceDiv = document.createElement("div");
             priceDiv.textContent = `Price: ${purchase.price.$numberDecimal} ETH`;
 
@@ -4177,7 +4155,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             dateNode.style.display = 'flex'; 
             dateNode.style.alignItems = 'center'; 
             dateNode.className = 'dateNode';
-
             firstNameDiv.style.width = '80%';
             firstNameDiv.style.height = '33%';
             firstNameDiv.style.fontSize = '1.6vh';
@@ -4190,11 +4167,10 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             priceDiv.style.display = 'flex'; 
             priceDiv.style.alignItems = 'center';
             priceDiv.className = 'purchasesPriceDiv';
-        
+
             infoContainer.appendChild(dateNode);
             infoContainer.appendChild(priceDiv);
             infoContainer.appendChild(firstNameDiv);
-
             purchaseDiv.appendChild(image);
             purchaseDiv.appendChild(infoContainer);
             recentSells.appendChild(purchaseDiv);
@@ -4261,7 +4237,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         while (body.firstChild) {
             body.removeChild(body.firstChild);
         }
-
         const newBodyContent = `
             <div class="Header">
                 <div class="buttonContainer"></div>
@@ -4275,9 +4250,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 </div>
             </div>
         `;
-
         body.innerHTML = newBodyContent;
-
         checkifConnected().then(() => {
             if(!isConnected){ 
                 const thisConnectBUtton =  document.querySelector(".connect-button");
@@ -4293,7 +4266,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 }
             }else{
                 const thisLoggedInBUtton = document.querySelector('.loggedIn-button');
-
                 if(thisLoggedInBUtton){
                     thisLoggedInBUtton.addEventListener("click", async function(){
                         console.log('clicking current connect button');
@@ -4301,13 +4273,11 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
                 }else{
                     console.log('cannot find the loggedIn-button');
                 }
-
             }
         }).catch(error =>{
             console.log('cannot call the checkifConnected() function properly');
             console.log(error);
         });  
-
         const paintingElement = document.querySelector('.Physical_art');
         const updatesElements = document.querySelector('.Upcoming_events'); 
         const digitalElement = document.querySelector('.Digitial_art'); 
@@ -4320,19 +4290,13 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else{
             console.log('cannot find new painting array');
         }
-
-
         if(digitalElement){
-            digitalElement.addEventListener('click', function() {
-                if(!NFTDivOverlay){
-                    NFTDivOverlay = true;
-                    gatherContracts(digitalElement);                   
-                }
-            }); 
+            addDigitalElementListener(digitalElement).then(()=>{
+                console.log('we added the listener again');
+            });                   
         }else{
             console.log('cannot find digitalElement div');
         }
-
         if(mathElement){
             mathElement.addEventListener('click', function() {
                 if(!mathOverlay){
@@ -4343,9 +4307,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else{
             console.log('cannot find math element div');
         }
-
-
-
         if(updatesElements){
             updatesElements.addEventListener('click', function() {
                 if(!updatesOverlay){
@@ -4385,6 +4346,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             containerInput.classList.add('container-input');
             containerInput.style.position = 'absolute';
             containerInput.style.top = '10%';
+            containerInput.style.left = '30%';
             containerInput.style.width = '450px';
             containerInput.style.height = '600px';
             containerInput.style.overflow = 'auto'; 
@@ -4397,8 +4359,8 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             containerInput.className = 'commissionUserInputForm';
             makeElementDraggable(containerInput);
             document.body.appendChild(containerInput);
-            const mediaQuery = window.matchMedia('(max-width: 768px)');
-            handleMediaQuery(mediaQuery);
+            const mediaQuery = window.matchMedia('(max-width: 800px)');
+            handleMediaQuery(containerInput);
             mediaQuery.addEventListener('change', (event) => {
                 handleMediaQuery(event.target);
             });
@@ -4444,20 +4406,16 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
             let para = document.createElement('p');
             para.textContent = formDescription;
             para.style.marginBottom = '10px';
-
             container.appendChild(title);
-
             let imageContainer = document.createElement('div');
             imageContainer.style.display = 'flex';
             imageContainer.style.justifyContent = 'center'; 
-
             let image = document.createElement('img');
             image.setAttribute('src', '/images/BursonSkull.png'); 
             image.setAttribute('alt', 'BursonSkullCommissionTemp'); 
             image.style.width = '100px'; 
             image.style.height = '100px'; 
             image.style.marginBottom = '20px'; 
-
             imageContainer.appendChild(image);
             container.appendChild(imageContainer);
             container.appendChild(para);
@@ -4917,16 +4875,13 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     gridBack.style.backgroundSize = 'contain';
     gridBack.style.backgroundRepeat = 'no-repeat';
     gridBack.style.backgroundPosition = 'center'; 
-
     header.style.backgroundColor = '#9b9999';
     header.style.boxShadow =  '0px 2px 4px rgba(0, 0, 0, 0.7)'; 
-
     headerLogo.style.position = 'absolute'; 
     headerLogo.style.height = '8.5vh'
     headerLogo.style.width = '10%'; 
     headerLogo.style.left = '0%'; 
     headerLogo.style.top = '0%';
-
     headerLogo.style.backgroundColor = 'none'; 
     headerLogo.style.backgroundImage = 'url(/images/BursonSkull.png)';
     headerLogo.style.backgroundSize = 'contain';
@@ -4940,7 +4895,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     header.appendChild(gridFowardContainer);
     gridBackContainer.appendChild(gridBack);
     header.appendChild(gridBackContainer);
-
     makePaintGrid(array, parentElement, numColumns, gridWidthPercent);
 
     footer.style.position = 'relative';
@@ -4953,7 +4907,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     footer.style.marginTop = '3vh';
     footer.style.boxShadow = '0px -2px 4px rgba(0, 0, 0, 0.7)';
     footer.className = 'footer';
-
     footerLEGAL.style.position = 'relative';
     footerLEGAL.style.height = '10vh';
     footerLEGAL.style.width = '100%';
@@ -4962,14 +4915,12 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     footerLEGAL.style.backgroundColor = '#9b9999';
     footerLEGAL.style.zIndex = '10';
     footerLEGAL.style.marginTop = '0vh';
-
     footerLine.style.backgroundColor = 'dimgray';
     footerLine.style.width = '70%';
     footerLine.style.left = '15%';
     footerLine.style.height = '0.4vh';
     footerLine.style.border = 'none';
     footerLine.style.marginTop = '0vh';
-
     footContainer.style.position = 'absolute'; 
     footContainer.style.height = '50%'
     footContainer.style.width = '70%'; 
@@ -4977,13 +4928,11 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     footContainer.style.bottom = '10%';
     footContainer.style.borderTop = "0.4vh solid dimgray"; 
     footContainer.style.backgroundColor = 'none'; 
-
     logoContainer.style.position = 'absolute'; 
     logoContainer.style.height = '30%'
     logoContainer.style.width = '70%'; 
     logoContainer.style.left = '15%'; 
     logoContainer.style.top = '10%';
-
     footerLargeTextContainer.style.position = 'absolute'; 
     footerLargeTextContainer.style.height = '100%'
     footerLargeTextContainer.style.width = '75%'; 
@@ -4993,7 +4942,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     footerLargeTextContainer.style.backgroundSize = 'cover';
     footerLargeTextContainer.style.backgroundRepeat = 'no-repeat';
     footerLargeTextContainer.style.backgroundPosition = 'center';
-
     logo.style.position = 'relative'; 
     logo.style.height = '100%'
     logo.style.width = '15%'; 
@@ -5020,9 +4968,7 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
         }else if(i == 3){
             heading.textContent = "Resources";
         }
-
         column.appendChild(heading);
-
         if(i==1){
             const communityListItems = Array.from(commnityList.children);
             communityListItems.forEach(function(item) {
@@ -5062,7 +5008,6 @@ export function makePaintingPage(array, purchaseArray, parentElement, numColumns
     parentElement.appendChild(footer);
     parentElement.appendChild(footerLEGAL);
 }
-
 function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement, numColumns){
     document.querySelectorAll('.option-item-2').forEach((item) => {
         item.addEventListener('click', async function () {
@@ -5328,10 +5273,7 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                     promptMessage.style.fontSize = '2vh';  
                     promptMessage.style.position = 'relative';
                     promptMessage.style.width = '80%';
-                    //promptMessage.style.left = '10%';
                     promptMessage.style.textAlign = 'center';  
-                    //promptMessage.style.margin = '10px 0'; 
-
                     searchContainer.appendChild(searchBar);
                     searchContainer.appendChild(promptMessage); 
                     searchContainer.appendChild(searchButton);
@@ -5643,7 +5585,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                                 console.error(`Error fetching token Data ${tokenData}`);
                                             }
                                         }
-
                                     }
                                     for(const item of itemsNotListed){
                                         sortedClientSideIDs.push(item);
@@ -5696,7 +5637,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                                         highestTokenID = parseInt(tokenDataCounter.id);
                                                         counterJ = j;
                                                     }
-
                                                 } catch (error) {
                                                     console.error(`Error fetching token data for ID ${gridIDINT2}:`, error);
                                                 }
@@ -5799,9 +5739,7 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                             if(gridOverlay !== undefined){
                                 gridOverlay.remove();    
                             }
-                            
                         });
-
                         miniSortContainer.appendChild(div);
                     });
                 }else if(item.textContent == 'File a Report'){
@@ -5818,7 +5756,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                     reportContainer.style.flexDirection = 'column';
                     reportContainer.style.alignItems = 'center';
                     reportContainer.style.justifyContent = 'space-evenly';
-                    //reportContainer.style.maxHeight = '80vh';
                     reportContainer.style.height = '27%'; 
                     reportContainer.style.overflowY = 'scroll';
                     const closeIcon = document.createElement('span');
@@ -5839,7 +5776,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                     tokenIdLabel.style.color = 'white';
                     tokenIdLabel.style.fontSize = '12px';
                     reportContainer.appendChild(tokenIdLabel);
-
                     const tokenIdInput = document.createElement('input');
                     tokenIdInput.type = 'number';
                     tokenIdInput.placeholder = 'Enter Token ID';
@@ -5851,14 +5787,12 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                     tokenIdInput.min = '1'; 
                     tokenIdInput.step = '1';
                     reportContainer.appendChild(tokenIdInput);
-
                     const emailLabel = document.createElement('label');
                     emailLabel.textContent = 'Email';
                     emailLabel.style.color = 'white';
                     emailLabel.style.left = "5%";
                     emailLabel.style.fontSize = '12px'; 
                     reportContainer.appendChild(emailLabel);
-
                     const emailInput = document.createElement('input');
                     emailInput.type = 'email';
                     emailInput.placeholder = 'Enter your email';
@@ -5867,14 +5801,12 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                     emailInput.style.height = '12%';
                     emailInput.style.fontSize = '12px'; 
                     reportContainer.appendChild(emailInput);
-
                     const messageLabel = document.createElement('label');
                     messageLabel.textContent = 'Message';
                     messageLabel.style.color = 'white';
                     messageLabel.style.fontSize = '12px'; 
                     messageLabel.style.marginBottom = '5px';
                     reportContainer.appendChild(messageLabel);
-
                     const messageInput = document.createElement('textarea');
                     messageInput.placeholder = 'Enter your message';
                     messageInput.maxLength = 500; 
@@ -5887,7 +5819,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                     messageInput.style.height = 'auto';
                     messageInput.style.position = 'relative';
                     reportContainer.appendChild(messageInput);
-
                     const fileButton = document.createElement('button');
                     fileButton.textContent = 'Submit';
                     fileButton.style.width = '40%';
@@ -5898,13 +5829,10 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                     fileButton.style.borderRadius = '5px';
                     fileButton.style.cursor = 'pointer';
                     fileButton.style.fontSize = '12px';
-
                     fileButton.addEventListener('click', async () => { 
                         const tokenID = tokenIdInput.value;
                         const email = emailInput.value;
                         const message = messageInput.value;
-
-                        console.log(`Token ID: ${tokenID}, Email: ${email}, Message: ${message}`);
                         const fields = [tokenID, email, message];
                         const fieldNames = ['Token ID', 'Email', 'Message'];
                         for (let i = 0; i < fields.length; i++) {
@@ -5913,7 +5841,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                 return; 
                             }
                         }
-
                         let walletSender;
                         if(isConnected === false){
                             alert('Please make sure to login to your main wallet before filing a report');
@@ -5928,7 +5855,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                     email: email, 
                                     message: message
                                 };
-
                                 try {
                                     const reportResponse = await fetch('/file-a-report', {
                                         method: "POST", 
@@ -5937,7 +5863,6 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
                                         },
                                         body: JSON.stringify(reportData)
                                     });
-
                                     if (reportResponse.ok) {
                                         const responseJson = await reportResponse.json();
                                         if (responseJson.success === false) {
@@ -6007,6 +5932,10 @@ function addToolsFunctionality(sideElementsWidth, contract, coin, parentElement,
         });
     });
 }
+
+
+
+
 function isValidPhoneNumber(phoneNumber) {
     let phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
     return phoneRegex.test(phoneNumber);
@@ -6019,10 +5948,11 @@ export async function getNFTS(contractName) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ contractName: contractName })
+            body: JSON.stringify({ contractName: contractName }) 
         });
-
+        
         if (response.ok) {
+            console.log('we received the response');
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let jsonString = '';
@@ -6032,23 +5962,15 @@ export async function getNFTS(contractName) {
                 const { value, done: readerDone } = await reader.read();
                 done = readerDone;
                 jsonString += decoder.decode(value, { stream: true });
-                if (jsonString.trim().endsWith(']')) {
-                    try {
-                        const tokens = JSON.parse(jsonString);
-                        tokens.forEach(token => {
-                            const tokenObject = {
-                                contractName: token.contractName,
-                                contractAddress: token.contractAddress,
-                                tokenID: token.tokenID,
-                                image: token.image
-                            };
-                            if (!tokensArray.some(t => t.tokenID === tokenObject.tokenID)) {
-                                tokensArray.push(tokenObject);
-                            }
-                        });
-                    } catch (parseError) {
-                        console.error('Error parsing JSON:', parseError);
-                    }
+            }
+            if (jsonString.trim().endsWith(']')) {
+                try {
+                    const tokens = JSON.parse(jsonString); 
+                    tokens.forEach(token => {
+                        tokensArray.push(token);
+                    });
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
                 }
             }
         } else {
@@ -6057,6 +5979,7 @@ export async function getNFTS(contractName) {
     } catch (error) {
         console.error('Error fetching NFTs:', error);
     }
+    
     return tokensArray;
 }
 function handleMediaQuery(containerInput){
@@ -6180,9 +6103,8 @@ async function createPurchaseArraySuccessForm(availabeTokensArray, coin, contrac
             smallTokenContainer.style.height = '30%';
             smallTokenContainer.style.width = '100%';
             smallTokenContainer.style.left = '0%';
-        
-
             let imageURL;
+
             for (const token of currentNFTArray) {
                 if (token.tokenID === thisTokenID) {
                     imageURL = token.image;
@@ -6313,7 +6235,6 @@ export function addMessage(message, username, timestamp, color) {
 
     const localChatBox = document.querySelector('.chatBox');
     localChatBox.appendChild(p);
-
     p.style.maxWidth = '80%';
     p.style.wordWrap = 'break-word'; 
     p.style.backgroundColor = color;
@@ -6321,21 +6242,17 @@ export function addMessage(message, username, timestamp, color) {
     p.style.marginBottom = '10px';
     p.style.marginTop = '0px';
     p.style.overflowY = 'auto';
-
     p.style.borderBottomStyle = 'solid';
     p.style.borderBottomWidth = '0.2vh'; 
     p.style.borderBottomColor = 'lightgray'; 
-
     p.style.padding = '4vh'; 
     p.style.color = 'white';
-
     p.style.scrollbarWidth = 'thin'; 
     p.style.scrollbarColor = 'transparent dimgray'; 
     localChatBox.scrollTop = localChatBox.scrollHeight;
 
     p.classList.add('live-Messages');
     p.setAttribute('id', username + "Message" + msgCount.toString()); 
-
     p.appendChild(usernameDiv);
     p.appendChild(timestampDiv);
         
@@ -6410,9 +6327,7 @@ export async function checkifConnected(){
     if(typeof window.ethereum == 'undefined'){
         isConnected = false; 
         buttonContainer.appendChild(connectButtton);
-
         connectButtton.style.boxShadow = '0px 0px 15px rgba(0, 0, 0, 0.5)'; 
-
         const buttonPTAG = document.createElement('p');
         buttonPTAG.innerHTML = 'Connect';
         buttonPTAG.classList.add('centered-text');
@@ -6454,10 +6369,8 @@ export async function checkifConnected(){
                     buttonContainer.appendChild(greenLight);
                     buttonContainer.appendChild(loggedInButton);
                     const connectButtonPTAG = document.createElement('p');
-
                     connectButtonPTAG.innerHTML = accounts[0].substring(0, 8) + '~~~'; 
                     connectButtonPTAG.classList.add('centered-text'); 
-
                     connectButtonPTAG.style.position = 'relative';
                     connectButtonPTAG.style.width = '70%';
                     connectButtonPTAG.style.height = '100%';
@@ -6615,8 +6528,6 @@ async function createChangeUsernamePopup() {
             }catch(error){
                 console.log('error with response from server try and catch failed', error);
             }
-
-            
         });
 
         const attemptsMessage = document.createElement('p');
@@ -6640,7 +6551,6 @@ function toggleGreenLight() {
         greenLight.style.backgroundColor = isGreen ? 'green' : 'transparent';
         }, 600); 
 }
-
 function removeString(parentElement, searchString) {
     searchString = searchString.toLowerCase();
     function searchAndRemove(element) {
@@ -6657,7 +6567,6 @@ function removeString(parentElement, searchString) {
     }
     searchAndRemove(parentElement);
 }
-
 export function addMetaMaskListener() {
     const metamaskConnectButton = document.querySelector('.Metamask'); 
     metamaskConnectButton.addEventListener('click', async function(){ 
@@ -6682,7 +6591,6 @@ export function addMetaMaskListener() {
 
     });
 }
-
 if(typeof window.ethereum !== 'undefined'){
     window.ethereum.on('accountsChanged', function (accounts) { 
         if (accounts.length === 0) {
@@ -7428,10 +7336,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
             console.log('Error getting token from contract', error);
             UsersNFTsIds = [];
         }
-
-        // comment to stop testing
-        // UsersNFTsIds = [1,2,3,4,5, 6,7,8];
-        console.log('tokens id from contract using loop on client side', UsersNFTsIds);
         if(UsersNFTsIds.length != 0){
             let userNFTARRay = [];
             for (var i = 0; i < UsersNFTsIds.length; i++) {
@@ -7468,7 +7372,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                     }catch(error){
                         // do not push uncomment this is a test 
                         console.log('Error getting data', error);
-                        console.log('display error message in small container');
                     }
                 }else{
                     console.log('contract does not give back information for tokens', UsersNFTsIds);
@@ -7493,8 +7396,6 @@ async function makeTokenPage(addressString, contract, parentContainer, footer, c
                 for(const token of userNFTARRay){
                     count+=1;
                     const soldItem = document.createElement('div');
-                    //soldItem.className = `sold-item-${token.tokenID}`; 
-                    console.log('trying to set className to', token.tokenID);
                     let tokenIDConverted = token.tokenID.toString();
                     soldItem.className = `sold-item sold-item-${tokenIDConverted}`;
                     soldItem.style.height = '100px';
@@ -7668,7 +7569,6 @@ function printInfo(div, strings) {
     printString(0);
     currentlyPrinted = true;
 }
-
 export async function getVeChainPrice(element) {
     let retryCount = 0; 
     const maxRetries = 2; 
@@ -7694,24 +7594,23 @@ export async function getVeChainPrice(element) {
                     setTimeout(fetchVETPrice, retryInterval); 
                 }else{
                     fetch('https://api.coincap.io/v2/assets/vechain')
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Failed to fetch VeChain price from CoinCap');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            const vechainPrice = parseFloat(data.data.priceUsd);
-                            element.textContent = '$' +  '  ' +  vechainPrice.toFixed(2); 
-                            console.log('VeChain price:', vechainPrice);
-                        })
-                        .catch(error => {
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch VeChain price from CoinCap');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const vechainPrice = parseFloat(data.data.priceUsd);
+                        element.textContent = '$' +  '  ' +  vechainPrice.toFixed(2); 
+                        console.log('VeChain price:', vechainPrice);
+                    })
+                    .catch(error => {
                             console.error('Error fetching VeChain price from CoinCap:', error);
-                        });
+                    });
                 }
             });
     }
-
     fetchVETPrice();
     setInterval(fetchVETPrice, retryInterval);
 }
@@ -7766,9 +7665,7 @@ function addSecretMenu() {
 
         itemDiv.addEventListener('click', function() {
             if(item == 'upload painting'){
-                //secretMenu.remove();
                 const isPaintingUploadFormActive = document.querySelector('.dbPopup');
-
                 if(isPaintingUploadFormActive){
 
                 }else{
@@ -7778,12 +7675,9 @@ function addSecretMenu() {
                     titleSpan.style.fontSize = '20px';
                     titleSpan.style.fontWeight = 'bold';
                     titleSpan.style.marginBottom = '15px';
-
                     popupForm.appendChild(titleSpan);
                     popupForm.classList.add('dbPopup');
-
                     makeElementDraggable(popupForm);
-
                     const form = document.createElement('form');
                     form.id = 'uploadForm';
                     const imageInput = document.createElement('input');
@@ -7961,7 +7855,6 @@ function addSecretMenu() {
                 }else{
                     makeMintingForm();
                 }
-                
             }else if(item == "Deploy a Contract"){
                 console.log('making a deployer form');
                 const deployerFormIsActive = document.querySelector('.Deployer-form');
@@ -7987,7 +7880,6 @@ function addSecretMenu() {
     secretMenu.appendChild(itemList);
     document.body.appendChild(secretMenu);
 }
-
 async function createContractManagerForm() {
     const form = document.createElement('div');
     form.style.position = 'absolute';
@@ -7995,23 +7887,34 @@ async function createContractManagerForm() {
     form.style.left = '30%';
     form.style.padding = '20px';
     form.style.width = '300px';
-    form.style.height = '400px';
+    form.style.height = 'auto';
     form.style.backgroundColor = 'dimgray';
     form.style.border = '1px solid #ccc';
     form.style.borderRadius = '10px';
+    form.style.textAlign = 'center';
     form.style.boxShadow = '0px 0px 10px rgba(0,0,0,0.1)';
     form.id = 'contractManagerForm';
     handleMediaQuery(form);
-    const loadingSymbol = document.createElement('div');
-    loadingSymbol.innerHTML = '🔄'; 
-    loadingSymbol.style.fontSize = '30px';
-    loadingSymbol.style.textAlign = 'center';
+    const loadingContainer = document.createElement("div");
+    loadingContainer.className = "loading-container";
+    loadingContainer.style.position = "relative";
+    loadingContainer.style.display = "block";
+    loadingContainer.style.justifyContent = "center";
+    loadingContainer.style.alignItems = "center";
+    loadingContainer.style.backgroundColor = "none"; 
+
+    const loadingIcon = document.createElement("img");
+    loadingIcon.setAttribute("class", "loading-gif");
+    loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
+    loadingIcon.setAttribute("alt", "Loading..."); 
+    loadingIcon.style.width = "50%"; 
+    loadingIcon.style.height = "50%";
 
     const statusMessage = document.createElement('span');
     statusMessage.innerText = 'Gathering data...';
     statusMessage.style.display = 'block';
     statusMessage.style.textAlign = 'center';
-    statusMessage.style.margin = '10px 0';
+    statusMessage.style.marginBottom = '15px';
 
     const exitButton = document.createElement('span');
     exitButton.innerHTML = '&times;';
@@ -8019,18 +7922,18 @@ async function createContractManagerForm() {
     exitButton.style.top = '10px';
     exitButton.style.right = '10px';
     exitButton.style.cursor = 'pointer';
-    exitButton.style.fontSize = '20px';
+    exitButton.style.fontSize = '14px';
     exitButton.onclick = () => form.remove();
+    loadingContainer.appendChild(loadingIcon);
     form.appendChild(exitButton);
-    form.appendChild(loadingSymbol);
     form.appendChild(statusMessage);
+    form.appendChild(loadingContainer);
     makeElementDraggable(form);
     document.body.appendChild(form);
 
     try {
         const result = await gatherContracts();
-        console.log(`We got the contracts as array of objects`, result);
-        loadingSymbol.remove();
+        loadingContainer.remove();
         statusMessage.innerText = 'Select a contract:';
         const contractSelect = document.createElement('select');
         contractSelect.style.display = 'block';
@@ -8047,9 +7950,15 @@ async function createContractManagerForm() {
         const nextButton = document.createElement('button');
         nextButton.innerText = 'Next';
         nextButton.style.display = 'block';
-        nextButton.style.margin = '20px auto';
-        nextButton.style.padding = '10px 20px';
+        nextButton.style.position = 'relative';
+        nextButton.style.left = '32%';
+        nextButton.style.width = '27.5%';
+        nextButton.style.justifyContent = "center";
+        nextButton.style.alignItems = "center";
         nextButton.style.cursor = 'pointer';
+        nextButton.style.backgroundColor = 'dimgray';
+        nextButton.style.color = 'white';
+        nextButton.style.borderRadius = '2vh';
         form.appendChild(nextButton);
         nextButton.onclick = () => {
             const selectedContractName = contractSelect.value;
@@ -8080,20 +7989,17 @@ async function createContractManagerForm() {
                 ];
                 const web3 = new Web3(window.ethereum);
                 const contract = new web3.eth.Contract(JSON.parse(selectedContract.contractABI), selectedContract.contractAddress);
-                let selectedTokens = [];
-                let optionSelected = ''; 
-
+                let selectedTokens = []; let optionSelected = ''; 
                 options.forEach((optionText) => {
                     const optionButton = document.createElement('div');
                     optionButton.innerText = optionText;
                     optionButton.style.padding = '10px';
-                    optionButton.style.margin = '5px 0';
+                    optionButton.style.marginTop = '5px';
                     optionButton.style.backgroundColor = 'lightgray';
                     optionButton.style.textAlign = 'center';
                     optionButton.style.cursor = 'pointer';
                     optionButton.style.border = '1px solid #ccc';
                     optionButton.style.borderRadius = '5px';
-
                     optionButton.onclick = async () => {
                         parent.innerHTML = ''; 
                         parent.style.height = '450px'; 
@@ -8126,6 +8032,7 @@ async function createContractManagerForm() {
                             actionSpan.style.marginBottom = '20px';
                             actionSpan.style.fontWeight = 'bold';
                             actionSpan.style.color = 'white';
+                            actionSpan.style.fontSize = '1.4vh';
                             parent.appendChild(actionSpan);
                             const gridParentContainer = document.createElement('div');
                             gridParentContainer.style.width = '80%';
@@ -8137,13 +8044,11 @@ async function createContractManagerForm() {
                             gridParentContainer.style.padding = '10px';
                             gridParentContainer.style.marginBottom = '20px';
                             parent.appendChild(gridParentContainer);
-
                             const gridContainer = document.createElement('div');
                             gridContainer.style.display = 'grid';
                             gridContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(50px, 1fr))';
                             gridContainer.style.gridGap = '10px';
                             gridParentContainer.appendChild(gridContainer); 
-
                             const tcount = await contract.methods.tokenCount().call(); 
                             const tcountP = parseInt(tcount);
                             for (let i = 1; i <= tcountP; i++) {
@@ -8166,47 +8071,38 @@ async function createContractManagerForm() {
                                         selectedTokens.push(parseInt(tokenId));
                                         tokenElement.style.backgroundColor = '#0067b3'; 
                                     }
-                                    console.log('Selected Tokens:', selectedTokens);
                                 };
-
                                 gridContainer.appendChild(tokenElement);
                             }
-
                             const submitContainer = document.createElement('div');
                             submitContainer.style.display = 'fixed';
                             submitContainer.style.marginTop = '0px';
                             submitContainer.style.bottom = '0%';
                             submitContainer.style.height = '15%';
-
                             const submitButton = document.createElement('button');
                             submitButton.innerText = 'Submit';
-                            submitButton.style.padding = '10px 20px';
                             submitButton.style.backgroundColor = 'gray';
                             submitButton.style.color = 'white';
                             submitButton.style.border = 'none';
                             submitButton.style.borderRadius = '5px';
                             submitButton.style.cursor = 'pointer';
-                            submitButton.style.left = '33%';
-                            submitButton.style.width = '30%';
+                            submitButton.style.left = '30%';
+                            submitButton.style.width = '27.5%';
                             submitButton.style.position = 'relative';
-
+                            submitButton.style.display = 'block';
                             submitButton.onclick = async () => {
-                                console.log('Final Array of Selected Tokens:', selectedTokens);
-                                //alert(`Action: ${optionSelected}\nSelected Tokens: ${selectedTokens.join(', ')}`);
                                 if (optionSelected === 'Flag tokens') {
-                                    console.log('trying to estimate the gas to call flagArrayOfTokens() via solidity');
                                     const gasEstimate = await contract.methods.flagArrayOfTokens(selectedTokens).estimateGas({
                                         from: currentClientWallet
                                     });                        
-                                    console.log('gas estimate determined:', gasEstimate);
-                                    const gasLimit = Math.floor(gasEstimate * 1.2);// adding buffer
+                                    const gasLimit = Math.floor(gasEstimate * 1.2);
                                     const mintResult = await contract.methods.flagArrayOfTokens(selectedTokens).send({
                                         from: currentClientWallet,
                                         gas: gasLimit 
                                     })
                                     .on('transactionHash', function(hash) {
                                             console.log("User accepted the transaction. Transaction hash:", hash);
-                                            gridParentContainer.removeChild();
+                                            gridParentContainer.remove();
                                             submitButton.remove();
                                             const successSpan = document.createElement('span');
                                             successSpan.textContent = "Tokens have been successfully flaged!";
@@ -8227,7 +8123,7 @@ async function createContractManagerForm() {
                                     .on('error', function(error, receipt) {
                                         console.log("Transaction rejected or failed:", error);
                                         console.log("Transaction failed receipt:", receipt);
-                                        inputBar.removeChild();
+                                        inputBar.remove();
                                         submitButton.remove();
                                         const successSpan = document.createElement('span');
                                         successSpan.textContent = `there was an unexpected error ${error}`;
@@ -8239,20 +8135,16 @@ async function createContractManagerForm() {
                                         parent.appendChild(successSpan);
                                     });
                                 } else if (optionSelected === 'Unflag tokens') {
-                                    // Call unflagToken function in the contract
-                                    console.log('trying to estimate the gas to call unflag array via solidity');
                                     const gasEstimate = await contract.methods.undoFlagedTokenArray(selectedTokens).estimateGas({
                                         from: currentClientWallet
                                     });                        
-                                    console.log('gas estimate to call flagNFT', gasEstimate);
                                     const gasLimit = Math.floor(gasEstimate * 1.2);
                                     const mintResult = await contract.methods.undoFlagedTokenArray(selectedTokens).send({
                                         from: currentClientWallet,
                                         gas: gasLimit 
                                     })
                                     .on('transactionHash', function(hash) {
-                                        console.log("User accepted the transaction. Transaction hash:", hash);
-                                        gridParentContainer.removeChild();
+                                        gridParentContainer.remove();
                                         submitButton.remove();
                                         const successSpan = document.createElement('span');
                                         successSpan.textContent = "Unflag operation was a success!";
@@ -8273,7 +8165,7 @@ async function createContractManagerForm() {
                                     .on('error', function(error, receipt) {
                                         console.log("Transaction rejected or failed:", error);
                                         console.log("Transaction failed receipt:", receipt);
-                                        inputBar.removeChild();
+                                        inputBar.remove();
                                         submitButton.remove();
                                         const successSpan = document.createElement('span');
                                         successSpan.textContent = `there was an unexpected error ${error}`;
@@ -8285,19 +8177,16 @@ async function createContractManagerForm() {
                                         parent.appendChild(successSpan);
                                     });
                                 } else if (optionSelected === 'Burn tokens') {
-                                    console.log('trying to estimate the gas to call Burn Token Array via solidity');
                                     const gasEstimate = await contract.methods.burnTokenArray(selectedTokens).estimateGas({
                                         from: currentClientWallet
                                     });                    
-                                    console.log('gas estimate to call flagNFT', gasEstimate);
                                     const gasLimit = Math.floor(gasEstimate * 1.2);
                                     const mintResult = await contract.methods.burnTokenArray(selectedTokens).send({
                                         from: currentClientWallet,
                                         gas: gasLimit 
                                     })
                                     .on('transactionHash', function(hash) {
-                                        console.log("User accepted the transaction. Transaction hash:", hash);
-                                        gridParentContainer.removeChild();
+                                        gridParentContainer.remove();
                                         submitButton.remove();
                                         const successSpan = document.createElement('span');
                                         successSpan.textContent = "Burn token operation successful! These tokens can no longer be listed for sell!";
@@ -8318,7 +8207,7 @@ async function createContractManagerForm() {
                                     .on('error', function(error, receipt) {
                                         console.log("Transaction rejected or failed:", error);
                                         console.log("Transaction failed receipt:", receipt);
-                                        inputBar.removeChild();
+                                        inputBar.remove();
                                         submitButton.remove();
                                         const successSpan = document.createElement('span');
                                         successSpan.textContent = `there was an unexpected error ${error}`;
@@ -8335,6 +8224,7 @@ async function createContractManagerForm() {
                             submitContainer.appendChild(submitButton);
                             parent.appendChild(submitContainer);
                         } else if (['Add Contract Owner', 'Add Contract Manager', 'Change Contract Owner'].includes(optionText)) {
+                            optionSelected = optionText; 
                             parent.innerHTML = '';
                             parent.style.height = '300px';
                             const closeButton = document.createElement('span');
@@ -8380,19 +8270,16 @@ async function createContractManagerForm() {
                                     if (inputValue) {
                                         console.log(`Option: ${optionText}, Input: ${inputValue}`);
                                         if (optionSelected === 'Add Contract Owner') {
-                                            console.log('trying to estimate the gas to call addOwnerToContract');
                                             const gasEstimate = await contract.methods.addOwnerToContract(inputValue).estimateGas({
                                                 from: currentClientWallet
                                             });                        
-                                            console.log('gas estimate to call flagNFT', gasEstimate);
                                             const gasLimit = Math.floor(gasEstimate * 1.2);
                                             const mintResult = await contract.methods.addOwnerToContract(inputValue).send({
                                                 from: currentClientWallet,
                                                 gas: gasLimit 
                                             })
                                             .on('transactionHash', function(hash) {
-                                                console.log("User accepted the transaction. Transaction hash:", hash);
-                                                inputBar.removeChild();
+                                                inputBar.remove();
                                                 submitButton.remove();
                                                 const successSpan = document.createElement('span');
                                                 successSpan.textContent = `successfully added the owner ${inputValue} to the owner array on the contract`;
@@ -8413,7 +8300,7 @@ async function createContractManagerForm() {
                                             .on('error', function(error, receipt) {
                                                 console.log("Transaction rejected or failed:", error);
                                                 console.log("Transaction failed receipt:", receipt);
-                                                inputBar.removeChild();
+                                                inputBar.remove();
                                                 submitButton.remove();
                                                 const successSpan = document.createElement('span');
                                                 successSpan.textContent = `there was an unexpected error ${error}`;
@@ -8425,19 +8312,16 @@ async function createContractManagerForm() {
                                                 parent.appendChild(successSpan);
                                             });
                                         } else if (optionSelected === 'Add Contract Manager') {
-                                            console.log('trying to estimate the gas to call changeContractManager');
-                                            const gasEstimate = await contract.methods.addManager(inputValue).estimateGas({
+                                            const gasEstimate = await contract.methods.changeContractManager(inputValue).estimateGas({
                                                 from: currentClientWallet
                                             });                        
-                                            console.log('gas estimate to call changeContractManager ', gasEstimate);
                                             const gasLimit = Math.floor(gasEstimate * 1.2);
                                             const mintResult = await contract.methods.changeContractManager(inputValue).send({
                                                 from: currentClientWallet,
                                                 gas: gasLimit 
                                             })
                                             .on('transactionHash', function(hash) {
-                                                console.log("User accepted the transaction. Transaction hash:", hash);
-                                                inputBar.removeChild();
+                                                inputBar.remove();
                                                 submitButton.remove();
                                                 const successSpan = document.createElement('span');
                                                 successSpan.textContent = `successfully added the new manager ${inputValue} to the contract. They can now flag and unflag tokens`;
@@ -8458,7 +8342,7 @@ async function createContractManagerForm() {
                                             .on('error', function(error, receipt) {
                                                 console.log("Transaction rejected or failed:", error);
                                                 console.log("Transaction failed receipt:", receipt);
-                                                inputBar.removeChild();
+                                                inputBar.remove();
                                                 submitButton.remove();
                                                 const successSpan = document.createElement('span');
                                                 successSpan.textContent = `there was an unexpected error ${error}`;
@@ -8470,19 +8354,16 @@ async function createContractManagerForm() {
                                                 parent.appendChild(successSpan);
                                             });
                                         } else if (optionSelected === 'Change Contract Owner') {
-                                            console.log('trying to estimate the gas to call changeContractManager');
                                             const gasEstimate = await contract.methods.changeContractOwner(inputValue).estimateGas({
                                                 from: currentClientWallet
                                             });                        
-                                            console.log('gas estimate to call changeContractManager ', gasEstimate);
                                             const gasLimit = Math.floor(gasEstimate * 1.2);
                                             const mintResult = await contract.methods.changeContractOwner(inputValue).send({
                                                 from: currentClientWallet,
                                                 gas: gasLimit 
                                             })
                                             .on('transactionHash', function(hash) {
-                                                console.log("User accepted the transaction. Transaction hash:", hash);
-                                                inputBar.removeChild();
+                                                inputBar.remove();
                                                 submitButton.remove();
                                                 const successSpan = document.createElement('span');
                                                 successSpan.textContent = `Successfully changed the owner ${inputValue} of the contract. 
@@ -8504,7 +8385,7 @@ async function createContractManagerForm() {
                                             .on('error', function(error, receipt) {
                                                 console.log("Transaction rejected or failed:", error);
                                                 console.log("Transaction failed receipt:", receipt);
-                                                inputBar.removeChild();
+                                                inputBar.remove();
                                                 submitButton.remove();
                                                 const successSpan = document.createElement('span');
                                                 successSpan.textContent = `there was an unexpected error ${error}`;
@@ -8516,7 +8397,6 @@ async function createContractManagerForm() {
                                                 parent.appendChild(successSpan);
                                             });
                                         }
-
                                     } else {
                                         console.log('No input provided.');
                                     }
@@ -8527,6 +8407,7 @@ async function createContractManagerForm() {
                         }else if (['Change minimal Listing price', 'Change minimal transfer fee', 'Change creator fee'].includes(optionText)) {
                             parent.innerHTML = '';
                             parent.style.height = '200px';
+                            optionSelected = optionText; 
                             const closeButton = document.createElement('span');
                             closeButton.innerText = '❌';
                             closeButton.style.position = 'absolute';
@@ -8569,15 +8450,13 @@ async function createContractManagerForm() {
                                         const gasEstimate = await contract.methods.changeMinimalListingFee(parseInt(inputValue)).estimateGas({
                                             from: currentClientWallet
                                         });                        
-                                        console.log('gas estimate to call changeMinimalListingFee ', gasEstimate);
                                         const gasLimit = Math.floor(gasEstimate * 1.2);
                                         const mintResult = await contract.methods.changeMinimalListingFee(parseInt(inputValue)).send({
                                             from: currentClientWallet,
                                             gas: gasLimit 
                                         })
                                         .on('transactionHash', function(hash) {
-                                            console.log("User accepted the transaction. Transaction hash:", hash);
-                                            inputBar.removeChild();
+                                            inputBar.remove();
                                             submitButton.remove();
                                             const successSpan = document.createElement('span');
                                             successSpan.textContent = `Successfully changed the minimal listing fee ${inputValue}`;
@@ -8598,7 +8477,7 @@ async function createContractManagerForm() {
                                         .on('error', function(error, receipt) {
                                             console.log("Transaction rejected or failed:", error);
                                             console.log("Transaction failed receipt:", receipt);
-                                            inputBar.removeChild();
+                                            inputBar.remove();
                                             submitButton.remove();
                                             const successSpan = document.createElement('span');
                                             successSpan.textContent = `there was an unexpected error ${error}`;
@@ -8613,15 +8492,13 @@ async function createContractManagerForm() {
                                         const gasEstimate = await contract.methods.changeMinimalTransferFee(parseint(inputValue)).estimateGas({
                                             from: currentClientWallet
                                         });                        
-                                        console.log('gas estimate to call changeMinimalListingFee ', gasEstimate);
                                         const gasLimit = Math.floor(gasEstimate * 1.2);
                                         const mintResult = await contract.methods.changeMinimalTransferFee(parseInt(inputValue)).send({
                                             from: currentClientWallet,
                                             gas: gasLimit 
                                         })
                                         .on('transactionHash', function(hash) {
-                                            console.log("User accepted the transaction. Transaction hash:", hash);
-                                            inputBar.removeChild();
+                                            inputBar.remove();
                                             submitButton.remove();
                                             const successSpan = document.createElement('span');
                                             successSpan.textContent = `Successfully changed the minimal listing fee ${inputValue}`;
@@ -8642,7 +8519,7 @@ async function createContractManagerForm() {
                                         .on('error', function(error, receipt) {
                                             console.log("Transaction rejected or failed:", error);
                                             console.log("Transaction failed receipt:", receipt);
-                                            inputBar.removeChild();
+                                            inputBar.remove();
                                             submitButton.remove();
                                             const successSpan = document.createElement('span');
                                             successSpan.textContent = `there was an unexpected error ${error}`;
@@ -8656,8 +8533,7 @@ async function createContractManagerForm() {
                                     } else if (optionSelected === 'Change creator fee') {
                                         const gasEstimate = await contract.methods.changeCreatorFee(parseInt(inputValue)).estimateGas({
                                             from: currentClientWallet
-                                        })                       
-                                        console.log('gas estimate to call changeMinimalListingFee ', gasEstimate);
+                                        });                       
                                         const gasLimit = Math.floor(gasEstimate * 1.2);
                                         const mintResult = await contract.methods.changeCreatorFee(parseInt(inputValue)).send({
                                             from: currentClientWallet,
@@ -8665,7 +8541,7 @@ async function createContractManagerForm() {
                                         })
                                         .on('transactionHash', function(hash) {
                                             console.log("User accepted the transaction. Transaction hash:", hash);
-                                            inputBar.removeChild();
+                                            inputBar.remove();
                                             submitButton.remove();
                                             const successSpan = document.createElement('span');
                                             successSpan.textContent = `Successfully changed the minimal listing fee ${inputValue}`;
@@ -8686,7 +8562,7 @@ async function createContractManagerForm() {
                                         .on('error', function(error, receipt) {
                                             console.log("Transaction rejected or failed:", error);
                                             console.log("Transaction failed receipt:", receipt);
-                                            inputBar.removeChild();
+                                            inputBar.remove();
                                             submitButton.remove();
                                             const successSpan = document.createElement('span');
                                             successSpan.textContent = `there was an unexpected error ${error}`;
@@ -8708,8 +8584,6 @@ async function createContractManagerForm() {
                     };
                     parent.appendChild(optionButton);
                 });
-
-
             }
         };
     } catch (error) {
@@ -8737,15 +8611,12 @@ function createContract(data) {
             uint256 lastSellData;  
             bool burned;          
         }
-
         mapping(uint256 => NFT) public nfts;
         mapping(address => bool) private seenOwners;
         NFT[] public recentSells; 
-
         event NFTMinted(uint256 id, address owner);
         event NFTForSale(uint256 id, uint256 price);
         event NFTSells(uint256 id, uint256 price, uint256 date);
-        
         address public contractCreator;
         string public artist;
         address[] internal owners;
@@ -8759,13 +8630,11 @@ function createContract(data) {
         uint256 public tokenCount;
         uint256 maximumTokenCount;
         uint256 public numberOfSells;
-
         bool isRoyaltyFeeChangeable;
         bool isManagerInitiated;
         bool isContractSellable;
         bool isTokensPausible;
         bool isTokensBurnable;
-
         constructor () {
             contractCreator = msg.sender; 
             artist = "Roy Burson";
@@ -8831,7 +8700,7 @@ function createContract(data) {
             nfts[tokenId].forSale = false;
         }
         function burnTokenArray(uint256[] memory tokenIdArray) public{
-            for(uint256 i=0; i< tokenIdArray; i++){
+            for(uint256 i=0; i< tokenIdArray.length; i++){
                 burnToken(tokenIdArray[i]);
             }
         }
@@ -9003,29 +8872,6 @@ function createContract(data) {
             }
             return maxPrice;
         }
-        function getAllUniqueOwners() public view returns (address[] memory) {
-            address[] memory uniqueOwners = new address[](tokenCount);
-            uint256 count = 0;
-            for (uint256 i = 0; i < tokenCount; i++) {
-                address owner = nfts[i].owner;
-                bool isUnique = true;
-                for (uint256 j = 0; j < count; j++) {
-                    if (uniqueOwners[j] == owner) {
-                        isUnique = false; 
-                        break;
-                    }
-                }
-                if (isUnique) {
-                    uniqueOwners[count] = owner;
-                    count++;
-                }
-            }
-            address[] memory result = new address[](count);
-            for (uint256 k = 0; k < count; k++) {
-                result[k] = uniqueOwners[k];
-            }
-            return result;
-        }
     }`;
     return contractString;
 }
@@ -9137,7 +8983,6 @@ function makeDeployerForm() {
     contractNameInput.style.border = '1px solid #333';
     contractNameInput.style.width = '80%';
     formContainer.appendChild(contractNameInput);
-
     const creatorEarningInput = document.createElement('input');
     creatorEarningInput.placeholder = 'Creator Earning (%)';
     creatorEarningInput.type = 'number';
@@ -9150,7 +8995,6 @@ function makeDeployerForm() {
     creatorEarningInput.style.border = '1px solid #333';
     creatorEarningInput.style.width = '80%';
     formContainer.appendChild(creatorEarningInput);
-
     const tokenCountInput = document.createElement('input');
     tokenCountInput.placeholder = 'Number of Tokens';
     tokenCountInput.type = 'number';
@@ -9161,8 +9005,6 @@ function makeDeployerForm() {
     tokenCountInput.style.border = '1px solid #333';
     tokenCountInput.style.width = '80%';
     formContainer.appendChild(tokenCountInput);
-
-
     const minimalListingPriceInput = document.createElement('input');
     minimalListingPriceInput.placeholder = 'Minimal Listing Price';
     minimalListingPriceInput.type = 'number';
@@ -9173,7 +9015,6 @@ function makeDeployerForm() {
     minimalListingPriceInput.style.border = '1px solid #333';
     minimalListingPriceInput.style.width = '80%';
     formContainer.appendChild(minimalListingPriceInput);
-
     const transferFeeMin = document.createElement('input');
     transferFeeMin.placeholder = 'Minimal Transfer Fee';
     transferFeeMin.type = 'number';
@@ -9184,7 +9025,6 @@ function makeDeployerForm() {
     transferFeeMin.style.border = '1px solid #333';
     transferFeeMin.style.width = '80%';
     formContainer.appendChild(transferFeeMin);
-
     const deployContractPasscode = document.createElement('input');
     deployContractPasscode.placeholder = 'Passcode';
     deployContractPasscode.style.marginTop = '10px';
@@ -9193,7 +9033,6 @@ function makeDeployerForm() {
     deployContractPasscode.style.border = '1px solid #333';
     deployContractPasscode.style.width = '80%';
     formContainer.appendChild(deployContractPasscode);
-
     const booleanOptions = [
         { label: 'Add a manager', value: 'addManager', placeholder: "Manager address" },
         { label: 'Make contract sellable', value: 'changeOwners', placeholder: "Owners Address" },
@@ -9201,31 +9040,25 @@ function makeDeployerForm() {
         { label: 'Enable Pause/Unpause', value: 'enablePause', placeholder: "Owners Address" },
         { label: 'Enable Burnable Tokens', value: 'enableBurnable', placeholder: "Burners Address" }
     ];
-
     booleanOptions.forEach(option => {
         const optionContainer = document.createElement('div');
         optionContainer.style.marginTop = '10px';
         optionContainer.style.width = '80%';
         optionContainer.style.display = 'flex';
         optionContainer.style.flexDirection = 'column';
-
         const labelRow = document.createElement('div');
         labelRow.style.display = 'flex';
         labelRow.style.justifyContent = 'space-between';
         labelRow.style.alignItems = 'center';
-
         const optionLabel = document.createElement('label');
         optionLabel.textContent = option.label;
-
         const switchLabel = document.createElement('label');
         switchLabel.className = 'switch';
         const switchInput = document.createElement('input');
         switchInput.type = 'checkbox';
         switchInput.value = option.value;
-
         const switchSpan = document.createElement('span');
         switchSpan.className = 'slider round';
-
         switchLabel.appendChild(switchInput);
         switchLabel.appendChild(switchSpan);
         labelRow.appendChild(optionLabel);
@@ -9311,7 +9144,6 @@ function makeDeployerForm() {
                 options: selectedOptions,
                 passcode: attemptedClientPasscode,
                 lastChunk: null
-
         };
         const contractString = createContract(contractData);  
         contractData.solidityContract = contractString;
@@ -9472,11 +9304,8 @@ async function deployContractUsingServer(data){
                             console.log('Transaction sent, waiting to be mined...', hash);
                         })
                         .on('receipt', async (receipt) => {
-                            console.log('Transaction mined!', receipt);
                             contractDeploymentSuccess = true;
                             const contractInstance = receipt.contractAddress ? receipt : await deployedContract;
-                            console.log('User accepted the transaction', contractInstance);
-                            console.log('Address of the contract:', contractInstance.contractAddress);
                             let contractInformation = {
                                 contractName: data.name,
                                 ERCStandard: data.token,
@@ -9484,7 +9313,6 @@ async function deployContractUsingServer(data){
                                 contractABI: serverMessage.contractABI,
                                 collectionBackground: data.backgroundImage
                             };
-                            console.log('trying to save data to database');
                             try {
                                 const response = await fetch('/saveNFTCollection', {
                                     method: 'POST',
@@ -9505,7 +9333,7 @@ async function deployContractUsingServer(data){
                                         return {
                                             success: contractDeploymentSuccess,
                                             abi: contractInformation.contractABI,
-                                            contractAddress: contractInformation.contractAddress  // initially null
+                                            contractAddress: contractInformation.contractAddress  
                                         };
                                     } else if(serverMessage.success === false && serverMessage.code === 121){
                                         console.log('Error saving collection to database');
@@ -9597,7 +9425,6 @@ async function makeMintingForm() {
     formContainer.style.display = 'flex';
     formContainer.style.flexDirection = 'column';
     formContainer.style.alignItems = 'center';
-
     makeElementDraggable(formContainer);
 
     const titleSpan = document.createElement('span');
@@ -9638,49 +9465,40 @@ async function makeMintingForm() {
     fileInput.type = 'file';
     fileInput.webkitdirectory = true;
     fileInput.style.display = 'none';
-
     dropArea.addEventListener('dragover', function(event) {
         event.preventDefault();
         dropArea.style.borderColor = 'lightblue';
     });
-
     dropArea.addEventListener('dragleave', function() {
         dropArea.style.borderColor = '#ccc';
     });
-
     dropArea.addEventListener('drop', function(event) {
         event.preventDefault();
         dropArea.style.borderColor = '#ccc';
         const files = event.dataTransfer.files;
         handleFiles(files);
     });
-
     dropArea.addEventListener('click', function() {
         fileInput.click();
     });
-
     fileInput.addEventListener('change', function(event) {
         const files = event.target.files;
         handleFiles(files);
     });
-
     formContainer.appendChild(dropArea);
     formContainer.appendChild(fileInput);
-
     const contractSelector = document.createElement('select');
     contractSelector.style.width = '100%';
     contractSelector.style.padding = '10px';
     contractSelector.style.marginBottom = '10px';
     contractSelector.style.borderRadius = '8px';
     contractSelector.style.border = '1px solid #ccc';
-
     const placeholderOption = document.createElement('option');
     placeholderOption.value = '';
     placeholderOption.textContent = 'Select contract';
     placeholderOption.disabled = true;
     placeholderOption.selected = true;
     contractSelector.appendChild(placeholderOption);
-       
     try {
          const response = await fetch('/getALLDeployedCollections', {
             method: 'GET',
@@ -9688,22 +9506,20 @@ async function makeMintingForm() {
                 'Content-Type': 'application/json'
             }
         });
-
         if (response.ok) {
             listofCollections = await response.json();
             if(listofCollections.success == false){
-                console.log('no databases active');
+                 console.log('no databases active');
             }else{
                 console.log('Received collections', listofCollections);
             }
         } else {
-            console.error("Failed to get response from server");
+                console.error("Failed to get response from server");
         }
     } catch (error) {
         console.error("Error With server");
         listofCollections = [];
     }
-
     for(const collection of listofCollections){
         const option = document.createElement('option');
         option.value = collection.contractName;
@@ -9754,7 +9570,6 @@ async function makeMintingForm() {
         loadingContainer.style.justifyContent = "center";
         loadingContainer.style.alignItems = "center";
         loadingContainer.style.backgroundColor = "none"; 
-
         const loadingIcon = document.createElement("img");
         loadingIcon.setAttribute("class", "loading-gif");
         loadingIcon.setAttribute("src", "/Gifs/LoadingIcon1/loadingicon1.gif"); 
@@ -9763,18 +9578,14 @@ async function makeMintingForm() {
         loadingIcon.style.height = "50%";
         loadingContainer.appendChild(loadingIcon);
         formContainer.appendChild(loadingContainer);
-
         const previousSearchBarContainer = document.querySelector('.progressBar1Container');
         const previousSearchText = document.querySelector('.progressBar1Text');
-
         if(previousSearchBarContainer){
             previousSearchBarContainer.remove();
         }
-
         if(previousSearchText){
             previousSearchText.remove();
         }
-
         const submitedProgressBarContainer = document.createElement('div');
         submitedProgressBarContainer.style.width = '100%';
         submitedProgressBarContainer.style.height = '20px';
@@ -9800,8 +9611,6 @@ async function makeMintingForm() {
 
         let mintingAddress;
         let mintingABI;
-        console.log('trying to get Address and ABI from data and selection', selectedContract);
-
         for(const collection of listofCollections){
             if(selectedContract == collection.contractName){
                 mintingAddress = collection.contractAddress;
@@ -9810,38 +9619,25 @@ async function makeMintingForm() {
 
             }
         }
-        console.log('minting address = ', mintingAddress);
-        console.log('minting ABI', mintingABI );
         let myContract;
         try{
             const web3 = new Web3(window.ethereum);
             await window.ethereum.request({ method: 'eth_requestAccounts' });
             const accounts = await web3.eth.getAccounts();
             const account = accounts[0];
-            console.log(`trying to set contract instance and call functions for: ${mintingAddress}`);
             const contract = new web3.eth.Contract(JSON.parse(mintingABI), mintingAddress);
-
-            console.log('access to contract granted', contract);
-            console.log('Contract methods:', contract.methods);
             const networkId = await web3.eth.net.getId();
-            console.log('Network ID:', networkId);
-
             if(filesArray.length == 0){
                 alert('Please Insert files to be processed');
             }else{
                 const tryToAddDocument = await addTokensToDataBase(filesArray, mintPasscode.value, selectedContract,  mintingAddress);
                 let successCheckerArray = await checkDocumentsSuccess(tryToAddDocument);
-                console.log('try to add document', tryToAddDocument);
-                console.log('succss array = ', successCheckerArray);
                 if (successCheckerArray.length !== 0) {
                     let mintableArray = [];
                     let numberOfNFTs = successCheckerArray.length;
-                    console.log('trying to loop through and make mintable array');
-
                     for (var k = 0; k < numberOfNFTs; k++) { 
-                        console.log("printing ID to make sure its integer", successCheckerArray[k].tokenID);
                         let maticMintPrice = 0.0; // start at zero it should not be for sale and not have price during mint
-                        let myNFTobjType = {    // mint is only designed to push object to contract so it exist
+                        let myNFTobjType = {      // mint is only designed to push object to contract so it exist
                             id: successCheckerArray[k].tokenID,
                             price: BigInt(maticMintPrice * (10 ** 18)), 
                             owner: RoysWallet,
@@ -9936,7 +9732,6 @@ async function makeMintingForm() {
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             if (file.type.startsWith('image/')) {
-                console.log('we found an image in file');
                 const promise = readFile(file)
                     .then(result => {
                         filesArray.push({
@@ -9945,7 +9740,6 @@ async function makeMintingForm() {
                             size: file.size,
                             image: result  
                         });
-
                         const progressPercentage = ((filesArray.length / files.length) * 100).toFixed(2);
                         progressBar.style.width = progressPercentage + '%';
                         progressText.textContent = `${filesArray.length} items processed`;
@@ -10007,7 +9801,6 @@ async function addTokensToDataBase(array, passcode, contract, address) {
                 },
                 body: JSON.stringify(folderData)
             });
-
             if (response.ok) {
                 const serverMessage = await response.json();
                 console.log(`Received response from server for chunk ${ii}`, serverMessage);
@@ -11369,7 +11162,6 @@ async function validateUserInfo(email, address, firstName, lastName) {
             })
         });
         if(response.ok){
-
             let data = await response.json();
             return data;
         }else{
