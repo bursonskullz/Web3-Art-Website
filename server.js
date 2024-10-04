@@ -1,8 +1,7 @@
 // Name: Roy Burson 
-// Date last modified: 09-20-24
+// Date last modified: 10-03-24
 // purpose: Make web3 art website to coincide with research related life
 
-// local variables to server
 const maxNumberOfAIEventsPerClient = 100;
 const max_array_length = 3294967295;
 var localAIUsers = [];
@@ -13,13 +12,13 @@ var timerIsAlreadyCalled = false;
 var userAIQuestions = [];
 var previousQuestion0 = [];
 var previousQuestion1 = [];
+let uniqueChars = [];
 let stringChunk = '';
 let soliditychunk;
 
-let Series2Holders = ["0x21331", "0x1122222"]; // Pull From contract add here (these are examples)
-let Series1Holders = []; // pull from contract and add them here!
+let Series2Holders = ["0x21331", "0x1122222"];
+let Series1Holders = []; 
 
-// packages
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -37,8 +36,6 @@ const OpenAI = require('openai');
 const solc = require('solc');
 
 require('dotenv').config();
-
-// collections db strings 
 const paintCollectionString = 'Painting';
 const purchasesCollectionString = 'Purchase';
 const commissionCollectionString = 'Commission';
@@ -46,7 +43,6 @@ const bursonSkullzModelString = 'Burson Skullz';
 const contractCollectionString = 'NFT Contracts';
 const reportString = 'Reports Filed';
 
-// security strings 
 const paintingUploadCode = 'Painting-code-here!';
 const appPasscode = 'google-app-passcode-here';
 const buisnessEmial = 'your-buisiness-email@gmail.com';
@@ -56,6 +52,15 @@ const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
 const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
 const addNFTCollectionDataPasscode = 'your-passcode-to-add-nfts';
 const deployableContractPasscode = 'passcode-to-deploy-contract';
+
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
 const myDomain = undefined;
 const openai = new OpenAI({
@@ -113,13 +118,12 @@ const tokenSchema = new mongoose.Schema({
 }); 
 
 const collectionSchema = new mongoose.Schema({
-    contractName: String,
-    ERCStandard: String,
-    contractAddress: String,
-    contractABI: String,
+    contractName: { type: String, required: true },
+    ERCStandard: { type: String, required: true },  
+    contractAddress: { type: String, required: true },
+    contractABI: { type: String, required: true },
     collectionBackgroundImage: String
-}); 
-
+});
 
 const reportSchema = new mongoose.Schema({
     clientWallet: String,
@@ -131,7 +135,6 @@ const reportSchema = new mongoose.Schema({
     message: String
 }); 
 
-// Create models 
 const paintingModel = mongoose.model(paintCollectionString, paintingSchema); 
 const purchaseModel = mongoose.model(purchasesCollectionString, purchaseSchema); 
 const commissionModel = mongoose.model(commissionCollectionString, commissionSchema); 
@@ -1915,11 +1918,8 @@ var knownDefinitions = [
 const users = [];
 
 const messageHistory = [];
-
 const updatedViewsHistory = [];
-
 const PORT = process.env.PORT || 27015; 
-
 
 try{
     if (cluster.isMaster) {
@@ -1956,7 +1956,7 @@ try{
                         const randomIndex = Math.floor(Math.random() * randomNames.length);
                         username = randomNames[randomIndex];
                     } while (isUsernameTaken(username, users)); 
-                    const currentUser = { 
+                        const currentUser = { 
                         ip: clientIP, 
                         user: username, 
                         coolDown: 0,
@@ -1965,14 +1965,17 @@ try{
                     users.push(currentUser);
                 }
                 socket.on('message', (message) => {
-                    const ipAddress = socket.handshake.address;
+                    console.log('A user connected');
                     const timeSent = new Date().toISOString();
+                    const forwarded = socket.handshake.headers['x-forwarded-for'];
+                    const ipAddress = forwarded ? forwarded.split(',')[0] : socket.handshake.address;  // Prefer X-Forwarded-For if available
                     let clientIP;
                     if (ipAddress.includes('::ffff:')) {
                         clientIP = ipAddress.split(':').pop();
                     } else {
                         clientIP = ipAddress;
                     }
+                    console.log('client IP', clientIP);
                     const sender = users.find(u => u.ip == clientIP);
 
                     let senderName;
@@ -2010,6 +2013,11 @@ try{
             });
             console.log('Socket Created');
             console.log('Connected to MongoDB, calling addBasicDefinitions() function');
+            console.log('setting uniqueChars from asian library. . . . ');
+            let chinaChars = await setUniqueCharMapping();
+            for(const char of chinaChars){
+                uniqueChars.push(char);
+            }
             await addBasicDefinitions(basicDefinitions);
             console.log('Done adding definitions, launching workers');
 
@@ -2301,7 +2309,15 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
 function isUsernameTaken(username, users) {
     return users.some(user => user.user === username);
 }
-
+async function setUniqueCharMapping(){
+    let chineseChars = [];
+    const start = 0x4E00; // Start of CJK Unified Ideographs block
+    const end = 0x9FFF;   // End of the CJK Unified Ideographs block
+    for (let i = start; i <= end; i++) {
+        chineseChars.push(String.fromCharCode(i));
+    }
+    return chineseChars;
+}
 async function getNewDefinition(word) {
   const apiUrl =`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${MERRIAM_WEBSTER_API_KEY}`;
   try {
@@ -2751,6 +2767,158 @@ async function fetchOpenAIResponse(question) {
     }
 }
 
+function BursonBase64Encrypted(image) {
+    console.log('image length before compression', image.length);
+    image = image.replace(/^data:image\/[a-z]+;base64,/, '');
+    try{
+        let encryptedString = ''; 
+        let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        let loopLength = Math.floor(image.length/3); var count = 1;
+        let imageRemainder = image.length % 3; var lastChunk = '';
+        for(var i = 0; i< loopLength-3;i++){
+            let chunk = image[i]+ image[i+1] +image[i+2];
+            if(chunk === lastChunk){
+                count += 1;
+            }else{
+                if([...chunk].every(char => alphabet.includes(char))) {
+                    let frontEncryption; let isUpperCase = chunk === chunk.toUpperCase(); 
+                    let isLowerCase = chunk === chunk.toLowerCase();
+                    let encryptedChunk = getUniqueChinaChar(chunk.toUpperCase(), uniqueChars);
+
+                    if(isUpperCase && count !=1){
+                        frontEncryption  = `${count}|${encryptedChunk}`;
+                    }else if(isLowerCase && count!=1){
+                        frontEncryption  = `${count}|${encryptedChunk}^`;
+                    }else if((isLowerCase || isUpperCase) && count == 1){
+                        frontEncryption = `${encryptedChunk}`;
+                    }else if((!isUpperCase && !isLowerCase) && count == 1){
+                        frontEncryption = `${chunk}`;
+                    }else{
+                        frontEncryption = `${chunk}`;
+                    }
+
+                    encryptedString += frontEncryption;
+                    //console.log('chunk', chunk);
+                    //console.log('encrypted chunk', frontEncryption);
+                }else{
+                    let newChunk;
+                    if(count!=1){
+                        newChunk = `${count}|${chunk}`;
+                    }else{
+                        newChunk = `${chunk}`;
+                    }
+                    encryptedString+= newChunk;
+                    //console.log('new chunk', newChunk);
+                } 
+                lastChunk = chunk;      
+            }
+            i = i+3;
+        }
+        //console.log('trying to attach last remaining elements');
+        if(imageRemainder!=0){
+            let endOfString = '';
+            for(var modIndex = 0; modIndex < imageRemainder; modIndex++){
+                endOfString += image[loopLength*3+modIndex+1];
+            }
+            encryptedString += endOfString;
+        }
+        console.log('image length after bursonBase64 compression', encryptedString.length);
+        return encryptedString;
+    }catch(error){
+        console.log('Error calling burson base64 compressor/Encrytion function ', error);
+        return null;
+    }
+}
+function getUniqueChinaChar(word, charArray) {
+    if (word.length !== 3) {
+        throw new Error("Input word must be exactly 3 characters long");
+    }
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const firstCharIndex = alphabet.indexOf(word[0]); 
+    const secondCharIndex = alphabet.indexOf(word[1]); 
+    const thirdCharIndex = alphabet.indexOf(word[2]); 
+    if (firstCharIndex === -1 || secondCharIndex === -1 || thirdCharIndex === -1) {
+        throw new Error("Invalid character in word");
+    }
+
+    const uniqueIndex = (firstCharIndex) + 
+                        (secondCharIndex * 26) + 
+                        (thirdCharIndex * 26 * 26);
+
+    if (uniqueIndex >= 0 && uniqueIndex < charArray.length) {
+        return charArray[uniqueIndex];
+    } else {
+        throw new Error("Unique index is out of bounds of the character array");
+    }
+}
+async function createReverseCharMap() {
+    const reverseMap = new Map();
+    const charMap = await setUniqueCharMapping(); 
+    charMap.forEach((value, key) => {
+        reverseMap.set(value, key);
+    });
+
+    return reverseMap;
+}
+
+async function BursonBase64Decrypt(encryptedString) {
+    const reverseMap = await createReverseCharMap(); 
+    let decryptedString = ''; let alphabet = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
+    for(var i=0; i<encryptedString.length; i++){
+        const char = encryptedString[i];
+        if (char === '|') {
+            let repeatCount = '';
+            for (let j = i - 1; j >= 0; j--) {
+                const previousChar = encryptedString[j];
+                if (!isNaN(previousChar)) {
+                    repeatCount = previousChar + repeatCount;
+                } else {
+                    break;
+                }
+            }   
+            const repeatCountNumber = parseInt(repeatCount) || 1;
+            var nextChar = encryptedString[i + 1];
+            if(reverseMap.has(nextChar)){
+                    let newString = '';
+                    for(var k =0; k< repeatCountNumber; k++){
+                        newString+=nextChar;
+                    }
+                    decryptedString+= newString;
+            }else{
+                let nextChar = encryptedString[i + 2]+encryptedString[i + 3];
+                let newString = '';
+
+                for(var k =0; k< repeatCountNumber; k++){
+                    newString+=nextChar;
+                }
+                decryptedString += newString;
+                i+2;
+            }
+        } else if (reverseMap.has(char)) {
+            let repeatCount = '';
+            for (let j = i - 1; j >= 0; j--) {
+                const previousChar = encryptedString[j];
+                if (!isNaN(previousChar)) {
+                    repeatCount = previousChar + repeatCount;
+                } else {
+                    break;
+                }
+            }
+            const repeatCountNumber = parseInt(repeatCount) || 1;
+            let newString = '';
+            for(var k =0; k< repeatCountNumber; k++){
+                newString+=char;
+            }
+            decryptedString+= newString;
+        } else {
+            decryptedString += char;
+        }
+    }
+    return decryptedString;
+}
+function isDigit(char) {
+    return /\d/.test(char);
+}
 async function validateTransaction(transactionHash) {
     const apiUrl = `https://api.etherscan.io/api?module=proxy&action=eth_getTransactionByHash&txhash=${transactionHash}&apikey=YOUR_API_KEY`;
 
@@ -2956,18 +3124,23 @@ const handleHttpRequest = async (req, res, io) => {
                 try {
                     const data = JSON.parse(body);
                     console.log('Attempting to save data to database -->', data);
-
                     const collectionModelInstance = new collectionModel({
                         contractName: data.contractName,
-                        ERCStandard: data.token,
+                        ERCStandard: data.ERCStandard,
                         contractAddress: data.contractAddress,
                         contractABI: JSON.stringify(data.contractABI), 
                         collectionBackgroundImage: data.collectionBackground 
                     });
-                    await collectionModelInstance.save();
-                    console.log('Item saved to database');
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: true, code: 100 }));
+                    try {
+                        await collectionModelInstance.save();
+                        console.log('Item saved to database');
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ success: true, code: 100 }));
+                    } catch (error) {
+                        console.error('Error saving item:', error);
+                        res.writeHead(210, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ success: false, code: 121 , error: error.message}));
+                    }
                 } catch (error) {
                     console.error("Error saving item to database", error);
                     res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -3025,48 +3198,64 @@ const handleHttpRequest = async (req, res, io) => {
         }
 
     }else if (req.method === 'POST' && req.url === '/getALL-NFTs') {
+        let body = '';
+        
+        req.on('data', (chunk) => {
+            body += chunk.toString();
+        });
 
-        try {
-            let body = '';
-            req.on('data', (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on('end', async () => {
+        req.on('end', async () => {
+            try {
                 const data = JSON.parse(body);
                 const getNFTs = async (name) => {
                     try {
                         const allModels = await getAllModels();
                         const specificModel = allModels[name] || mongoose.model(name, tokenSchema);
-
+                        
                         if (specificModel) {
-                            const cursor = specificModel.find({}).cursor(); 
-                            res.writeHead(200, { 'Content-Type': 'application/json' });
-                            res.write('['); 
-                            let isFirst = true;
-                            for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
-                                if (!isFirst) res.write(',');
-                                res.write(JSON.stringify(doc));
-                                isFirst = false;
+                            const pageSize = 100; 
+                            const docs = await specificModel.find({})
+                                .limit(pageSize)  // Limit to 50 documents
+                                .lean();
+                            if (docs.length > 0) {
+                                const gzip = zlib.createGzip();
+                                res.writeHead(200, { 'Content-Encoding': 'gzip', 'Content-Type': 'application/json' });
+                                gzip.pipe(res);
+                            
+                                for(var i = 0; i < docs.length; i++){
+                                    let imageDecoder = BursonBase64Decrypt(docs[i].image);
+                                    docs[i].image = imageDecoder;
+                                }
+                                gzip.write(JSON.stringify(docs));
+                                gzip.end();  
+                            } else {
+                                res.writeHead(204, { 'Content-Type': 'application/json' }); 
+                                res.end(JSON.stringify({ success: true, message: 'No documents available' }));
                             }
-                            res.write(']'); 
-                            res.end();
                         } else {
                             res.writeHead(400, { 'Content-Type': 'application/json' });
                             res.end(JSON.stringify({ success: false, error: 'Model not found' }));
                         }
-                    } catch (error) {
-                        console.error('Error finding tokens in the database', error);
+                    } catch (err) {
+                        console.error('Error retrieving NFTs:', err);
                         res.writeHead(500, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ success: false, error: 'Database error' }));
+                        res.end(JSON.stringify({ success: false, error: 'Internal server error' }));
                     }
                 };
-                getNFTs(data.contractName);
-            });
-        } catch (error) {
-            console.log('Error with fetch request /getALL-NFTs', error);
-        }
 
+                await getNFTs(data.contractName);
+            } catch (err) {
+                console.error('Error parsing request body:', err);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, error: 'Invalid request' }));
+            }
+        });
+
+        req.on('error', (error) => {
+            console.error('Request error', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: 'Request error' }));
+        });
     }else if(req.method == 'POST' && req.url == '/add-commission'){
         try{
             let body = '';
@@ -3383,7 +3572,6 @@ const handleHttpRequest = async (req, res, io) => {
             });
 
             req.on('end', async ()=> {
-
                 const data = JSON.parse(body);
                 const { transactionHash, objectId, address, email, firstName, lastName } = data;
                 const clientIP = req.connection.remoteAddress;
@@ -3510,7 +3698,6 @@ const handleHttpRequest = async (req, res, io) => {
                                             attemptedClients.splice(i, 1);
                                         }
                                     }
-
                                     for (let i = globalPurchaseTimerArray.length - 1; i >= 0; i--) {
                                         const currentTimedOutUser = globalPurchaseTimerArray[i];
 
@@ -3803,23 +3990,22 @@ const handleHttpRequest = async (req, res, io) => {
                             console.log('successfully accessed model successfully', specificModel);
                         }else{
                             console.log('we had to make a new model');
-
                            specificModel = mongoose.model(data.contractName, tokenSchema); 
                         }
+                        let encryptedImage = BursonBase64Encrypted(data.tokenURI);
+
                         const thisNFT = new specificModel({
                             contractName: data.contractName,
                             contractAddress: data.contractAddress,
                             tokenID: data.tokenID,
-                            image: data.tokenURI,
+                            image: encryptedImage, 
                         });
 
                         thisNFT.save().then((result)=>{
-                            console.log('mongo result (maybe need to check if result is success )-->', result);
                             res.setHeader('Content-Type', 'application/json');
                             res.end(JSON.stringify({ success: true, code: 222102999221121, tokenID: data.tokenID}));
                         }).catch((error) =>{
-                            console.log("Error saving data to database check erro to see if it is internet");
-                            console.log(error);
+                            console.log("Error saving data to database check erro to see if it is internet", error);
                             res.setHeader('Content-Type', 'application/json');
                             res.end(JSON.stringify({success: false, code: 21202021122344, tokenID: data.tokenID})); 
                         });
