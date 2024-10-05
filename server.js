@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 10-04-24
+// Date last modified: 10-05-24
 // purpose: Make web3 art website to coincide with research related life
 
 const maxNumberOfAIEventsPerClient = 100;
@@ -14,6 +14,7 @@ var previousQuestion0 = [];
 var previousQuestion1 = [];
 let uniqueChars = [];
 let uniqueChars2 = [];
+let uniqueChars3 = [];
 let stringChunk = '';
 let soliditychunk;
 
@@ -2014,27 +2015,44 @@ try{
 
             let chinaChars = await setUniqueChinaCharMapping();
             let kmferChars = await setUniqueKhmerMapping();
+            let japaneseChars = await setUniqueJapaneseCharsMapping();
+
             for (const char of chinaChars) {
                 uniqueChars.push(char);
             }
             for (const kmferChar of kmferChars) {
                 uniqueChars2.push(kmferChar);
             }
+            for (const jChar of japaneseChars) {
+                uniqueChars3.push(jChar);
+            }
 
             console.log('current china chars', uniqueChars);
             console.log('current k-mfers chars', uniqueChars2);
-            const base64TestString = `data:image/png;base64,iVBORw0KGgoAAAAAANSUhEUgAABdwAAAfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV8/pCKVDpYi4pChOlkQK+IoVSyChdJCQQQQQQQQQQQQQQQQZZZZZZZZZZWWWWWWWWWWWWWWWWWWWWWkajjejJBEBEjJKiklloooOOOOOOOOOOOOOOOOOOOOlkiNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmo+-nnnnn22222AAAAAQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQLLLLfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcLLLLLLLLLLLLLJJJJJJJJJJJJJJJJJJJJTTTTTTTTTTTTTTTTCCCCCCCCCCCCCDDDDnnnTyOTyOTyOHKLhJk+k1-2fQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0Ac33ddHkiHkiHkiHkiHki`;
-            const encryptedStringTest = await BursonBase64Encrypted(base64TestString);
+            console.log('current japaneseChars', uniqueChars3);
 
-            const chineseCharTest = String.fromCharCode(0x4E00); 
+            const base64TestString = `data:image/png;base64,iVBORw0KGgoAAAAAANSUhEUgAABdwAAAfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV8/pCKVDpYi4
+            pChOlkQK+IoVSyChdJCQQQQQQQQQQQQQQQQZZZZZZZZZZWWWWWWWWWWWWWWWWWWWWWkajjejJBEBEjJKiklloooOOOOOOOOOOOOOOOOOOOOlkiNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmo
+            NmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmo+-nnnnn22222AAAAAQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQLLLLfQCAYAAADYaJ02AAABhG
+            lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYA
+            AADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcLLLLLLLLLLLLLJJJJJJJJJJJJJJJJJJJJTTTTTTTTTTTTTTTTCCCCCCCCCCCCCDDDDnnnTyOTyOTyOHKLhJk+k1-2fQCAYAAADYa
+            J02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0Ac
+            fQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJ
+            F9kT1Iw0Ac33ddHkiHkiHkiHkiHkiJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ
+            AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIIIIIIIIiamamaLLLL+-Mk-Mkksmsapapaa1M9944Kkkkkkkkkkkkkkkkkk
+            2333e3e3e3e3eee2222222222223333333333333222222222223333333328888882288228818101111111JJJJJJSJSJSJSJSSSSSSSSSJJSJSJSJSJSJSJSJSSSSSSSSSSSSSJSJSJSJSJ
+            QQnsnne3n3ne3e3ne3-+k3k3kXcIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+            2l8288888888288282828sjjsssj28828sjsj28288sjzjj8282j=Jj----SSSSSS`;
+
+            const encryptedStringTest = BursonBase64Encrypted(base64TestString);
+            const chineseCharTest = String.fromCharCode(0x4E02); 
             const khmerCharTest = String.fromCharCode(0x1780); 
-
             const transformedWord = mapCharsToTransformedWord(chineseCharTest, khmerCharTest, uniqueChars2);
             console.log(`The transformed 3-letter word is (should not be all caps or lower case): ${transformedWord}`);
+            // use getUniqueKhmferChar to see how to get inverse word back
 
-
-            const decryptionTestStringTest = await BursonBase64Decrypt(encryptedStringTest);
-            console.log('decryptedString length', decryptionTestStringTest.length);
+            //const decryptionTestStringTest = await BursonBase64Decrypt(encryptedStringTest);
+            //console.log('decryptedString length', decryptionTestStringTest.length);
 
             await addBasicDefinitions(basicDefinitions);
             console.log('Done adding definitions, launching workers');
@@ -2331,7 +2349,7 @@ async function setUniqueKhmerMapping() {
     let khmerChars = [];
     const start = 0x1780; // Start of Khmer block
     const end = 0x17FF;   // End of Khmer block
-    const limit = 24;     // Only get the first 48 characters
+    const limit = 24;     // Only get the first 24 characters
     
     for (let i = start; i <= end && khmerChars.length < limit; i++) {
         khmerChars.push(String.fromCharCode(i));
@@ -2347,6 +2365,32 @@ async function setUniqueChinaCharMapping(){
         chineseChars.push(String.fromCharCode(i));
     }
     return chineseChars;
+}
+async function setUniqueJapaneseCharsMapping() {
+    let japaneseChars = [];
+
+    // Hiragana (U+3040 to U+309F)
+    const hiraganaStart = 0x3040;
+    const hiraganaEnd = 0x309F;
+    for (let i = hiraganaStart; i <= hiraganaEnd; i++) {
+        japaneseChars.push(String.fromCharCode(i));
+    }
+
+    // Katakana (U+30A0 to U+30FF)
+    const katakanaStart = 0x30A0;
+    const katakanaEnd = 0x30FF;
+    for (let i = katakanaStart; i <= katakanaEnd; i++) {
+        japaneseChars.push(String.fromCharCode(i));
+    }
+
+    // Kanji (CJK Unified Ideographs U+4E00 to U+9FFF)
+    const kanjiStart = 0x4E00;
+    const kanjiEnd = 0x9FFF;
+    for (let i = kanjiStart; i <= kanjiEnd; i++) {
+        japaneseChars.push(String.fromCharCode(i));
+    }
+
+    return japaneseChars;
 }
 async function getNewDefinition(word) {
   const apiUrl =`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${MERRIAM_WEBSTER_API_KEY}`;
@@ -2807,6 +2851,7 @@ function getUniqueKhmferChar(word, khmerChars) {
     if (word.length !== 3) {
         throw new Error("Word must be exactly 3 characters long.");
     }
+    // take in 3 letter upper case word and 
     const caseValues = word.split('').map(getCharCaseValue); 
     const caseProduct = caseValues.reduce((acc, val) => acc * val, 1); 
     const permutationRank = getPermutationRank(word.split('')); 
@@ -2830,62 +2875,71 @@ function getPermutationRank(arr) {
 function BursonBase64Encrypted(image) {
     console.log('image length before compression', image.length);
     image = image.replace(/^data:image\/[a-z]+;base64,/, '');
-    try{
-        let encryptedString = ''; 
-        let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-        let loopLength = Math.floor(image.length/3); var count = 1; let imageRemainder = image.length % 3; var lastChunk = '';
-        for(var i = 0; i< loopLength-3;i++){
-            let chunk = image[i]+ image[i+1] +image[i+2];
-            if(chunk === lastChunk){
-                count += 1;
-            }else{
-                if([...chunk].every(char => alphabet.includes(char))) {
-                    let frontEncryption; let isUpperCase = chunk === chunk.toUpperCase(); 
-                    let isLowerCase = chunk === chunk.toLowerCase();
-                    let encryptedChunk = getUniqueChinaChar(chunk.toUpperCase(), uniqueChars);
-                    if(isUpperCase && count !=1){
-                        frontEncryption  = `${count}|${encryptedChunk}`;
-                        count = 1;
-                    }else if(isLowerCase && count!=1){
-                        frontEncryption  = `${count}|${encryptedChunk}^`;
-                        count = 1;
-                    }else if((isLowerCase || isUpperCase) && count == 1){
-                        frontEncryption = `${encryptedChunk}`;
-                    }else if((!isUpperCase && !isLowerCase) && count == 1){
-                        const uniqueKmferChar = getUniqueKhmferChar(chunk, uniqueChars2);
-                        frontEncryption = `${encryptedChunk}${uniqueKmferChar}`;
-                    }else{
-                        const uniqueKmferChar = getUniqueKhmferChar(chunk, uniqueChars2);
-                        frontEncryption = `${count}|${encryptedChunk}${uniqueKmferChar}`;
-                        count = 1;
-                    }
-                    encryptedString += frontEncryption;
+    let encryptedString = ''; let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    let loopLength = Math.floor(image.length/3); var count = 1; let imageRemainder = image.length % 3; var lastChunk = '';
+    for(var i = 0; i< loopLength-3;i++){
+        let chunk = image[i]+ image[i+1] +image[i+2];
+        if(chunk === lastChunk){
+            count += 1;
+        }else{
+            if([...chunk].every(char => alphabet.includes(char))) {
+                let frontEncryption; let isUpperCase = chunk === chunk.toUpperCase();let isLowerCase = chunk === chunk.toLowerCase();
+                let encryptedChunk = getUniqueChinaChar(chunk.toUpperCase(), uniqueChars);
+                if(isUpperCase && count !=1){
+                    frontEncryption  = `${count}|${encryptedChunk}`;
+                    count = 1;
+                }else if(isLowerCase && count!=1){
+                    frontEncryption  = `${count}|${encryptedChunk}^`;
+                    count = 1;
+                }else if((isLowerCase || isUpperCase) && count == 1){
+                    frontEncryption = `${encryptedChunk}`;
+                }else if((!isUpperCase && !isLowerCase) && count == 1){
+                    const uniqueKmferChar = getUniqueKhmferChar(chunk, uniqueChars2);
+                    frontEncryption = `${encryptedChunk}${uniqueKmferChar}`;
                 }else{
-                    let newChunk;
-                    if(count !=1){
-                        newChunk = `${count}|${chunk}`;
-                        count = 1;
-                    }else{
-                        newChunk = `${chunk}`;
-                    }
-                } 
-                lastChunk = chunk;      
-            }
-            i = i+3;
+                    const uniqueKmferChar = getUniqueKhmferChar(chunk, uniqueChars2);
+                    frontEncryption = `${count}|${encryptedChunk}${uniqueKmferChar}`;
+                    count = 1;
+                }
+                encryptedString += frontEncryption;
+            }else{
+                   let chunkExtra = chunk;
+                   let chunkyChunk1 = parseInt(chunkExtra[0])|| chunk[0];
+                   let chunkyChunk2 = parseInt(chunkExtra[1])|| chunk[1];
+                   let chunkyChunk3 = parseInt(chunkExtra[2])|| chunk[2];
+                   if(typeof chunkyChunk1 === 'number' && typeof chunkyChunk2 === 'number' && typeof chunkyChunk3 === 'number'){
+                        let indexOfJapanChar = chunk;
+                        let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
+                        let newChunk;
+                        if(count !=1){
+                            newChunk = `${count}|${uniqueJapanChar}`;
+                            count = 1;
+                        }else{
+                            newChunk = `${uniqueJapanChar}`;
+                        }
+                   }else{
+                        if(count !=1){
+                            newChunk = `${count}|${chunk}`;
+                            count = 1;
+                        }else{
+                            newChunk = `${chunk}`;
+                        }
+                   }
+                   encryptedString+= newChunk;
+            } 
+            lastChunk = chunk;      
         }
-        if(imageRemainder != 0){
-            let endOfString = '';
-            for(var modIndex = 0; modIndex < imageRemainder; modIndex++){
-                endOfString += image[loopLength*3+modIndex];
-            }
-            encryptedString += endOfString;
-        }
-        console.log('image length after compressor applied', encryptedString.length);
-        return encryptedString;
-    }catch(error){
-        console.log('Error calling burson base64 compressor/Encrytion function ', error);
-        return null;
+        i = i+3;
     }
+    if(imageRemainder != 0){
+        let endOfString = '';
+        for(var modIndex = 0; modIndex < imageRemainder; modIndex++){
+            endOfString += image[loopLength*3+modIndex];
+        }
+        encryptedString += endOfString;
+    }
+    console.log('image length after compressor applied', encryptedString.length);
+    return encryptedString;
 }
 function getUniqueChinaChar(word, charArray) {
     if (word.length !== 3) {
@@ -2939,13 +2993,6 @@ function getCharIndexInArray(khmerChar, khmerChars) {
 }
 
 function mapCharsToTransformedWord(chineseChar, khmerChar, khmerChars) {
-    /*
-        take china char and kmferChar and determine 1 of the 24 different combinations that kmferChar represents
-        it should return a 3 letter word with 2 caps and 1 lower, or 2 lower and 1 caps (never all caps and lowers)
-        use khmfer index to determine which combinatin it is 1-24 
-
-    
-    */
     const reverseChinaChunk = reverseChinaChar(chineseChar, uniqueChars);
     if (!reverseChinaChunk) {
         throw new Error("Chinese character not found in reverse mapping.");
@@ -2953,13 +3000,24 @@ function mapCharsToTransformedWord(chineseChar, khmerChar, khmerChars) {
     if (typeof reverseChinaChunk !== 'string') {
         throw new Error("Retrieved value is not a string.");
     }
-    const khmerIndex = getCharIndexInArray(khmerChar, khmerChars);
-    const khmerValue = getUniqueKhmferChar(reverseChinaChunk, khmerChars); 
-    const caseValues = getCaseValuesFromIndex(khmerIndex);
+    const khmerIndex = khmerChars.indexOf(khmerChar);
+    if (khmerIndex === -1) {
+        throw new Error("Khmer character not found in uniqueKhmerChars array.");
+    }
+    let caseValues = [];
+    if (khmerIndex < 12) {
+        caseValues = [1, 1, 0]; // 2 lower, 1 upper
+    } else if (khmerIndex < 24) {
+        caseValues = [1, 0, 1]; // 1 lower, 2 upper
+    } else {
+        caseValues = [0, 1, 1]; // 1 upper, 2 lower
+    }
+
     const transformedWord = reverseChinaChunk.split('').map((char, idx) => {
-        const caseValue = caseValues[idx % caseValues.length]; 
+        const caseValue = caseValues[idx % caseValues.length]; // Cycle through caseValues
         return caseValue === 1 ? char.toLowerCase() : char.toUpperCase();
     }).join('');
+
     return transformedWord;
 }
 
