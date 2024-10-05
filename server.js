@@ -2907,8 +2907,9 @@ function BursonBase64Encrypted(image) {
                    let chunkyChunk1 = parseInt(chunkExtra[0])|| chunk[0];
                    let chunkyChunk2 = parseInt(chunkExtra[1])|| chunk[1];
                    let chunkyChunk3 = parseInt(chunkExtra[2])|| chunk[2];
+                   // to be integer chunkyChunk 1 must not be zero otherwise its not so use index mapping below
                    if(typeof chunkyChunk1 === 'number' && typeof chunkyChunk2 === 'number' && typeof chunkyChunk3 === 'number'){
-                        let indexOfJapanChar = chunk;
+                        let indexOfJapanChar = chunkyChunk1 + 10* chunkyChunk2 + 10**2*chunkyChunk3;
                         let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
                         let newChunk;
                         if(count !=1){
