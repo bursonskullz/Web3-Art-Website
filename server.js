@@ -2851,12 +2851,16 @@ function getUniqueKhmferChar(word, khmerChars) {
     if (word.length !== 3) {
         throw new Error("Word must be exactly 3 characters long.");
     }
-    // take in 3 letter upper case word and 
-    const caseValues = word.split('').map(getCharCaseValue); 
-    const caseProduct = caseValues.reduce((acc, val) => acc * val, 1); 
-    const permutationRank = getPermutationRank(word.split('')); 
-    const index = caseProduct * permutationRank;
-    return khmerChars[(index - 1) % khmerChars.length]; 
+    let permutation = []; const baseLength = 2;
+    for(const char of word){
+        if(char === char.toUpperCase()){
+            permutation.push(1);
+        }else{
+            permutation.push(0);
+        }
+    }
+    let index = permutation[0]+ permutation[1]*baseLength+ permutation[2]*baseLength**2; 
+    return khmerChars[index]; 
 }
 function getPermutationRank(arr) {
     let rank = 1;
@@ -2980,21 +2984,9 @@ function reverseChinaChar(chinaChar, charArray) {
     const thirdChar = alphabet[thirdCharIndex];
     return firstChar + secondChar + thirdChar;
 }
-
-function getCaseValuesFromIndex(index) {
-    let caseValues = [];
-    caseValues.push(index % 2 === 0 ? 2 : 1); 
-    caseValues.push(Math.floor(index / 2) % 2 === 0 ? 2 : 1); 
-    caseValues.push(Math.floor(index / 4) % 2 === 0 ? 2 : 1); 
-    return caseValues;
-}
-
-function getCharIndexInArray(khmerChar, khmerChars) {
-    return khmerChars.indexOf(khmerChar);
-}
-
 function mapCharsToTransformedWord(chineseChar, khmerChar, khmerChars) {
     const reverseChinaChunk = reverseChinaChar(chineseChar, uniqueChars);
+    let caseValues = []; let transformedWord = '';
     if (!reverseChinaChunk) {
         throw new Error("Chinese character not found in reverse mapping.");
     }
@@ -3005,23 +2997,29 @@ function mapCharsToTransformedWord(chineseChar, khmerChar, khmerChars) {
     if (khmerIndex === -1) {
         throw new Error("Khmer character not found in uniqueKhmerChars array.");
     }
-    let caseValues = [];
-    if (khmerIndex < 12) {
-        caseValues = [1, 1, 0]; // 2 lower, 1 upper
-    } else if (khmerIndex < 24) {
-        caseValues = [1, 0, 1]; // 1 lower, 2 upper
-    } else {
-        caseValues = [0, 1, 1]; // 1 upper, 2 lower
+    if(khmerIndex == 0) {
+        caseValues = [0,0,1];
+    }else if(khmerIndex == 1){
+        caseValues = [0,1,0];
+    }else if(khmerIndex == 2){
+        caseValues = [0,1,1];
+    }else if(khmerIndex == 3){
+        caseValues = [1,0,0];
+    }else if(khmerIndex == 4){
+        caseValues = [1,0,1];
+    }else if(khmerIndex == 5){
+        caseValues = [1,1,0];
     }
-
-    const transformedWord = reverseChinaChunk.split('').map((char, idx) => {
-        const caseValue = caseValues[idx % caseValues.length]; // Cycle through caseValues
-        return caseValue === 1 ? char.toLowerCase() : char.toUpperCase();
-    }).join('');
-
+    for(var i = 0; i<reverseChinaChunk.length; i++){
+        let char = reverseChinaChunk[i];
+        if(caseValues[i] == 0){
+            transformedWord+= char.toLowerCase();
+        }else{
+           transformedWord+= char.toUpperCase();
+        }
+    }
     return transformedWord;
 }
-
 function getBarNumberAttachment(i, encryptedString){
     let repeatCount = '';
     for (let j = i - 1; j >= 0; j--) {
@@ -3044,6 +3042,7 @@ function isAKMfer(char){
     return uniqueCharsSet.has(char);
 }
 async function BursonBase64Decrypt(encryptedString) {
+    // need to also check for japanese symbols 
     let decryptedString = ''; let alphabet = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
     for(var i=0; i<encryptedString.length; i++){
         const char = encryptedString[i];
@@ -3102,6 +3101,7 @@ async function BursonBase64Decrypt(encryptedString) {
             }
             decryptedString+= newString;
         } else {
+            // need to check for japanese character addtion that has been added 
             decryptedString += char;
         }
     }
