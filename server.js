@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 10-05-24
+// Date last modified: 10-06-24
 // purpose: Make web3 art website to coincide with research related life
 
 const maxNumberOfAIEventsPerClient = 100;
@@ -1938,7 +1938,6 @@ try{
             });
 
             const io = socketIo(server);
-
             io.on('connection', (socket) => {
                 console.log('A user connected');
                 const ipAddress = socket.handshake.address;
@@ -1969,7 +1968,7 @@ try{
                     console.log('A user connected');
                     const timeSent = new Date().toISOString();
                     const forwarded = socket.handshake.headers['x-forwarded-for'];
-                    const ipAddress = forwarded ? forwarded.split(',')[0] : socket.handshake.address;  // Prefer X-Forwarded-For if available
+                    const ipAddress = forwarded ? forwarded.split(',')[0] : socket.handshake.address;  
                     let clientIP;
                     if (ipAddress.includes('::ffff:')) {
                         clientIP = ipAddress.split(':').pop();
@@ -2047,10 +2046,10 @@ try{
             const encryptedStringTest = BursonBase64Encrypted(base64TestString);
             const chineseCharTest = String.fromCharCode(0x4E02); 
             const khmerCharTest = String.fromCharCode(0x1780); 
+
             const transformedWord = mapCharsToTransformedWord(chineseCharTest, khmerCharTest, uniqueChars2);
             console.log(`The transformed 3-letter word is (should not be all caps or lower case): ${transformedWord}`);
             // use getUniqueKhmferChar to see how to get inverse word back
-
             //const decryptionTestStringTest = await BursonBase64Decrypt(encryptedStringTest);
             //console.log('decryptedString length', decryptionTestStringTest.length);
 
@@ -2140,7 +2139,7 @@ function canSendMessage(array, name, time) {
                     setTimeout(() => {
                         thisSender.coolDown = 0;
                         console.log('User has ability to send again');
-                    }, 24 * 60 * 60 * 1000); // 24 hours in seconds
+                    }, 24 * 60 * 60 * 1000);
                 }
             }           
         } else { 
@@ -2215,7 +2214,6 @@ async function checkIfName(string) {
 
     
 }
-
 async function sendEmail(email, address, firstName, lastName, productID, price, productName, productIMG) {
     let atagRef = 'mailto:' + buisnessEmial;
     let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
@@ -2250,16 +2248,13 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
     });
 
     transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
-
      let mailOptions = {
             from: buisnessEmial, 
             to: email, 
             subject: 'Congrats on your new purchase!', 
             html: HTML
     };
-
     try {
-
         let result = await transporter.sendMail(mailOptions);
         return result;
     } catch (error) {
@@ -2268,16 +2263,12 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
     }
 }
 
-
 function getMaxValueofPurchases(attemptedClientsArray) {
     let maxValue = 0;
-
     if(attemptedClientsArray.length == 0){
-
     }else{
         let lastelement = attemptedClientsArray[0];
         attemptedClientsArray.forEach(element => {
-            // if first index dont do anything bec
             if(lastelement.numberOfPurchaseAttempts<= element.numberOfPurchaseAttempts){
                 maxValue = element.numberOfPurchaseAttempts;
             }else{
@@ -2286,14 +2277,10 @@ function getMaxValueofPurchases(attemptedClientsArray) {
             lastelement = element;
         });
     }
-
-
     return maxValue;
 }
 
 async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, image) {
-
-// HTML files to send
     let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
                     <div class="header" style="width: 100%; margin-bottom: 20px; text-align: center;">
                         <img src="https://i.ibb.co/kmVWh5p/Burson-SKull-Text.png" alt="Burson-SKull-Text" style="width: 100%; height: auto; max-height: 200px;">
@@ -2400,9 +2387,6 @@ async function getNewDefinition(word) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
     const data = await response.json();
-
-    //console.log(`we recieved data for the word ${word}:`, data);
-
     if (data.length === 0) {
       console.log('No definition found.');
       return null;
@@ -2421,7 +2405,7 @@ async function getNewDefinition(word) {
       definition7: entry.shortdef[6] ? entry.shortdef[6] : null,
       definition8: entry.shortdef[7] ? entry.shortdef[7] : null,
       usage: entry.fl || 'Unknown',
-      type: 'Unknown' // You might need additional logic to determine the type
+      type: 'Unknown' 
     };
 
     return wordInfo;
@@ -2433,10 +2417,7 @@ async function getNewDefinition(word) {
 
 async function getAllCollections() {
     try {
-        // List all collections in the database
         const collections = await mongoose.connection.db.listCollections().toArray();
-        
-        // Extract and return collection names
         return collections.map(col => col.name);
     } catch (error) {
         console.error('Error fetching collections:', error);
@@ -2450,13 +2431,10 @@ async function getAllModels() {
 
     collectionNames.forEach(name => {
         try {
-            // Check if the model already exists in mongoose.models
             if (mongoose.models[name]) {
-                // If it exists, use the existing model
                 models[name] = mongoose.models[name];
             } else {
-                // Otherwise, create a new model with a flexible schema
-                const schema = new mongoose.Schema({}, { strict: false }); // Flexible schema
+                const schema = new mongoose.Schema({}, { strict: false }); 
                 models[name] = mongoose.model(name, schema);
             }
         } catch (error) {
@@ -2464,7 +2442,7 @@ async function getAllModels() {
         }
     });
 
-    return models; // Return an object containing all models
+    return models;
 }
 
 
@@ -2486,7 +2464,7 @@ async function verifyUserinputData(email, address, firstName, lastName){
 
 
 async function roulsResponse(question) {
-    const lowercaseQuestion = question.toLowerCase(); // Convert question to lowercase
+    const lowercaseQuestion = question.toLowerCase(); 
 
     const artworkPurchaseKeywords = [
       'buy a painting',
@@ -2633,8 +2611,6 @@ async function roulsResponse(question) {
     if (currentPart.trim() !== '') {
         parts.push(currentPart.trim());
     }
-
-    // Extract the word from the parts
     let targetWord = '';
     for (let part of parts) {
         const match = part.match(/(?:of|mean\s*)\s+["']?(.*?)[?"']?$/);
@@ -2646,8 +2622,6 @@ async function roulsResponse(question) {
     let response = '';
     let responseArray = [];
     let partIndex = -1;
-
-    // Array of similar time phrases
     const similarTimePhrases = [
         "what time is it",
         "current time",
@@ -2764,20 +2738,14 @@ async function roulsResponse(question) {
           const thisWord = targetWord;
           //const thisWord = part.substring(part.lastIndexOf(" ")+1);
           const stripedWord = thisWord.replace(/\s/g, "");
-          //console.log(' seems like the user is asking for a definition of:', stripedWord);
-          
           let matchingObj = knownDefinitions.find(obj => obj.word === stripedWord);
-
           if (matchingObj) {
-              //console.log('We found a matching word:', matchingObj);
-
               let formattedString = Object.entries(matchingObj)
                   .filter(([key, value]) => value !== null) 
                   .map(([key, value]) => `${key}: ${value}`)
                   .join('\n\n'); 
 
               response = formattedString + '\n';
-              //console.log('we formatted the json object to string:', response);
           } else {
               response = 'We could not find the word you are looking for.\n\n';
           }
@@ -2796,12 +2764,10 @@ async function roulsResponse(question) {
                 response = previousQuestion1[questionHasAlreadyBeenAsked1].response;
             }else{
                 response = await fetchOpenAIResponse(part);
-                // push to array
                 const AIeventObject = {
                     question: part,
                     response: response
                 };
-
                 if(questionHasAlreadyBeenAsked0.length <= max_array_length){
                     previousQuestion0.push(AIeventObject);     
                 }else if(questionHasAlreadyBeenAsked1.length <= max_array_length){
@@ -2810,7 +2776,6 @@ async function roulsResponse(question) {
                     console.log('Memory system full do not push to array');
                 }
             }
-            
         }
       }else{
         response = 'Sorry I do not accept inappropriate input and bad words!';
@@ -2828,7 +2793,6 @@ async function fetchOpenAIResponse(question) {
             messages: [{ role: "user", content: question }],
             stream: true,
         });
-
         let aiResponse = '';
         for await (const chunk of stream) {
             aiResponse += chunk.choices[0]?.delta?.content || "";
@@ -2839,13 +2803,6 @@ async function fetchOpenAIResponse(question) {
         return "I'm sorry, I couldn't understand your question or it's not related to the topics I can assist with.\n\n";
         console.log('openAI failed', error);
     }
-}
-
-function getCharCaseValue(char) {
-    return (char === char.toLowerCase()) ? 1 : 2;
-}
-function factorial(n) {
-    return (n === 0) ? 1 : n * factorial(n - 1);
 }
 function getUniqueKhmferChar(word, khmerChars) {
     if (word.length !== 3) {
@@ -2862,20 +2819,6 @@ function getUniqueKhmferChar(word, khmerChars) {
     let index = permutation[0]+ permutation[1]*baseLength+ permutation[2]*baseLength**2; 
     return khmerChars[index]; 
 }
-function getPermutationRank(arr) {
-    let rank = 1;
-    let n = arr.length;
-    let factorials = Array(n).fill(0).map((_, i) => factorial(i));
-    for (let i = 0; i < n; i++) {
-        let smaller = 0;
-        for (let j = i + 1; j < n; j++) {
-            if (arr[i] > arr[j]) smaller++;
-        }
-        rank += smaller * factorials[n - 1 - i];
-    }
-    return rank;
-}
-
 function BursonBase64Encrypted(image) {
     console.log('image length before compression', image.length);
     image = image.replace(/^data:image\/[a-z]+;base64,/, '');
@@ -2911,7 +2854,6 @@ function BursonBase64Encrypted(image) {
                    let chunkyChunk1 = parseInt(chunkExtra[0])|| chunk[0];
                    let chunkyChunk2 = parseInt(chunkExtra[1])|| chunk[1];
                    let chunkyChunk3 = parseInt(chunkExtra[2])|| chunk[2];
-                   // to be integer chunkyChunk 1 must not be zero otherwise its not so use index mapping below
                    if(typeof chunkyChunk1 === 'number' && typeof chunkyChunk2 === 'number' && typeof chunkyChunk3 === 'number'){
                         let indexOfJapanChar = chunkyChunk1 + 10* chunkyChunk2 + 10**2*chunkyChunk3;
                         let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
