@@ -2043,16 +2043,16 @@ try{
             QQnsnne3n3ne3e3ne3-+k3k3kXcIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
             2l8288888888288282828sjjsssj28828sjsj28288sjzjj8282j=Jj----SSSSSS`;
 
-            const encryptedStringTest = BursonBase64Encrypted(base64TestString);
             const chineseCharTest = String.fromCharCode(0x4E02); 
-            const khmerCharTest = String.fromCharCode(0x1780); 
-
+            const khmerCharTest = String.fromCharCode(0x1780);
+            
             const transformedWord = mapCharsToTransformedWord(chineseCharTest, khmerCharTest, uniqueChars2);
-            console.log(`The transformed 3-letter word is (should not be all caps or lower case): ${transformedWord}`);
-            // use getUniqueKhmferChar to see how to get inverse word back
-            //const decryptionTestStringTest = await BursonBase64Decrypt(encryptedStringTest);
-            //console.log('decryptedString length', decryptionTestStringTest.length);
-
+            console.log(`The transformed 3-char: ${transformedWord}`);
+            
+            const encryptedStringTest = BursonBase64Encrypted(base64TestString); 
+            const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest);
+            console.log('decryptedString length it should equal and bingo wen 50G though!!', decryptionTestStringTest.length);
+            
             await addBasicDefinitions(basicDefinitions);
             console.log('Done adding definitions, launching workers');
 
@@ -2983,37 +2983,43 @@ function isAKMfer(char){
     const uniqueCharsSet = new Set(uniqueChars2);
     return uniqueCharsSet.has(char);
 }
-async function BursonBase64Decrypt(encryptedString) {
-    // need to also check for japanese symbols 
+function BursonBase64Decrypt(encryptedString) {
+    console.log('calling burson decompression with length', encryptedString.length );
     let decryptedString = ''; let alphabet = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
     for(var i=0; i<encryptedString.length; i++){
         const char = encryptedString[i];
         if (char === '|') {
-            let repeatCount = getBarNumberAttachment(i, encryptedString);
+            let repeatCount = getBarNumberAttachment(i, encryptedString); 
             const repeatCountNumber = parseInt(repeatCount) || 1;
-            var nextChar = encryptedString[i + 1];// vertical bar is only present in front of an item so this is fine
+            var nextChar = encryptedString[i + 1]; // vertical bar is only present in front of an item so this is fine
             if(isChineseChar(nextChar)){
-                    // check if a k-mfer symbol is to the right 
+                    let decryptedKMFERString = '';
                     if(i!= encryptedString.length){
                         const getKmferChar = encryptedString[i+1];
-                        let decryptedKMFERString = '';
                         if(isAKMfer(getKmferChar)){
-                           decryptedKMFERString = mapCharsToTransformedWord(getKmferChar, getKmferChar, uniqueChars2);
+                           decryptedKMFERString = mapCharsToTransformedWord(nextChar, getKmferChar, uniqueChars2);
                            i+=2;
                         }else{
-                           decryptedKMFERString = reverseChinaChar(nextChar, uniqueChars);
+                           decryptedKMFERString = uniqueChars.indexOf(nextChar);
                            i+=1;
                         }
                     }else{
-                        decryptedKMFERString =  reverseChinaChar(nextChar, uniqueChars);
+                        decryptedKMFERString =  uniqueChars.indexOf(nextChar);
                     }
                     let newString = '';
                     for(var k =0; k< repeatCountNumber; k++){
                         newString+=decryptedKMFERString;
                     }
                     decryptedString+= newString;
+            }else if(isJapaneseChar(nextChar)){
+                    let newString = ''; 
+                    let jpanIntegerString = uniqueChars3.indexOf(nextChar).toString();// no prime symbol only for chineese symbols;
+                    for(var k =0; k< repeatCountNumber; k++){
+                        newString+= jpanIntegerString;
+                    }
+                    decryptedString+= newString;
             }else{
-                let nextChar = encryptedString[i + 2]+encryptedString[i + 3];
+                let nextCharDouble = nextChar +encryptedString[i + 2]+encryptedString[i + 3];
                 let newString = '';
 
                 for(var k = 0; k< repeatCountNumber; k++){
@@ -3023,27 +3029,30 @@ async function BursonBase64Decrypt(encryptedString) {
                 i+=2;
             }
         } else if (isChineseChar(char)) {
-            let repeatCount = getBarNumberAttachment(i, encryptedString);
+            let repeatCount = getBarNumberAttachment(i, encryptedString); 
             const repeatCountNumber = parseInt(repeatCount) || 1;
             let decryptedKMFERString = '';
-            if(i!= encryptedString.length){// not possible to have a K-mfer char at end of string
+            if(i!= encryptedString.length){
                 const getKmferChar = encryptedString[i+1];
                 if(isAKMfer(getKmferChar)){
                     decryptedKMFERString += mapCharsToTransformedWord(getKmferChar, getKmferChar, uniqueChars2);
                     i += 1;
                 }else{
-                    decryptedKMFERString += reverseChinaChar(char, uniqueChars); 
+                    decryptedKMFERString += uniqueChars.indexOf(char);
                 }
             }else{
-               decryptedKMFERString = reverseChinaChar(char, uniqueChars);
+               decryptedKMFERString = uniqueChars.indexOf(char);
             }
             let newString = '';
             for(var k =0; k< repeatCountNumber; k++){
                 newString+=decryptedKMFERString;
             }
             decryptedString+= newString;
+        }else if(isJapaneseChar(char)){
+            decryptedString+= uniqueChars3.indexOf(char).toString();
         } else {
-            // need to check for japanese character addtion that has been added 
+            // not vertical bar, not chineese char, not a japanese char, not a Combodian symbol
+            // it can be a number from a number or +- symbol not encrypted
             decryptedString += char;
         }
     }
