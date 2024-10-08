@@ -2032,11 +2032,10 @@ try{
             console.log('current china chars', uniqueChars);
             console.log('current k-mfers chars', uniqueChars2);
             console.log('current japaneseChars', uniqueChars3);
-            var base64TestString = `data:image/png;base64,AAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBB+-+dekddeB`;
+            var base64TestString = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABMIAAAUACAYAAAClIP6rAAABhWlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV`;
             console.log('Base 64 string image length before compressor applied', base64TestString.length);
             const encryptedStringTest = BursonBase64Encrypted(base64TestString, 4);
-            console.log(`Burson Skull internet speed = ${5*(base64TestString.length/encryptedStringTest.length).toFixed(3)}G`);
-            console.log(`increase amount =, ${(base64TestString.length/encryptedStringTest.length).toFixed(3)}x`);
+            console.log(`Compression amount =, ${(base64TestString.length/encryptedStringTest.length).toFixed(3)}x`);
             //const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest);
             //console.log('decryptedString length it should equal and bingo wen 50G though!!', decryptionTestStringTest.length);
 
@@ -2342,17 +2341,6 @@ async function setUniqueKhmerMapping() {
     }
     return khmerChars;
 }
-/*
-async function setUniqueChinaCharMapping(){
-    let chineseChars = [];
-    const start = 0x4E00; // Start of CJK Unified Ideographs block
-    const end = 0x9FFF;   // End of the CJK Unified Ideographs block
-    for (let i = start; i <= end; i++) {
-        chineseChars.push(String.fromCharCode(i));
-    }
-    return chineseChars;
-}*/
-
 async function setUniqueChinaCharMapping(chunkLength) {
     let uniqueChars = [];
     const totalCharsNeeded = 26 ** chunkLength;  // 26^chunkLength is 456,976 for chunkLength = 4
@@ -2360,7 +2348,7 @@ async function setUniqueChinaCharMapping(chunkLength) {
     const excludedRanges = [
         [0x3040, 0x309F], // Hiragana
         [0x30A0, 0x30FF], // Katakana
-        [0x4E00, 0x9FFF], // CJK Unified Ideographs (Kanji)
+        [0x4E00, 0x9FFF], // Kanji
         [0x1780, 0x17FF], // Khmer
     ];
 
@@ -2932,7 +2920,6 @@ function separateIntoBestChunk(base64String, chunkLength) {
 function BursonBase64Encrypted(base64String, modulus) {
     base64String = base64String.replace(/^data:image\/[a-z]+;base64,/, '');
     let bestChunks = separateIntoBestChunk(base64String, modulus);
-    console.log('Using Burson algorithm on chunks', bestChunks);
     let encryptedString = '';
     let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let processedIndices = new Set(); let counterString = '';
@@ -3036,7 +3023,6 @@ function BursonBase64Encrypted(base64String, modulus) {
         }
     });
     console.log('Image length after compressor applied', encryptedString.length);
-    console.log('Image after encryption', encryptedString);
     return encryptedString;
 }
 function getUniqueModulusChar(word, charArray, modLength) {
@@ -3044,20 +3030,18 @@ function getUniqueModulusChar(word, charArray, modLength) {
         throw new Error(`Input word must be exactly ${modLength} characters long`);
     }
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const base = alphabet.length; 
-    
-    let uniqueIndex = 0;
-    for (let i = 0; i < modLength; i++) {
-        const charIndex = alphabet.indexOf(word[i]);  
-        if (charIndex === -1) {
-            throw new Error(`Invalid character '${word[i]}' in word`);
-        }
-        uniqueIndex += (charIndex) * (base ** (modLength - 1 - i));
-    }
-    uniqueIndex += 1;
-    if (uniqueIndex > 0 && uniqueIndex <= charArray.length) {
-        return charArray[uniqueIndex - 1]; 
+    let base = alphabet.length;
+    let char1Index = alphabet.indexOf(word[0])+1;
+    let char2Index = alphabet.indexOf(word[1])+1;
+    let char3Index = alphabet.indexOf(word[2])+1;
+    let char4Index = alphabet.indexOf(word[3])+1;
+
+    let calculatedIndex = char4Index + (base**1+char3Index) + (base**2+char2Index) + (base**3+char1Index);
+    let uniqueIndex = calculatedIndex;
+    if (uniqueIndex >= 0 && uniqueIndex <= charArray.length) {
+        return charArray[uniqueIndex]; 
     } else {
+        console.log('Error index out of boundary', calculatedIndex);
         throw new Error("Unique index is out of bounds of the character array");
     }
 }
