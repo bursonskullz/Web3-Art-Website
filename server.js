@@ -3001,8 +3001,31 @@ function BursonBase64Encrypted(base64String, modulus) {
                 }else{
                     encryptedString += chunk;
                 }
+            }else if(maxCount == 0 && chunk.length === modulus){
+                let isUpperCase = chunk === chunk.toUpperCase();
+                let isLowerCase = chunk === chunk.toLowerCase();
+                let isEnglishChunk = [...chunk].every(char => alphabet.includes(char));
+                let isStringDigits = parseInt(chunk); 
+                let encryptedChunk;
+                if ((isUpperCase || isLowerCase) && isEnglishChunk && chunk.length === modulus) {
+                    uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
+                    frontEncryption = `${uniqueSymbol}`;
+                } else if (!isUpperCase && !isLowerCase && isEnglishChunk) {
+                    uniqueSymbol = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
+                    frontEncryption = `${uniqueSymbol}`;
+                } else if (!isUpperCase && !isLowerCase && !isEnglishChunk) {
+                    frontEncryption = `${chunk}`;
+                }else if(isStringDigits){
+                    let indexOfJapanChar = isStringDigits ;
+                    let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
+                    frontEncryption = `${uniqueJapanChar}`;
+                }else{
+                    frontEncryption = `${chunk}`;
+                }
+                encryptedString += frontEncryption;
             }else{
-
+                // for plus or minus signs and 3-char chunks
+                encryptedString += chunk;
             }
         }
     });
