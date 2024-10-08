@@ -2929,77 +2929,81 @@ function separateIntoBestChunk(base64String, chunkLength) {
     return chunks;
 }
 
-
 function BursonBase64Encrypted(base64String, modulus) {
     base64String = base64String.replace(/^data:image\/[a-z]+;base64,/, '');
     let bestChunks = separateIntoBestChunk(base64String, modulus);
-    console.log('Using burson algorithm on chunks', bestChunks);
-    let encryptedString = ''; let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    var count = 1; var lastChunk = ''; 
-    for(var chunk of bestChunks){
+    console.log('Using Burson algorithm on chunks', bestChunks);
+    let encryptedString = '';
+    let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    let processedIndices = new Set(); 
+    bestChunks.forEach((chunk, currentIndex) => {
+        if (processedIndices.has(currentIndex)) return;
         let maxCount = getMaxChunkCount(chunk, bestChunks); 
-        if(chunk === lastChunk){
-            count += 1;
-            if(count === maxCount){
-                encryptedString += `${count}|${chunk}`;
-            }
-            
-        }else{
-            if([...chunk].every(char => alphabet.includes(char)) && chunk.length === modulus) {
-                let frontEncryption; let isUpperCase = chunk === chunk.toUpperCase();let isLowerCase = chunk === chunk.toLowerCase();
-                let encryptedChunk = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
-                if(isUpperCase && count !=1){
-                    frontEncryption  = `${count}|${encryptedChunk}`;
-                    count = 1;
-                }else if(isLowerCase && count!=1){
-                    frontEncryption  = `${count}|${encryptedChunk}^`;
-                    count = 1;
-                }else if((isLowerCase || isUpperCase) && count == 1){
-                    frontEncryption = `${encryptedChunk}`;
-                }else if((!isUpperCase && !isLowerCase) && count == 1){
-                    const uniqueKmferChar = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
-                    frontEncryption = `${encryptedChunk}${uniqueKmferChar}`;
-                }else if((!isUpperCase && !isLowerCase) && count > 1){
-                    const uniqueKmferChar = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
-                    frontEncryption = `${count}|${encryptedChunk}${uniqueKmferChar}`;
-                    count = 1;
-                }
-                encryptedString += frontEncryption;
-            }else if(chunk.length === modulus){  
-               let newChunk; let integerChecker = true;
-                for (let n = 0; n < chunk.length; n++) {
-                    if (!Number.isInteger(parseInt(chunk[n]))) {
-                        integerChecker = false; 
-                        break; 
-                    }
-                }
-               if(integerChecker){
-                    let indexOfJapanChar = parseInt(chunk);
+        console.log('Checking chunk', chunk, 'with maxCount', maxCount);
+        if (maxCount > 0 && chunk.length === modulus) {
+            let frontEncryption;
+            let isUpperCase = chunk === chunk.toUpperCase();
+            let isLowerCase = chunk === chunk.toLowerCase();
+            let isEnglishChunk = [...chunk].every(char => alphabet.includes(char));
+            let isStringDigits = parseInt(chunk);
+            let encryptedChunk;
+            if (maxCount === 1) {
+                if ((isUpperCase || isLowerCase) && isEnglishChunk && chunk.length === modulus) {
+                    uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
+                    frontEncryption = `${uniqueSymbol}`;
+                } else if (!isUpperCase && !isLowerCase && isEnglishChunk) {
+                    uniqueSymbol = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
+                    frontEncryption = `${uniqueSymbol}`;
+                } else if (!isUpperCase && !isLowerCase && !isEnglishChunk) {
+                    frontEncryption = `${chunk}`;
+                }else if(isStringDigits){
+                    let indexOfJapanChar = isStringDigits ;
                     let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
-                    if(count !=1){
-                        newChunk = `${count}|${uniqueJapanChar}`;
-                        count = 1;
-                    }else{
-                        newChunk = `${uniqueJapanChar}`;
-                    }
-               }else{
-                    if(count !=1){
-                        newChunk = `${count}|${chunk}`;
-                        count = 1;
-                    }else{
-                        newChunk = `${chunk}`;
-                    }
-               }
-               encryptedString+= newChunk;
+                    frontEncryption = `${uniqueJapanChar}`;
+                }else{
+                    frontEncryption = `${maxCount}|${chunk}`;
+                }
+                frontEncryption = chunk; 
+            } else if(maxCount!=1) {
+                let uniqueSymbol;
+                if ((isUpperCase || isLowerCase) && isEnglishChunk && chunk.length === modulus) {
+                    uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
+                    frontEncryption = `${maxCount}|${uniqueSymbol}`;
+                    console.log('adding front encytpion using chineese 4-char reduction', frontEncryption);
+                } else if (!isUpperCase && !isLowerCase && isEnglishChunk) {
+                    uniqueSymbol = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
+                    frontEncryption = `${maxCount}|${uniqueSymbol}`;
+                    console.log('adding front encytpion using chineese 4-char reduction and permutation char', frontEncryption);
+                } else if (!isUpperCase && !isLowerCase && !isEnglishChunk) {
+                    console.log('chunk not english not lower or upper just append using repeatedCount', frontEncryption);
+                    frontEncryption = `${maxCount}|${chunk}`;
+                }else if(isStringDigits){
+                    let indexOfJapanChar = isStringDigits;
+                    let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
+                    frontEncryption = `${maxCount}|${uniqueJapanChar}`;
+                }else{
+                    console.log('Chunk not English, upper, or lower; just appending using repeatedCount:', frontEncryption);
+                    frontEncryption = `${maxCount}|${chunk}`;
+                }
             }else{
-                encryptedString+= chunk;
+                frontEncryption+= chunk;
             }
-            lastChunk = chunk;      
+            encryptedString += frontEncryption; 
+
+            for (let i = 1; i < maxCount; i++) {
+                if (currentIndex + i < bestChunks.length) {
+                    processedIndices.add(currentIndex + i);
+                }
+            }
+        } else {
+            // If maxCount is 0, simply append the chunk as-is
+            // can handle 3-char chunks seperatly but we need 26^x +10^x+2^x -3 more chars for  x=chunk length 
+            encryptedString += chunk;
         }
-    }
-    console.log('image length after compressor applied', encryptedString.length);
+    });
+    console.log('Image length after compressor applied', encryptedString.length);
     console.log('Image after encrypting', encryptedString);
-    return encryptedString;
+    return encryptedString; // Return the final encrypted string
 }
 function getUniqueModulusChar(word, charArray, modLength) {
     if (word.length !== modLength) {
@@ -3025,11 +3029,15 @@ function getUniqueModulusChar(word, charArray, modLength) {
 }
 function getMaxChunkCount(chunk, bestChunks) {
     let maxCount = 0;
-    for (let i = 0; i < bestChunks.length; i++) {
+    let startIndex = bestChunks.indexOf(chunk); 
+    if (startIndex === -1) {
+        return maxCount;
+    }
+    for (let i = startIndex; i < bestChunks.length; i++) {
         if (bestChunks[i] === chunk) {
             maxCount += 1;
         } else {
-            break; // Stop when the chunk doesn't match
+            break;
         }
     }
     return maxCount;
