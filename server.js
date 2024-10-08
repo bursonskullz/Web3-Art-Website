@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 10-06-24
+// Date last modified: 10-08-24
 // purpose: Make web3 art website to coincide with research related life
 
 const maxNumberOfAIEventsPerClient = 100;
@@ -38,6 +38,7 @@ const OpenAI = require('openai');
 const solc = require('solc');
 
 require('dotenv').config();
+
 const paintCollectionString = 'Painting';
 const purchasesCollectionString = 'Purchase';
 const commissionCollectionString = 'Commission';
@@ -1938,6 +1939,7 @@ try{
             });
 
             const io = socketIo(server);
+
             io.on('connection', (socket) => {
                 console.log('A user connected');
                 const ipAddress = socket.handshake.address;
@@ -1968,7 +1970,7 @@ try{
                     console.log('A user connected');
                     const timeSent = new Date().toISOString();
                     const forwarded = socket.handshake.headers['x-forwarded-for'];
-                    const ipAddress = forwarded ? forwarded.split(',')[0] : socket.handshake.address;  
+                    const ipAddress = forwarded ? forwarded.split(',')[0] : socket.handshake.address;  // Prefer X-Forwarded-For if available
                     let clientIP;
                     if (ipAddress.includes('::ffff:')) {
                         clientIP = ipAddress.split(':').pop();
@@ -2012,7 +2014,8 @@ try{
                 });   
             });
 
-            let chinaChars = await setUniqueChinaCharMapping();
+
+            let chinaChars = await setUniqueChinaCharMapping(4);
             let kmferChars = await setUniqueKhmerMapping();
             let japaneseChars = await setUniqueJapaneseCharsMapping();
 
@@ -2029,30 +2032,14 @@ try{
             console.log('current china chars', uniqueChars);
             console.log('current k-mfers chars', uniqueChars2);
             console.log('current japaneseChars', uniqueChars3);
+            var base64TestString = `data:image/png;base64,AAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBB+-+dekddeB`;
+            console.log('Base 64 string image length before compressor applied', base64TestString.length);
+            const encryptedStringTest = BursonBase64Encrypted(base64TestString, 4);
+            console.log(`Burson Skull internet speed = ${5*(base64TestString.length/encryptedStringTest.length).toFixed(3)}G`);
+            console.log(`increase amount =, ${(base64TestString.length/encryptedStringTest.length).toFixed(3)}x`);
+            //const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest);
+            //console.log('decryptedString length it should equal and bingo wen 50G though!!', decryptionTestStringTest.length);
 
-            const base64TestString = `data:image/png;base64,iVBORw0KGgoAAAAAANSUhEUgAABdwAAAfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV8/pCKVDpYi4
-            pChOlkQK+IoVSyChdJCQQQQQQQQQQQQQQQQZZZZZZZZZZWWWWWWWWWWWWWWWWWWWWWkajjejJBEBEjJKiklloooOOOOOOOOOOOOOOOOOOOOlkiNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmo
-            NmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmoNmo+-nnnnn22222AAAAAQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQLLLLfQCAYAAADYaJ02AAABhG
-            lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYA
-            AADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcLLLLLLLLLLLLLJJJJJJJJJJJJJJJJJJJJTTTTTTTTTTTTTTTTCCCCCCCCCCCCCDDDDnnnTyOTyOTyOHKLhJk+k1-2fQCAYAAADYa
-            J02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0Ac
-            fQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcfQCAYAAADYaJ02AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJ
-            F9kT1Iw0Ac33ddHkiHkiHkiHkiHkiJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ
-            AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIIIIIIIIiamamaLLLL+-Mk-Mkksmsapapaa1M9944Kkkkkkkkkkkkkkkkkk
-            2333e3e3e3e3eee2222222222223333333333333222222222223333333328888882288228818101111111JJJJJJSJSJSJSJSSSSSSSSSJJSJSJSJSJSJSJSJSSSSSSSSSSSSSJSJSJSJSJ
-            QQnsnne3n3ne3e3ne3-+k3k3kXcIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-            2l8288888888288282828sjjsssj28828sjsj28288sjzjj8282j=Jj----SSSSSS`;
-
-            const chineseCharTest = String.fromCharCode(0x4E02); 
-            const khmerCharTest = String.fromCharCode(0x1780);
-            
-            const transformedWord = mapCharsToTransformedWord(chineseCharTest, khmerCharTest, uniqueChars2);
-            console.log(`The transformed 3-char: ${transformedWord}`);
-            
-            const encryptedStringTest = BursonBase64Encrypted(base64TestString); 
-            const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest);
-            console.log('decryptedString length it should equal and bingo wen 50G though!!', decryptionTestStringTest.length);
-            
             await addBasicDefinitions(basicDefinitions);
             console.log('Done adding definitions, launching workers');
 
@@ -2139,7 +2126,7 @@ function canSendMessage(array, name, time) {
                     setTimeout(() => {
                         thisSender.coolDown = 0;
                         console.log('User has ability to send again');
-                    }, 24 * 60 * 60 * 1000);
+                    }, 24 * 60 * 60 * 1000); // 24 hours in seconds
                 }
             }           
         } else { 
@@ -2214,6 +2201,7 @@ async function checkIfName(string) {
 
     
 }
+
 async function sendEmail(email, address, firstName, lastName, productID, price, productName, productIMG) {
     let atagRef = 'mailto:' + buisnessEmial;
     let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
@@ -2248,13 +2236,16 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
     });
 
     transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
+
      let mailOptions = {
             from: buisnessEmial, 
             to: email, 
             subject: 'Congrats on your new purchase!', 
             html: HTML
     };
+
     try {
+
         let result = await transporter.sendMail(mailOptions);
         return result;
     } catch (error) {
@@ -2263,12 +2254,16 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
     }
 }
 
+
 function getMaxValueofPurchases(attemptedClientsArray) {
     let maxValue = 0;
+
     if(attemptedClientsArray.length == 0){
+
     }else{
         let lastelement = attemptedClientsArray[0];
         attemptedClientsArray.forEach(element => {
+            // if first index dont do anything bec
             if(lastelement.numberOfPurchaseAttempts<= element.numberOfPurchaseAttempts){
                 maxValue = element.numberOfPurchaseAttempts;
             }else{
@@ -2277,10 +2272,14 @@ function getMaxValueofPurchases(attemptedClientsArray) {
             lastelement = element;
         });
     }
+
+
     return maxValue;
 }
 
 async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, image) {
+
+// HTML files to send
     let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
                     <div class="header" style="width: 100%; margin-bottom: 20px; text-align: center;">
                         <img src="https://i.ibb.co/kmVWh5p/Burson-SKull-Text.png" alt="Burson-SKull-Text" style="width: 100%; height: auto; max-height: 200px;">
@@ -2333,17 +2332,17 @@ function isUsernameTaken(username, users) {
     return users.some(user => user.user === username);
 }
 async function setUniqueKhmerMapping() {
+    // need to increase limit of chars when permutations increase to 2^5-2 = 30 > 24 
     let khmerChars = [];
     const start = 0x1780; // Start of Khmer block
     const end = 0x17FF;   // End of Khmer block
     const limit = 24;     // Only get the first 24 characters
-    
     for (let i = start; i <= end && khmerChars.length < limit; i++) {
         khmerChars.push(String.fromCharCode(i));
     }
-    
     return khmerChars;
 }
+/*
 async function setUniqueChinaCharMapping(){
     let chineseChars = [];
     const start = 0x4E00; // Start of CJK Unified Ideographs block
@@ -2352,7 +2351,46 @@ async function setUniqueChinaCharMapping(){
         chineseChars.push(String.fromCharCode(i));
     }
     return chineseChars;
+}*/
+
+async function setUniqueChinaCharMapping(chunkLength) {
+    let uniqueChars = [];
+    const totalCharsNeeded = 26 ** chunkLength;  // 26^chunkLength is 456,976 for chunkLength = 4
+
+    const excludedRanges = [
+        [0x3040, 0x309F], // Hiragana
+        [0x30A0, 0x30FF], // Katakana
+        [0x4E00, 0x9FFF], // CJK Unified Ideographs (Kanji)
+        [0x1780, 0x17FF], // Khmer
+    ];
+
+    function isExcluded(codePoint) {
+        for (let range of excludedRanges) {
+            if (codePoint >= range[0] && codePoint <= range[1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Loop through a larger Unicode range to get more unique characters
+    for (let i = 0x0000; i <= 0x10FFFF; i++) {
+        if (!isExcluded(i) && i <= 0xFFFF || i >= 0x10000) {  // Ensure we include both BMP and beyond
+            try {
+                uniqueChars.push(String.fromCodePoint(i));
+            } catch (e) {
+                // Handle invalid Unicode code points
+            }
+        }
+        if (uniqueChars.length >= totalCharsNeeded) {
+            break;
+        }
+    }
+
+    console.log(`Unique character set length: ${uniqueChars.length}`);
+    return uniqueChars;
 }
+
 async function setUniqueJapaneseCharsMapping() {
     let japaneseChars = [];
 
@@ -2387,6 +2425,9 @@ async function getNewDefinition(word) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
     const data = await response.json();
+
+    //console.log(`we recieved data for the word ${word}:`, data);
+
     if (data.length === 0) {
       console.log('No definition found.');
       return null;
@@ -2405,7 +2446,7 @@ async function getNewDefinition(word) {
       definition7: entry.shortdef[6] ? entry.shortdef[6] : null,
       definition8: entry.shortdef[7] ? entry.shortdef[7] : null,
       usage: entry.fl || 'Unknown',
-      type: 'Unknown' 
+      type: 'Unknown' // You might need additional logic to determine the type
     };
 
     return wordInfo;
@@ -2417,7 +2458,10 @@ async function getNewDefinition(word) {
 
 async function getAllCollections() {
     try {
+        // List all collections in the database
         const collections = await mongoose.connection.db.listCollections().toArray();
+        
+        // Extract and return collection names
         return collections.map(col => col.name);
     } catch (error) {
         console.error('Error fetching collections:', error);
@@ -2431,10 +2475,13 @@ async function getAllModels() {
 
     collectionNames.forEach(name => {
         try {
+            // Check if the model already exists in mongoose.models
             if (mongoose.models[name]) {
+                // If it exists, use the existing model
                 models[name] = mongoose.models[name];
             } else {
-                const schema = new mongoose.Schema({}, { strict: false }); 
+                // Otherwise, create a new model with a flexible schema
+                const schema = new mongoose.Schema({}, { strict: false }); // Flexible schema
                 models[name] = mongoose.model(name, schema);
             }
         } catch (error) {
@@ -2442,8 +2489,9 @@ async function getAllModels() {
         }
     });
 
-    return models;
+    return models; // Return an object containing all models
 }
+
 
 
 async function verifyUserinputData(email, address, firstName, lastName){
@@ -2464,7 +2512,7 @@ async function verifyUserinputData(email, address, firstName, lastName){
 
 
 async function roulsResponse(question) {
-    const lowercaseQuestion = question.toLowerCase(); 
+    const lowercaseQuestion = question.toLowerCase(); // Convert question to lowercase
 
     const artworkPurchaseKeywords = [
       'buy a painting',
@@ -2611,6 +2659,8 @@ async function roulsResponse(question) {
     if (currentPart.trim() !== '') {
         parts.push(currentPart.trim());
     }
+
+    // Extract the word from the parts
     let targetWord = '';
     for (let part of parts) {
         const match = part.match(/(?:of|mean\s*)\s+["']?(.*?)[?"']?$/);
@@ -2622,6 +2672,8 @@ async function roulsResponse(question) {
     let response = '';
     let responseArray = [];
     let partIndex = -1;
+
+    // Array of similar time phrases
     const similarTimePhrases = [
         "what time is it",
         "current time",
@@ -2738,14 +2790,20 @@ async function roulsResponse(question) {
           const thisWord = targetWord;
           //const thisWord = part.substring(part.lastIndexOf(" ")+1);
           const stripedWord = thisWord.replace(/\s/g, "");
+          //console.log(' seems like the user is asking for a definition of:', stripedWord);
+          
           let matchingObj = knownDefinitions.find(obj => obj.word === stripedWord);
+
           if (matchingObj) {
+              //console.log('We found a matching word:', matchingObj);
+
               let formattedString = Object.entries(matchingObj)
                   .filter(([key, value]) => value !== null) 
                   .map(([key, value]) => `${key}: ${value}`)
                   .join('\n\n'); 
 
               response = formattedString + '\n';
+              //console.log('we formatted the json object to string:', response);
           } else {
               response = 'We could not find the word you are looking for.\n\n';
           }
@@ -2753,14 +2811,9 @@ async function roulsResponse(question) {
         } else {
             const questionHasAlreadyBeenAsked0 = previousQuestion0.findIndex(obj=> obj.question == part);
             const questionHasAlreadyBeenAsked1 = previousQuestion1.findIndex(obj=> obj.question == part);
-
-            console.log('searching to see if question is already asked');
-
             if(questionHasAlreadyBeenAsked0 !== -1){
-                console.log('we found previous question in array1 no need to fetching OPENAI event');
                 response = previousQuestion0[questionHasAlreadyBeenAsked0].response;
             }else if(questionHasAlreadyBeenAsked1 !== -1){
-                console.log('we found previous question in array2 no need to fetching OPENAI event');
                 response = previousQuestion1[questionHasAlreadyBeenAsked1].response;
             }else{
                 response = await fetchOpenAIResponse(part);
@@ -2768,6 +2821,7 @@ async function roulsResponse(question) {
                     question: part,
                     response: response
                 };
+
                 if(questionHasAlreadyBeenAsked0.length <= max_array_length){
                     previousQuestion0.push(AIeventObject);     
                 }else if(questionHasAlreadyBeenAsked1.length <= max_array_length){
@@ -2804,9 +2858,11 @@ async function fetchOpenAIResponse(question) {
         console.log('openAI failed', error);
     }
 }
-function getUniqueKhmferChar(word, khmerChars) {
-    if (word.length !== 3) {
-        throw new Error("Word must be exactly 3 characters long.");
+
+
+function getUniquePermutationSymbol(word, khmerChars, modulus) {
+    if (word.length !== modulus) {
+        throw new Error(`Word must be exactly ${modulus} characters long.`);
     }
     let permutation = []; const baseLength = 2;
     for(const char of word){
@@ -2816,22 +2872,82 @@ function getUniqueKhmferChar(word, khmerChars) {
             permutation.push(0);
         }
     }
-    let index = permutation[0]+ permutation[1]*baseLength+ permutation[2]*baseLength**2; 
+    let index = 0;
+    for(var k =0; k<permutation.length; k++){
+        index += permutation[k]*baseLength**k;
+    }
     return khmerChars[index]; 
 }
-function BursonBase64Encrypted(image) {
-    console.log('image length before compression', image.length);
-    image = image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+function separateIntoBestChunk(base64String, chunkLength) {
+    const chunks = [];
+    let buffer = "";
+    let i = 0;
+    const pushBuffer = () => {
+        if (buffer.length) {
+            chunks.push(buffer);
+            buffer = ""; 
+        }
+    };
+    const charType = (char) => {
+        if (/[A-Z]/.test(char)) return 'upper';
+        if (/[a-z]/.test(char)) return 'lower';
+        if (/[0-9]/.test(char)) return 'number';
+        return 'other';
+    };
+
+    while (i < base64String.length) {
+        let char = base64String[i];
+        let type = charType(char);
+
+        if (type === 'upper' || type === 'lower') {
+            let letterChunk = "";
+            while (i < base64String.length && /[A-Za-z]/.test(base64String[i]) && letterChunk.length < chunkLength) {
+                letterChunk += base64String[i];
+                i++;
+            }
+            if (letterChunk.length === 3 || i === base64String.length || charType(base64String[i]) !== 'number') {
+                chunks.push(letterChunk);
+            } else {
+                chunks.push(letterChunk.slice(0, 3)); 
+                buffer = letterChunk.slice(3); 
+            }
+        } else if (type === 'number') {
+            let numChunk = "";
+            while (i < base64String.length && charType(base64String[i]) === 'number' && numChunk.length < chunkLength) {
+                numChunk += base64String[i];
+                i++;
+            }
+            chunks.push(numChunk);
+        } else {
+            pushBuffer();
+            chunks.push(char);
+            i++;
+        }
+    }
+    pushBuffer();
+    return chunks;
+}
+
+
+function BursonBase64Encrypted(base64String, modulus) {
+    base64String = base64String.replace(/^data:image\/[a-z]+;base64,/, '');
+    let bestChunks = separateIntoBestChunk(base64String, modulus);
+    console.log('Using burson algorithm on chunks', bestChunks);
     let encryptedString = ''; let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    let loopLength = Math.floor(image.length/3); var count = 1; let imageRemainder = image.length % 3; var lastChunk = '';
-    for(var i = 0; i< loopLength-3;i++){
-        let chunk = image[i]+ image[i+1] +image[i+2];
+    var count = 1; var lastChunk = ''; 
+    for(var chunk of bestChunks){
+        let maxCount = getMaxChunkCount(chunk, bestChunks); 
         if(chunk === lastChunk){
             count += 1;
+            if(count === maxCount){
+                encryptedString += `${count}|${chunk}`;
+            }
+            
         }else{
-            if([...chunk].every(char => alphabet.includes(char))) {
+            if([...chunk].every(char => alphabet.includes(char)) && chunk.length === modulus) {
                 let frontEncryption; let isUpperCase = chunk === chunk.toUpperCase();let isLowerCase = chunk === chunk.toLowerCase();
-                let encryptedChunk = getUniqueChinaChar(chunk.toUpperCase(), uniqueChars);
+                let encryptedChunk = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
                 if(isUpperCase && count !=1){
                     frontEncryption  = `${count}|${encryptedChunk}`;
                     count = 1;
@@ -2841,93 +2957,98 @@ function BursonBase64Encrypted(image) {
                 }else if((isLowerCase || isUpperCase) && count == 1){
                     frontEncryption = `${encryptedChunk}`;
                 }else if((!isUpperCase && !isLowerCase) && count == 1){
-                    const uniqueKmferChar = getUniqueKhmferChar(chunk, uniqueChars2);
+                    const uniqueKmferChar = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
                     frontEncryption = `${encryptedChunk}${uniqueKmferChar}`;
-                }else{
-                    const uniqueKmferChar = getUniqueKhmferChar(chunk, uniqueChars2);
+                }else if((!isUpperCase && !isLowerCase) && count > 1){
+                    const uniqueKmferChar = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
                     frontEncryption = `${count}|${encryptedChunk}${uniqueKmferChar}`;
                     count = 1;
                 }
                 encryptedString += frontEncryption;
+            }else if(chunk.length === modulus){  
+               let newChunk; let integerChecker = true;
+                for (let n = 0; n < chunk.length; n++) {
+                    if (!Number.isInteger(parseInt(chunk[n]))) {
+                        integerChecker = false; 
+                        break; 
+                    }
+                }
+               if(integerChecker){
+                    let indexOfJapanChar = parseInt(chunk);
+                    let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
+                    if(count !=1){
+                        newChunk = `${count}|${uniqueJapanChar}`;
+                        count = 1;
+                    }else{
+                        newChunk = `${uniqueJapanChar}`;
+                    }
+               }else{
+                    if(count !=1){
+                        newChunk = `${count}|${chunk}`;
+                        count = 1;
+                    }else{
+                        newChunk = `${chunk}`;
+                    }
+               }
+               encryptedString+= newChunk;
             }else{
-                   let chunkExtra = chunk;
-                   let chunkyChunk1 = parseInt(chunkExtra[0])|| chunk[0];
-                   let chunkyChunk2 = parseInt(chunkExtra[1])|| chunk[1];
-                   let chunkyChunk3 = parseInt(chunkExtra[2])|| chunk[2];
-                   if(typeof chunkyChunk1 === 'number' && typeof chunkyChunk2 === 'number' && typeof chunkyChunk3 === 'number'){
-                        let indexOfJapanChar = chunkyChunk1 + 10* chunkyChunk2 + 10**2*chunkyChunk3;
-                        let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
-                        let newChunk;
-                        if(count !=1){
-                            newChunk = `${count}|${uniqueJapanChar}`;
-                            count = 1;
-                        }else{
-                            newChunk = `${uniqueJapanChar}`;
-                        }
-                   }else{
-                        if(count !=1){
-                            newChunk = `${count}|${chunk}`;
-                            count = 1;
-                        }else{
-                            newChunk = `${chunk}`;
-                        }
-                   }
-                   encryptedString+= newChunk;
-            } 
+                encryptedString+= chunk;
+            }
             lastChunk = chunk;      
         }
-        i = i+3;
-    }
-    if(imageRemainder != 0){
-        let endOfString = '';
-        for(var modIndex = 0; modIndex < imageRemainder; modIndex++){
-            endOfString += image[loopLength*3+modIndex];
-        }
-        encryptedString += endOfString;
     }
     console.log('image length after compressor applied', encryptedString.length);
+    console.log('Image after encrypting', encryptedString);
     return encryptedString;
 }
-function getUniqueChinaChar(word, charArray) {
-    if (word.length !== 3) {
-        throw new Error("Input word must be exactly 3 characters long");
+function getUniqueModulusChar(word, charArray, modLength) {
+    if (word.length !== modLength) {
+        throw new Error(`Input word must be exactly ${modLength} characters long`);
     }
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const firstCharIndex = alphabet.indexOf(word[0]); 
-    const secondCharIndex = alphabet.indexOf(word[1]); 
-    const thirdCharIndex = alphabet.indexOf(word[2]); 
-    if (firstCharIndex === -1 || secondCharIndex === -1 || thirdCharIndex === -1) {
-        throw new Error("Invalid character in word");
+    const base = alphabet.length; 
+    
+    let uniqueIndex = 0;
+    for (let i = 0; i < modLength; i++) {
+        const charIndex = alphabet.indexOf(word[i]);  
+        if (charIndex === -1) {
+            throw new Error(`Invalid character '${word[i]}' in word`);
+        }
+        uniqueIndex += (charIndex) * (base ** (modLength - 1 - i));
     }
-
-    const uniqueIndex = (firstCharIndex) + 
-                        (secondCharIndex * 26) + 
-                        (thirdCharIndex * 26 * 26);
-
-    if (uniqueIndex >= 0 && uniqueIndex < charArray.length) {
-        return charArray[uniqueIndex];
+    uniqueIndex += 1;
+    if (uniqueIndex > 0 && uniqueIndex <= charArray.length) {
+        return charArray[uniqueIndex - 1]; 
     } else {
         throw new Error("Unique index is out of bounds of the character array");
     }
 }
-function reverseChinaChar(chinaChar, charArray) {
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const uniqueIndex = charArray.indexOf(chinaChar); 
-    
-    if (uniqueIndex === -1) {
-        throw new Error("Character not found in charArray");
+function getMaxChunkCount(chunk, bestChunks) {
+    let maxCount = 0;
+    for (let i = 0; i < bestChunks.length; i++) {
+        if (bestChunks[i] === chunk) {
+            maxCount += 1;
+        } else {
+            break; // Stop when the chunk doesn't match
+        }
     }
-    const thirdCharIndex = Math.floor(uniqueIndex / (26 * 26));
-    const remainderAfterThird = uniqueIndex % (26 * 26);
-    const secondCharIndex = Math.floor(remainderAfterThird / 26);
-    const firstCharIndex = remainderAfterThird % 26;
-    const firstChar = alphabet[firstCharIndex];
-    const secondChar = alphabet[secondCharIndex];
-    const thirdChar = alphabet[thirdCharIndex];
-    return firstChar + secondChar + thirdChar;
+    return maxCount;
 }
+function getPermutation(khmerIndex) {
+    const permutations = [];
+    for (let i = 0; i < 2 ** 4; i++) {
+        const binaryArray = i.toString(2).padStart(4, '0').split('').map(Number);
+        if (binaryArray.every(val => val === 0) || binaryArray.every(val => val === 1)) {
+            continue;
+        }
+
+        permutations.push(binaryArray);
+    }
+    return permutations[khmerIndex];
+}
+
 function mapCharsToTransformedWord(chineseChar, khmerChar, khmerChars) {
-    const reverseChinaChunk = reverseChinaChar(chineseChar, uniqueChars);
+    const reverseChinaChunk = uniqueChars.indexOf(chineseChar).toString();
     let caseValues = []; let transformedWord = '';
     if (!reverseChinaChunk) {
         throw new Error("Chinese character not found in reverse mapping.");
@@ -2939,19 +3060,7 @@ function mapCharsToTransformedWord(chineseChar, khmerChar, khmerChars) {
     if (khmerIndex === -1) {
         throw new Error("Khmer character not found in uniqueKhmerChars array.");
     }
-    if(khmerIndex == 0) {
-        caseValues = [0,0,1];
-    }else if(khmerIndex == 1){
-        caseValues = [0,1,0];
-    }else if(khmerIndex == 2){
-        caseValues = [0,1,1];
-    }else if(khmerIndex == 3){
-        caseValues = [1,0,0];
-    }else if(khmerIndex == 4){
-        caseValues = [1,0,1];
-    }else if(khmerIndex == 5){
-        caseValues = [1,1,0];
-    }
+    caseValues = getPermutation(khmerIndex);
     for(var i = 0; i<reverseChinaChunk.length; i++){
         let char = reverseChinaChunk[i];
         if(caseValues[i] == 0){
@@ -2962,6 +3071,7 @@ function mapCharsToTransformedWord(chineseChar, khmerChar, khmerChars) {
     }
     return transformedWord;
 }
+
 function getBarNumberAttachment(i, encryptedString){
     let repeatCount = '';
     for (let j = i - 1; j >= 0; j--) {
@@ -2977,6 +3087,10 @@ function getBarNumberAttachment(i, encryptedString){
 
 function isChineseChar(char){
     const uniqueCharsSet = new Set(uniqueChars);
+    return uniqueCharsSet.has(char);
+}
+function isJapaneseChar(char){
+    const uniqueCharsSet = new Set(uniqueChars3);
     return uniqueCharsSet.has(char);
 }
 function isAKMfer(char){
