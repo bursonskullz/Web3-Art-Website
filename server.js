@@ -2923,7 +2923,7 @@ function BursonBase64Encrypted(base64String, modulus) {
     let encryptedString = '';
     let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let processedIndices = new Set(); let counterString = '';
-    for(var i = 0; i<bestChunks.length; i++){
+    for(var i = 0; i< bestChunks.length; i++){
         let chunk = bestChunks[i];
         let maxCount = getMaxChunkCount(chunk, bestChunks); 
         let currentIndex = i;
@@ -3019,7 +3019,7 @@ function BursonBase64Encrypted(base64String, modulus) {
             encryptedString += chunk;
         }
         if(maxCount >1){
-            i+ maxCount-1;
+            i+= maxCount-1;
         }
     }
     console.log('Image length after compressor applied', encryptedString.length);
