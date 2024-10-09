@@ -3021,12 +3021,48 @@ function BursonBase64Encrypted(base64String, modulus) {
             }
         }
     });
-    console.log('Image length after compressor applied', encryptedString.length);
     let owlphaString = performOwlphaLoop(encryptedString);
+    console.log('Image length after compressor applied', owlphaString.length);
     return owlphaString;
 }
-function performOwlphaLoop(encryptedString){
-    return encryptedString;
+function performOwlphaLoop(encryptedString) {
+    let result = '';
+    let i = 0;
+    function findPattern(str, startIndex) {
+        for (let patternLength = Math.floor((str.length - startIndex) / 2); patternLength >= 1; patternLength--) {
+            let pattern = str.substring(startIndex, startIndex + patternLength);
+            let repeatCount = 1;
+            let j = startIndex + patternLength;
+            while (str.substring(j, j + patternLength) === pattern) {
+                repeatCount++;
+                j += patternLength;
+            }
+            if (repeatCount > 1) {
+                return { pattern, repeatCount, patternLength };
+            }
+        }
+        return null;
+    }
+    while (i < encryptedString.length) {
+        let patternData = findPattern(encryptedString, i);
+        if (patternData) {
+            let { pattern, repeatCount, patternLength } = patternData;
+            let compressedLength = `[${repeatCount}$${pattern}$`.length;
+            let originalLength = repeatCount * patternLength;
+
+            if (compressedLength < originalLength) {
+                result += `[${repeatCount}$${pattern}$`;
+                i += repeatCount * patternLength; 
+            } else {
+                result += encryptedString.substring(i, i + patternLength);
+                i += patternLength;
+            }
+        } else {
+            result += encryptedString[i];
+            i++;
+        }
+    }
+    return result;
 }
 function getUniqueModulusChar(word, charArray, modLength) {
     // fix loop in comment below 
