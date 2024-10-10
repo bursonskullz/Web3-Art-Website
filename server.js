@@ -2342,10 +2342,9 @@ async function setUniqueKhmerMapping() {
     }
     return khmerChars;
 }
-async function setUniqueChinaCharMapping(chunkLength) {
+function setUniqueChinaCharMapping(chunkLength) {
     let uniqueChars = [];
-    const totalCharsNeeded = 26 ** chunkLength;  // 26^chunkLength is 456,976 for chunkLength = 4
-
+    const totalCharsNeeded = 26 ** chunkLength;
     const excludedRanges = [
         [0x3040, 0x309F], // Hiragana
         [0x30A0, 0x30FF], // Katakana
@@ -2354,8 +2353,11 @@ async function setUniqueChinaCharMapping(chunkLength) {
         [0x005E, 0x005E], // "^" symbol
         [0x007C, 0x007C], // "|" symbol
         [0x0024, 0x0024], // "$" symbol
+        [0x005B, 0x005B], // "[" symbol
+        [0x0030, 0x0039], // Digits "0-9"
+        [0x0041, 0x005A], // Uppercase English letters (A-Z)
+        [0x0061, 0x007A]  // Lowercase English letters (a-z)
     ];
-
     function isExcluded(codePoint) {
         for (let range of excludedRanges) {
             if (codePoint >= range[0] && codePoint <= range[1]) {
@@ -2364,21 +2366,20 @@ async function setUniqueChinaCharMapping(chunkLength) {
         }
         return false;
     }
-
-    // Loop through a larger Unicode range to get more unique characters
     for (let i = 0x0000; i <= 0x10FFFF; i++) {
-        if (!isExcluded(i) && i <= 0xFFFF || i >= 0x10000) {  // Ensure we include both BMP and beyond
+        if (!isExcluded(i) && (i <= 0xFFFF || i >= 0x10000)) {
             try {
-                uniqueChars.push(String.fromCodePoint(i));
+                let char = String.fromCodePoint(i);
+                if (!/\d/.test(char)) {
+                    uniqueChars.push(char);
+                }
             } catch (e) {
-                // Handle invalid Unicode code points
             }
         }
         if (uniqueChars.length >= totalCharsNeeded) {
             break;
         }
     }
-
     console.log(`Unique character set length: ${uniqueChars.length}`);
     return uniqueChars;
 }
