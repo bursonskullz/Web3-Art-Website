@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 10-08-24
+// Date last modified: 10-09-24
 // purpose: Make web3 art website to coincide with research related life
 
 const maxNumberOfAIEventsPerClient = 100;
@@ -2351,6 +2351,9 @@ async function setUniqueChinaCharMapping(chunkLength) {
         [0x30A0, 0x30FF], // Katakana
         [0x4E00, 0x9FFF], // Kanji
         [0x1780, 0x17FF], // Khmer
+        [0x005E, 0x005E], // "^" symbol
+        [0x007C, 0x007C], // "|" symbol
+        [0x0024, 0x0024], // "$" symbol
     ];
 
     function isExcluded(codePoint) {
@@ -3230,12 +3233,13 @@ function isAKMfer(char){
 function BursonBase64Decrypt(encryptedString) {
     console.log('calling burson decompression with length', encryptedString.length );
     let decryptedString = ''; let alphabet = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
+    let undoOwlLoop = reverseOwlphaLoop(encryptedString);
     for(var i=0; i<encryptedString.length; i++){
         const char = encryptedString[i];
         if (char === '|') {
             let repeatCount = getBarNumberAttachment(i, encryptedString); 
             const repeatCountNumber = parseInt(repeatCount) || 1;
-            var nextChar = encryptedString[i + 1]; // vertical bar is only present in front of an item so this is fine
+            var nextChar = encryptedString[i + 1]; 
             if(isChineseChar(nextChar)){
                     let decryptedKMFERString = '';
                     if(i!= encryptedString.length){
@@ -3257,15 +3261,18 @@ function BursonBase64Decrypt(encryptedString) {
                     decryptedString+= newString;
             }else if(isJapaneseChar(nextChar)){
                     let newString = ''; 
-                    let jpanIntegerString = uniqueChars3.indexOf(nextChar).toString();// no prime symbol only for chineese symbols;
+                    let jpanIntegerString = uniqueChars3.indexOf(nextChar).toString();
                     for(var k =0; k< repeatCountNumber; k++){
                         newString+= jpanIntegerString;
                     }
-                    decryptedString+= newString;
+                    if(newString!= ''){
+                        decryptedString+= newString;
+                    }else{
+                        decryptedString+=jpanIntegerString;
+                    }
             }else{
-                let nextCharDouble = nextChar +encryptedString[i + 2]+encryptedString[i + 3];
+                let nextCharDouble = nextChar +encryptedString[i + 2]+encryptedString[i + 3]+encryptedString[i + 4];
                 let newString = '';
-
                 for(var k = 0; k< repeatCountNumber; k++){
                     newString+=nextChar;
                 }
@@ -3279,7 +3286,7 @@ function BursonBase64Decrypt(encryptedString) {
             if(i!= encryptedString.length){
                 const getKmferChar = encryptedString[i+1];
                 if(isAKMfer(getKmferChar)){
-                    decryptedKMFERString += mapCharsToTransformedWord(getKmferChar, getKmferChar, uniqueChars2);
+                    decryptedKMFERString += mapCharsToTransformedWord(char, getKmferChar, uniqueChars2);
                     i += 1;
                 }else{
                     decryptedKMFERString += uniqueChars.indexOf(char);
@@ -3291,12 +3298,14 @@ function BursonBase64Decrypt(encryptedString) {
             for(var k =0; k< repeatCountNumber; k++){
                 newString+=decryptedKMFERString;
             }
-            decryptedString+= newString;
+            if(newString!== ''){
+                decryptedString+= newString;
+            }else{
+                decryptedString+=decryptedKMFERString;
+            }
         }else if(isJapaneseChar(char)){
             decryptedString+= uniqueChars3.indexOf(char).toString();
         } else {
-            // not vertical bar, not chineese char, not a japanese char, not a Combodian symbol
-            // it can be a number from a number or +- symbol not encrypted
             decryptedString += char;
         }
     }
