@@ -2032,10 +2032,11 @@ try{
             console.log('current china chars', uniqueChars);
             console.log('current k-mfers chars', uniqueChars2);
             console.log('current japaneseChars', uniqueChars3);
-            var base64TestString = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABMIAAAUACAYAAAClIP6rAAABhWlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV`;
+            var base64TestString = `data:image/png;base64,AAAAAhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhhAAAAAhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhhAAAAAhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhhAAAAAhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhh`;
             console.log('Base 64 string image length before compressor applied', base64TestString.length);
             const encryptedStringTest = BursonBase64Encrypted(base64TestString, 4);
-            console.log(`Compression amount =, ${(base64TestString.length/encryptedStringTest.length).toFixed(3)}x`);
+            const reverseOwlLoop = reverseOwlphaLoop(encryptedStringTest); console.log('image after reverse Owl loop result (should be the same)', reverseOwlLoop);
+            console.log(`Compression amount = ${(base64TestString.length/encryptedStringTest.length).toFixed(3)}x`);
             //const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest);
             //console.log('decryptedString length it should equal and bingo wen 50G though!!', decryptionTestStringTest.length);
 
@@ -2916,7 +2917,6 @@ function separateIntoBestChunk(base64String, chunkLength) {
     pushBuffer();
     return chunks;
 }
-
 function BursonBase64Encrypted(base64String, modulus) {
     base64String = base64String.replace(/^data:image\/[a-z]+;base64,/, '');
     let bestChunks = separateIntoBestChunk(base64String, modulus);
@@ -3028,6 +3028,7 @@ function BursonBase64Encrypted(base64String, modulus) {
 }
 function performOwlphaLoop(encryptedString) {
     // to improve return array of index's of each dallor symbol added. Use a counter method to keep track each time we add it and psuh counter to an array
+    // need to edit reverse owl loop if you implement this 
     let result = '';
     let i = 0;
     function findPattern(str, startIndex) {
@@ -3065,6 +3066,59 @@ function performOwlphaLoop(encryptedString) {
         }
     }
     return result;
+}
+function reverseOwlphaLoop(encryptedString) {
+    let lastDollarPosition = null;
+    let intgerChunk = ''; 
+    let intermediateString = '';
+    let skipMode = false; 
+    for (var i = 0; i < encryptedString.length; i++) {
+        let currentChunk = '';
+        if (encryptedString[i] === '$') {
+            skipMode = false; 
+            intgerChunk = '';
+            if (lastDollarPosition) {
+                for (var k = i - 1; k >= lastDollarPosition; k--) {
+                    if (encryptedString[k] === '[') {
+                        break;
+                    } else {
+                        intgerChunk = encryptedString[k] + intgerChunk;
+                    }
+                }               
+            } else {
+                for (var k = i - 1; k >= 0; k--) {
+                    if (encryptedString[k] === '[') {
+                        break;
+                    } else {
+                        intgerChunk = encryptedString[k] + intgerChunk; 
+                    }
+                }
+            }
+            let chunk = '';
+            for (var l = i + 1; l < encryptedString.length; l++) {
+                if (encryptedString[l] === '$') {
+                    lastDollarPosition = l;
+                    break;
+                } else {
+                    chunk += encryptedString[l];
+                }
+            }
+            let loopLength = parseInt(intgerChunk);
+            if (!isNaN(loopLength)) {
+                for (var q = 0; q < loopLength; q++) {
+                    currentChunk += chunk;
+                }
+                intermediateString += currentChunk;
+            }
+            let difference = lastDollarPosition - i;
+            i += difference;
+        } else if (encryptedString[i] === '[') {
+            skipMode = true; 
+        } else if (!skipMode) {
+            intermediateString += encryptedString[i];
+        }
+    }
+    return intermediateString;
 }
 function getUniqueModulusChar(word, charArray, modLength) {
     // fix loop in comment below 
