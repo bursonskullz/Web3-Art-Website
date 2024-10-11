@@ -2015,13 +2015,16 @@ try{
             });
 
 
-            let chinaChars = await setUniqueChinaCharMapping(4);
-            let kmferChars = await setUniqueKhmerMapping();
-            let japaneseChars = await setUniqueJapaneseCharsMapping();
+            console.log('setting custom symbols . . . ');
 
-            for (const char of chinaChars) {
-                uniqueChars.push(char);
-            }
+            let mainBase = 26; 
+            let modulus = 4;
+
+            let customSymbolArray = await setMainUniquebaseCharMapping(mainBase, modulus);
+            let kmferChars = setUniquePermutationMapping();
+            let japaneseChars = setUniqueDigitCharsMapping();
+            uniqueChars = customSymbolArray;
+
             for (const kmferChar of kmferChars) {
                 uniqueChars2.push(kmferChar);
             }
@@ -2029,16 +2032,20 @@ try{
                 uniqueChars3.push(jChar);
             }
 
-            console.log('current china chars', uniqueChars);
-            console.log('current k-mfers chars', uniqueChars2);
-            console.log('current japaneseChars', uniqueChars3);
-            var base64TestString = `data:image/png;base64,AAAAAhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhhAAAAAhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhhAAAAAhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhhAAAAAhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhh`;
+            var base64TestString = `data:image/png;base64,ZZZZZZZZZZhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhhAAAAAhbdehbdeAACcccccccccccccccccccccccc`;
             console.log('Base 64 string image length before compressor applied', base64TestString.length);
-            const encryptedStringTest = BursonBase64Encrypted(base64TestString, 4);
-            const reverseOwlLoop = reverseOwlphaLoop(encryptedStringTest); console.log('image after reverse Owl loop result (should be the same)', reverseOwlLoop);
-            console.log(`Compression amount = ${(base64TestString.length/encryptedStringTest.length).toFixed(3)}x`);
-            //const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest);
-            //console.log('decryptedString length it should equal and bingo wen 50G though!!', decryptionTestStringTest.length);
+
+            if(uniqueChars.length >= mainBase**modulus){
+                console.log('calling compressor using unique set of symbols generated:', uniqueChars.length);
+                const encryptedStringTest = BursonBase64Encrypted(base64TestString, modulus);
+                console.log(`Compression amount = ${(base64TestString.length/encryptedStringTest.length).toFixed(3)}x`);
+
+                //const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest);
+                //console.log('decryptedString length', decryptionTestStringTest.length);
+            }else{
+                console.log('Error unique char array length is not long enough to call the burson compressor function');
+                console.log('unique symbol length for main base:', customSymbolArray.length);
+            }
 
             await addBasicDefinitions(basicDefinitions);
             console.log('Done adding definitions, launching workers');
@@ -2331,8 +2338,186 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
 function isUsernameTaken(username, users) {
     return users.some(user => user.user === username);
 }
-async function setUniqueKhmerMapping() {
-    // need to increase limit of chars when permutations increase to 2^5-2 = 30 > 24 
+function drawSpiralSymbol(index) {
+    const canvasSize = 50;
+    const spiral = [];
+    const centerX = canvasSize / 2;
+    const centerY = canvasSize / 2;
+    const radius = canvasSize + (index % 10) * 3;
+    const angleIncrement = 0.1 + (index % 5) * 0.02;
+    const numSpiralPoints = 100;
+    for (let i = 0; i < numSpiralPoints; i++) {
+        const angle = i * angleIncrement; 
+        const x = centerX + radius * Math.cos(angle) * (i / numSpiralPoints);
+        const y = centerY + radius * Math.sin(angle) * (i / numSpiralPoints);
+        spiral.push({ x, y });
+    }
+
+    const numTicks = 20;
+    for (let j = 0; j < numTicks; j++) {
+        const tickX = centerX + (radius + 5) * Math.cos(j * Math.PI / 4);
+        const tickY = centerY + (radius + 5) * Math.sin(j * Math.PI / 4);
+        spiral.push({ x: tickX, y: tickY, isTick: true });
+    }
+    return spiral;
+}
+
+function createCustomSymbol(index) {
+    const symbolData = drawSpiralSymbol(index); 
+    const encodedData = btoa(JSON.stringify(symbolData)); 
+    return { 
+        char: String.fromCharCode(0xE000 + index), 
+        data: encodedData
+    };
+}
+
+function generateCustomSymbolData(totalCount) {
+    const customSymbols = [];
+    for (let i = 0; i < totalCount; i++) {
+        const customSymbol = createCustomSymbol(i);
+        customSymbols.push(customSymbol); 
+    }
+    console.log(`Generated unique symbol set length: ${customSymbols.length}`);
+    return customSymbols; 
+}
+function drawStringFromSymbols(symbols) {
+    if (!Array.isArray(symbols)) {
+        throw new Error('Expected an array of symbols'); 
+    }
+    const symbolChars = []; 
+    symbols.forEach((symbol) => {
+        const canvasSize = 10; 
+        const canvas = Array.from({ length: canvasSize }, () => Array(canvasSize).fill(' ')); 
+
+        const points = JSON.parse(atob(symbol.data)); 
+        points.forEach(point => {
+            const x = Math.round(point.x / (100 / canvasSize)); 
+            const y = Math.round(point.y / (100 / canvasSize)); 
+            if (x >= 0 && x < canvasSize && y >= 0 && y < canvasSize) {
+                canvas[y][x] = point.isTick ? '+' : '*'; 
+            }
+        });
+        const stringRepresentation = canvas.map(row => row.join('')).join('\n');
+        symbolChars.push(symbol.char); 
+    });
+    return symbolChars; 
+}
+async function setMainUniquebaseCharMapping(modulus, baseLength) {
+    const totalCount = baseLength ** modulus;
+    //const totalCount = 21300;  
+    const chunkSize = 20000;   
+    let customs = [];
+
+    for (let i = 0; i < totalCount; i += chunkSize) {
+        const currentChunkSize = Math.min(chunkSize, totalCount - i);
+        let customSpiralSymbols = []; // Reset symbol array for each chunk
+
+        for (let j = 0; j < currentChunkSize; j++) {
+            const normalizedIndex = (i + j) / totalCount; 
+            const index = normalizedIndex + Math.sin(normalizedIndex * 2 * Math.PI) * 0.1; 
+            const customSymbol = createCustomSymbol(index);
+            customSpiralSymbols.push(customSymbol); 
+            //console.log('symbol data length', customSpiralSymbols.length);
+        }
+        const newSymbols = drawStringFromSymbols(customSpiralSymbols);
+        customs.push(...newSymbols);
+        console.log('Code made a new set of symbols', newSymbols);
+        console.log('Processed chunk starting at', i, 'chunk size:', currentChunkSize);
+    }
+    console.log(`Total custom symbols created: ${customs.length}`);
+    return customs;
+}
+function setUniquePermutationMapping() {
+    let khmerCfunction drawSpiralSymbol(index) {
+    const canvasSize = 50;
+    const spiral = [];
+    const centerX = canvasSize / 2;
+    const centerY = canvasSize / 2;
+    const radius = canvasSize + (index % 10) * 3;
+    const angleIncrement = 0.1 + (index % 5) * 0.02;
+    const numSpiralPoints = 100;
+    for (let i = 0; i < numSpiralPoints; i++) {
+        const angle = i * angleIncrement; 
+        const x = centerX + radius * Math.cos(angle) * (i / numSpiralPoints);
+        const y = centerY + radius * Math.sin(angle) * (i / numSpiralPoints);
+        spiral.push({ x, y });
+    }
+
+    const numTicks = 20;
+    for (let j = 0; j < numTicks; j++) {
+        const tickX = centerX + (radius + 5) * Math.cos(j * Math.PI / 4);
+        const tickY = centerY + (radius + 5) * Math.sin(j * Math.PI / 4);
+        spiral.push({ x: tickX, y: tickY, isTick: true });
+    }
+    return spiral;
+}
+
+function createCustomSymbol(index) {
+    const symbolData = drawSpiralSymbol(index); 
+    const encodedData = btoa(JSON.stringify(symbolData)); 
+    return { 
+        char: String.fromCharCode(0xE000 + index), 
+        data: encodedData
+    };
+}
+
+function generateCustomSymbolData(totalCount) {
+    const customSymbols = [];
+    for (let i = 0; i < totalCount; i++) {
+        const customSymbol = createCustomSymbol(i);
+        customSymbols.push(customSymbol); 
+    }
+    console.log(`Generated unique symbol set length: ${customSymbols.length}`);
+    return customSymbols; 
+}
+function drawStringFromSymbols(symbols) {
+    if (!Array.isArray(symbols)) {
+        throw new Error('Expected an array of symbols'); 
+    }
+    const symbolChars = []; 
+    symbols.forEach((symbol) => {
+        const canvasSize = 10; 
+        const canvas = Array.from({ length: canvasSize }, () => Array(canvasSize).fill(' ')); 
+
+        const points = JSON.parse(atob(symbol.data)); 
+        points.forEach(point => {
+            const x = Math.round(point.x / (100 / canvasSize)); 
+            const y = Math.round(point.y / (100 / canvasSize)); 
+            if (x >= 0 && x < canvasSize && y >= 0 && y < canvasSize) {
+                canvas[y][x] = point.isTick ? '+' : '*'; 
+            }
+        });
+        const stringRepresentation = canvas.map(row => row.join('')).join('\n');
+        symbolChars.push(symbol.char); 
+    });
+    return symbolChars; 
+}
+async function setMainUniquebaseCharMapping(modulus, baseLength) {
+    const totalCount = baseLength ** modulus;
+    //const totalCount = 21300;  
+    const chunkSize = 20000;   
+    let customs = [];
+
+    for (let i = 0; i < totalCount; i += chunkSize) {
+        const currentChunkSize = Math.min(chunkSize, totalCount - i);
+        let customSpiralSymbols = []; // Reset symbol array for each chunk
+
+        for (let j = 0; j < currentChunkSize; j++) {
+            const normalizedIndex = (i + j) / totalCount; 
+            const index = normalizedIndex + Math.sin(normalizedIndex * 2 * Math.PI) * 0.1; 
+            const customSymbol = createCustomSymbol(index);
+            customSpiralSymbols.push(customSymbol); 
+            //console.log('symbol data length', customSpiralSymbols.length);
+        }
+        const newSymbols = drawStringFromSymbols(customSpiralSymbols);
+        customs.push(...newSymbols);
+        console.log('Code made a new set of symbols', newSymbols);
+        console.log('Processed chunk starting at', i, 'chunk size:', currentChunkSize);
+    }
+    console.log(`Total custom symbols created: ${customs.length}`);
+    return customs;
+}
+function setUniquePermutationMapping() {
     let khmerChars = [];
     const start = 0x1780; // Start of Khmer block
     const end = 0x17FF;   // End of Khmer block
@@ -2342,49 +2527,41 @@ async function setUniqueKhmerMapping() {
     }
     return khmerChars;
 }
-function setUniqueChinaCharMapping(chunkLength) {
-    let uniqueChars = [];
-    const totalCharsNeeded = 26 ** chunkLength;
-    const excludedRanges = [
-        [0x3040, 0x309F], // Hiragana
-        [0x30A0, 0x30FF], // Katakana
-        [0x4E00, 0x9FFF], // Kanji
-        [0x1780, 0x17FF], // Khmer
-        [0x005E, 0x005E], // "^" symbol
-        [0x007C, 0x007C], // "|" symbol
-        [0x0024, 0x0024], // "$" symbol
-        [0x005B, 0x005B], // "[" symbol
-        [0x0030, 0x0039], // Digits "0-9"
-        [0x0041, 0x005A], // Uppercase English letters (A-Z)
-        [0x0061, 0x007A]  // Lowercase English letters (a-z)
-    ];
-    function isExcluded(codePoint) {
-        for (let range of excludedRanges) {
-            if (codePoint >= range[0] && codePoint <= range[1]) {
-                return true;
-            }
-        }
-        return false;
-    }
-    for (let i = 0x0000; i <= 0x10FFFF; i++) {
-        if (!isExcluded(i) && (i <= 0xFFFF || i >= 0x10000)) {
-            try {
-                let char = String.fromCodePoint(i);
-                if (!/\d/.test(char)) {
-                    uniqueChars.push(char);
-                }
-            } catch (e) {
-            }
-        }
-        if (uniqueChars.length >= totalCharsNeeded) {
-            break;
-        }
-    }
-    console.log(`Unique character set length: ${uniqueChars.length}`);
-    return uniqueChars;
-}
+function setUniqueDigitCharsMapping() {
+    let japaneseChars = [];
 
-async function setUniqueJapaneseCharsMapping() {
+    // Hiragana (U+3040 to U+309F)
+    const hiraganaStart = 0x3040;
+    const hiraganaEnd = 0x309F;
+    for (let i = hiraganaStart; i <= hiraganaEnd; i++) {
+        japaneseChars.push(String.fromCharCode(i));
+    }
+
+    // Katakana (U+30A0 to U+30FF)
+    const katakanaStart = 0x30A0;
+    const katakanaEnd = 0x30FF;
+    for (let i = katakanaStart; i <= katakanaEnd; i++) {
+        japaneseChars.push(String.fromCharCode(i));
+    }
+
+    // Kanji (CJK Unified Ideographs U+4E00 to U+9FFF)
+    const kanjiStart = 0x4E00;
+    const kanjiEnd = 0x9FFF;
+    for (let i = kanjiStart; i <= kanjiEnd; i++) {
+        japaneseChars.push(String.fromCharCode(i));
+    }
+
+    return japaneseChars;
+}hars = [];
+    const start = 0x1780; // Start of Khmer block
+    const end = 0x17FF;   // End of Khmer block
+    const limit = 24;     // Only get the first 24 characters
+    for (let i = start; i <= end && khmerChars.length < limit; i++) {
+        khmerChars.push(String.fromCharCode(i));
+    }
+    return khmerChars;
+}
+function setUniqueDigitCharsMapping() {
     let japaneseChars = [];
 
     // Hiragana (U+3040 to U+309F)
@@ -2921,114 +3098,80 @@ function separateIntoBestChunk(base64String, chunkLength) {
     pushBuffer();
     return chunks;
 }
-function BursonBase64Encrypted(base64String, modulus) {
-    base64String = base64String.replace(/^data:image\/[a-z]+;base64,/, '');
-    let bestChunks = separateIntoBestChunk(base64String, modulus);
-    let encryptedString = '';
-    let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    let processedIndices = new Set(); 
-    for(var i = 0; i< bestChunks.length; i++){
-        const chunk = bestChunks[i];
-        let currentIndex = i;
-        if (processedIndices.has(currentIndex)) return;
-        let maxCount = getMaxChunkCount(chunk, bestChunks); 
-        let frontEncryption;
-        if (maxCount > 1 && chunk.length === modulus) {
-            let isUpperCase = chunk === chunk.toUpperCase();
-            let isLowerCase = chunk === chunk.toLowerCase();
-            let isEnglishChunk = [...chunk].every(char => alphabet.includes(char));
-            let isStringDigits = parseInt(chunk); 
-            let encryptedChunk;
-            if (maxCount === 1) {
-                if ((isUpperCase || isLowerCase) && isEnglishChunk && chunk.length === modulus) {
-                    uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
-                    frontEncryption = `${uniqueSymbol}`;
-                } else if (!isUpperCase && !isLowerCase && isEnglishChunk) {
-                    uniqueSymbol = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
-                    frontEncryption = `${uniqueSymbol}`;
-                } else if (!isUpperCase && !isLowerCase && !isEnglishChunk && !isStringDigits) {
-                    frontEncryption = `${chunk}`;
-                }else if(isStringDigits){
-                    let indexOfJapanChar = isStringDigits ;
-                    let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
-                    frontEncryption = `${uniqueJapanChar}`;
-                }else{
-                    frontEncryption = `${chunk}`;
+function BursonBase64Decrypt(encryptedString) {
+    console.log('calling burson decompression with length', encryptedString.length );
+    let decryptedString = ''; let alphabet = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
+    let undoOwlLoop = reverseOwlphaLoop(encryptedString);
+    console.log('image length after reversing owlphaLoop', undoOwlLoop.length);
+    for(var i=0; i<encryptedString.length; i++){
+        const char = encryptedString[i];
+        if (char === '|') {
+            let repeatCount = getBarNumberAttachment(i, encryptedString); 
+            const repeatCountNumber = parseInt(repeatCount) || 1;
+            var nextChar = encryptedString[i + 1]; 
+            if(isChineseChar(nextChar)){
+                    let decryptedKMFERString = '';
+                    if(i!= encryptedString.length){
+                        const getKmferChar = encryptedString[i+1];
+                        if(isAKMfer(getKmferChar)){
+                           decryptedKMFERString = mapCharsToTransformedWord(nextChar, getKmferChar, uniqueChars2);
+                           i+=2;
+                        }else{
+                           decryptedKMFERString = uniqueChars.indexOf(nextChar);
+                           i+=1;
+                        }
+                    }else{
+                        decryptedKMFERString =  uniqueChars.indexOf(nextChar);
+                    }
+                    let newString = '';
+                    for(var k =0; k< repeatCountNumber; k++){
+                        newString+=decryptedKMFERString;
+                    }
+                    decryptedString+= newString;
+            }else if(isJapaneseChar(nextChar)){
+                    let newString = ''; 
+                    let jpanIntegerString = uniqueChars3.indexOf(nextChar).toString();
+                    for(var k =0; k< repeatCountNumber; k++){
+                        newString+= jpanIntegerString;
+                    }
+                    decryptedString+= newString;
+            }else{
+                let nextCharDouble = nextChar +encryptedString[i + 2]+encryptedString[i + 3]+encryptedString[i + 4];
+                let newString = '';
+                for(var k = 0; k< repeatCountNumber; k++){
+                    newString+=nextChar;
                 }
-                frontEncryption = chunk; 
-            } else if(maxCount!=0) {
-                let uniqueSymbol;
-                if (isUpperCase && isEnglishChunk && chunk.length === modulus) {
-                    uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
-                    frontEncryption = `${maxCount}|${uniqueSymbol}`;
-                } else if(isLowerCase && isEnglishChunk && chunk.length === modulus) {
-                    uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
-                    frontEncryption = `${maxCount}|${uniqueSymbol}^`;
-                } else if (!isUpperCase && !isLowerCase && isEnglishChunk) {
-                    uniqueSymbol = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
-                    frontEncryption = `${maxCount}|${uniqueSymbol}`;
-                }else if(isStringDigits){
-                    let indexOfJapanChar = isStringDigits;
-                    let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
-                    frontEncryption = `${maxCount}|${uniqueJapanChar}`;
-                } else if (!isUpperCase && !isLowerCase && !isEnglishChunk) {
-                    frontEncryption = `${maxCount}|${chunk}`;
-                }else{
-                    frontEncryption = `${maxCount}|${chunk}`;
+                decryptedString += newString;
+                i+=2;
+            }
+        }else if (isChineseChar(char)) {
+            // should not be a number attachment here if no vertical bar we do not need to try to get it 
+            // need to check for prime symbol and use .toLowerCase if next char is prime 
+            console.log('isChineseChar for', char, '=>', isChineseChar(char));
+            let decryptedKMFERString = '';
+            if(i!= encryptedString.length){
+                const nextChar = encryptedString[i+1];
+                if(isAKMfer(nextChar)){
+                    decryptedKMFERString += mapCharsToTransformedWord(char, nextChar, uniqueChars2);
+                    i += 1;
+                }else if(nextChar === '^'){
+                    let upperCaseWord = uniqueChars.indexOf(char);
+                    console.log('upperCaseWord', upperCaseWord);
+                    decryptedKMFERString += upperCaseWord.toLowerCase();
+                } else{
+                    decryptedKMFERString += uniqueChars.indexOf(char);
                 }
             }else{
-                frontEncryption+= chunk;
+               decryptedKMFERString = uniqueChars.indexOf(char);
             }
-            encryptedString += frontEncryption; 
-            for (let i = 1; i < maxCount; i++) {
-                if (currentIndex + i < bestChunks.length) {
-                    processedIndices.add(currentIndex + i);
-                }
-            }
-        }else if(chunk.includes('+') || chunk.includes('-')) {
-            if(maxCount > 1){
-                for(var i=0; i< maxCount; i++){
-                    encryptedString+= chunk;
-                }
-            }else{
-                encryptedString += chunk;
-            }
-        }else if(maxCount == 1 && chunk.length === modulus){
-            let isUpperCase = chunk === chunk.toUpperCase();
-            let isLowerCase = chunk === chunk.toLowerCase();
-            let isEnglishChunk = [...chunk].every(char => alphabet.includes(char));
-            let isStringDigits = parseInt(chunk); 
-            let encryptedChunk;
-            if (isUpperCase && isEnglishChunk && chunk.length === modulus) {
-                uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
-                frontEncryption = `${uniqueSymbol}`;
-            }else if (isLowerCase && isEnglishChunk && chunk.length === modulus) {
-                uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
-                frontEncryption = `${uniqueSymbol}^`;
-            } else if (!isUpperCase && !isLowerCase && isEnglishChunk) {
-                let permutationFrontEncryption =  getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
-                uniqueSymbol = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
-                frontEncryption = `${uniqueSymbol}${permutationFrontEncryption}`;
-            } else if (!isUpperCase && !isLowerCase && !isEnglishChunk) {
-                frontEncryption = `${chunk}`;
-            }else if(isStringDigits){
-                let indexOfJapanChar = isStringDigits ;
-                let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
-                frontEncryption = `${uniqueJapanChar}`;
-            }else{
-                frontEncryption = `${chunk}`;
-            }
-            encryptedString += frontEncryption;
-        }else{
-            encryptedString += chunk;
-        }
-        if(maxCount >1){
-            i += maxCount - 1;
+            decryptedString+=decryptedKMFERString;
+        }else if(isJapaneseChar(char)){
+            decryptedString+= uniqueChars3.indexOf(char).toString();
+        } else {
+            decryptedString += char;
         }
     }
-    let owlphaString = performOwlphaLoop(encryptedString);
-    console.log('Image length after compressor applied', owlphaString.length);
-    return owlphaString;
+    return decryptedString;
 }
 function performOwlphaLoop(encryptedString) {
     // to improve return array of index's of each dallor symbol added. Use a counter method to keep track each time we add it and psuh counter to an array
