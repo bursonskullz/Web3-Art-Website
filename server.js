@@ -3410,10 +3410,22 @@ function isAKMfer(char){
     const uniqueCharsSet = new Set(uniqueChars2);
     return uniqueCharsSet.has(char);
 }
+
+function numberToLetters(num, baseLength) {
+    let letters = [];
+    for (let i = 0; i < 3; i++) {
+        let remainder = num % baseLength; 
+        letters.push(String.fromCharCode(remainder + 'A'.charCodeAt(0))); 
+        num = Math.floor(num / baseLength); 
+    }
+    return letters.reverse().join('');
+}
+
 function BursonBase64Decrypt(encryptedString) {
     console.log('calling burson decompression with length', encryptedString.length );
     let decryptedString = ''; let alphabet = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
     let undoOwlLoop = reverseOwlphaLoop(encryptedString);
+    console.log('image length after reversing owlphaLoop', undoOwlLoop.length);
     for(var i=0; i<encryptedString.length; i++){
         const char = encryptedString[i];
         if (char === '|') {
@@ -3445,11 +3457,7 @@ function BursonBase64Decrypt(encryptedString) {
                     for(var k =0; k< repeatCountNumber; k++){
                         newString+= jpanIntegerString;
                     }
-                    if(newString!= ''){
-                        decryptedString+= newString;
-                    }else{
-                        decryptedString+=jpanIntegerString;
-                    }
+                    decryptedString+= newString;
             }else{
                 let nextCharDouble = nextChar +encryptedString[i + 2]+encryptedString[i + 3]+encryptedString[i + 4];
                 let newString = '';
@@ -3459,30 +3467,24 @@ function BursonBase64Decrypt(encryptedString) {
                 decryptedString += newString;
                 i+=2;
             }
-        } else if (isChineseChar(char)) {
-            let repeatCount = getBarNumberAttachment(i, encryptedString); 
-            const repeatCountNumber = parseInt(repeatCount) || 1;
+        }else if (isChineseChar(char)) {
             let decryptedKMFERString = '';
             if(i!= encryptedString.length){
-                const getKmferChar = encryptedString[i+1];
-                if(isAKMfer(getKmferChar)){
-                    decryptedKMFERString += mapCharsToTransformedWord(char, getKmferChar, uniqueChars2);
+                const nextChar = encryptedString[i+1];
+                if(isAKMfer(nextChar)){
+                    decryptedKMFERString += mapCharsToTransformedWord(char, nextChar, uniqueChars2);
                     i += 1;
-                }else{
+                }else if(nextChar === '^'){
+                    let indexOfModChar = uniqueChars.indexOf(char);
+                    let modCharInverse = numberToLetters(indexOfModChar, alphabet.length);
+                    decryptedKMFERString += modCharInverse.toLowerCase();
+                } else{
                     decryptedKMFERString += uniqueChars.indexOf(char);
                 }
             }else{
                decryptedKMFERString = uniqueChars.indexOf(char);
             }
-            let newString = '';
-            for(var k =0; k< repeatCountNumber; k++){
-                newString+=decryptedKMFERString;
-            }
-            if(newString!== ''){
-                decryptedString+= newString;
-            }else{
-                decryptedString+=decryptedKMFERString;
-            }
+            decryptedString+=decryptedKMFERString;
         }else if(isJapaneseChar(char)){
             decryptedString+= uniqueChars3.indexOf(char).toString();
         } else {
