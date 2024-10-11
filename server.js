@@ -2028,10 +2028,21 @@ try{
             const endTime = performance.now();
             const duration = endTime - startTime;
             
+            console.log('setting custom symbols . . . ');
+
+            let mainBase = 26; 
+            let digitBase = 10;
+            let modulus = 4; // to implement 5-char or 6 char you can uncomment here. May experience memory issues compile using node --max-old-space-size=8192 server.js. 
+
+            const startTime = performance.now();
+            let customSymbolArray = setMainUniquebaseCharMapping(modulus, mainBase);
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+
             console.log(`Initializing base set symbols time:  ${duration.toFixed(2)} milliseconds.`);
-            
-            let kmferChars = setUniquePermutationMapping();
-            let japaneseChars = setUniqueDigitCharsMapping(modulus, mainBase);
+
+            let kmferChars = setUniquePermutationMapping(modulus);
+            let japaneseChars = setUniqueDigitCharsMapping(modulus, digitBase);
             uniqueChars = customSymbolArray;
 
             for (const kmferChar of kmferChars) {
@@ -2041,7 +2052,7 @@ try{
                 uniqueChars3.push(jChar);
             }
 
-            var base64TestString = `data:image/png;base64,ZZZZZZZZZZhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhhAAAAAhbdehbdeAACcccccccccccccccccccccccc`;
+            var base64TestString = `data:image/png;base64,iVBORw0KGgoAAAAAAAAAAAAAAAAAAAANSUhEUgAdhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7SUhEUgAdhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7SUhEUgAdhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7SUhEUgAdhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7SUhEUgAdhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7`;
             if(uniqueChars.length >= mainBase**modulus){
                 console.log('calling compressor using unique set of symbols generated with length:', uniqueChars.length);
                 console.log(`Calling burson encryption using a ${modulus}-char reduction technique`);
@@ -2504,19 +2515,22 @@ function setMainUniquebaseCharMapping(modulus, baseLength) {
     console.log(`Total custom symbols created: ${customs.length}`);
     return customs;
 }
-function setUniquePermutationMapping() {
+function setUniquePermutationMapping(modulus) {
     let khmerChars = [];
     const start = 0x1780; 
     const end = 0x17FF;   
-    const limit = 48;    
+    let permutationLimit =  2**modulus-2;
+    console.log('permutation limit', permutationLimit);
+    const limit = 48; // results change if we edit limit to permutation limit this is unusual and should not happen (unless another bug is present)    
     for (let i = start; i <= end && khmerChars.length < limit; i++) {
         khmerChars.push(String.fromCharCode(i));
     }
+
     return khmerChars;
 }
 function setUniqueDigitCharsMapping(modulus,baseLength) {
-    console.log('setting 10^5 elements to map the digit chunks to');
-    const totalCount = 10**5;
+    const totalCount = baseLength**modulus;
+    console.log(`setting ${totalCount} elements to map the digit chunks to`);
     const chunkSize = 5000; 
     let customs = [];
     for (let i = 0; i < totalCount; i += chunkSize) {
