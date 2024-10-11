@@ -2403,9 +2403,9 @@ function drawStringFromSymbols(symbols) {
 }
 
 async function setMainUniquebaseCharMapping(modulus, baseLength) {
-    const totalCount = baseLength ** modulus;
-    //const totalCount = 21300;  
-    const chunkSize = 20000;   
+    const totalCount = 26**4;
+    // totalCount = baseLength**modulus; not working for some crazy fucking reason printing some larger number 
+    const chunkSize = 70000;    
     let customs = [];
 
     for (let i = 0; i < totalCount; i += chunkSize) {
