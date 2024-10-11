@@ -1973,11 +1973,13 @@ try{
                     const forwarded = socket.handshake.headers['x-forwarded-for'];
                     const ipAddress = forwarded ? forwarded.split(',')[0] : socket.handshake.address;  // Prefer X-Forwarded-For if available
                     let clientIP;
+                    
                     if (ipAddress.includes('::ffff:')) {
                         clientIP = ipAddress.split(':').pop();
                     } else {
                         clientIP = ipAddress;
                     }
+                    
                     console.log('client IP', clientIP);
                     const sender = users.find(u => u.ip == clientIP);
 
@@ -2102,6 +2104,7 @@ function checkString(input) {
             return false;
         }
     }
+    
     for (const pattern of threatPatterns) {
         if (input.includes(pattern)) {
             console.log("Matched threat pattern:", pattern);
@@ -2196,7 +2199,6 @@ async function checkIfName(string) {
     'assault you', 'intimidate you', 'coerce you', 'terrorize you', 'pussy', 
     'dick', 'cock', 'vagina', 'asshole', 'boobs', 'tits', 'anal', 'cum', 'sex'
     ];
-
     const lowerCaseFirstName = string.toLowerCase();
     if (badWords.some(word => lowerCaseFirstName.includes(word))) {
         return false; 
@@ -2205,11 +2207,8 @@ async function checkIfName(string) {
     if (excessiveRepeatingRegex.test(string)) {
         return false; 
     }
-    return true;
-
-    
+    return true;  
 }
-
 async function sendEmail(email, address, firstName, lastName, productID, price, productName, productIMG) {
     let atagRef = 'mailto:' + buisnessEmial;
     let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
@@ -2242,18 +2241,14 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
         }
 
     });
-
     transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
-
      let mailOptions = {
             from: buisnessEmial, 
             to: email, 
             subject: 'Congrats on your new purchase!', 
             html: HTML
     };
-
     try {
-
         let result = await transporter.sendMail(mailOptions);
         return result;
     } catch (error) {
@@ -2261,17 +2256,13 @@ async function sendEmail(email, address, firstName, lastName, productID, price, 
         throw error; 
     }
 }
-
-
 function getMaxValueofPurchases(attemptedClientsArray) {
+    
     let maxValue = 0;
-
     if(attemptedClientsArray.length == 0){
-
     }else{
         let lastelement = attemptedClientsArray[0];
         attemptedClientsArray.forEach(element => {
-            // if first index dont do anything bec
             if(lastelement.numberOfPurchaseAttempts<= element.numberOfPurchaseAttempts){
                 maxValue = element.numberOfPurchaseAttempts;
             }else{
@@ -2280,14 +2271,10 @@ function getMaxValueofPurchases(attemptedClientsArray) {
             lastelement = element;
         });
     }
-
-
     return maxValue;
 }
-
 async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, image) {
-
-// HTML files to send
+    
     let HTML = `<div class="container" style="width: 100%; max-width: 600px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto;">
                     <div class="header" style="width: 100%; margin-bottom: 20px; text-align: center;">
                         <img src="https://i.ibb.co/kmVWh5p/Burson-SKull-Text.png" alt="Burson-SKull-Text" style="width: 100%; height: auto; max-height: 200px;">
@@ -2305,7 +2292,6 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
                         <p style="font-size: 16px; margin: 0;">Best regards,<br><span class="signature" style="text-indent: 20px;"> &nbsp; &nbsp; Roy Burson</span></p>
                     </div>
                 </div>`;
-
     let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465, 
@@ -2314,9 +2300,8 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
             user: buisnessEmial, 
             pass: appPasscode
         }
-
     });
-
+    
     transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
      let mailOptions = {
             from: buisnessEmial, 
@@ -2326,7 +2311,6 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
     };
 
     try {
-
         let result = await transporter.sendMail(mailOptions);
         console.log('Email sent');
         return result;
@@ -2339,6 +2323,7 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
 function isUsernameTaken(username, users) {
     return users.some(user => user.user === username);
 }
+
 function drawSpiralSymbol(index ,base, modulus) {
     var newSpiralData = [];
     if(index == 0){
@@ -2366,8 +2351,8 @@ function drawSpiralSymbol(index ,base, modulus) {
         return spiral;
     }else{
         let point = globalSpiralData[globalSpiralData.length-1];
-        point[0] += 1/(base**modulus);
-        point[1] += 1/(base**modulus);
+        point.x += 1/(base**modulus);
+        point.y += 1/(base**modulus);
         let newPoint = point;
         NewSpiralData = globalSpiralData;
         newSpiralData[newSpiralData.length-1] = newPoint;
@@ -2375,7 +2360,6 @@ function drawSpiralSymbol(index ,base, modulus) {
         return newSpiralData;
     }
 }
-
 
 function createCustomSymbol(index) {
     const symbolData = drawSpiralSymbol(index); 
@@ -2395,6 +2379,7 @@ function generateCustomSymbolData(totalCount) {
     console.log(`Generated unique symbol set length: ${customSymbols.length}`);
     return customSymbols; 
 }
+
 function drawStringFromSymbols(symbols) {
     if (!Array.isArray(symbols)) {
         throw new Error('Expected an array of symbols'); 
@@ -2403,7 +2388,6 @@ function drawStringFromSymbols(symbols) {
     symbols.forEach((symbol) => {
         const canvasSize = 10; 
         const canvas = Array.from({ length: canvasSize }, () => Array(canvasSize).fill(' ')); 
-
         const points = JSON.parse(atob(symbol.data)); 
         points.forEach(point => {
             const x = Math.round(point.x / (100 / canvasSize)); 
@@ -2417,6 +2401,7 @@ function drawStringFromSymbols(symbols) {
     });
     return symbolChars; 
 }
+
 async function setMainUniquebaseCharMapping(modulus, baseLength) {
     const totalCount = baseLength ** modulus;
     //const totalCount = 21300;  
