@@ -2021,11 +2021,17 @@ try{
             console.log('setting custom symbols . . . ');
 
             let mainBase = 26; 
-            let modulus = 4;
+            let modulus = 5;
 
+            const startTime = performance.now();
             let customSymbolArray = setMainUniquebaseCharMapping(modulus, mainBase);
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            console.log(`Initializing base set symbols time:  ${duration.toFixed(2)} milliseconds.`);
+            
             let kmferChars = setUniquePermutationMapping();
-            let japaneseChars = setUniqueDigitCharsMapping();
+            let japaneseChars = setUniqueDigitCharsMapping(modulus, mainBase);
             uniqueChars = customSymbolArray;
 
             for (const kmferChar of kmferChars) {
@@ -2036,15 +2042,15 @@ try{
             }
 
             var base64TestString = `data:image/png;base64,ZZZZZZZZZZhbdehbdeAACccccccccccccccccccccccccccAHBHhhhhhhAAAAAhbdehbdeAACcccccccccccccccccccccccc`;
-            console.log('Base 64 string image length before compressor applied', base64TestString.length);
-
             if(uniqueChars.length >= mainBase**modulus){
-                console.log('calling compressor using unique set of symbols generated:', uniqueChars.length);
+                console.log('calling compressor using unique set of symbols generated with length:', uniqueChars.length);
+                console.log(`Calling burson encryption using a ${modulus}-char reduction technique`);
+
                 const encryptedStringTest = BursonBase64Encrypted(base64TestString, modulus);
                 console.log(`Compression amount = ${(base64TestString.length/encryptedStringTest.length).toFixed(3)}x`);
 
-                //const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest);
-                //console.log('decryptedString length', decryptionTestStringTest.length);
+                const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest);
+                console.log('decryptedString length', decryptionTestStringTest.length);
             }else{
                 console.log('Error unique char array length is not long enough to call the burson compressor function');
                 console.log('unique symbol length for main base:', customSymbolArray.length);
@@ -2426,28 +2432,14 @@ async function setMainUniquebaseCharMapping(modulus, baseLength) {
     return customs;
 }
 function setUniquePermutationMapping() {
-    let khmerCfunction drawSpiralSymbol(index) {
-    const canvasSize = 50;
-    const spiral = [];
-    const centerX = canvasSize / 2;
-    const centerY = canvasSize / 2;
-    const radius = canvasSize + (index % 10) * 3;
-    const angleIncrement = 0.1 + (index % 5) * 0.02;
-    const numSpiralPoints = 100;
-    for (let i = 0; i < numSpiralPoints; i++) {
-        const angle = i * angleIncrement; 
-        const x = centerX + radius * Math.cos(angle) * (i / numSpiralPoints);
-        const y = centerY + radius * Math.sin(angle) * (i / numSpiralPoints);
-        spiral.push({ x, y });
+    let khmerChars = [];
+    const start = 0x1780; 
+    const end = 0x17FF;   
+    const limit = 48;    
+    for (let i = start; i <= end && khmerChars.length < limit; i++) {
+        khmerChars.push(String.fromCharCode(i));
     }
-
-    const numTicks = 20;
-    for (let j = 0; j < numTicks; j++) {
-        const tickX = centerX + (radius + 5) * Math.cos(j * Math.PI / 4);
-        const tickY = centerY + (radius + 5) * Math.sin(j * Math.PI / 4);
-        spiral.push({ x: tickX, y: tickY, isTick: true });
-    }
-    return spiral;
+    return khmerChars;
 }
 
 function createCustomSymbol(index) {
@@ -2490,22 +2482,19 @@ function drawStringFromSymbols(symbols) {
     });
     return symbolChars; 
 }
-async function setMainUniquebaseCharMapping(modulus, baseLength) {
+function setMainUniquebaseCharMapping(modulus, baseLength) {
     const totalCount = baseLength ** modulus;
-    //const totalCount = 21300;  
     const chunkSize = 20000;   
     let customs = [];
 
     for (let i = 0; i < totalCount; i += chunkSize) {
         const currentChunkSize = Math.min(chunkSize, totalCount - i);
-        let customSpiralSymbols = []; // Reset symbol array for each chunk
-
+        let customSpiralSymbols = []; 
         for (let j = 0; j < currentChunkSize; j++) {
             const normalizedIndex = (i + j) / totalCount; 
             const index = normalizedIndex + Math.sin(normalizedIndex * 2 * Math.PI) * 0.1; 
             const customSymbol = createCustomSymbol(index);
             customSpiralSymbols.push(customSymbol); 
-            //console.log('symbol data length', customSpiralSymbols.length);
         }
         const newSymbols = drawStringFromSymbols(customSpiralSymbols);
         customs.push(...newSymbols);
@@ -2517,73 +2506,33 @@ async function setMainUniquebaseCharMapping(modulus, baseLength) {
 }
 function setUniquePermutationMapping() {
     let khmerChars = [];
-    const start = 0x1780; // Start of Khmer block
-    const end = 0x17FF;   // End of Khmer block
-    const limit = 24;     // Only get the first 24 characters
+    const start = 0x1780; 
+    const end = 0x17FF;   
+    const limit = 48;    
     for (let i = start; i <= end && khmerChars.length < limit; i++) {
         khmerChars.push(String.fromCharCode(i));
     }
     return khmerChars;
 }
-function setUniqueDigitCharsMapping() {
-    let japaneseChars = [];
-
-    // Hiragana (U+3040 to U+309F)
-    const hiraganaStart = 0x3040;
-    const hiraganaEnd = 0x309F;
-    for (let i = hiraganaStart; i <= hiraganaEnd; i++) {
-        japaneseChars.push(String.fromCharCode(i));
+function setUniqueDigitCharsMapping(modulus,baseLength) {
+    console.log('setting 10^5 elements to map the digit chunks to');
+    const totalCount = 10**5;
+    const chunkSize = 5000; 
+    let customs = [];
+    for (let i = 0; i < totalCount; i += chunkSize) {
+        const currentChunkSize = Math.min(chunkSize, totalCount - i);
+        let customSpiralSymbols = [];
+        for (let j = 0; j < currentChunkSize; j++) {
+            const normalizedIndex = (2*i + 3*j) / totalCount+ Math.sin(i+j); 
+            const index = normalizedIndex + Math.sin(normalizedIndex * 2 * Math.PI) * 0.1; 
+            const customSymbol = createCustomSymbol(index, baseLength, modulus);
+            customSpiralSymbols.push(customSymbol); 
+        }
+        const newSymbols = drawStringFromSymbols(customSpiralSymbols);
+        customs.push(...newSymbols);
     }
-
-    // Katakana (U+30A0 to U+30FF)
-    const katakanaStart = 0x30A0;
-    const katakanaEnd = 0x30FF;
-    for (let i = katakanaStart; i <= katakanaEnd; i++) {
-        japaneseChars.push(String.fromCharCode(i));
-    }
-
-    // Kanji (CJK Unified Ideographs U+4E00 to U+9FFF)
-    const kanjiStart = 0x4E00;
-    const kanjiEnd = 0x9FFF;
-    for (let i = kanjiStart; i <= kanjiEnd; i++) {
-        japaneseChars.push(String.fromCharCode(i));
-    }
-
-    return japaneseChars;
-}hars = [];
-    const start = 0x1780; // Start of Khmer block
-    const end = 0x17FF;   // End of Khmer block
-    const limit = 24;     // Only get the first 24 characters
-    for (let i = start; i <= end && khmerChars.length < limit; i++) {
-        khmerChars.push(String.fromCharCode(i));
-    }
-    return khmerChars;
-}
-function setUniqueDigitCharsMapping() {
-    let japaneseChars = [];
-
-    // Hiragana (U+3040 to U+309F)
-    const hiraganaStart = 0x3040;
-    const hiraganaEnd = 0x309F;
-    for (let i = hiraganaStart; i <= hiraganaEnd; i++) {
-        japaneseChars.push(String.fromCharCode(i));
-    }
-
-    // Katakana (U+30A0 to U+30FF)
-    const katakanaStart = 0x30A0;
-    const katakanaEnd = 0x30FF;
-    for (let i = katakanaStart; i <= katakanaEnd; i++) {
-        japaneseChars.push(String.fromCharCode(i));
-    }
-
-    // Kanji (CJK Unified Ideographs U+4E00 to U+9FFF)
-    const kanjiStart = 0x4E00;
-    const kanjiEnd = 0x9FFF;
-    for (let i = kanjiStart; i <= kanjiEnd; i++) {
-        japaneseChars.push(String.fromCharCode(i));
-    }
-
-    return japaneseChars;
+    console.log(`Total custom symbols to map digit chunks: ${customs.length}`);
+    return customs;
 }
 async function getNewDefinition(word) {
   const apiUrl =`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${MERRIAM_WEBSTER_API_KEY}`;
@@ -2593,16 +2542,11 @@ async function getNewDefinition(word) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
     const data = await response.json();
-
-    //console.log(`we recieved data for the word ${word}:`, data);
-
     if (data.length === 0) {
       console.log('No definition found.');
       return null;
     }
-
     const entry = data[0];
-
     const wordInfo = {
       word: word,
       definition1: entry.shortdef[0] ? entry.shortdef[0] : null,
