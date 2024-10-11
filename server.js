@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 10-10-24
+// Date last modified: 10-11-24
 // purpose: Make web3 art website to coincide with research related life
 
 const maxNumberOfAIEventsPerClient = 100;
@@ -15,6 +15,7 @@ var previousQuestion1 = [];
 let uniqueChars = [];
 let uniqueChars2 = [];
 let uniqueChars3 = [];
+let globalSpiralData = [];
 let stringChunk = '';
 let soliditychunk;
 
@@ -2338,29 +2339,43 @@ async function sendPaintingTrackingNumberEmail(email, name, trackingNumber, imag
 function isUsernameTaken(username, users) {
     return users.some(user => user.user === username);
 }
-function drawSpiralSymbol(index) {
-    const canvasSize = 50;
-    const spiral = [];
-    const centerX = canvasSize / 2;
-    const centerY = canvasSize / 2;
-    const radius = canvasSize + (index % 10) * 3;
-    const angleIncrement = 0.1 + (index % 5) * 0.02;
-    const numSpiralPoints = 100;
-    for (let i = 0; i < numSpiralPoints; i++) {
-        const angle = i * angleIncrement; 
-        const x = centerX + radius * Math.cos(angle) * (i / numSpiralPoints);
-        const y = centerY + radius * Math.sin(angle) * (i / numSpiralPoints);
-        spiral.push({ x, y });
-    }
+function drawSpiralSymbol(index ,base, modulus) {
+    var newSpiralData = [];
+    if(index == 0){
+        const canvasSize = 50;
+        const spiral = [];
+        const centerX = canvasSize / 2;
+        const centerY = canvasSize / 2;
+        const radius = canvasSize + (index % 10) * 3;
+        const angleIncrement = 0.1 + (index % 5) * 0.02;
+        const numSpiralPoints = 100;
+        for (let i = 0; i < numSpiralPoints; i++) {
+            const angle = i * angleIncrement; 
+            const x = centerX + radius * Math.cos(angle) * (i / numSpiralPoints);
+            const y = centerY + radius * Math.sin(angle) * (i / numSpiralPoints);
+            spiral.push({ x, y });
+        }
 
-    const numTicks = 20;
-    for (let j = 0; j < numTicks; j++) {
-        const tickX = centerX + (radius + 5) * Math.cos(j * Math.PI / 4);
-        const tickY = centerY + (radius + 5) * Math.sin(j * Math.PI / 4);
-        spiral.push({ x: tickX, y: tickY, isTick: true });
+        const numTicks = 20;
+        for (let j = 0; j < numTicks; j++) {
+            const tickX = centerX + (radius + 5) * Math.cos(j * Math.PI / 4);
+            const tickY = centerY + (radius + 5) * Math.sin(j * Math.PI / 4);
+            spiral.push({ x: tickX, y: tickY, isTick: true });
+        }
+        globalSpiralData = spiral;
+        return spiral;
+    }else{
+        let point = globalSpiralData[globalSpiralData.length-1];
+        point[0] += 1/(base**modulus);
+        point[1] += 1/(base**modulus);
+        let newPoint = point;
+        NewSpiralData = globalSpiralData;
+        newSpiralData[newSpiralData.length-1] = newPoint;
+
+        return newSpiralData;
     }
-    return spiral;
 }
+
 
 function createCustomSymbol(index) {
     const symbolData = drawSpiralSymbol(index); 
