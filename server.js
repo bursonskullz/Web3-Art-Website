@@ -2023,7 +2023,7 @@ try{
             let mainBase = 26; 
             let modulus = 4;
 
-            let customSymbolArray = await setMainUniquebaseCharMapping(mainBase, modulus);
+            let customSymbolArray = setMainUniquebaseCharMapping(modulus, mainBase);
             let kmferChars = setUniquePermutationMapping();
             let japaneseChars = setUniqueDigitCharsMapping();
             uniqueChars = customSymbolArray;
@@ -2403,14 +2403,12 @@ function drawStringFromSymbols(symbols) {
 }
 
 async function setMainUniquebaseCharMapping(modulus, baseLength) {
-    const totalCount = 26**4;
-    // totalCount = baseLength**modulus; not working for some crazy fucking reason printing some larger number 
+    const totalCount = baseLength**modulus;
     const chunkSize = 70000;    
     let customs = [];
-
     for (let i = 0; i < totalCount; i += chunkSize) {
         const currentChunkSize = Math.min(chunkSize, totalCount - i);
-        let customSpiralSymbols = []; // Reset symbol array for each chunk
+        let customSpiralSymbols = []; 
 
         for (let j = 0; j < currentChunkSize; j++) {
             const normalizedIndex = (i + j) / totalCount; 
