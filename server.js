@@ -3246,29 +3246,24 @@ function reverseOwlphaLoop(encryptedString) {
     return intermediateString;
 }
 function getUniqueModulusChar(word, charArray, modLength) {
-    // fix loop in comment below 
     if (word.length !== modLength) {
         throw new Error(`Input word must be exactly ${modLength} characters long`);
     }
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let base = alphabet.length;
-
-    let char1Index = alphabet.indexOf(word[0])+1;
-    let char2Index = alphabet.indexOf(word[1])+1;
-    let char3Index = alphabet.indexOf(word[2])+1;
-    let char4Index = alphabet.indexOf(word[3])+1;
-
-    let calculatedIndex = char4Index + (base**1+char3Index) + (base**2+char2Index) + (base**3+char1Index);
-    /*
+    let base = alphabet.length;    
     let calculatedIndex = 0;
     for (let i = 0; i < word.length; i++) {
-        let charIndex = alphabet.indexOf(word[i]) + 1;
-        calculatedIndex += charIndex* base ** (word.length-i-1);
+        let charIndex = alphabet.indexOf(word.length-i) + 1;
+        if(i==0){
+            calculatedIndex += charIndex;
+        }else{
+            calculatedIndex += base **i + charIndex;     
+        }
+       
     }
-    */
     let uniqueIndex = calculatedIndex;
     if (uniqueIndex >= 0 && uniqueIndex <= charArray.length) {
-        return charArray[uniqueIndex]; // Adjust for zero-based indexing
+        return charArray[uniqueIndex]; 
     } else {
         console.log('Error index out of boundary', calculatedIndex);
         throw new Error("Unique index is out of bounds of the character array");
