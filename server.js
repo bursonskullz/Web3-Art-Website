@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 10-09-24
+// Date last modified: 10-10-24
 // purpose: Make web3 art website to coincide with research related life
 
 const maxNumberOfAIEventsPerClient = 100;
