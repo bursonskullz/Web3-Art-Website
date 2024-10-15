@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 10-14-24
+// Date last modified: 10-15-24
 // purpose: Make web3 art website to coincide with research related life
 
 const maxNumberOfAIEventsPerClient = 100;
@@ -2025,11 +2025,9 @@ try{
             const duration = endTime - startTime;
 
             console.log(`Initializing base set symbols time:  ${duration.toFixed(2)} milliseconds.`);
-            let kmferChars = setUniquePermutationMapping(modulus); // probley shoul ddraw own symbols here but doesnt look like we will ever need to because 2^m will never get large as 26^m it doesnt compare 
-            let japaneseChars = setUniqueDigitCharsMapping(modulus, digitBase); // this sets inverse of uniqueChars2 
+            let kmferChars = setUniquePermutationMapping(modulus);
+            let japaneseChars = setUniqueDigitCharsMapping(modulus, digitBase); 
             uniqueChars = customSymbolArray;
-            console.log('inverse base map', uniqueCharsInverse); // this has been verified to return M-char inverse all caps (but is one off)
-            console.log('inverse base map of permutation', uniqueChars2Inverse); // this has been verified to return reverse map of permutation symbol
 
             for (const kmferChar of kmferChars) {
                 uniqueChars2.push(kmferChar);
@@ -2038,27 +2036,30 @@ try{
                 uniqueChars3.push(jChar);
             }
 
+            console.log(`inverse of ${modulus}-char base map`, uniqueCharsInverse); // has been verified uncomment to check again
+            console.log('inverse permutations ', uniqueChars2Inverse); // has been verified uncomment to check again
 
-            var base64TestString = `data:image/png;base64,iVBORw0KGgoAAAAAAAAAAAAAAAAAAAAnenjenNSNSNSNSNSSNSNNSNSNSNSNSbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7SUhEUgAdhbehdbedhbed7Adh
-            behdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7SUhEUgAdhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7SUhEUgAdhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7A
-            dhbehdbedhbed7SUhEUgAdhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7Adhbehdbedhbed7`;
-            if(uniqueChars.length >= mainBase**modulus){
+            const duplicator = hasDuplicates(uniqueChars);
+            var base64TestString = `data:image/png;base64,ABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAA
+            BCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA23222332
+            2AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAabVYKLIqWEAabVYKLIqWEAabVYKLIqWEAabVYKLIqWEAabVYKLIqWEAabVYKLIqWEAabcDabcD`;
+            if(uniqueChars.length >= mainBase**modulus && !duplicator){
                 console.log('calling compressor using unique set of symbols generated with length:', uniqueChars.length);
                 console.log(`Calling burson encryption using a ${modulus}-char reduction technique`);
-
                 const encryptedStringTest = BursonBase64Encrypted(base64TestString, modulus);
+
+                // issue with bijection starting point
+
+                // before callin
                 console.log(`Compression amount = ${(base64TestString.length/encryptedStringTest.length).toFixed(3)}x`);
+                const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest, modulus);
 
-                /*      decompression tool will not work until we initialize the reverse array/need to find & use inverse formula
-                        the print correctly but we are experiencing issue 
-
-                */
-
-                const decryptionTestStringTest = BursonBase64Decrypt(encryptedStringTest, modulus, uniqueCharsInverse, uniqueChars2Inverse);
                 console.log('decryptedString length', decryptionTestStringTest.length);
-
-            }else{
-                console.log('Error unique char array length is not long enough to call the burson compressor function');
+                console.log('Image base 64 representation after decompression', decryptionTestStringTest);
+            }else if(duplicator){
+                console.warn(`duplicator is true spirals are not unique`, uniqueChars);
+            } else{
+                 console.warn(`Error unique char array length is not long enough `);
                 console.log('unique symbol length for main base:', customSymbolArray.length);
             }
             
@@ -2086,16 +2087,16 @@ try{
     console.log('Error creating the Server', error);
 }
 
-function inverseMapping(array) {
-  let inverseMap = {};
-
-  for (var i = 0; i < array.length; i++) {
-    inverseMap[array[i]] = i; // Use array[i] as the key and i as the value
-  }
-
-  return inverseMap;
+function hasDuplicates(uniqueChars) {
+    for (var i = 0; i < uniqueChars.length; i++) {
+        for (var j = i + 1; j < uniqueChars.length; j++) {
+            if (uniqueChars[i] === uniqueChars[j]) {
+                return true; // Found a duplicate
+            }
+        }
+    }
+    return false; // No duplicates found
 }
-
 const getPrice = async (chainlinkAbi, address) => {
   try {
     return price = '100'; 
@@ -2367,7 +2368,7 @@ function isUsernameTaken(username, users) {
 function drawSpiralSymbol(index ,base, modulus) {
     var newSpiralData = [];
     if(index == 0){
-        const canvasSize = 50;
+        const canvasSize = 500;
         const spiral = [];
         const centerX = canvasSize / 2;
         const centerY = canvasSize / 2;
@@ -2376,8 +2377,8 @@ function drawSpiralSymbol(index ,base, modulus) {
         const numSpiralPoints = 100;
         for (let i = 0; i < numSpiralPoints; i++) {
             const angle = i * angleIncrement; 
-            const x = centerX + radius * Math.cos(angle) * (i / numSpiralPoints);
-            const y = centerY + radius * Math.sin(angle) * (i / numSpiralPoints);
+            const x = centerX + radius * angle * (i / numSpiralPoints);
+            const y = centerY + radius * angle * (i / numSpiralPoints);
             spiral.push({ x, y });
         }
 
@@ -2391,8 +2392,8 @@ function drawSpiralSymbol(index ,base, modulus) {
         return spiral;
     }else{
         let point = globalSpiralData[globalSpiralData.length-1];
-        point.x += 1/(base**modulus);
-        point.y += 1/(base**modulus);
+        point.x += index/(base**modulus);
+        point.y += index/(base**modulus);
         let newPoint = point;
         NewSpiralData = globalSpiralData;
         newSpiralData[newSpiralData.length-1] = newPoint;
@@ -2444,52 +2445,48 @@ function setMainUniquebaseCharMapping(modulus, alphabetBase) {
     let customs = [];
     for (let i = 0; i < totalCount; i += chunkSize) {
         const currentChunkSize = Math.min(chunkSize, totalCount - i);
-        let customSpiralSymbols = [];  let skipper = 0;
+        let customSpiralSymbols = [];
         for (let j = 0; j < currentChunkSize; j++) {
             const normalizedIndex = (i + j) / totalCount; 
             const index = normalizedIndex + Math.sin(normalizedIndex * 2 * Math.PI) * 0.1; 
             const customSymbol = createCustomSymbol(index, baseLength, modulus);
             customSpiralSymbols.push(customSymbol); 
-            let InvSym = getModCharInverse(j+skipper, modulus, alphabetBase); // returns string of length M
-            uniqueCharsInverse.push(InvSym); 
-        }
-        if(i == 0){
-        }else{
-            skipper = currentChunkSize;
         }
         const newSymbols = drawStringFromSymbols(customSpiralSymbols);
         customs.push(...newSymbols); 
     }
     console.log(`Total custom symbols created: ${customs.length}`);
     console.log(`Total inverse symbols: ${uniqueCharsInverse.length}`);
+    for (var i = 0; i<customs.length; i++) {
+        let InvSym = getModCharInverse(i, modulus, alphabetBase); // returns string of length M
+        uniqueCharsInverse.push(InvSym); 
+    }
     return customs;
 }
 
 function getModCharInverse(x, modulus, mainBase) {
     let myArray = [];
     let baseLength = mainBase.length;
-    x = x + 1;
-    for (let i = modulus; i > 0; i--) {
-        let lowerBound = Math.pow(baseLength, i - 1);
-        let upperBound = Math.pow(baseLength, i);
-        if(mainBase == '01'){
-            console.log('current base:', mainBase);
-            console.log('current bounds', upperBound, lowerBound);
-            console.log('current value of X:', x);
-        }
-        if (lowerBound <= x && x <= upperBound) {
-            let vector = [];
-            for (let j = i; j > 0; j--) {
-                let divisor = Math.pow(baseLength, j - 1);
-                let q = Math.floor(x / divisor);
-                x = x % divisor;
-                vector.push(q + 1);
+    if (x === 0) {
+        myArray = Array(modulus).fill(1); 
+    } else {
+        for (let i = modulus; i > 0; i--) {
+            let lowerBound = Math.pow(baseLength, i - 1);
+            let upperBound = Math.pow(baseLength, i);
+            if (lowerBound <= x && x < upperBound) {
+                let vector = [];
+                for (let j = i; j > 0; j--) {
+                    let divisor = Math.pow(baseLength, j - 1);
+                    let q = Math.floor(x / divisor);
+                    x = x % divisor;
+                    vector.push(q + 1);
+                }
+                while (vector.length < modulus) {
+                    vector.unshift(1);
+                }
+                myArray = vector;
+                break;
             }
-            while (vector.length < modulus) {
-                vector.unshift(1); 
-            }
-            myArray = vector; 
-            break; 
         }
     }
     let modChar = '';
@@ -2498,10 +2495,11 @@ function getModCharInverse(x, modulus, mainBase) {
         if (charIndex >= 0 && charIndex < baseLength) {
             modChar += mainBase[charIndex];
         } else {
-            console.log('char index out of range cannot set data');
+            console.log('char index out of range, cannot set data');
         }
     }
-    return modChar;
+
+    return modChar; // Return the final character string
 }
 function setUniquePermutationMapping(modulus) {
     // use index formula to set permutation depending on index 
@@ -2521,10 +2519,10 @@ function setUniquePermutationMapping(modulus) {
         if (counter >= permutationLimit) {
             break;
         } else {
-            counter += 1;
             khmerChars.push(String.fromCharCode(i));
             let permStringInverse = getModCharInverse(counter, modulus, base); 
             uniqueChars2Inverse.push(permStringInverse);
+            counter += 1;
         }
     }
     
@@ -3054,6 +3052,7 @@ function BursonBase64Encrypted(base64String, modulus) {
     let bestChunks = separateIntoBestChunk(base64String, modulus);
     console.log('Image length before compression applied', base64String.length);
     console.log('best chunks length (how many loops inside compressor):', bestChunks.length);
+    console.log('Image in base 64):', base64String);
     let encryptedString = '';
     let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let processedIndices = new Set(); 
@@ -3090,23 +3089,23 @@ function BursonBase64Encrypted(base64String, modulus) {
                 let uniqueSymbol;
                 if (isUpperCase && isEnglishChunk && chunk.length === modulus) {
                     uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
-                    frontEncryption = `${maxCount}|${uniqueSymbol}`;
+                    frontEncryption = `~${maxCount}|${uniqueSymbol}`; // tilda seperates from other numbers when decrypting we need this 
                 } else if(isLowerCase && isEnglishChunk && chunk.length === modulus) {
                     uniqueSymbol = getUniqueModulusChar(chunk.toUpperCase(), uniqueChars, modulus);
-                    frontEncryption = `${maxCount}|${uniqueSymbol}^`;
+                    frontEncryption = `~${maxCount}|${uniqueSymbol}^`;
                 } else if (!isUpperCase && !isLowerCase && isEnglishChunk) {
                     uniqueSymbol = getUniquePermutationSymbol(chunk, uniqueChars2, modulus);
                     frontEncryption = `${maxCount}|${uniqueSymbol}`;
                 }else if(isStringDigits){
                     let indexOfJapanChar = isStringDigits;
                     let uniqueJapanChar = uniqueChars3[indexOfJapanChar];
-                    frontEncryption = `${maxCount}|${uniqueJapanChar}`;
+                    frontEncryption = `~${maxCount}|${uniqueJapanChar}`;
                 } else if (!isUpperCase && !isLowerCase && !isEnglishChunk) {
-                    frontEncryption = `${maxCount}|${chunk}`;
+                    frontEncryption = `~${maxCount}|${chunk}`;
                 }else{
-                    frontEncryption = `${maxCount}|${chunk}`;
+                    frontEncryption = `~${maxCount}|${chunk}`;
                 }
-            }else{
+            }else{ // this should never fire unless max chunk is undefined
                 frontEncryption+= chunk;
             }
             encryptedString += frontEncryption; 
@@ -3156,11 +3155,12 @@ function BursonBase64Encrypted(base64String, modulus) {
             i += maxCount - 1;
         }
     }
-    console.log('Image length before owl loop', encryptedString.length);
-    console.log('Image base representation', encryptedString);
+    console.log('Image length before Owlphaloop', encryptedString.length);
+    console.log('Image base representation after encryption', encryptedString);
 
     let owlphaString = performOwlphaLoop(encryptedString);
     console.log('Image length after owl compression', owlphaString.length);
+     console.log('Image representation after after Owlphaloop', owlphaString);
     return owlphaString;
 }
 function performOwlphaLoop(encryptedString) {
@@ -3308,9 +3308,9 @@ function getMaxChunkCount(chunk, bestChunks) {
     return maxCount;
 }
 
-function mapCharsToTransformedWord(chineseChar, khmerChar, reverseMainBaseMap, reversePermutations) {
+function mapCharsToTransformedWord(chineseChar, khmerChar) {
     let indexOfChineseChar = uniqueChars.indexOf(chineseChar);
-    const reverseChinaChunk = reverseMainBaseMap[indexOfChineseChar];
+    const reverseChinaChunk = uniqueCharsInverse[indexOfChineseChar];
     let caseValues = []; 
     let transformedWord = '';
     if (!reverseChinaChunk) {
@@ -3323,7 +3323,7 @@ function mapCharsToTransformedWord(chineseChar, khmerChar, reverseMainBaseMap, r
     if (khmerIndex === -1) {
         throw new Error("Khmer character not found in uniqueKhmerChars array.");
     }
-    let stringPerm = reversePermutations[khmerIndex];
+    let stringPerm = uniqueChars2Inverse[khmerIndex];
     for(var i = 0; i< stringPerm.length; i++ ){
         caseValues.push(parseInt(stringPerm[i]));
     }
@@ -3336,8 +3336,8 @@ function mapCharsToTransformedWord(chineseChar, khmerChar, reverseMainBaseMap, r
            transformedWord+= char.toUpperCase();
         }
     }
-    console.log('word before being permuted ', reverseChinaChunk);
-    console.log('transformedWord from map chars to transformedWord', transformedWord);
+    //console.log('word before being permuted ', reverseChinaChunk);
+    //console.log('transformedWord from map chars to transformedWord', transformedWord);
     return transformedWord;
 }
 function getBarNumberAttachment(i, encryptedString){
@@ -3374,79 +3374,124 @@ function numberToLetters(num, baseLength) {
     return letters.reverse().join('');
 }
 
-function BursonBase64Decrypt(encryptedString, modulus, reverseMainBaseMap, reversePermutations) { // not working yet printing undefined permuated words
-    console.log('calling burson decompression with length', encryptedString.length );
-    let decryptedString = ''; let alphabet = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
+function BursonBase64Decrypt(encryptedString, modulus) {
+    console.log('unique chars inverse', uniqueCharsInverse);
+    console.log('Calling Burson decompression with length', encryptedString.length);
+    let decryptedString = ''; 
+    let alphabet = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
+
     encryptedString = reverseOwlphaLoop(encryptedString);
-    console.log('image length after reversing owlphaLoop', encryptedString.length);
-    console.log('image to decrypt', encryptedString);
-    for(var i=0; i<encryptedString.length; i++){
+    console.log('Image length after reversing owlphaLoop', encryptedString.length);
+    console.log('Image to decrypt:', encryptedString);
+
+    for (let i = 0; i < encryptedString.length; i++) {
         const char = encryptedString[i];
+
+        // Handle the "|" case for repeating characters
         if (char === '|') {
             let repeatCount = getBarNumberAttachment(i, encryptedString); 
             const repeatCountNumber = parseInt(repeatCount) || 1;
-            var nextChar = encryptedString[i + 1]; 
+            let nextChar = encryptedString[i + 1]; 
             let decryptedKMFERString = '';
             let newString = '';
-            if(isInMainBase(nextChar)){
-                    if(i!= encryptedString.length){
-                        const getKmferChar = encryptedString[i+1];
-                        if(isAKMfer(getKmferChar)){
-                           decryptedKMFERString = mapCharsToTransformedWord(nextChar, getKmferChar, reverseMainBaseMap, reversePermutations);
-                           console.log('permutated word should not be all caps:', decryptedKMFERString);
-                           i+=2;
-                        }else{
-                            let index = uniqueChars.indexOf(nextChar);
-                            let modCharInverse = reverseMainBaseMap[index];
-                            console.log('mod char inverse:', modCharInverse);
-                            decryptedKMFERString += modCharInverse;
-                            i+=1;
-                        }
-                    }else{
+
+            if (isInMainBase(nextChar)) {
+                if (i != encryptedString.length) {
+                    const getKmferChar = encryptedString[i + 1];
+
+                    if (isAKMfer(getKmferChar)) {
+                        decryptedKMFERString = mapCharsToTransformedWord(nextChar, getKmferChar);
+                        i += 2;
+                    } else {
                         let index = uniqueChars.indexOf(nextChar);
-                        let modCharInverse = reverseMainBaseMap[index];
-                        console.log('mod char inverse should be all capital letters we are at end of string:', modCharInverse);
+                        console.log('Index for char', nextChar, ':', index);  // Debug index
+                        let modCharInverse = uniqueCharsInverse[index];
+                        console.log('Inverse for char', nextChar, ':', modCharInverse);  // Debug inverse
                         decryptedKMFERString += modCharInverse;
+                        i += 1;
                     }
-            }else if(isbaseDigit(nextChar)){
-                let jpanIntegerString = uniqueChars3.indexOf(nextChar).toString();// index should be the same as the digit because we used the magical base formula! 
-                decryptedKMFERString += jpanIntegerString;
-            }else{
-                let parts = '';
-                for(var m = 1 ;m <= modulus ; m++){
-                    parts+= encryptedString[i+m];
-                }
-                decryptedKMFERString+= parts;
-                i += modulus;
-            }
-            for(var k =0; k< repeatCountNumber; k++){
-                newString+=decryptedKMFERString;
-            }
-            decryptedString+= newString;
-        }else if (isInMainBase(char)) {
-            let decryptedKMFERString = '';
-            let modCharInverse = reverseMainBaseMap[char];
-            console.log('mod char inverse should be all capital letters:', modCharInverse);
-            if(i!= encryptedString.length){
-                const nextChar = encryptedString[i+1];
-                if(isAKMfer(nextChar)){
-                    decryptedKMFERString += mapCharsToTransformedWord(char, nextChar, uniqueChars2, reverseMainBaseMap);
-                    i += 1;
-                }else if(nextChar === '^'){
-                    decryptedKMFERString += modCharInverse.toLowerCase();
-                } else{
+                } else {
+                    let index = uniqueChars.indexOf(nextChar);
+                    console.log('Index for char', nextChar, ':', index);  // Debug index
+                    let modCharInverse = uniqueCharsInverse[index];
+                    console.log('Inverse for char', nextChar, ':', modCharInverse);  // Debug inverse
                     decryptedKMFERString += modCharInverse;
                 }
-            }else{
-               decryptedKMFERString = modCharInverse;
+            } 
+            else if (isbaseDigit(nextChar)) {
+                let jpanIntegerString = uniqueChars3.indexOf(nextChar).toString();
+                decryptedKMFERString += jpanIntegerString;
+            } 
+            else {
+                let parts = '';
+                for (let m = 1; m <= modulus; m++) {
+                    parts += encryptedString[i + m];
+                }
+                decryptedKMFERString += parts;
+                i += modulus;
             }
-            decryptedString+=decryptedKMFERString;
-        }else if(isbaseDigit(char)){
-            decryptedString+= uniqueChars3.indexOf(char).toString();// index should be the same as the digit because we used the magical base formula! 
-        } else {
+
+            for (let k = 0; k < repeatCountNumber; k++) {
+                newString += decryptedKMFERString;
+            }
+            decryptedString += newString;
+        }
+        // Handle characters in the main base alphabet
+        else if (isInMainBase(char)) {
+            let decryptedKMFERString = '';
+            let index = uniqueChars.indexOf(char);
+            console.log('Index for char', char, ':', index);  // Debug index
+            let modCharInverse = uniqueCharsInverse[index];
+            console.log('Inverse for char', char, ':', modCharInverse);  // Debug inverse
+
+            if (i != encryptedString.length) {
+                const nextChar = encryptedString[i + 1];
+
+                if (isAKMfer(nextChar)) {
+                    decryptedKMFERString += mapCharsToTransformedWord(char, nextChar);
+                    i += 1;
+                } else if (nextChar === '^') {
+                    decryptedKMFERString += modCharInverse.toLowerCase();
+                } else {
+                    decryptedKMFERString += modCharInverse;
+                }
+            } else if (char === '^') {
+                // Do nothing for "^"
+            } else {
+                decryptedKMFERString = modCharInverse;
+            }
+
+            decryptedString += decryptedKMFERString;
+        } 
+        else if (isbaseDigit(char)) {
+            decryptedString += uniqueChars3.indexOf(char).toString();
+        } 
+        else if (char != '^' && !parseInt(char)) {
             decryptedString += char;
+        } 
+        else if (parseInt(char)) {
+            let nextChar = encryptedString[i]; 
+            let skipperRouny = 0;
+
+            if (nextChar != '|') {
+                let newStringint = '';
+                for (let j = 0; j < decryptedString.length; j++) {
+                    let nextCharInt = decryptedString[j];
+                    if (!parseInt(nextCharInt)) {
+                        break;
+                    } else {
+                        newStringint += nextCharInt;
+                        skipperRouny += 1;
+                    }
+                }
+                if (newStringint != '') {
+                    let stringInt = parseInt(newStringint);
+                    i += skipperRouny;  // Skip past integer sequence
+                }
+            }
         }
     }
+    
     return decryptedString;
 }
 function isDigit(char) {
