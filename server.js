@@ -48,13 +48,6 @@ const bursonSkullzModelString = 'Burson Skullz';
 const contractCollectionString = 'NFT Contracts';
 const reportString = 'Reports Filed';
 
-const paintCollectionString = 'Painting';
-const purchasesCollectionString = 'Purchase';
-const commissionCollectionString = 'Commission';
-const bursonSkullzModelString = 'Burson Skullz';
-const contractCollectionString = 'NFT Contracts';
-const reportString = 'Reports Filed';
-
 const paintingUploadCode = 'Painting-code-here!';
 const appPasscode = 'google-app-passcode-here';
 const buisnessEmial = 'your-buisiness-email@gmail.com';
