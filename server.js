@@ -1,5 +1,5 @@
 // Name: Roy Burson 
-// Date last modified: 10-15-24
+// Date last modified: 10-16-24
 // purpose: Make web3 art website to coincide with research related life
 
 const maxNumberOfAIEventsPerClient = 100;
@@ -48,6 +48,13 @@ const bursonSkullzModelString = 'Burson Skullz';
 const contractCollectionString = 'NFT Contracts';
 const reportString = 'Reports Filed';
 
+const paintCollectionString = 'Painting';
+const purchasesCollectionString = 'Purchase';
+const commissionCollectionString = 'Commission';
+const bursonSkullzModelString = 'Burson Skullz';
+const contractCollectionString = 'NFT Contracts';
+const reportString = 'Reports Filed';
+
 const paintingUploadCode = 'Painting-code-here!';
 const appPasscode = 'google-app-passcode-here';
 const buisnessEmial = 'your-buisiness-email@gmail.com';
@@ -57,6 +64,7 @@ const MERRIAM_WEBSTER_API_KEY = 'YOUR-WEBSTER_API_KEY';
 const OPENAI_API_KEY = 'YOUR-OPENAI-API-KEY;
 const addNFTCollectionDataPasscode = 'your-passcode-to-add-nfts';
 const deployableContractPasscode = 'passcode-to-deploy-contract';
+
 
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
@@ -2026,6 +2034,8 @@ try{
 
             console.log(`Initializing base set symbols time:  ${duration.toFixed(2)} milliseconds.`);
             let kmferChars = setUniquePermutationMapping(modulus);
+
+            console.log('setting unique digit mapping');
             let japaneseChars = setUniqueDigitCharsMapping(modulus, digitBase); 
             uniqueChars = customSymbolArray;
 
@@ -2038,12 +2048,13 @@ try{
 
             console.log(`inverse of ${modulus}-char base map`, uniqueCharsInverse); // has been verified uncomment to check again
             console.log('inverse permutations ', uniqueChars2Inverse); // has been verified uncomment to check again
+            console.log('japaneseChars max of 4-char reduction (unique symbols not working) ', uniqueChars3); // has been verified uncomment to check again
 
-            const duplicator = hasDuplicates(uniqueChars);
+            //const duplicator = hasDuplicates(uniqueChars);
             var base64TestString = `data:image/png;base64,ABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAA
             BCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAABCDAAA23222332
             2AAAAAAAAAAAAAAAAAAAABCDAAA232223322AAAAAAAAAAAAAAAAAAAabVYKLIqWEAabVYKLIqWEAabVYKLIqWEAabVYKLIqWEAabVYKLIqWEAabVYKLIqWEAabcDabcD`;
-            if(uniqueChars.length >= mainBase**modulus && !duplicator){
+            if(uniqueChars.length >= mainBase**modulus){
                 console.log('calling compressor using unique set of symbols generated with length:', uniqueChars.length);
                 console.log(`Calling burson encryption using a ${modulus}-char reduction technique`);
                 const encryptedStringTest = BursonBase64Encrypted(base64TestString, modulus);
@@ -2432,8 +2443,10 @@ function drawStringFromSymbols(symbols) {
     });
     return symbolChars; 
 }
-function setMainUniquebaseCharMapping(modulus, alphabetBase) {
-    let baseLength = alphabetBase.length;
+
+function setMainUniquebaseCharMapping(modulus, alphabetBase)  {
+    /*
+        let baseLength = alphabetBase.length;
     const totalCount = baseLength**modulus;
     let chunkSize = 0;
     console.log(`setting ${totalCount} element inside main base`);
@@ -2462,8 +2475,52 @@ function setMainUniquebaseCharMapping(modulus, alphabetBase) {
         uniqueCharsInverse.push(InvSym); 
     }
     return customs;
-}
+    */
+    let baseLength = alphabetBase.length;
+    let uniqueChars = [];
+    const totalCharsNeeded = baseLength ** modulus;
+    const excludedRanges = [
+        [0x3040, 0x309F], // Hiragana
+        [0x30A0, 0x30FF], // Katakana
+        [0x4E00, 0x9FFF], // Kanji
+        [0x1780, 0x17FF], // Khmer
+        [0x005E, 0x005E], // "^" symbol
+        [0x007C, 0x007C], // "|" symbol
+        [0x0024, 0x0024], // "$" symbol
+        [0x005B, 0x005B], // "[" symbol
+        [0x0030, 0x0039], // Digits "0-9"
+        [0x0041, 0x005A], // Uppercase English letters (A-Z)
+        [0x0061, 0x007A]  // Lowercase English letters (a-z)
+    ];
+    function isExcluded(codePoint) {
+        for (let range of excludedRanges) {
+            if (codePoint >= range[0] && codePoint <= range[1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    for (let i = 0x0000; i <= 0x10FFFF; i++) {
+        if (!isExcluded(i) && (i <= 0xFFFF || i >= 0x10000)) {
+            try {
+                let char = String.fromCodePoint(i);
+                if (!/\d/.test(char)) {
+                    uniqueChars.push(char);
+                }
 
+                let InvSym = getModCharInverse(i, modulus, alphabetBase); // returns string of length M
+                uniqueCharsInverse.push(InvSym); 
+            } catch (e) {
+                console.log('Error adding symbols', e);
+            }
+        }
+        if (uniqueChars.length >= totalCharsNeeded) {
+            break;
+        }
+    }
+    console.log(`Unique character set length: ${uniqueChars.length}`);
+    return uniqueChars;
+}
 function getModCharInverse(x, modulus, mainBase) {
     let myArray = [];
     let baseLength = mainBase.length;
@@ -2529,6 +2586,9 @@ function setUniquePermutationMapping(modulus) {
     return khmerChars;
 }
 function setUniqueDigitCharsMapping(modulus,baseLength) {
+    // use japanese symbols
+
+    /*
     const totalCount = baseLength**modulus;
     console.log(`setting ${totalCount} elements to map the digit chunks to`);
     const chunkSize = 5000; 
@@ -2547,7 +2607,54 @@ function setUniqueDigitCharsMapping(modulus,baseLength) {
     }
     console.log(`Total custom symbols to map digit chunks: ${customs.length}`);
     return customs;
+
+    */
+    let jpanChars = [];  
+    let limit = baseLength ** modulus;
+
+    // Define the ranges for Hiragana, Katakana, and a limited set of Kanji (for example)
+    const hiraganaStart = 0x3040; // Hiragana range starts at 0x3040
+    const hiraganaEnd = 0x309F;   // Hiragana range ends at 0x309F
+
+    const katakanaStart = 0x30A0; // Katakana range starts at 0x30A0
+    const katakanaEnd = 0x30FF;   // Katakana range ends at 0x30FF
+
+    const kanjiStart = 0x4E00;    // Kanji range starts at 0x4E00
+    const kanjiEnd = 0x9FAF;      // Kanji range ends at 0x9FAF
+
+    // Calculate the total number of characters in all three ranges
+    const totalHiragana = hiraganaEnd - hiraganaStart + 1;
+    const totalKatakana = katakanaEnd - katakanaStart + 1;
+    const totalKanji = kanjiEnd - kanjiStart + 1;
+    const totalCharsInRange = totalHiragana + totalKatakana + totalKanji;
+
+    // Throw an error if the limit exceeds the available characters in the combined ranges
+    if (limit > totalCharsInRange) {
+        throw new Error(`Symbol limit of ${limit} exceeds the available range of ${totalCharsInRange} characters.`);
+    }
+
+    var counter = 0;     
+    // Add Hiragana characters
+    for (let i = hiraganaStart; i <= hiraganaEnd && counter < limit; i++) {
+        jpanChars.push(String.fromCharCode(i));
+        counter++;
+    }
+
+    // Add Katakana characters
+    for (let i = katakanaStart; i <= katakanaEnd && counter < limit; i++) {
+        jpanChars.push(String.fromCharCode(i));
+        counter++;
+    }
+
+    // Add Kanji characters
+    for (let i = kanjiStart; i <= kanjiEnd && counter < limit; i++) {
+        jpanChars.push(String.fromCharCode(i));
+        counter++;
+    }
+    
+    return jpanChars;
 }
+
 async function getNewDefinition(word) {
   const apiUrl =`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${MERRIAM_WEBSTER_API_KEY}`;
   try {
@@ -3375,7 +3482,7 @@ function numberToLetters(num, baseLength) {
 }
 
 function BursonBase64Decrypt(encryptedString, modulus) {
-    console.log('unique chars inverse', uniqueCharsInverse);
+    //console.log('unique chars inverse', uniqueCharsInverse);
     console.log('Calling Burson decompression with length', encryptedString.length);
     let decryptedString = ''; 
     let alphabet = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
@@ -3404,17 +3511,17 @@ function BursonBase64Decrypt(encryptedString, modulus) {
                         i += 2;
                     } else {
                         let index = uniqueChars.indexOf(nextChar);
-                        console.log('Index for char', nextChar, ':', index);  // Debug index
+                        //console.log('Index for char', nextChar, ':', index);  // Debug index
                         let modCharInverse = uniqueCharsInverse[index];
-                        console.log('Inverse for char', nextChar, ':', modCharInverse);  // Debug inverse
+                        //console.log('Inverse for char', nextChar, ':', modCharInverse);  // Debug inverse
                         decryptedKMFERString += modCharInverse;
                         i += 1;
                     }
                 } else {
                     let index = uniqueChars.indexOf(nextChar);
-                    console.log('Index for char', nextChar, ':', index);  // Debug index
+                    //console.log('Index for char', nextChar, ':', index);  // Debug index
                     let modCharInverse = uniqueCharsInverse[index];
-                    console.log('Inverse for char', nextChar, ':', modCharInverse);  // Debug inverse
+                    //console.log('Inverse for char', nextChar, ':', modCharInverse);  // Debug inverse
                     decryptedKMFERString += modCharInverse;
                 }
             } 
@@ -3440,9 +3547,9 @@ function BursonBase64Decrypt(encryptedString, modulus) {
         else if (isInMainBase(char)) {
             let decryptedKMFERString = '';
             let index = uniqueChars.indexOf(char);
-            console.log('Index for char', char, ':', index);  // Debug index
+            //console.log('Index for char', char, ':', index);  // Debug index
             let modCharInverse = uniqueCharsInverse[index];
-            console.log('Inverse for char', char, ':', modCharInverse);  // Debug inverse
+            //console.log('Inverse for char', char, ':', modCharInverse);  // Debug inverse
 
             if (i != encryptedString.length) {
                 const nextChar = encryptedString[i + 1];
