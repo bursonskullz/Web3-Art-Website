@@ -3376,9 +3376,9 @@ function getUniqueModulusChar(word, charArray, modLength) {
     */ 
     for (var i = 1; i<= modLength; i++) {
         if(i != modLength){
-            calculatedIndex += (alphabet.length ** (modLength-i)) * (alphabet.indexOf(word[i-1])+1)
+            calculatedIndex += (base ** (modLength-i)) * (alphabet.indexOf(word[i-1]))
         }else{
-            calculatedIndex += alphabet.indexOf(word[i-1])+1 
+            calculatedIndex += alphabet.indexOf(word[i-1]) 
         }
 
     }
